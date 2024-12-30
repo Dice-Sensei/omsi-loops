@@ -1,8 +1,3 @@
-let LZString;
-import('lz-string').then((module) => {
-  LZString = module;
-});
-
 function decompressFromBase64(item) {
   return LZString.decompressFromBase64(item);
 }

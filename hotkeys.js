@@ -64,18 +64,6 @@ class GameKeyboard {
   }
 }
 
-// Don't bind spacebar during button focus
-Mousetrap.prototype.stopCallback = (
-  (origStopCallback) =>
-  (
-    e,
-    element,
-    combo,
-  ) => (origStopCallback(e, element, combo) || (element.tagName === 'BUTTON' && combo === 'space'))
-)(Mousetrap.prototype.stopCallback);
-
-GameKeyboard.spins = [];
-
 function executeHotkey(action) {
   // @ts-ignore
   if (
@@ -129,54 +117,69 @@ globalThis.addEventListener('keydown', (e) => {
 
 // bind hotkeys
 
-GameKeyboard.bindHotkey('space', () => pauseGame());
-GameKeyboard.bindHotkey('r', () => manualRestart());
-GameKeyboard.bindHotkey('b', () => toggleOffline());
+GameKeyboard.spins = [];
+setTimeout(async () => {
+  await MousetrapPromise;
 
-for (let i = 1; i < 6; i++) {
-  // eslint-disable-next-line no-loop-func
-  GameKeyboard.bindHotkey(`shift+${i}`, () => loadLoadout(i));
-}
+  // Don't bind spacebar during button focus
+  Mousetrap.prototype.stopCallback = (
+    (origStopCallback) =>
+    (
+      e,
+      element,
+      combo,
+    ) => (origStopCallback(e, element, combo) || (element.tagName === 'BUTTON' && combo === 'space'))
+  )(Mousetrap.prototype.stopCallback);
 
-for (let i = 1; i <= 9; i++) {
-  GameKeyboard.bindHotkey(`${i}`, () => changeActionAmount(i));
-}
-GameKeyboard.bindHotkey('0', () => changeActionAmount(actions.addAmount * 10));
-GameKeyboard.bindHotkey('backspace', () => changeActionAmount(Math.floor(actions.addAmount / 10)));
+  GameKeyboard.bindHotkey('space', () => pauseGame());
+  GameKeyboard.bindHotkey('r', () => manualRestart());
+  GameKeyboard.bindHotkey('b', () => toggleOffline());
 
-GameKeyboard.bindHotkey('shift+s', () => saveList());
-GameKeyboard.bindHotkey('shift+l', () => loadList());
-GameKeyboard.bindHotkey('shift+c', () => clearList());
+  for (let i = 1; i < 6; i++) {
+    // eslint-disable-next-line no-loop-func
+    GameKeyboard.bindHotkey(`shift+${i}`, () => loadLoadout(i));
+  }
 
-GameKeyboard.bindRepeatableHotkey('=', () => adjustActionListSize(100));
-GameKeyboard.bindRepeatableHotkey('-', () => adjustActionListSize(-100));
-// devs need hotkeys too okay
-if (globalThis.location.href.includes('http://10.0.0.3:8080/loops/')) GameKeyboard.bindHotkey('c', () => cheat());
+  for (let i = 1; i <= 9; i++) {
+    GameKeyboard.bindHotkey(`${i}`, () => changeActionAmount(i));
+  }
+  GameKeyboard.bindHotkey('0', () => changeActionAmount(actions.addAmount * 10));
+  GameKeyboard.bindHotkey('backspace', () => changeActionAmount(Math.floor(actions.addAmount / 10)));
 
-GameKeyboard.bind('shift', () => setShiftKey(true), 'keydown');
-GameKeyboard.bind('shift', () => setShiftKey(false), 'keyup');
-GameKeyboard.bind(['ctrl', 'command'], () => setControlKey(true), 'keydown');
-GameKeyboard.bind(['ctrl', 'command'], () => setControlKey(false), 'keyup');
+  GameKeyboard.bindHotkey('shift+s', () => saveList());
+  GameKeyboard.bindHotkey('shift+l', () => loadList());
+  GameKeyboard.bindHotkey('shift+c', () => clearList());
 
-function handleTownHotkey(townNum) {
-  if (townNum === undefined) return;
-  if (townsUnlocked.includes(townNum)) view.showTown(townNum);
-}
+  GameKeyboard.bindRepeatableHotkey('=', () => adjustActionListSize(100));
+  GameKeyboard.bindRepeatableHotkey('-', () => adjustActionListSize(-100));
+  // devs need hotkeys too okay
+  if (globalThis.location.href.includes('http://10.0.0.3:8080/loops/')) GameKeyboard.bindHotkey('c', () => cheat());
 
-function undo() {
-  actions.undoLast();
-  view.updateNextActions();
-  view.updateLockedHidden();
-}
+  GameKeyboard.bind('shift', () => setShiftKey(true), 'keydown');
+  GameKeyboard.bind('shift', () => setShiftKey(false), 'keyup');
+  GameKeyboard.bind(['ctrl', 'command'], () => setControlKey(true), 'keydown');
+  GameKeyboard.bind(['ctrl', 'command'], () => setControlKey(false), 'keyup');
 
-GameKeyboard.bindHotkey('right', () => handleTownHotkey(townsUnlocked[townsUnlocked.indexOf(townShowing) + 1]));
-GameKeyboard.bindHotkey('d', () => handleTownHotkey(townsUnlocked[townsUnlocked.indexOf(townShowing) + 1]));
-GameKeyboard.bindHotkey('left', () => handleTownHotkey(townsUnlocked[townsUnlocked.indexOf(townShowing) - 1]));
-GameKeyboard.bindHotkey('a', () => handleTownHotkey(townsUnlocked[townsUnlocked.indexOf(townShowing) - 1]));
+  function handleTownHotkey(townNum) {
+    if (townNum === undefined) return;
+    if (townsUnlocked.includes(townNum)) view.showTown(townNum);
+  }
 
-GameKeyboard.bindHotkey('shift+right', () => view.showActions(true));
-GameKeyboard.bindHotkey('shift+d', () => view.showActions(true));
-GameKeyboard.bindHotkey('shift+left', () => view.showActions(false));
-GameKeyboard.bindHotkey('shift+a', () => view.showActions(false));
+  function undo() {
+    actions.undoLast();
+    view.updateNextActions();
+    view.updateLockedHidden();
+  }
 
-GameKeyboard.bindHotkey('shift+z', () => undo());
+  GameKeyboard.bindHotkey('right', () => handleTownHotkey(townsUnlocked[townsUnlocked.indexOf(townShowing) + 1]));
+  GameKeyboard.bindHotkey('d', () => handleTownHotkey(townsUnlocked[townsUnlocked.indexOf(townShowing) + 1]));
+  GameKeyboard.bindHotkey('left', () => handleTownHotkey(townsUnlocked[townsUnlocked.indexOf(townShowing) - 1]));
+  GameKeyboard.bindHotkey('a', () => handleTownHotkey(townsUnlocked[townsUnlocked.indexOf(townShowing) - 1]));
+
+  GameKeyboard.bindHotkey('shift+right', () => view.showActions(true));
+  GameKeyboard.bindHotkey('shift+d', () => view.showActions(true));
+  GameKeyboard.bindHotkey('shift+left', () => view.showActions(false));
+  GameKeyboard.bindHotkey('shift+a', () => view.showActions(false));
+
+  GameKeyboard.bindHotkey('shift+z', () => undo());
+}, 0);

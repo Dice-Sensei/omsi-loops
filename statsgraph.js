@@ -36,6 +36,7 @@ class StatGraph {
     if (this.initalized) return;
     const orderedStats = statList.map((s) => stats[s]);
     const datasets = this.getGraphDatasets();
+
     this.statsContainer = d3.select(statsContainer).datum(stats);
     this.svg = /** @type {d3.Selection<SVGSVGElement>} */ (d3.select('svg#statChart')).datum(stats);
     for (const layer of ['axes', 'legend', 'scaleLines', 'data']) {
@@ -269,5 +270,3 @@ class StatGraph {
 }
 
 const statGraph = new StatGraph();
-
-let radarModifier;

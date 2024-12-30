@@ -64,14 +64,17 @@ const Views = globalThis['Views'] = {
     if (canDraw) {
       Views.views.push(viewName);
     }
-    // @ts-ignore
+
     Views[viewName] = view;
     return view;
   },
   views: [],
   draw() {
-    for (const viewName of Views.views) {
-      $(Views[viewName].selector).html(Views[viewName].html());
+    for (const view of Views.views) {
+      const element = document.querySelector(Views[view].selector);
+      if (!element) throw Error(`Invalid selector for view ${view}`);
+
+      element.innerHTML = Views[view].html();
     }
   },
 };

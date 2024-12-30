@@ -3,11 +3,13 @@ const timeControlsView = Views.registerView('timeControls', {
   stories() {
     let html = '';
     // eslint-disable-next-line no-unused-vars
+
     _txtsObj('time_controls>stories>story').each((index, story) => {
       html += `<div id='story${$(story).attr('num')}'>
                 ${$(story).text()}
             </div>`;
     });
+
     return html;
   },
   html() {
