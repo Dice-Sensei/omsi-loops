@@ -1,20 +1,5 @@
 import * as d3 from 'd3';
 
-type Stat = {
-  name: StatName;
-  short_form: StatName;
-  manaMultiplier: number;
-};
-type StatName = string;
-type StatRecord = Record<StatName, Stat>;
-
-declare global {
-  var statList: StatName[];
-  var stats: StatRecord;
-
-  var _txt: (key: string) => string;
-}
-
 type Dataset = {
   name: string;
   label: string;
@@ -309,10 +294,6 @@ export class StatGraph {
 
     view.updateStatGraphNeeded = false;
   }
-}
-
-declare global {
-  var trash: { StatGraph: typeof StatGraph };
 }
 
 globalThis.trash ??= { StatGraph };

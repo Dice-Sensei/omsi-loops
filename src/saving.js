@@ -112,7 +112,7 @@ function initializeTowns() {
   }
 }
 
-const statList = /** @type {const} */ (['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul']);
+const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
 /** @typedef {typeof statList[number]} StatName */
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
 let totalTalent = 0;
@@ -120,7 +120,6 @@ let totalTalent = 0;
 let shouldRestart = true;
 
 // let prestigeValues = {};
-
 // let prestigeCurrentPoints = 0;
 // let prestigeTotalPoints = 0;
 // let completedCurrentPrestige = false;
@@ -170,7 +169,6 @@ let curLoadout = 0;
 let loadouts;
 /** @type {string[] & {"-1"?: string}} */
 let loadoutnames;
-//let loadoutnames = ["1", "2", "3", "4", "5"];
 const skillList = /** @type {const} */ ([
   'Combat',
   'Magic',
