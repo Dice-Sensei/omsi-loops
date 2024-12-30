@@ -8,7 +8,7 @@
   },
   "lint": {
     "rules": {
-      "exclude": ["no-namespace"]
+      "exclude": ["no-namespace", "no-var"]
     }
   },
   "fmt": {

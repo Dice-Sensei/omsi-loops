@@ -1,49 +1,114 @@
-class StatGraph {
-  /** @typedef {ReturnType<StatGraph["getGraphDatasets"]>[number]} Dataset */
-  /**
-   * @typedef {{
-   *     type: string,
-   *     options: any,
-   *     data: {
-   *         datasets: Dataset[],
-   *     },
-   * }} GraphObject
-   */
+import * as d3 from 'd3';
 
+type Stat = {
+  name: StatName;
+  short_form: StatName;
+  manaMultiplier: number;
+};
+type StatName = string;
+type StatRecord = Record<StatName, Stat>;
+
+declare global {
+  var statList: StatName[];
+  var stats: StatRecord;
+
+  var _txt: (key: string) => string;
+}
+
+type Dataset = {
+  name: string;
+  label: string;
+  data: (stat: Stat) => number;
+  enabled: boolean;
+};
+
+type GraphObject = {
+  type: string;
+  options: {
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (context: { dataset: Dataset; raw: number }) => string;
+        };
+      };
+    };
+    elements: {
+      line: {
+        tension: number;
+        borderWidth: number;
+      };
+      point: {
+        radius: number;
+        hoverRadius: number;
+        hitRadius: number;
+      };
+    };
+    scales: {
+      r: {
+        suggestedMin: number;
+        suggestedMax: number;
+        ticks: {
+          showLabelBackdrop: boolean;
+          maxTicksLimit: number;
+          stepSize: number;
+          precision: number;
+          z: number;
+        };
+      };
+    };
+  };
+  data: { datasets: Dataset[] };
+};
+
+const format = (value: number) => {
+  if (value > 99.99999999) return value.toPrecision(12);
+  else if (value > 99.999999) return value.toPrecision(10);
+  else if (value > 99.9999) return value.toPrecision(8);
+  else if (value > 99.99) return value.toPrecision(6);
+  else if (value === 0) return 0;
+  return value.toPrecision(4);
+};
+
+export class StatGraph {
   radius = 150;
   initalized = false;
 
-  /** @type {d3.ScaleBand<StatName>} */
-  statScale;
+  statScale!: d3.ScaleBand<StatName>;
+  graphObject!: GraphObject;
+  svg!: d3.Selection<SVGSVGElement, StatRecord, null, unknown>;
+  statsContainer!: d3.Selection<HTMLElement, StatRecord, null, unknown>;
 
-  /** @type {GraphObject} */
-  graphObject = null;
-  /** @type {d3.Selection<SVGSVGElement, Record<StatName, Stat>, HTMLElement, any>} */
-  svg;
-  /** @type {d3.Selection<HTMLElement, Record<StatName, Stat>>} */
-  statsContainer;
-
-  /** @param {StatName} stat */
-  getAxisTip(stat) {
-    return d3.pointRadial(this.statScale(stat), this.radius + 10);
+  getAxisTip(stat: StatName): [x: number, y: number] {
+    return d3.pointRadial(this.statScale(stat)!, this.radius + 10);
   }
 
-  /** @param {HTMLElement} statsContainer */
-  init(statsContainer) {
+  init(container: HTMLElement): void {
     if (this.initalized) return;
+
     const orderedStats = statList.map((s) => stats[s]);
-    const datasets = this.getGraphDatasets();
+    const datasets: Dataset[] = [{
+      name: 'mana_cost_reduction',
+      label: _txt('stats>tooltip>mana_cost_reduction'),
+      data: ({ manaMultiplier }) => (1 - manaMultiplier) * 100,
+      enabled: true,
+    }];
 
-    this.statsContainer = d3.select(statsContainer).datum(stats);
-    this.svg = /** @type {d3.Selection<SVGSVGElement>} */ (d3.select('svg#statChart')).datum(stats);
-    for (const layer of ['axes', 'legend', 'scaleLines', 'data']) {
-      this.svg.append('g')
-        .classed(`layer ${layer}`, true);
-    }
+    this.statsContainer = d3.select(container).datum(stats);
+    this.svg = d3.select('svg#statChart').datum(stats) as unknown as d3.Selection<
+      SVGSVGElement,
+      StatRecord,
+      null,
+      unknown
+    >;
+    this.svg.append('g').classed(`layer axes`, true);
+    this.svg.append('g').classed(`layer legend`, true);
+    this.svg.append('g').classed(`layer scaleLines`, true);
+    this.svg.append('g').classed(`layer data`, true);
 
-    const tScale = this.statScale = d3.scaleBand(statList, [0, Math.PI * 2]);
+    const tScale = d3.scaleBand<StatName>(statList, [0, Math.PI * 2]);
+    this.statScale = tScale;
 
-    const axes = /** @type {d3.Selection<SVGGElement, Stat>} */ (this.svg.selectChild('g.layer.axes')
+    this.svg.selectChild('g.layer.axes')
       .selectAll('g.axis')
       .data(orderedStats, (s) => s.name)
       .join((enter) =>
@@ -61,17 +126,21 @@ class StatGraph {
       .call((axis) =>
         axis
           .selectChild('path')
-          .attr('d', (stat) => d3.lineRadial()([[tScale(stat.name), 0], [tScale(stat.name), this.radius]]))
+          .attr('d', (stat) =>
+            d3.lineRadial()([[this.statScale(stat.name)!, 0], [this.statScale(stat.name)!, this.radius]]))
       )
       .call((axis) =>
         axis
           .selectChild('g.label')
-          .attr('transform', (stat) => `translate(${d3.pointRadial(tScale(stat.name), this.radius + 10).join()})`)
+          .attr(
+            'transform',
+            (stat) => `translate(${d3.pointRadial(this.statScale(stat.name)!, this.radius + 10).join()})`,
+          )
           .selectChild('text')
           .text((stat) => stat.short_form)
-      ));
+      );
 
-    const legend = this.svg.selectChild('g.legend')
+    this.svg.selectChild('g.legend')
       .attr('transform', `translate(0, ${-this.radius - 20})`)
       .selectChildren('g.dataset')
       .data(datasets)
@@ -97,10 +166,10 @@ class StatGraph {
           .attr('width', 25)
           .attr('height', 10)
       )
-      .attr('transform', /** @this {SVGGElement} */ function () {
-        const bbox = this.getBBox();
-        console.log(this, bbox);
-        return `translate(-${(bbox.width + bbox.x * 2) / 2}, 0)`;
+      .attr('transform', function () {
+        const { width, x } = (this as SVGGElement).getBBox();
+
+        return `translate(-${(width + x * 2) / 2}, 0)`;
       });
 
     this.graphObject = {
@@ -109,17 +178,7 @@ class StatGraph {
         plugins: {
           tooltip: {
             callbacks: {
-              label(context) {
-                // format raw value as a reasonable percentage
-                let formattedValue = context.raw;
-                if (formattedValue > 99.99999999) formattedValue = formattedValue.toPrecision(12);
-                else if (formattedValue > 99.999999) formattedValue = formattedValue.toPrecision(10);
-                else if (formattedValue > 99.9999) formattedValue = formattedValue.toPrecision(8);
-                else if (formattedValue > 99.99) formattedValue = formattedValue.toPrecision(6);
-                else if (formattedValue === 0) formattedValue = 0;
-                else formattedValue = formattedValue.toPrecision(4);
-                return `${context.dataset.label}: ${formattedValue}%`;
-              },
+              label: ({ raw, dataset }) => `${dataset.label}: ${format(raw)}%`,
             },
           },
         },
@@ -148,40 +207,22 @@ class StatGraph {
           },
         },
       },
-      data: {
-        datasets,
-      },
+      data: { datasets },
     };
+
     this.initalized = true;
     this.update();
   }
 
-  /** @param {Stat} stat  */
-  static getManaCostReduction(stat) {
-    return (1 - stat.manaMultiplier) * 100;
-  }
-
-  /** @param {Dataset} dataset  */
-  autoscaleRange(dataset) {
-    const dataMax = d3.max(Object.values(stats).map(dataset.data));
+  autoscaleRange(dataset: Dataset): [min: number, max: number] {
+    const dataMax = d3.max(Object.values(stats).map(dataset.data))!;
     const scaleMax = Math.max(Math.ceil(dataMax / 10) * 12.5, 22.5);
-    const ticks = d3.ticks(.01, scaleMax, 3);
+    const ticks = d3.ticks(0.01, scaleMax, 3);
+
     return [0, Math.max(scaleMax, ticks[ticks.length - 1] * 1.25)];
   }
 
-  getGraphDatasets() {
-    const datasets = [
-      {
-        name: 'mana_cost_reduction',
-        label: _txt('stats>tooltip>mana_cost_reduction'),
-        data: StatGraph.getManaCostReduction,
-        enabled: true,
-      },
-    ];
-    return datasets;
-  }
-
-  update(skipAnimation) {
+  update(skipAnimation: boolean = false): void {
     if (!this.initalized) return;
 
     const tScale = this.statScale;
@@ -193,8 +234,9 @@ class StatGraph {
       .domain(autoscale)
       .range([0, this.radius]);
 
-    const pointScale = ([name, value]) => d3.pointRadial(tScale(name), rScale(value));
-    const line = /** @type {() => d3.LineRadial<StatName>} */ (d3.lineRadial)().angle(tScale);
+    const pointScale = ([name, value]: [StatName, number]) => d3.pointRadial(tScale(name)!, rScale(value)!);
+
+    const line = d3.lineRadial().angle(tScale);
     const ticks = d3.ticks(1, autoscale[1], 3);
 
     const closedStatNames = [...statList, statList[0]];
@@ -205,7 +247,7 @@ class StatGraph {
 
     this.svg.selectChild('g.layer.scaleLines')
       .selectAll('g.scaleLine')
-      .data(ticks, (t) => t)
+      .data(ticks, (t) => t as number)
       .join((enter) =>
         enter
           .append('g')
@@ -217,14 +259,14 @@ class StatGraph {
       .call((lines) =>
         lines
           .selectChild('path')
-          .attr('d', (d) => line.radius((_) => rScale(d))(closedStatNames))
+          .attr('d', (d) => line.radius(() => rScale(d))(closedStatNames))
       )
       .call((lines) =>
         lines
           .selectChild('text')
           .attr('x', 0)
           .attr('y', (d) => -rScale(d) - 2)
-          .text((d) => d)
+          .text((d) => d.toString())
       );
 
     this.svg.selectChild('g.layer.data')
@@ -243,12 +285,12 @@ class StatGraph {
           .transition(transition)
           .attr('points', (set) => closedStats.map((stat) => pointScale([stat.name, set.data(stat)]).join()).join(' '))
       )
-      .call((sets) =>
-        sets
+      .call((datasets) =>
+        datasets
           .selectChildren('g.datapoint')
           .data(
-            (set) => Object.values(stats).map((stat) => /** @type {[Dataset, Stat]} */ ([set, stat])),
-            ([_, stat]) => stat.name,
+            (dataset) => Object.values(stats).map((stat) => [dataset, stat]),
+            ([, stat]: any) => stat.name,
           )
           .join((enter) =>
             enter
@@ -257,7 +299,10 @@ class StatGraph {
               .call((enter) => enter.append('circle'))
           )
           .transition(transition)
-          .attr('transform', ([set, stat]) => `translate(${pointScale([stat.name, set.data(stat)]).join()})`)
+          .attr(
+            'transform',
+            ([dataset, stat]: any) => `translate(${pointScale([stat.name, dataset.data(stat)]).join()})`,
+          )
           .selectChild('circle')
           .attr('r', this.graphObject.options.elements.point.radius)
       );
@@ -266,5 +311,8 @@ class StatGraph {
   }
 }
 
-globalThis.trash ??= {};
-globalThis.trash.StatGraph = StatGraph;
+declare global {
+  var trash: { StatGraph: typeof StatGraph };
+}
+
+globalThis.trash ??= { StatGraph };
