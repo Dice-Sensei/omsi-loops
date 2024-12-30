@@ -1,7 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
   "name": "Idle Loops",
-  "short_name": "Idle Loops",
+  "short_name": "IL",
+  "categories": [
+    "games",
+    "entertainment",
+    "idle",
+    "incremental",
+    "time-loop",
+    "idle-game",
+    "idle-incremental",
+    "idle-time-loop",
+    "idle-game-incremental",
+    "idle-game-time-loop"
+  ],
   "start_url": ".",
   "display": "standalone",
   "background_color": "#111811",
