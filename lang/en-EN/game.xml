@@ -784,7 +784,7 @@
         <!--countable items with names and counts on the top bar-->
         <resource id="power" initially_hidden="true">
             <label>Divine Power</label>
-            <title><![CDATA[<img src="img/power.svg" class="smallIcon">]]></title>
+            <title><![CDATA[<img src="icons/power.svg" class="smallIcon">]]></title>
             <desc>Powers of the gods.</desc>
         </resource>
         <resource id="timer" no_reset_on_restart="true">
@@ -874,48 +874,48 @@
         </resource>
         <resource id="heart" initially_hidden="true">
             <label>Beating Hearts</label>
-            <title><![CDATA[<img src="img/heart.svg" class="smallIcon">]]></title>
+            <title><![CDATA[<img src="icons/heart.svg" class="smallIcon">]]></title>
             <desc>The still-beating heart of your target. The Assassin's guild will reward you for this.</desc>
         </resource>
         <!--singular items with img icons rather than counts-->
         <resource id="glasses" initially_hidden="true" no_count="true">
             <label>Glasses</label>
-            <title><![CDATA[<img src="img/buyGlasses.svg" class="smallIcon">]]></title>
+            <title><![CDATA[<img src="icons/buyGlasses.svg" class="smallIcon">]]></title>
             <desc>Woah, trees have so many leaves on them.</desc>
         </resource>
         <resource id="supplies" initially_hidden="true" no_count="true">
             <label>Travel Supplies</label>
-            <title><![CDATA[<img src="img/buySupplies.svg" class="smallIcon">]]></title>
+            <title><![CDATA[<img src="icons/buySupplies.svg" class="smallIcon">]]></title>
             <desc>Needed to go to the next town.</desc>
         </resource>
         <resource id="pickaxe" initially_hidden="true" no_count="true">
             <label>Pickaxe</label>
-            <title><![CDATA[<img src="img/buyPickaxe.svg" class="smallIcon">]]></title>
+            <title><![CDATA[<img src="icons/buyPickaxe.svg" class="smallIcon">]]></title>
             <desc>It's heavy, but you can make use of it.</desc>
         </resource>
         <resource id="loopingPotion" initially_hidden="true" no_count="true">
             <label>Looping Potion</label>
-            <title><![CDATA[<img src="img/loopingPotion.svg" class="smallIcon">]]></title>
+            <title><![CDATA[<img src="icons/loopingPotion.svg" class="smallIcon">]]></title>
             <desc>It's a potion made with the very same formula that got you into this mess. Why exactly did you make this?</desc>
         </resource>
         <resource id="citizenship" initially_hidden="true" no_count="true">
             <label>Valhalla Citizenship</label>
-            <title><![CDATA[<img src="img/seekCitizenship.svg" class="smallIcon">]]></title>
+            <title><![CDATA[<img src="icons/seekCitizenship.svg" class="smallIcon">]]></title>
             <desc>You're one of Valhalla's proud citizens now, giving you the right to fight in their honor.</desc>
         </resource>
         <resource id="pegasus" initially_hidden="true" no_count="true">
             <label>Pegasus</label>
-            <title><![CDATA[<img src="img/pegasus.svg" class="smallIcon">]]></title>
+            <title><![CDATA[<img src="icons/pegasus.svg" class="smallIcon">]]></title>
             <desc>A horse with great angelic wings. It can run across clouds as easily as dirt.</desc>
         </resource>
         <resource id="key" initially_hidden="true" no_count="true">
             <label>Commerceville Key</label>
-            <title><![CDATA[<img src="img/purchaseKey.svg" class="smallIcon">]]></title>
+            <title><![CDATA[<img src="icons/purchaseKey.svg" class="smallIcon">]]></title>
             <desc>Needed to go to the next town.</desc>
         </resource>
         <resource id="stone" initially_hidden="true" no_count="true">
             <label>Temporal Stone</label>
-            <title><![CDATA[<img src="img/temporalStone.svg" class="smallIcon">]]></title>
+            <title><![CDATA[<img src="icons/temporalStone.svg" class="smallIcon">]]></title>
             <desc>A strange rock that seems unaffected by the time loops.</desc>
         </resource>
     </tracked_resources>

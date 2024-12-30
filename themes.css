@@ -42,8 +42,8 @@
   --action-capped-hover-background: #a8a8a8;
 
   --story-color: black;
-  --story-background: url(img/misc/textureDesaturated.png);
-  --story-completed-background: url(img/misc/texture.png);
+  --story-background: url(icons/misc/textureDesaturated.png);
+  --story-completed-background: url(icons/misc/texture.png);
   --story-border: #b89651;
   --story-button-color: #b5a585;
   --story-button-completed-color: #b89651;
@@ -109,8 +109,8 @@
   --scrollbar-button-background: #87c489;
   --scrollbar-button-color: black;
   --scrollbar-button-hover-background: #54ac57;
-  --scrollbar-button-vertical-decrement-background: url('img/misc/arrowUpLight.svg');
-  --scrollbar-button-vertical-increment-background: url('img/misc/arrowDownLight.svg');
+  --scrollbar-button-vertical-decrement-background: url('icons/misc/arrowUpLight.svg');
+  --scrollbar-button-vertical-increment-background: url('icons/misc/arrowDownLight.svg');
 
   --actions-scrollbar-track-background: #99c193;
   --actions-scrollbar-button-background: #4caf50;
@@ -239,8 +239,8 @@
   --action-capped-hover-background: #575757;
 
   --story-color: white;
-  --story-background: url(img/misc/textureDesaturated-dark.png);
-  --story-completed-background: url(img/misc/texture-dark.png);
+  --story-background: url(icons/misc/textureDesaturated-dark.png);
+  --story-completed-background: url(icons/misc/texture-dark.png);
   --story-border: #b89651;
   --story-button-color: #b5a585;
   --story-button-completed-color: #b89651;
@@ -307,8 +307,8 @@
   --scrollbar-button-background: #256628;
   --scrollbar-button-color: black;
   --scrollbar-button-hover-background: #427439;
-  --scrollbar-button-vertical-decrement-background: url('img/misc/arrowUpDark.svg');
-  --scrollbar-button-vertical-increment-background: url('img/misc/arrowDownDark.svg');
+  --scrollbar-button-vertical-decrement-background: url('icons/misc/arrowUpDark.svg');
+  --scrollbar-button-vertical-increment-background: url('icons/misc/arrowDownDark.svg');
 
   --actions-scrollbar-track-background: #567e49;
   --actions-scrollbar-button-background: #4caf50;

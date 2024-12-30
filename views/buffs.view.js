@@ -10,7 +10,7 @@ const buffsView = Views.registerView('buffsContainer', {
       html +=
         `<div class="buffContainer showthat" id="buff${buff}Container" onmouseover="view.showBuff('${buff}')" onmouseout="view.showBuff(undefined)">
                     <div class="buffNameContainer">
-                        <img class="buffIcon" src="img/${camelize(fullName)}.svg">
+                        <img class="buffIcon" src="icons/${camelize(fullName)}.svg">
                         <div class="skillLabel medium bold">${_txt(`buffs>${XMLName}>label`)}</div>
                         <div class="showthis">
                             <span>${_txt(`buffs>${XMLName}>desc`)}</span>

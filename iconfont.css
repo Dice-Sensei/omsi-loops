@@ -2,7 +2,7 @@
   font-family: IdleLoopsIcons;
   font-style: normal;
   font-weight: normal;
-  src: url(img/IdleLoopsIcons.woff2);
+  src: url(icons/IdleLoopsIcons.woff2);
 }
 
 .il-icon::before {

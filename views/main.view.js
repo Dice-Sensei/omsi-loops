@@ -831,7 +831,7 @@ class View {
       .call((container) =>
         container
           .select('div.nextActionLoops > img')
-          .property('src', (a) => `img/${a.action.imageName}.svg`)
+          .property('src', (a) => `icons/${a.action.imageName}.svg`)
       )
       .call((container) =>
         container
@@ -860,7 +860,7 @@ class View {
         `<div class='curActionContainer small' onmouseover='view.mouseoverAction(${i}, true)' onmouseleave='view.mouseoverAction(${i}, false)'>
                     <div class='curActionBar' id='action${i}Bar'></div>
                     <div class='actionSelectedIndicator' id='action${i}Selected'></div>
-                    <img src='img/${imageName}.svg' class='smallIcon'>
+                    <img src='icons/${imageName}.svg' class='smallIcon'>
                     <div id='action${i}LoopsDone' style='margin-left:3px; border-left: 1px solid var(--action-separator-border);padding-left: 3px;'>${actionLoopsDone}</div>
                     /<div id='action${i}Loops'>${actionLoops}</div>
                 </div>`;
@@ -1479,7 +1479,7 @@ class View {
     ];
     if (action.affectedBy) {
       for (let i = 0; i < action.affectedBy.length; i++) {
-        extraImage += `<img src='img/${
+        extraImage += `<img src='icons/${
           camelize(action.affectedBy[i])
         }.svg' class='smallIcon' draggable='false' style='position:absolute;${extraImagePositions[i]}'>`;
       }
@@ -1508,7 +1508,7 @@ class View {
             >
                 <label>${action.label}</label><br>
                 <div style='position:relative'>
-                    <img src='img/${imageName}.svg' class='superLargeIcon' draggable='false'>${extraImage}
+                    <img src='icons/${imageName}.svg' class='superLargeIcon' draggable='false'>${extraImage}
                 </div>
                 ${statPie}
                 <div class='showthis when-unlocked' draggable='false'>
@@ -1561,7 +1561,7 @@ class View {
         `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='hideNotification("storyContainer${action.varName}")'>${action.label}
                     <br>
                     <div style='position:relative'>
-                        <img src='img/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>
+                        <img src='icons/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>
                         <div id='storyContainer${action.varName}Notification' class='notification storyNotification'></div>
                     </div>
                     <div class='showthisstory' draggable='false'>
