@@ -104,7 +104,7 @@ function prestigeWithNewValues(nextPrestigeValues, nextPrestigeBuffs) {
   pauseGame();
 
   // Regain prestige values and Totals
-  for (const [key, value] of typedEntries(nextPrestigeBuffs)) {
+  for (const [key, value] of Object.entries(nextPrestigeBuffs)) {
     addBuffAmt(key, 0); // Set them to 0
     addBuffAmt(key, value); // Then set them to actual value
     view.requestUpdate('updateBuff', key);

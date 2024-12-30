@@ -501,7 +501,7 @@ const Koviko = {
       /** @type {Partial<NextActionEntry>[]} */
       const actions = [];
 
-      for (const name of typedKeys(this.predictions)) {
+      for (const name of Object.keys(this.predictions)) {
         actions.push({ name: name, loops: 100 });
       }
 
@@ -1892,7 +1892,7 @@ const Koviko = {
       this.predictions = {};
 
       // Create predictions
-      for (const name of typedKeys(predictions)) {
+      for (const name of Object.keys(predictions)) {
         this.predictions[name] = new Koviko.Prediction(name, predictions[name]);
         if (name == 'Secret Trial') {
           this.predictions['Secret Trial']._updateTicks = this.predictions[name].updateTicks;

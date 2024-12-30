@@ -1325,7 +1325,7 @@ function doLoad(toLoad) {
 
   totalOfflineMs = toLoad.totalOfflineMs === undefined ? 0 : toLoad.totalOfflineMs; // must load before options
 
-  for (const option of typedKeys(options)) {
+  for (const option of Object.keys(options)) {
     loadOption(option, options[option]);
   }
   storyShowing = toLoad.storyShowing === undefined ? 0 : toLoad.storyShowing;
@@ -1505,14 +1505,9 @@ function processSave(saveData) {
       return;
     }
   }
-  let saveJson = '';
-  // idle loops save version 01. patch v0.94, moved from old save system to lzstring base 64
-  if (saveData.substr(0, 6) === 'ILSV01') {
-    saveJson = decompressFromBase64(saveData.substr(6));
-  } else {
-    // handling for old saves from stopsign or patches prior to v0.94
-    saveJson = decode(saveData);
-  }
+
+  const saveJson = decompressFromBase64(saveData.slice(6));
+
   if (saveJson) {
     storeSaveJson(saveJson);
   }

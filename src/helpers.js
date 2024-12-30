@@ -9,57 +9,12 @@ Math.log10 = Math.log10 || function (x) {
   return Math.log(x) * Math.LOG10E;
 };
 
-function round1(num) {
-  return Math.floor(num * 10) / 10;
-}
-function round2(num) {
-  return Math.floor(num * 100) / 100;
-}
-
-function precision2(num) {
-  return Number(num.toPrecision(2));
-}
 function precision3(num) {
   return Number(num.toPrecision(3));
-}
-function precision4(num) {
-  return Number(num.toPrecision(4));
-}
-
-function pxToInt(num) {
-  return parseFloat(num.substring(0, num.indexOf('px')));
-}
-
-function round(num) {
-  return formatNumber(num);
 }
 
 function formatNumber(num) {
   return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
-}
-
-function formatTime(seconds) {
-  if (seconds > 300) {
-    let second = Math.floor(seconds % 60);
-    let minute = Math.floor(seconds / 60 % 60);
-    let hour = Math.floor(seconds / 60 / 60 % 24);
-    let day = Math.floor(seconds / 60 / 60 / 24);
-
-    let timeString = '';
-    if (day > 0) timeString += day + 'd ';
-    if (day > 0 || hour > 0) timeString += hour + 'h ';
-    if (day > 0 || hour > 0 || minute > 0) timeString += minute + 'm ';
-    timeString += second + 's';
-
-    return timeString;
-  }
-  if (Number.isInteger(seconds)) {
-    return (formatNumber(seconds) + _txt('time_controls>seconds')).replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
-  }
-  if (seconds < 10) {
-    return seconds.toFixed(2) + _txt('time_controls>seconds');
-  }
-  return (seconds.toFixed(1) + _txt('time_controls>seconds')).replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
 }
 
 function copyArray(arr) {
@@ -69,30 +24,6 @@ function copyArray(arr) {
 /** @type {<T>(obj: T) => T} */
 function copyObject(obj) {
   return JSON.parse(JSON.stringify(obj));
-}
-
-function withinDistance(x1, y1, x2, y2, radius) {
-  return getDistance(x1, y1, x2, y2) < radius;
-}
-
-function getDistance(x1, y1, x2, y2) {
-  return Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2));
-}
-
-function intToStringNegative(value, amount) {
-  let isPositive = 1;
-  if (value < 0) {
-    isPositive = -1;
-    value *= -1;
-  }
-  if (value >= 10000) {
-    return (isPositive === 1 ? '+' : '-') + nFormatter(value, 3);
-  }
-  let baseValue = 3;
-  if (amount) {
-    baseValue = amount;
-  }
-  return (isPositive === 1 ? '+' : '-') + parseFloat(value).toFixed(baseValue - 1);
 }
 
 function intToString(value, amount, fixPrecision = false) {
@@ -246,21 +177,6 @@ function camelize(str) {
   });
 }
 
-function isVisible(obj) {
-  return obj.offsetWidth > 0 && obj.offsetHeight > 0;
-}
-
-const factorials = [];
-function factorial(n) {
-  if (n === 0 || n === 1) {
-    return 1;
-  }
-  if (factorials[n] > 0) {
-    return factorials[n];
-  }
-  return factorials[n] = factorial(n - 1) * n;
-}
-
 const fibonaccis = [];
 function fibonacci(n) {
   if (n === 0 || n === 1 || n === undefined) {
@@ -270,26 +186,6 @@ function fibonacci(n) {
     return fibonaccis[n];
   }
   return fibonaccis[n] = fibonacci(n - 1) + fibonacci(n - 2);
-}
-
-function sortArrayObjectsByValue(arr, valueName) {
-  const n = arr.length;
-
-  // one by one move boundary of unsorted subarray
-  for (let i = 0; i < n - 1; i++) {
-    // find the minimum element in unsorted array
-    let minIdx = i;
-    for (let j = i + 1; j < n; j++) {
-      if (arr[j][valueName] < arr[minIdx][valueName]) {
-        minIdx = j;
-      }
-    }
-
-    // swap the found minimum element with the first element
-    const swap = arr[minIdx];
-    arr[minIdx] = arr[i];
-    arr[i] = swap;
-  }
 }
 
 function addClassToDiv(div, className) {
@@ -305,15 +201,6 @@ function removeClassFromDiv(div, className) {
 
 const wrappedElementSymbol = Symbol('wrappedElement');
 
-/**
- * @template {Element} [T=Element]
- *
- * @param {string|Element} elementOrId
- * @param {(new() => T)|((new() => T)[])} [expectedClass]
- * @param {boolean} [throwIfMissing]
- * @param {boolean} [warnIfMissing]
- * @returns {T}
- */
 function getElement(
   elementOrId,
   expectedClass = /** @type {new()=>T} */ (Element),
@@ -348,28 +235,22 @@ function getElement(
   return undefined;
 }
 
-/** @param {string|Element} elementOrId  */
 function htmlElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(elementOrId, HTMLElement, throwIfMissing, warnIfMissing);
 }
 
-/** @param {string|Element} elementOrId  */
 function inputElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(elementOrId, HTMLInputElement, throwIfMissing, warnIfMissing);
 }
 
-/** @param {string|Element} elementOrId  */
 function textAreaElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(elementOrId, HTMLTextAreaElement, throwIfMissing, warnIfMissing);
 }
 
-/** @param {string|Element} elementOrId  */
 function selectElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(elementOrId, HTMLSelectElement, throwIfMissing, warnIfMissing);
 }
 
-/** @typedef {HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement} HTMLValueElement */
-/** @param {string|Element} elementOrId  */
 function valueElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(
     elementOrId,
@@ -379,24 +260,18 @@ function valueElement(elementOrId, throwIfMissing = true, warnIfMissing = true) 
   );
 }
 
-/** @returns {node is HTMLValueElement} */
 function isValueElement(node) {
   return node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement || node instanceof HTMLSelectElement;
 }
 
-/** @param {string|Element} elementOrId  */
 function svgElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(elementOrId, SVGElement, throwIfMissing, warnIfMissing);
 }
 
-/** @param {string|Element} elementOrId  */
 function templateElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(elementOrId, HTMLTemplateElement, throwIfMissing, warnIfMissing);
 }
 
-/** @overload @param {string|Element} templateOrId @param {boolean} [alwaysReturnFragment] @returns {Element | DocumentFragment} */
-/** @overload @param {string|Element} templateOrId @param {true} alwaysReturnFragment @returns {DocumentFragment} */
-/** @param {string} templateOrId */
 function cloneTemplate(templateOrId, alwaysReturnFragment = false) {
   const template = templateElement(templateOrId);
   const fragment = /** @type {DocumentFragment} */ (template.content.cloneNode(true));
@@ -410,6 +285,7 @@ function cloneTemplate(templateOrId, alwaysReturnFragment = false) {
 const numbers =
   'zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen'
     .split(' ');
+
 const tens = 'twenty thirty forty fifty sixty seventy eighty ninety'.split(' ');
 
 function number2Words(n) {
@@ -426,14 +302,6 @@ function capitalizeFirst(s) {
 
 function numberToWords(n) {
   return capitalizeFirst(number2Words(n));
-}
-
-function encode(theSave) {
-  return Base64.encode(LZWEncode(theSave));
-}
-
-function decode(encodedSave) {
-  return LZWDecode(Base64.decode(encodedSave));
 }
 
 // lzw-compress a string
@@ -484,141 +352,6 @@ function LZWDecode(s) {
     oldPhrase = phrase;
   }
   return out.join('');
-}
-
-const Base64 = {
-  // private property
-  _keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
-
-  // public method for encoding
-  encode(input) {
-    let output = '';
-    let chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-    let i = 0;
-
-    input = Base64.UTF8Encode(input);
-
-    while (i < input.length) {
-      chr1 = input.charCodeAt(i++);
-      chr2 = input.charCodeAt(i++);
-      chr3 = input.charCodeAt(i++);
-
-      enc1 = chr1 >> 2;
-      enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-      enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-      enc4 = chr3 & 63;
-
-      if (isNaN(chr2)) {
-        enc3 = 64;
-        enc4 = 64;
-      } else if (isNaN(chr3)) {
-        enc4 = 64;
-      }
-      output = output +
-        this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
-        this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
-    }
-    return output;
-  },
-
-  // public method for decoding
-  decode(input) {
-    let output = '';
-    let chr1, chr2, chr3;
-    let enc1, enc2, enc3, enc4;
-    let i = 0;
-
-    input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '');
-
-    while (i < input.length) {
-      enc1 = this._keyStr.indexOf(input.charAt(i++));
-      enc2 = this._keyStr.indexOf(input.charAt(i++));
-      enc3 = this._keyStr.indexOf(input.charAt(i++));
-      enc4 = this._keyStr.indexOf(input.charAt(i++));
-
-      chr1 = (enc1 << 2) | (enc2 >> 4);
-      chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-      chr3 = ((enc3 & 3) << 6) | enc4;
-
-      output += String.fromCharCode(chr1);
-      if (enc3 !== 64) {
-        output += String.fromCharCode(chr2);
-      }
-      if (enc4 !== 64) {
-        output += String.fromCharCode(chr3);
-      }
-    }
-    output = Base64.UTF8Decode(output);
-    return output;
-  },
-
-  // private method for UTF-8 encoding
-  UTF8Encode(string) {
-    string = string.replace(/\r\n/gu, '\n');
-    let utftext = '';
-
-    for (let n = 0; n < string.length; n++) {
-      const c = string.charCodeAt(n);
-      if (c < 128) {
-        utftext += String.fromCharCode(c);
-      } else if ((c > 127) && (c < 2048)) {
-        utftext += String.fromCharCode((c >> 6) | 192);
-        utftext += String.fromCharCode((c & 63) | 128);
-      } else {
-        utftext += String.fromCharCode((c >> 12) | 224);
-        utftext += String.fromCharCode(((c >> 6) & 63) | 128);
-        utftext += String.fromCharCode((c & 63) | 128);
-      }
-    }
-    return utftext;
-  },
-
-  // private method for UTF-8 decoding
-  UTF8Decode(utftext) {
-    let string = '';
-    let i = 0;
-    let c = 0, c2 = 0;
-    while (i < utftext.length) {
-      c = utftext.charCodeAt(i);
-      if (c < 128) {
-        string += String.fromCharCode(c);
-        i++;
-      } else if ((c > 191) && (c < 224)) {
-        c2 = utftext.charCodeAt(i + 1);
-        string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-        i += 2;
-      } else {
-        c2 = utftext.charCodeAt(i + 1);
-        const c3 = utftext.charCodeAt(i + 2);
-        string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-        i += 3;
-      }
-    }
-    return string;
-  },
-};
-
-function roughSizeOfObject(object) {
-  const objectList = [];
-  const stack = [object];
-  let bytes = 0;
-
-  while (stack.length) {
-    const value = stack.pop();
-    if (typeof value === 'boolean') {
-      bytes += 4;
-    } else if (typeof value === 'string') {
-      bytes += value.length * 2;
-    } else if (typeof value === 'number') {
-      bytes += 8;
-    } else if (typeof value === 'object' && objectList.indexOf(value) === -1) {
-      objectList.push(value);
-      for (const i in value) {
-        stack.push(value[i]);
-      }
-    }
-  }
-  return bytes;
 }
 
 /** @type {(object: any, strings?: (string|number)[], map?: Record<string, number>) => any} */
@@ -693,23 +426,16 @@ async function delay(milliseconds) {
   await new Promise((r) => setTimeout(r, milliseconds));
 }
 
-/** @returns {Promise<DOMHighResTimeStamp>} */
 function nextAnimationFrame() {
-  /** @param {FrameRequestCallback} r */
   return new Promise((r) => requestAnimationFrame(r));
 }
 
-/** @param {IdleRequestOptions} [idleRequestOptions] @returns {Promise<IdleDeadline>} */
 function nextIdle(idleRequestOptions) {
   return new Promise((r) => requestIdleCallback(r, idleRequestOptions));
 }
 
-// modified from: https://stackoverflow.com/questions/879152/how-do-i-make-javascript-beep/13194087#13194087
 function beep(duration) {
-  // @ts-ignore
-  const ctxClass = globalThis.audioContext || globalThis.AudioContext || globalThis.AudioContext ||
-    globalThis.webkitAudioContext;
-  const ctx = new ctxClass();
+  const ctx = new AudioContext();
   const osc = ctx.createOscillator();
 
   // stop/start for new browsers, on/off for old
@@ -722,150 +448,3 @@ function beep(duration) {
     if (osc.stop) osc.stop();
   }, duration);
 }
-
-function statistics() {
-  let actionCount = 0;
-  let actionWithStoryCount = 0;
-  let multiPartActionCount = 0;
-  let PBAActionCount = 0;
-  let limitedActionCount = 0;
-  let storyCount = 0;
-  // let skillCount = 0;
-  // let buffCount = 0;
-  for (const action of totalActionList) {
-    if (action.storyReqs !== undefined) {
-      const name = action.name.toLowerCase().replace(/ /gu, '_');
-      storyCount += _txt(`actions>${name}`, 'fallback').split('⮀').length - 1;
-      actionWithStoryCount++;
-    }
-    if (action.type === 'progress') PBAActionCount++;
-    else if (action.type === 'limited') limitedActionCount++;
-    else if (action.type === 'multipart') multiPartActionCount++;
-    actionCount++;
-  }
-
-  const list = `Actions: ${actionCount} (${actionWithStoryCount} with story)
- Multi part actions: ${multiPartActionCount}
- Progress based actions: ${PBAActionCount}
- Limited actions: ${limitedActionCount}
- Training actions: ${trainingActions.length}/9
- Stories: ${storyCount} (~${(storyCount / actionCount).toFixed(2)} avg per action)
- Skills: ${skillList.length}
- Buffs: ${buffList.length}`;
-  return list;
-}
-
-const nullFunc = () => {};
-function benchmark(func, iterations, returnTimeOnly) {
-  const baseCost = (func === nullFunc && returnTimeOnly) ? 0 : benchmark(nullFunc, iterations, true);
-  const before = performance.mark('benchmark-start');
-  for (let i = 0; i < iterations; i++) {
-    func();
-  }
-  const after = performance.mark('benchmark-end');
-  const measure = performance.measure('benchmark', 'benchmark-start', 'benchmark-end');
-  if (returnTimeOnly) return (measure.duration - baseCost);
-  return `Total cost: ${measure.duration - baseCost}ms\n Cost per iteration: ~${
-    (measure.duration - baseCost) / iterations
-  }ms`;
-}
-
-// make a lazy getter for an object (most useful for prototypes), which executes the
-// provided function once upon first attempting to get the property, and in the future has
-// the computed result as an own property of the instance
-// usage: defineLazyGetter(A.prototype, 'prop', function() { return ...; })
-function defineLazyGetter(object, name, getter) {
-  Object.defineProperty(object, name, {
-    get() {
-      if (Object.prototype.hasOwnProperty.call(this, name)) {
-        // only used if this getter itself is own
-        // otherwise, shadowing the property is enough
-        delete this[name];
-      }
-      Object.defineProperty(this, name, {
-        value: getter.call(this),
-      });
-      return this[name];
-    },
-    configurable: true,
-  });
-}
-
-/** Strongly-typed version of Object.keys */
-const typedKeys = /** @type {<K extends string|number|symbol>(object: Partial<Record<K, any>>) => K[]} */ (Object.keys);
-
-/** Strongly-typed version of Object.keys */
-const typedEntries =
-  /** @type {<K extends string|number|symbol, V>(object: Partial<Record<K, V>>) => [K, V][]} */ (Object.entries);
-
-const devtoolsHeader = Symbol.for('devtoolsHeader');
-const devtoolsHasBody = Symbol.for('devtoolsHasBody');
-const devtoolsBody = Symbol.for('devtoolsBody');
-
-/**
- * Convenience class for defining devtools formatting
- * @template {*} DTConfig
- */
-class DevtoolsFormattable {
-  /** @param {DTConfig} config @returns {DTJHTML<this, DTConfig> | null} */
-  dtHeader(config) {
-    return null;
-  }
-  /** @param {DTConfig} config */
-  dtHasBody(config) {
-    return false;
-  }
-  /** @param {DTConfig} config @returns {DTJHTML<this, DTConfig> | null} */
-  dtBody(config) {
-    return null;
-  }
-
-  [devtoolsHeader](config) {
-    return this.dtHeader(config);
-  }
-  [devtoolsHasBody](config) {
-    return this.dtHasBody(config);
-  }
-  [devtoolsBody](config) {
-    return this.dtBody(config);
-  }
-
-  constructor() {
-    new.target.addFormatter();
-  }
-
-  /** @type {DTFormatter} */
-  static formatter = {
-    header(object, config) {
-      return object?.[devtoolsHeader]?.(config) ?? null;
-    },
-    hasBody(object, config) {
-      return object?.[devtoolsHasBody]?.(config) ?? false;
-    },
-    body(object, config) {
-      return object?.[devtoolsBody]?.(config) ?? null;
-    },
-  };
-
-  static addFormatter() {
-    self.devtoolsFormatters ??= [];
-    if (!self.devtoolsFormatters.includes(this.formatter)) {
-      self.devtoolsFormatters.push(this.formatter);
-    }
-  }
-}
-
-//Convenience class for rendering html template strings with syntax coloring
-/** @satisfies {Record<string, (strings: TemplateStringsArray, ...exprs: any[]) => any>} */
-const Raw = {
-  html(strings, ...exprs) {
-    let htmlString = String.raw(strings, ...exprs);
-    if (strings.raw[0][0] === '\n' || strings.raw[0][0] === '\r') { // if this starts with an explicit linebreak, strip early whitespace
-      htmlString = htmlString.trimStart();
-    }
-    return htmlString;
-  },
-  css(strings, ...exprs) {
-    return String.raw(strings, ...exprs);
-  },
-};

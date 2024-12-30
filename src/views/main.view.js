@@ -2,6 +2,30 @@
 
 let screenSize;
 
+function formatTime(seconds) {
+  if (seconds > 300) {
+    let second = Math.floor(seconds % 60);
+    let minute = Math.floor(seconds / 60 % 60);
+    let hour = Math.floor(seconds / 60 / 60 % 24);
+    let day = Math.floor(seconds / 60 / 60 / 24);
+
+    let timeString = '';
+    if (day > 0) timeString += day + 'd ';
+    if (day > 0 || hour > 0) timeString += hour + 'h ';
+    if (day > 0 || hour > 0 || minute > 0) timeString += minute + 'm ';
+    timeString += second + 's';
+
+    return timeString;
+  }
+  if (Number.isInteger(seconds)) {
+    return (formatNumber(seconds) + _txt('time_controls>seconds')).replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
+  }
+  if (seconds < 10) {
+    return seconds.toFixed(2) + _txt('time_controls>seconds');
+  }
+  return (seconds.toFixed(1) + _txt('time_controls>seconds')).replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
+}
+
 class View {
   initalize() {
     this.createTravelMenu();
@@ -107,7 +131,7 @@ class View {
       const axisTip = statGraph.getAxisTip(stat);
       totalContainer.insertAdjacentHTML(
         'beforebegin',
-        Raw.html`<div class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${
+        `<div class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${
           axisTip[1] + 3
         }%;' onmouseover='view.showStat("${stat}")' onmouseout='view.showStat(undefined)'>
                 <div class='statLabelContainer'>
@@ -1297,7 +1321,7 @@ class View {
 
   /** @param {ActionOfType<"progress">} action @param {string} [label] */
   createActionProgress(action, varSuffix = '', label, includeExpBar = true) {
-    const totalDivText = Raw.html`<div class='townStatContainer showthat'>
+    const totalDivText = `<div class='townStatContainer showthat'>
             <div class='bold townLabel'>${label ?? action.labelDone}</div>
             <div class='progressValue' id='prc${action.varName}${varSuffix}'>5</div><div class='percentSign'>%</div>
             <div class='progressBars'>
@@ -1337,7 +1361,7 @@ class View {
     let lockedSkills = '';
     const pieSlices = [];
     const gradientStops = [];
-    const statEntries = typedEntries(action.stats);
+    const statEntries = Object.entries(action.stats);
     // sort high to low, then by statname index
     statEntries.sort((
       [aStat, aRatio],
@@ -1586,7 +1610,7 @@ class View {
   createTownInfo(action) {
     const totalInfoText =
       // important that there be 8 element children of townInfoContainer (excluding the showthis popup and hideVarButton)
-      Raw.html`
+      `
             <div class='townInfoContainer showthat'>
                 <div class='bold townLabel'>${action.labelDone}</div>
                 <div class='numeric goodTemp' id='goodTemp${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
@@ -1633,7 +1657,7 @@ class View {
     } else if (varName === 'TheSpire') {
       mouseOver = "onmouseover='view.showDungeon(2)' onmouseout='view.showDungeon(undefined)'";
     }
-    const totalDivText = Raw.html`
+    const totalDivText = `
             <div class='townStatContainer' id='infoContainer${varName}'>
                 <div class='multipartLabel'>
                     <div class='flexMargin'></div>
