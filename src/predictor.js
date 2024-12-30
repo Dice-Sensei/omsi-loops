@@ -400,7 +400,8 @@ const Koviko = {
         throw new Error("Can't get worker from inside worker!");
       }
       if (!this.#worker && options.predictorBackgroundThread && !this.#workerDisabled) {
-        this.#worker = new Worker('predictor-worker.js', { name: 'predictor' });
+        this.#worker = new Worker('./src/predictor-worker.js', { name: 'predictor' });
+
         this.#worker.onmessage = this.handleWorkerMessage.bind(this);
         this.#worker.postMessage({ type: 'setOptions', options });
         this.#worker.postMessage({ type: 'verifyDefaultIds', idRefs: Data.exportDefaultIds() });

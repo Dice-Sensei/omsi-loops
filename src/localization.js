@@ -92,8 +92,8 @@ const Localization = self['Localization'] = {
     globalThis.location.href = `${globalThis.location.origin + globalThis.location.pathname}?${$.param(vars)}`;
   },
   loadXML(libName, callback) {
-    if (libName === 'fallback') $.get('lang/en-EN/game.xml', null, callback, 'xml');
-    else $.get(`lang/${Localization.currentLang}/${libName}.xml`, null, callback, 'xml');
+    if (libName === 'fallback') $.get('locales/en-EN/game.xml', null, callback, 'xml');
+    else $.get(`locales/${Localization.currentLang}/${libName}.xml`, null, callback, 'xml');
   },
   getUrlVars() {
     const vars = {};

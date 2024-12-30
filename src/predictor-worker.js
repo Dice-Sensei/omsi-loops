@@ -1,15 +1,15 @@
 importScripts(
-  'data.js',
-  'localization.js',
-  'helpers.js',
-  'actionList.js',
-  'driver.js',
-  'stats.js',
-  'actions.js',
-  'town.js',
-  'prestige.js',
-  'saving.js',
-  'predictor.js',
+  './data.js',
+  './localization.js',
+  './helpers.js',
+  './actionList.js',
+  './driver.js',
+  './stats.js',
+  './actions.js',
+  './town.js',
+  './prestige.js',
+  './saving.js',
+  './predictor.js',
 );
 
 /**
