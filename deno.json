@@ -1,4 +1,16 @@
 {
+  "compilerOptions": {
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable"
+    ]
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-namespace"]
+    }
+  },
   "fmt": {
     "singleQuote": true,
     "semiColons": true,
