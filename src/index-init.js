@@ -1,7 +1,7 @@
 loadDefaults();
 
 Localization.ready.then(() => {
-  Views.draw();
+  renderViews();
   Localization.localizePage('game');
   localStorage['loadingText'] = document.getElementById('loadingText').textContent;
   startGame();
