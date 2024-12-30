@@ -7,7 +7,6 @@
  * @typedef {{
  *  menu: typeof menuView,
  *  buffsContainer: typeof buffsView,
- *  talentTree: typeof talentTreeView,
  *  timeControls: typeof timeControlsView,
  *  trackedResources: typeof trackedResourcesView,
  * }} ViewTypes

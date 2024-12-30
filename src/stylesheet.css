@@ -1717,14 +1717,6 @@ li#actionLogLatest {
   height: 16px;
 }
 
-/* Unused
-#talentTree {
-    height: 700px;
-    width: 500px;
-    background: #e4ece5;
-}
-*/
-
 /* responsive layout */
 
 :root.responsive {

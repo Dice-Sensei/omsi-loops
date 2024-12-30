@@ -1063,18 +1063,6 @@ export const translationsEn = {
         'A mountain-shaped hole in the ground. It is ever so faint, but even here in this dark realm, you can feel the presence of the gods looking down upon you.',
     },
   },
-  talents: {
-    calculated_shattering: {
-      name: 'Calculated Shattering',
-      desc:
-        'Practicing your Shattering technique to get through all these pots as quickly as possible seems surprisingly productive.<br>Reduces the mana cost of <span class="localized" data-lockey="actions>smash_pots>name"></span> by 1 per level.',
-    },
-    no_frill_frames: {
-      name: 'No-frill Frames',
-      desc:
-        `If you dedicate a bit of time to perusing for glasses, you can find some cheaper frames. And considering you won't be using them for too long until everything starts over again, you figure it's a good idea to skimp.<br>Reduces the gold cost of <span class="localized" data-lockey="actions>buy_glasses>name"></span> by 1 per level.`,
-    },
-  },
   spells: {
     title: 'Spells',
   },
