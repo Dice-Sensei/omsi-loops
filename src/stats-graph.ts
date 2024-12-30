@@ -1,3 +1,4 @@
+import './types.ts';
 import * as d3 from 'd3';
 
 type Dataset = {
@@ -296,4 +297,4 @@ export class StatGraph {
   }
 }
 
-globalThis.trash ??= { StatGraph };
+globalThis.trash.StatGraph = StatGraph;

@@ -108,13 +108,15 @@ let curTown = 0;
 function initializeTowns() {
   for (let i = 0; i <= 8; i++) {
     // @ts-ignore
-    towns[i] = new Town(i);
+    towns[i] = new globalThis.trash.Town(i);
   }
 }
 
 const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
+
 /** @typedef {typeof statList[number]} StatName */
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
+
 let totalTalent = 0;
 // eslint-disable-next-line prefer-const
 let shouldRestart = true;

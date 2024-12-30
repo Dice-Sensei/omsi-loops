@@ -72,7 +72,7 @@ class Data {
       __proto__: null,
       [-1]: Object.prototype,
       [-2]: Array.prototype,
-      [-3]: Town.prototype,
+      [-3]: globalThis.trash.Town.prototype,
       [-4]: Stat.prototype,
       [-5]: LevelExp.prototype,
       [-6]: Skill.prototype,

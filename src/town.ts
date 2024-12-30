@@ -33,23 +33,15 @@
 /**
  * @template {number} TN Town number
  */
-class Town {
-  /** @type {TN} */
-  index;
-  /** @type {string[]} */
-  allVarNames = [];
-  /** @type {string[]} */
-  varNames = [];
-  /** @type {string[]} */
-  progressVars = [];
-  /** @type {string[]} */
-  multipartVars = [];
-  /** @type {Record<string, ProgressScalingType>} */
-  progressScaling = {};
-  /** @type {AnyAction[]} */
-  totalActionList = [];
-  /** @type {Set<string>} */
-  hiddenVars = new Set();
+class Town<TN extends number> {
+  index: TN;
+  allVarNames: string[] = [];
+  varNames: string[] = [];
+  progressVars: string[] = [];
+  multipartVars: string[] = [];
+  progressScaling: Record<string, ProgressScalingType> = {};
+  totalActionList: AnyAction[] = [];
+  hiddenVars: Set<string> = new Set();
 
   static {
     Data.omitProperties(this.prototype, ['hiddenVars']);
@@ -214,3 +206,6 @@ class Town {
     }
   }
 }
+
+globalThis.trash ??= {};
+globalThis.trash.Town = Town;

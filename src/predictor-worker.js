@@ -6,7 +6,7 @@ importScripts(
   './driver.js',
   './stats.js',
   './actions.js',
-  './town.js',
+  './town.ts',
   './prestige.js',
   './saving.js',
   './predictor.js',
