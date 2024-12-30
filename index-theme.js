@@ -1,8 +1,7 @@
-loadDefaults();
+if (localStorage['latestTheme']) {
+  document.body.className = `t-${localStorage['latestTheme']} loading`;
+}
 
-Localization.ready.then(() => {
-  Views.draw();
-  Localization.localizePage('game');
-  localStorage['loadingText'] = document.getElementById('loadingText').textContent;
-  startGame();
-});
+if (localStorage['loadingText']) {
+  document.getElementById('loadingText').textContent = localStorage['loadingText'];
+}
