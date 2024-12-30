@@ -1,4 +1,4 @@
-const menuView = Views.registerView('menu', {
+Views.registerView('menu', {
   selector: '#menu',
   html() {
     let html = '';

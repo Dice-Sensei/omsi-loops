@@ -1,14 +1,5 @@
 'use strict';
 
-// because I hate IE so much
-/* eslint-disable max-statements-per-line */
-Math.log2 = Math.log2 || function (x) {
-  return Math.log(x) * Math.LOG2E;
-};
-Math.log10 = Math.log10 || function (x) {
-  return Math.log(x) * Math.LOG10E;
-};
-
 function precision3(num) {
   return Number(num.toPrecision(3));
 }

@@ -1,4 +1,4 @@
-const buffsView = Views.registerView('buffsContainer', {
+Views.registerView('buffsContainer', {
   selector: '#buffsContainer',
   html() {
     const fullNames = Buff.fullNames;
@@ -29,4 +29,3 @@ const buffsView = Views.registerView('buffsContainer', {
     return html;
   },
 });
-//                            ${desc2 ? `<span class="localized" data-lockey="buffs>${XMLName}>desc2"></span>` : ""}
