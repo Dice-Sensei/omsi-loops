@@ -1,3 +1,16 @@
+let LZString;
+import('lz-string').then((module) => {
+  LZString = module;
+});
+
+function decompressFromBase64(item) {
+  return LZString.decompressFromBase64(item);
+}
+
+function compressToBase64(item) {
+  return LZString.compressToBase64(item);
+}
+
 function startGame() {
   // load calls recalcInterval, which will start the callbacks
   load();
@@ -1482,13 +1495,13 @@ function save() {
 }
 
 function currentSaveData() {
-  return `ILSV01${LZString.compressToBase64(globalThis.localStorage[saveName])}`;
+  return `ILSV01${compressToBase64(globalThis.localStorage[saveName])}`;
 }
 
 function exportSave() {
   const saveJson = save();
   // idle loops save version 01. patch v0.94, moved from old save system to lzstring base 64
-  inputElement('exportImport').value = `ILSV01${LZString.compressToBase64(saveJson)}`;
+  inputElement('exportImport').value = `ILSV01${compressToBase64(saveJson)}`;
   inputElement('exportImport').select();
   if (!document.execCommand('copy')) {
     alert('Copying the save to the clipboard failed! You will need to copy the highlighted value yourself.');
@@ -1512,7 +1525,7 @@ function processSave(saveData) {
   let saveJson = '';
   // idle loops save version 01. patch v0.94, moved from old save system to lzstring base 64
   if (saveData.substr(0, 6) === 'ILSV01') {
-    saveJson = LZString.decompressFromBase64(saveData.substr(6));
+    saveJson = decompressFromBase64(saveData.substr(6));
   } else {
     // handling for old saves from stopsign or patches prior to v0.94
     saveJson = decode(saveData);
@@ -1553,7 +1566,7 @@ function saveFileName() {
 
 function exportSaveFile() {
   const saveJson = save();
-  const saveData = `ILSV01${LZString.compressToBase64(saveJson)}`;
+  const saveData = `ILSV01${compressToBase64(saveJson)}`;
   const a = document.createElement('a');
   a.setAttribute('href', 'data:text/plain;charset=utf-8,' + saveData);
   a.setAttribute('download', saveFileName());
