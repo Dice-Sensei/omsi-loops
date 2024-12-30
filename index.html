@@ -2,15 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <!-- to force a reload -->
     <meta http-equiv="cache-control" content="max-age=0" />
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="expires" content="0" />
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
-    <!-- mobile support -->
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-
     <title>Idle Loops</title>
     <link rel="stylesheet" href="themes.css">
     <link rel="stylesheet" href="predictor.css">
@@ -27,25 +24,14 @@
     <script src="lib/d3.v7.min.js"></script>
     <script src="lib/mousetrap.min.js"></script>
   </head>
-
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-D7MKZE2ZZH"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-
-    gtag('config', 'G-D7MKZE2ZZH');
-  </script>
+  <script src="index-gapi.js"></script>
   <!-- Google API (for cloud saves) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
-
   <body id="theBody" style="min-width: 1210px">
     <div id="loadingBox" class="showWhileLoading hideWhenLoaded">
-      <!-- This will only be visible if the localization has never been loaded in this browser -->
       <div id="loadingText" class="localized" data-lockey="misc>loading">Initial load (this may take a while)...</div>
     </div>
     <canvas id="talentTreeCanvas" style="display: none"></canvas>
@@ -69,10 +55,8 @@
       <br>
       <div id="timeControls"></div>
     </header>
-
     <main id="main">
       <div id="statsColumn">
-        <!-- The stat view starts out in radar mode so that init() can get text lengths -->
         <div id="statsWindow" data-view="radar">
           <div id="statsTitle" class="showthat block">
             <div class="large bold localized" data-lockey="stats>title"></div>
@@ -555,7 +539,6 @@
           </div>
         </div>
       </div>
-
       <div id="actionsColumn">
         <div id="actionList" style="width: 100%; text-align: center">
           <div class="showthat">
@@ -792,7 +775,6 @@
           <div style="width: 100%; padding-top: 5px"></div>
         </div>
       </div>
-
       <div id="townColumn" style="width: 535px; vertical-align: top">
         <div id="shortTownColumn">
           <div id="townWindow" style="width: 100%; text-align: center; height: 34px">
@@ -890,7 +872,6 @@
         </div>
       </div>
     </main>
-
     <nav id="navbar">
       <a
         id="navbar_town"
@@ -932,15 +913,7 @@
       </div>
     </div>
 
-    <script>
-      if (localStorage['latestTheme']) {
-        document.body.className = `t-${localStorage['latestTheme']} loading`;
-      }
-      if (localStorage['loadingText']) {
-        document.getElementById('loadingText').textContent = localStorage['loadingText'];
-      }
-    </script>
-
+    <script src="index-theme.js"></script>
     <script src="data.js"></script>
     <script src="localization.js"></script>
     <script src="helpers.js"></script>
@@ -967,14 +940,6 @@
     <script src="views/timecontrols.view.js"></script>
     <script src="views/buffs.view.js"></script>
     <script src="views/talenttree.view.js"></script>
-    <script>
-      loadDefaults();
-      Localization.ready.then(() => {
-        Views.draw();
-        Localization.localizePage('game');
-        localStorage['loadingText'] = document.getElementById('loadingText').textContent;
-        startGame();
-      });
-    </script>
+    <script src="index-init.js"></script>
   </body>
 </html>
