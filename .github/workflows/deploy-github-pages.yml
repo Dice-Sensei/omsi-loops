@@ -1,8 +1,8 @@
-name: Deploy static content to Pages
+name: Deploy to Github Pages
 on:
+  workflow_dispatch:
   # push:
   #   branches: ['main']
-  workflow_dispatch:
 permissions:
   contents: read
   pages: write
@@ -19,8 +19,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Generate Manifest
-        uses: dmchurch/create-repository-manifest@v0.0.1
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
