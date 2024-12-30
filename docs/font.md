@@ -1,6 +1,6 @@
 # Font - IdleLoopsIcons
 
-Custom font created for IdleLoops by omsi6.
+Custom font created for IdleLoops by dmchurch.
 
 It extends some font with extra characters for mana, effort, exp.
 
