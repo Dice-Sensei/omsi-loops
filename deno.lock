@@ -2,9 +2,6 @@
   "version": "4",
   "specifiers": {
     "npm:@types/d3@^7.4.3": "7.4.3",
-    "npm:@types/gapi.client.drive-v3@^0.0.5": "0.0.5",
-    "npm:@types/gapi@^0.0.47": "0.0.47",
-    "npm:@types/google.accounts@^0.0.15": "0.0.15",
     "npm:@types/jquery@^3.5.32": "3.5.32",
     "npm:@types/lz-string@^1.5.0": "1.5.0",
     "npm:d3@^7.9.0": "7.9.0_d3-selection@3.0.0",
@@ -88,20 +85,6 @@
     },
     "@esbuild/win32-x64@0.24.2": {
       "integrity": "sha512-7VTgWzgMGvup6aSqDPLiW5zHaxYJGTO4OokMjIlrCtf+VpEL+cXKtCvg723iguPYI5oaUNdS+/V7OU2gvXVWEg=="
-    },
-    "@maxim_mazurok/gapi.client.discovery-v1@0.1.20200806": {
-      "integrity": "sha512-Wl6UfmZVDdWbY3PUu8E2ULk9RPLjnMqp/iOA4tcK8Ne+U/GmlnWP/e34IaZNGArfl7iXJNOG+/3Rj9L9jQyF9Q==",
-      "dependencies": [
-        "@types/gapi.client",
-        "@types/gapi.client.discovery-v1"
-      ]
-    },
-    "@maxim_mazurok/gapi.client.drive-v3@0.0.20241216": {
-      "integrity": "sha512-0azYtDWHe1MilMraHTShWK1dHBjUdiBzZ+qI2AWw2VzEUSwIS9ZfeSgCeSGHLlwJYnQkjqxKG9sexM+MVRz9nQ==",
-      "dependencies": [
-        "@types/gapi.client",
-        "@types/gapi.client.discovery-v1"
-      ]
     },
     "@rollup/rollup-android-arm-eabi@4.29.1": {
       "integrity": "sha512-ssKhA8RNltTZLpG6/QNkCSge+7mBQGUqJRisZ2MDQcEGaK93QESEgWK2iOpIDZ7k9zPVkG5AS3ksvD5ZWxmItw=="
@@ -323,29 +306,8 @@
     "@types/estree@1.0.6": {
       "integrity": "sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw=="
     },
-    "@types/gapi.client.discovery-v1@0.0.4": {
-      "integrity": "sha512-uevhRumNE65F5mf2gABLaReOmbFSXONuzFZjNR3dYv6BmkHg+wciubHrfBAsp3554zNo3Dcg6dUAlwMqQfpwjQ==",
-      "dependencies": [
-        "@maxim_mazurok/gapi.client.discovery-v1"
-      ]
-    },
-    "@types/gapi.client.drive-v3@0.0.5": {
-      "integrity": "sha512-yYBxiqMqJVBg4bns4Q28+f2XdJnd3tVA9dxQX1lXMVmzT2B+pZdyCi1u9HLwGveVlookSsAXuqfLfS9KO6MF6w==",
-      "dependencies": [
-        "@maxim_mazurok/gapi.client.drive-v3"
-      ]
-    },
-    "@types/gapi.client@1.0.8": {
-      "integrity": "sha512-qJQUmmumbYym3Amax0S8CVzuSngcXsC1fJdwRS2zeW5lM63zXkw4wJFP+bG0jzgi0R6EsJKoHnGNVTDbOyG1ng=="
-    },
-    "@types/gapi@0.0.47": {
-      "integrity": "sha512-/ZsLuq6BffMgbKMtZyDZ8vwQvTyKhKQ1G2K6VyWCgtHHhfSSXbk4+4JwImZiTjWNXfI2q1ZStAwFFHSkNoTkHA=="
-    },
     "@types/geojson@7946.0.15": {
       "integrity": "sha512-9oSxFzDCT2Rj6DfcHF8G++jxBKS7mBqXl5xrRW+Kbvjry6Uduya2iiwqHPhVXpasAVMBYKkEPGgKhd3+/HZ6xA=="
-    },
-    "@types/google.accounts@0.0.15": {
-      "integrity": "sha512-NiydIuJzwdpnWNqTPOeDzGXhzz46Ll6T4rN3YWSm9Zfx/8ZfbwFbzyPSw1Tkz4uE3gQiU+fRj4KvBVUuHmk+KQ=="
     },
     "@types/jquery@3.5.32": {
       "integrity": "sha512-b9Xbf4CkMqS02YH8zACqN1xzdxc3cO735Qe5AbSUFmyOiaWAbcpqh9Wna+Uk0vgACvoQHpWDg2rGdHkYPLmCiQ==",
@@ -690,9 +652,6 @@
     "packageJson": {
       "dependencies": [
         "npm:@types/d3@^7.4.3",
-        "npm:@types/gapi.client.drive-v3@^0.0.5",
-        "npm:@types/gapi@^0.0.47",
-        "npm:@types/google.accounts@^0.0.15",
         "npm:@types/jquery@^3.5.32",
         "npm:@types/lz-string@^1.5.0",
         "npm:d3@^7.9.0",

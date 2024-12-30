@@ -640,7 +640,6 @@ function virtualizeGlobalVariables(variables) {
 
 /** @type {Notification} */
 let pauseNotification = null;
-const googleCloud = selfIsGame ? new GoogleCloud() : null;
 
 const options = {
   theme: 'normal',
@@ -667,7 +666,6 @@ const options = {
   autoMaxTraining: false,
   hotkeys: true,
   predictor: false,
-  googleCloud: false,
   updateRate: 50,
   autosaveRate: 30,
   predictorTimePrecision: 1,
@@ -786,7 +784,6 @@ const isStandardOption = {
   autoMaxTraining: true,
   hotkeys: true,
   predictor: false,
-  googleCloud: false,
   updateRate: true,
   autosaveRate: true,
   predictorTimePrecision: false,
@@ -844,15 +841,6 @@ const optionValueHandlers = {
   },
   predictor(value, init) {
     localStorage['loadPredictor'] = value || '';
-  },
-  googleCloud(value, init, getInput) {
-    if (value) {
-      googleCloud.init();
-      document.getElementById('cloud_save').style.display = '';
-    } else {
-      document.getElementById('cloud_save').style.display = 'none';
-    }
-    if (!init && !value) googleCloud.revoke();
   },
   speedIncrease10x: checkExtraSpeed,
   speedIncrease20x: checkExtraSpeed,
