@@ -28,6 +28,8 @@ function formatTime(seconds) {
 
 class View {
   initalize() {
+    this.statGraph = new globalThis.trash.StatGraph();
+
     this.createTravelMenu();
     this.createStats();
     this.updateStats();
@@ -124,11 +126,12 @@ class View {
   }
 
   createStats() {
-    if (statGraph.initalized) return;
-    statGraph.init(document.getElementById('statsContainer'));
+    if (this.statGraph.initalized) return;
+
+    this.statGraph.init(document.getElementById('statsContainer'));
     const totalContainer = htmlElement('totalStatContainer');
     for (const stat of statList) {
-      const axisTip = statGraph.getAxisTip(stat);
+      const axisTip = this.statGraph.getAxisTip(stat);
       totalContainer.insertAdjacentHTML(
         'beforebegin',
         `<div class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${
@@ -253,7 +256,7 @@ class View {
     this.handleUpdateRequests();
 
     if (dungeonShowing !== undefined) this.updateSoulstoneChance(dungeonShowing);
-    if (this.updateStatGraphNeeded) statGraph.update();
+    if (this.updateStatGraphNeeded) this.statGraph.update();
     this.updateTime();
   }
 
@@ -445,7 +448,7 @@ class View {
     const statsContainer = htmlElement('statsContainer');
     if (skipAnimation) {
       statsContainer.classList.remove('animate-logBars');
-      statGraph.update(true);
+      this.statGraph.update(true);
     }
     statsContainer.style.setProperty('--max-bar-value', String(maxValue));
     if (!statsContainer.classList.contains('animate-logBars')) {
@@ -1871,7 +1874,7 @@ class View {
       statsWindow.dataset.view = 'regular';
     } else {
       statsWindow.dataset.view = 'radar';
-      statGraph.update();
+      this.statGraph.update();
     }
   }
 

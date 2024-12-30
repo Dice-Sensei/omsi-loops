@@ -1,6 +1,3 @@
-// @ts-check
-'use strict';
-
 class StatGraph {
   /** @typedef {ReturnType<StatGraph["getGraphDatasets"]>[number]} Dataset */
   /**
@@ -269,4 +266,5 @@ class StatGraph {
   }
 }
 
-const statGraph = new StatGraph();
+globalThis.trash ??= {};
+globalThis.trash.StatGraph = StatGraph;
