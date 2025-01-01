@@ -16,7 +16,7 @@ const buffsContainer = {
     for (const name of buffList) {
       const fullName = Buff.fullNames[name];
       const XMLName = getXMLName(fullName);
-      const desc2 = _txtsObj(`buffs>${XMLName}`)[0].innerHTML.includes('desc2');
+      const desc2 = Localization.txtsObj(`buffs>${XMLName}`)[0].innerHTML.includes('desc2');
 
       html += `
         <div 
@@ -26,9 +26,9 @@ const buffsContainer = {
           onmouseout="view.showBuff(undefined)">
           <div class="buffNameContainer">
             <img class="buffIcon" src="icons/${camelize(fullName)}.svg">
-            <div class="skillLabel medium bold">${_txt(`buffs>${XMLName}>label`)}</div>
+            <div class="skillLabel medium bold">${Localization.txt(`buffs>${XMLName}>label`)}</div>
             <div class="showthis">
-              <span>${_txt(`buffs>${XMLName}>desc`)}</span>
+              <span>${Localization.txt(`buffs>${XMLName}>desc`)}</span>
               <br>
               ${desc2 ? `<span class="localized" data-lockey="buffs>${XMLName}>desc2"></span>` : ''}
             </div>
@@ -89,7 +89,7 @@ const menu = {
               <li>
                 <input type='checkbox' id='enableMenu_${menu}' data-menu='${menu}' onchange='onEnableMenu(this)' 
                 ${disabledMenus.includes(menu) ? '' : 'checked'}>
-                        <label for='enableMenu_${menu}'>${_txt(`menu>${menu}>meta>title`)}</label>
+                        <label for='enableMenu_${menu}'>${Localization.txt(`menu>${menu}>meta>title`)}</label>
                     </li>`).join('\n')
     }
                 </ul>
@@ -98,16 +98,15 @@ const menu = {
         `;
     return html;
   },
-  /** @param {HTMLInputElement} input  */
   versions() {
     let html = '';
-    const versions = _txtsObj('menu>changelog>version');
+    const versions = Localization.txtsObj('menu>changelog>version');
     $(versions).each((_index, version) => {
       const caption = $(version).attr('caption');
       const verNum = $(version).attr('verNum');
       html += `
                     <li class='showthat2' tabindex='0' ${verNum ? `data-verNum="${verNum}"` : ''}>
-                        ${caption ? caption : `${_txt('menu>changelog>meta>version_prefix')} ${verNum}`}
+                        ${caption ? caption : `${Localization.txt('menu>changelog>meta>version_prefix')} ${verNum}`}
                         <div class='showthis2'>
                             ${$(version).text()}
                         </div>
@@ -118,7 +117,7 @@ const menu = {
   htmlChangelog() {
     const html =
       `<li id='changelogMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt('menu>changelog>meta>title')}
+            ${Localization.txt('menu>changelog>meta>title')}
             <ul class='showthisH' id='changelog'>
                 ${this.versions()}
             </ul>
@@ -128,35 +127,39 @@ const menu = {
   htmlSaveMenu() {
     const html =
       `<li id='saveMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt('menu>save>meta>title')}
+            ${Localization.txt('menu>save>meta>title')}
             <div class='showthisH'>
-                <button class='button' onclick='save()'>${_txt('menu>save>manual_save')}</button>
+                <button class='button' onclick='save()'>${Localization.txt('menu>save>manual_save')}</button>
                 <br>
                 <textarea id='exportImportList'></textarea><label for='exportImportList'> ${
-        _txt('menu>save>list_label')
+        Localization.txt('menu>save>list_label')
       }</label>
                 <br>
                 <button class='button' style='margin-right: 2px;' onclick='exportCurrentList()'>${
-        _txt('menu>save>export_button')
+        Localization.txt('menu>save>export_button')
       }</button>
-                <button class='button' onclick='importCurrentList()'>${_txt('menu>save>import_button')}</button>
+                <button class='button' onclick='importCurrentList()'>${
+        Localization.txt('menu>save>import_button')
+      }</button>
                 <br>
-                ${_txt('menu>save>list_comment')}
+                ${Localization.txt('menu>save>list_comment')}
                 <br><br>
-                <input id='exportImport'><label for='exportImport'> ${_txt('menu>save>input_label')}</label><br>
+                <input id='exportImport'><label for='exportImport'> ${
+        Localization.txt('menu>save>input_label')
+      }</label><br>
                 <button class='button' style='margin-top: 5px; margin-right: 2px;' onclick='exportSave()'>${
-        _txt('menu>save>export_button')
+        Localization.txt('menu>save>export_button')
       }</button>
                 <button class='button' style='margin-top: 1px;' onclick='importSave()'>${
-        _txt('menu>save>import_button')
+        Localization.txt('menu>save>import_button')
       }</button><br>
-                ${_txt('menu>save>export_comment')}<br>
-                ${_txt('menu>save>import_comment')}<br>
+                ${Localization.txt('menu>save>export_comment')}<br>
+                ${Localization.txt('menu>save>import_comment')}<br>
                 <button class='button' style='margin-top: 5px; margin-right: 2px;' onclick='exportSaveFile()'>${
-        _txt('menu>save>exportfile_button')
+        Localization.txt('menu>save>exportfile_button')
       }</button>
                 <button class='button' style='margin-top: 1px;' onclick='openSaveFile()'>${
-        _txt('menu>save>importfile_button')
+        Localization.txt('menu>save>importfile_button')
       }</button>
                 <input id="SaveFileInput" type='file' style="visibility:hidden;" onchange="importSaveFile(event)" />
                 <br>
@@ -166,7 +169,7 @@ const menu = {
   },
   FAQs() {
     let html = '';
-    const QAs = _txtsObj('menu>faq>q_a');
+    const QAs = Localization.txtsObj('menu>faq>q_a');
     $(QAs).each((_index, QA) => {
       html += `
                 <li class='showthat2' tabindex='0'>
@@ -181,7 +184,7 @@ const menu = {
   htmlFAQMenu() {
     const html =
       `<li id='faqMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt('menu>faq>meta>title')}
+            ${Localization.txt('menu>faq>meta>title')}
             <ul class='showthisH' id="faq">
                 ${this.FAQs()}
             </ul>
@@ -191,47 +194,47 @@ const menu = {
   htmlOptionsMenu() {
     const html =
       `<li id='optionsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt('menu>options>meta>title')}
+            ${Localization.txt('menu>options>meta>title')}
             <div class='showthisH'>
-                <a target='_blank' href='${_txt('menu>options>discord>link')}'>${
-        _txt('menu>options>discord>title')
+                <a target='_blank' href='${Localization.txt('menu>options>discord>link')}'>${
+        Localization.txt('menu>options>discord>title')
       }</a><br>
                 ${menu.htmlThemeMenu()}
                 ${Object.keys(Localization.supportedLang).length > 1 ? menu.htmlLocalizationMenu() : ''}
-                ${_txt('menu>options>adblock_warning')}<br>
+                ${Localization.txt('menu>options>adblock_warning')}<br>
                 <input id='responsiveUIInput' type='checkbox' onchange='setOption("responsiveUI", this.checked)'/>
-                    <label for='responsiveUIInput'>${_txt('menu>options>responsive_ui')}</label>
+                    <label for='responsiveUIInput'>${Localization.txt('menu>options>responsive_ui')}</label>
                 <br>
                 <input id='actionLogInput' type='checkbox' onchange='setOption("actionLog", this.checked)'/>
-                    <label for='actionLogInput'>${_txt('menu>options>action_log')}</label>
+                    <label for='actionLogInput'>${Localization.txt('menu>options>action_log')}</label>
                 <br>
                 <input id='highlightNewInput' type='checkbox' onchange='setOption("highlightNew", this.checked)'/>
-                    <label for='highlightNewInput'>${_txt('menu>options>highlight_new')}</label>
+                    <label for='highlightNewInput'>${Localization.txt('menu>options>highlight_new')}</label>
                 <br>
                 <input id='statColorsInput' type='checkbox' onchange='setOption("statColors", this.checked)'/>
-                    <label for='statColorsInput'>${_txt('menu>options>stat_colors')}</label>
+                    <label for='statColorsInput'>${Localization.txt('menu>options>stat_colors')}</label>
                 <br>
                 <input id='statHintsInput' type='checkbox' onchange='setOption("statHints", this.checked)'/>
-                    <label for='statHintsInput'>${_txt('menu>options>stat_hints')}</label>
+                    <label for='statHintsInput'>${Localization.txt('menu>options>stat_hints')}</label>
                 <br>
                 <input id='pingOnPauseInput' type='checkbox' onchange='setOption("pingOnPause", this.checked)'/>
-                    <label for='pingOnPauseInput'>${_txt('menu>options>pause_audio_cue')}</label>
+                    <label for='pingOnPauseInput'>${Localization.txt('menu>options>pause_audio_cue')}</label>
                 <br>
                 <input id='notifyOnPauseInput' type='checkbox' onchange='setOption("notifyOnPause", this.checked)'/>
-                    <label for='notifyOnPauseInput'>${_txt('menu>options>pause_notify_cue')}</label>
+                    <label for='notifyOnPauseInput'>${Localization.txt('menu>options>pause_notify_cue')}</label>
                 <br>
                 <input id='autoMaxTrainingInput' type='checkbox' onchange='setOption("autoMaxTraining", this.checked)'/>
-                    <label for='autoMaxTrainingInput'>${_txt('menu>options>auto_max_training')}</label>
+                    <label for='autoMaxTrainingInput'>${Localization.txt('menu>options>auto_max_training')}</label>
                 <br>
                 <input id='hotkeysInput' type='checkbox' onchange='setOption("hotkeys", this.checked)'/>
-                    <label class='showthat' for='hotkeysInput'>${_txt('menu>options>hotkeys')}
-                    <div class='showthis'>${_txt('menu>options>hotkeys_tooltip')}</div>
+                    <label class='showthat' for='hotkeysInput'>${Localization.txt('menu>options>hotkeys')}
+                    <div class='showthis'>${Localization.txt('menu>options>hotkeys_tooltip')}</div>
                 </label>
                 <br>
-                ${_txt('menu>options>update_rate')}
+                ${Localization.txt('menu>options>update_rate')}
                 <input id='updateRateInput' type='number' value='50' min='1' style='width: 50px;transform: translateY(-2px);' oninput='setOption("updateRate", parseInt(this.value))' />
                 <br>
-                ${_txt('menu>options>autosave_rate')}
+                ${Localization.txt('menu>options>autosave_rate')}
                 <input id='autosaveRateInput' type='number' value='30' min='1' style='width: 50px;transform: translateY(-2px);' oninput='setOption("autosaveRate", parseInt(this.value))' />
                 <br>
             </div>
@@ -241,7 +244,7 @@ const menu = {
   htmlLocalizationMenu() {
     const lg = Localization.supportedLang;
     let html = `${
-      _txt('menu>options>localization_title')
+      Localization.txt('menu>options>localization_title')
     }: <select id='localization_menu' onchange='Localization.change();'>`;
     $.each(lg, (val, str) => {
       html += `<option value='${val}'${Localization.currentLang === val ? 'selected' : ''}>${str}</option>`;
@@ -251,8 +254,10 @@ const menu = {
   },
   htmlThemeMenu() {
     const themeList = ['normal', 'dark', 'cubic', 'cubic t-dark', 'zen', 'zen t-dark'];
-    const themes = _txtsObj('menu>options>theme');
-    let html = `${_txt('menu>options>theme_title')}: <select id='themeInput' onchange='view.changeTheme();'>`;
+    const themes = Localization.txtsObj('menu>options>theme');
+    let html = `${
+      Localization.txt('menu>options>theme_title')
+    }: <select id='themeInput' onchange='view.changeTheme();'>`;
     $(themes).each((index, theme) => {
       html += `<option value='${themeList[index]}'>${
         $(theme).find(themeList[index].replaceAll(' ', '_')).text()
@@ -260,7 +265,7 @@ const menu = {
     });
     html += '</select><br>';
     html += `<div class='block' id='themeVariantSection'>${
-      _txt('menu>options>theme_variant_title')
+      Localization.txt('menu>options>theme_variant_title')
     }: <select id='themeVariantInput' onchange='view.changeTheme();'>`;
     $(themes).each((index, theme) => {
       $(theme).find('variants>*').each((vindex, variant) => {
@@ -275,68 +280,72 @@ const menu = {
   htmlExtrasMenu() {
     const html =
       `<li id='extrasMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt('menu>extras>meta>title')}
+            ${Localization.txt('menu>extras>meta>title')}
             <div class='showthisH' style='padding-top:1ex'>
-                ${_txt('menu>options>extras_warning')}<br>
+                ${Localization.txt('menu>options>extras_warning')}<br>
                 <br>
                 <input id='fractionalManaInput' type='checkbox' onchange='setOption("fractionalMana", this.checked)'/>
-                    <label for='fractionalManaInput'>${_txt('menu>options>fractional_mana')}</label>
+                    <label for='fractionalManaInput'>${Localization.txt('menu>options>fractional_mana')}</label>
                 <br>
                 <input id='predictorInput' type='checkbox' onchange='setOption("predictor", this.checked)'/>
-                    <label for='predictorInput'>${_txt('menu>options>predictor')}</label>
+                    <label for='predictorInput'>${Localization.txt('menu>options>predictor')}</label>
                 <br>
                 <div class='control'>
                     <input type='checkbox' id='speedIncrease10xInput' onchange='setOption("speedIncrease10x", this.checked)'>
-                    <label for='speedIncrease10xInput'>${_txt('menu>options>speedIncrease10x_text')}</label>
+                    <label for='speedIncrease10xInput'>${Localization.txt('menu>options>speedIncrease10x_text')}</label>
                 </div>
                 <br>
                 <div class='control'>
                     <input type='checkbox' id='speedIncrease20xInput' onchange='setOption("speedIncrease20x", this.checked)'>
-                    <label for='speedIncrease20xInput'>${_txt('menu>options>speedIncrease20x_text')}</label>
+                    <label for='speedIncrease20xInput'>${Localization.txt('menu>options>speedIncrease20x_text')}</label>
                 </div>
                 <br>
-                ${_txt('menu>options>speedIncreaseCustom_text')}
+                ${Localization.txt('menu>options>speedIncreaseCustom_text')}
                 <input id='speedIncreaseCustomInput' type='number' value='5' min='1' style='width: 50px;transform: translateY(-2px);' oninput='setOption("speedIncreaseCustom", parseInt(this.value))' />
                 <br>
-                ${_txt('menu>options>speedIncreaseBackground_text')}
+                ${Localization.txt('menu>options>speedIncreaseBackground_text')}
                 <input id='speedIncreaseBackgroundInput' type='number' value='' placeholder='same' min='0' style='width: 50px;transform: translateY(-2px);' oninput='setOption("speedIncreaseBackground", parseFloat(this.value))' />
                 <div id='speedIncreaseBackgroundWarning' class='small block' style='display:none'>${
-        _txt('menu>options>speedIncreaseBackground_warning')
+        Localization.txt('menu>options>speedIncreaseBackground_warning')
       }</div>
                 <br>
                 <button id='borrowTimeButton' class='button showthat control' onclick='borrowTime()'>${
-        _txt('menu>options>borrow_time')
+        Localization.txt('menu>options>borrow_time')
       }
-                    <div class='showthis'>${_txt('menu>options>borrow_time_tooltip')}</div>
+                    <div class='showthis'>${Localization.txt('menu>options>borrow_time_tooltip')}</div>
                 </button>
                 <div class='show-when-time-borrowed'>
                     <button id='returnTimeButton' class='button control' onclick='returnTime()'>${
-        _txt('menu>options>return_time')
+        Localization.txt('menu>options>return_time')
       }</button>
-                    ${_txt('menu>options>time_borrowed')} <span id='borrowedTimeDays'></span>
+                    ${Localization.txt('menu>options>time_borrowed')} <span id='borrowedTimeDays'></span>
                 </div><br>
                 <div id='predictorSettings'>
                     <br>
-                    <b>${_txt('predictor>settings')}</b>
+                    <b>${Localization.txt('predictor>settings')}</b>
                     <br>
                     <input id='predictorBackgroundThreadInput' type='checkbox' onchange='setOption("predictorBackgroundThread", this.checked)'>
-                    <label for='predictorBackgroundThreadInput'>${_txt('predictor>background_thread')}</label>
+                    <label for='predictorBackgroundThreadInput'>${
+        Localization.txt('predictor>background_thread')
+      }</label>
                     <br>
-                    <label for='predictorTimePrecisionInput'>${_txt('predictor>time_precision')}</label>
+                    <label for='predictorTimePrecisionInput'>${Localization.txt('predictor>time_precision')}</label>
                     <input id='predictorTimePrecisionInput' type='number' value='1' min='1' max='10' style='width: 50px;' oninput='setOption("predictorTimePrecision", parseInt(this.value))'>
                     <br>
-                    <label for='predictorNextPrecisionInput'>${_txt('predictor>next_precision')}</label>
+                    <label for='predictorNextPrecisionInput'>${Localization.txt('predictor>next_precision')}</label>
                     <input id='predictorNextPrecisionInput' type='number' value='2' min='1' max='10' style='width: 50px;' oninput='setOption("predictorNextPrecision", parseInt(this.value))'>
                     <br>
-                    <label for='predictorActionWidthInput'>${_txt('predictor>action_list_width')}</label>
+                    <label for='predictorActionWidthInput'>${Localization.txt('predictor>action_list_width')}</label>
                     <input id='predictorActionWidthInput' type='number' value='500' min='100' max='4000' style='width: 50px; margin-left:40px' oninput='setOption("predictorActionWidth", parseInt(this.value))'>
                     <br>
                     <input id='predictorRepeatPredictionInput' type='checkbox' onchange='setOption("predictorRepeatPrediction", this.checked)'>
-                    <label for='predictorRepeatPredictionInput'>${_txt('predictor>repeat_last_action')}</label>
+                    <label for='predictorRepeatPredictionInput'>${
+        Localization.txt('predictor>repeat_last_action')
+      }</label>
                     <br>
                     <input id='predictorSlowModeInput' type='checkbox' onchange='setOption("predictorSlowMode", this.checked)'>
                     <label for='predictorSlowModeInput'>${
-        _txt('predictor>slow_mode')
+        Localization.txt('predictor>slow_mode')
           .replace(
             '{slowMode}',
             `<input id='predictorSlowTimerInput' type='number' value='1' min='1' style='width: 20px;' oninput='setOption("predictorSlowTimer", parseInt(this.value))'>`,
@@ -350,7 +359,7 @@ const menu = {
   htmlChallengeMenu() {
     const html =
       `<li id='challengesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt('menu>challenges>meta>title')}
+            ${Localization.txt('menu>challenges>meta>title')}
             <div class='showthisH'>
                 ${this.challenges()}
             </div>
@@ -360,7 +369,7 @@ const menu = {
   htmlTotalsMenu() {
     const html =
       `<li id='totalsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt('menu>totals>meta>title')}
+            ${Localization.txt('menu>totals>meta>title')}
             <div class='showthisH'>
                 ${this.totals()}
             </div>
@@ -370,7 +379,7 @@ const menu = {
   htmlPrestigeMenu() {
     const html =
       `<li id='prestige_bonusesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${_txt('menu>prestige_bonus>meta>title')}
+            ${Localization.txt('menu>prestige_bonus>meta>title')}
             <div class='showthisH'>
                 ${this.prestige_bonuses()}
             </div>
@@ -393,17 +402,17 @@ const menu = {
     }
     html += `<button class='button showthat control' style='margin-top: 2px;' onclick='beginChallenge(1)'>Mana Drought 
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:100px;'>${
-      _txt('menu>challenges>mana_drought')
+      Localization.txt('menu>challenges>mana_drought')
     }</div>
         </button><br>
         <button class='button showthat control' style='margin-top: 2px;' onclick='beginChallenge(2)'>Noodle Arms
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:100px;'>${
-      _txt('menu>challenges>noodle_arms')
+      Localization.txt('menu>challenges>noodle_arms')
     }</div>
         </button><br>
         <button class='button showthat control' style='margin-top: 2px;' onclick='beginChallenge(3)'>Mana Burn
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:100px;'>${
-      _txt('menu>challenges>mana_burn')
+      Localization.txt('menu>challenges>mana_burn')
     }</div>
         </button><br>`;
     html += `</div>`;
@@ -414,7 +423,7 @@ const menu = {
         Effective Time: <div id='totalEffectiveTime'></div><br>
         Running Time: <div id='totalPlaytime'></div><br>
         <span class='show-when-time-borrowed'>${
-      _txt('menu>options>time_borrowed')
+      Localization.txt('menu>options>time_borrowed')
     } <div id='borrowedTimeBalance'></div><br></span>
         Loops: <div id='totalLoops'></div><br>
         Actions: <div id='totalActions'></div><br>
@@ -446,7 +455,7 @@ const menu = {
         <br>
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigePhysical")'>Prestige Physical
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-      _txt('menu>prestige_bonus>PrestigePhysical')
+      Localization.txt('menu>prestige_bonus>PrestigePhysical')
     }
                 <br><br>
                 Current Bonus: <div id='prestigePhysicalCurrentBonus'></div>%<br>
@@ -456,7 +465,7 @@ const menu = {
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeMental")'>Prestige Mental
         <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-      _txt('menu>prestige_bonus>PrestigeMental')
+      Localization.txt('menu>prestige_bonus>PrestigeMental')
     }
             <br><br>
             Current Bonus: <div id='prestigeMentalCurrentBonus'></div>%<br>
@@ -467,7 +476,7 @@ const menu = {
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeCombat")'>Prestige Combat
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-      _txt('menu>prestige_bonus>PrestigeCombat')
+      Localization.txt('menu>prestige_bonus>PrestigeCombat')
     }
                 <br><br>
                 Current Bonus: <div id='prestigeCombatCurrentBonus'></div>%<br>
@@ -477,7 +486,7 @@ const menu = {
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeSpatiomancy")'>Prestige Spatiomancy
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-      _txt('menu>prestige_bonus>PrestigeSpatiomancy')
+      Localization.txt('menu>prestige_bonus>PrestigeSpatiomancy')
     }
                 <br><br>
                 Current Bonus: <div id='prestigeSpatiomancyCurrentBonus'></div>%<br>
@@ -487,7 +496,7 @@ const menu = {
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeChronomancy")'>Prestige Chronomancy
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-      _txt('menu>prestige_bonus>PrestigeChronomancy')
+      Localization.txt('menu>prestige_bonus>PrestigeChronomancy')
     }
                 <br><br>
                 Current Bonus: <div id='prestigeChronomancyCurrentBonus'></div>%<br>
@@ -497,7 +506,7 @@ const menu = {
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeBartering")'>Prestige Bartering
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-      _txt('menu>prestige_bonus>PrestigeBartering')
+      Localization.txt('menu>prestige_bonus>PrestigeBartering')
     }
                 <br><br>
                 Current Bonus: <div id='prestigeBarteringCurrentBonus'></div>%<br>
@@ -507,7 +516,7 @@ const menu = {
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeExpOverflow")'>Prestige Experience Overflow
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-      _txt('menu>prestige_bonus>PrestigeExpOverflow')
+      Localization.txt('menu>prestige_bonus>PrestigeExpOverflow')
     }
                 <br><br>
                 Current Bonus: <div id='prestigeExpOverflowCurrentBonus'></div>%<br>
@@ -519,7 +528,7 @@ const menu = {
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='resetAllPrestiges()'>Reset All Prestiges
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-      _txt('menu>prestige_bonus>PrestigeResetAll')
+      Localization.txt('menu>prestige_bonus>PrestigeResetAll')
     }
             </div>
         </button><br>
@@ -534,9 +543,7 @@ const timeControls = {
   html() {
     const stories = () => {
       let html = '';
-      // eslint-disable-next-line no-unused-vars
-
-      _txtsObj('time_controls>stories>story').each((index, story) => {
+      Localization.txtsObj('time_controls>stories>story').each((index, story) => {
         html += `
           <div id='story${$(story).attr('num')}'>
             ${$(story).text()}
@@ -550,16 +557,16 @@ const timeControls = {
     return `
       <div id='timeControlsMain'>
         <button id='pausePlay' onclick='pauseGame()'' class='button control'>
-          ${_txt('time_controls>pause_button')}
+          ${Localization.txt('time_controls>pause_button')}
         </button>
         <button onclick='manualRestart()' class='button showthatO control'>
-          ${_txt('time_controls>restart_button')}
+          ${Localization.txt('time_controls>restart_button')}
           <div class='showthis' style='color:var(--default-color);width:230px;'>
-          ${_txt('time_controls>restart_text')}</div>
+          ${Localization.txt('time_controls>restart_text')}</div>
         </button>
         <input id='bonusIsActiveInput' type='checkbox' onchange='setOption("bonusIsActive", this.checked)'/>
         <button class='button showthatO control' onclick='toggleOffline()'>
-          ${_txt('time_controls>bonus_seconds>title')}
+          ${Localization.txt('time_controls>bonus_seconds>title')}
           <div class='showthis' id='bonusText' style='max-width:500px;color:var(--default-color);'>
             ${view.getBonusText()}
           </div>
@@ -567,7 +574,7 @@ const timeControls = {
         <div class='control'>
           <div tabindex='0' id='story_control' class='showthatH' onmouseover='view.updateStory(storyShowing)' onfocus='view.updateStory(storyShowing)' style='height:30px;'>
             <div class='large bold'>
-              ${_txt('time_controls>story_title')}
+              ${Localization.txt('time_controls>story_title')}
             </div>
             <div id='newStory' style='color:var(--alert-color);display:none;'>(!)</div>
             <div id='story_tooltip' class='showthisH' style='width:400px;'>
@@ -582,15 +589,15 @@ const timeControls = {
       <div id='timeControlsOptions'>
         <div class='control'>
           <input type='checkbox' id='pauseBeforeRestartInput' onchange='setOption("pauseBeforeRestart", this.checked)'>
-          <label for='pauseBeforeRestartInput'>${_txt('time_controls>pause_before_restart')}</label>
+          <label for='pauseBeforeRestartInput'>${Localization.txt('time_controls>pause_before_restart')}</label>
         </div>
         <div class='control'>
           <input type='checkbox' id='pauseOnFailedLoopInput' onchange='setOption("pauseOnFailedLoop", this.checked)'>
-          <label for='pauseOnFailedLoopInput'>${_txt('time_controls>pause_on_failed_loop')}</label>
+          <label for='pauseOnFailedLoopInput'>${Localization.txt('time_controls>pause_on_failed_loop')}</label>
         </div>
         <div class='control'>
           <input type='checkbox' id='pauseOnCompleteInput' onchange='setOption("pauseOnComplete", this.checked)'>
-          <label for='pauseOnCompleteInput'>${_txt('time_controls>pause_on_complete')}</label>
+          <label for='pauseOnCompleteInput'>${Localization.txt('time_controls>pause_on_complete')}</label>
         </div>
       </div>
     `;
@@ -602,7 +609,7 @@ const trackedResources = {
   html() {
     let html = '';
 
-    const resources = _txtsObj('tracked_resources>resource');
+    const resources = Localization.txtsObj('tracked_resources>resource');
 
     $(resources).each((_index, resource) => {
       const hasCount = !$(resource).attr('no_count');
@@ -615,7 +622,7 @@ const trackedResources = {
           ${hasCount ? `<div id='${$(resource).attr('id')}'>0</div>` : ''}
           <div class='showthis'>
             ${$(resource).find('desc').text()}
-            ${resetOnRestart ? `<br>${_txt('tracked_resources>reset_on_restart_txt')}` : ''}
+            ${resetOnRestart ? `<br>${Localization.txt('tracked_resources>reset_on_restart_txt')}` : ''}
           </div>
         </div>
       `;

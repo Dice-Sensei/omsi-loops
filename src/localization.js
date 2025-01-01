@@ -1,6 +1,6 @@
 // @ts-check
 
-const Localization = self['Localization'] = {
+const Localization = {
   // config
   // set to true for more console.log
   debug: false,
@@ -104,24 +104,7 @@ const Localization = self['Localization'] = {
   },
 };
 
-// binding the _txt function for simplier use
-const _txt = self['_txt'] = Localization.txt;
-const _txtsObj = self['_txtsObj'] = Localization.txtsObj;
-
-if (typeof window !== 'undefined') {
-  Localization.init();
-
-  Localization.loadLib('fallback', () => {
-    Localization.loadLib('game', () => Localization.setReady());
-  });
-}
-
-/**
- * Represents a localization subtree; intended as a base class for a piece of game data
- * with associated localization
- */
 class Localizable {
-  /** @type {JQuery<Element>} */
   #txtsObj;
   #rootPath;
   #lib;
@@ -133,7 +116,7 @@ class Localizable {
     return this.#lib;
   }
   get txtsObj() {
-    return this.#txtsObj ??= _txtsObj(this.#rootPath, this.#lib);
+    return this.#txtsObj ??= Localization.txtsObj(this.#rootPath, this.#lib);
   }
 
   /** @param {string} rootPath @param {string} [lib] */
@@ -145,15 +128,10 @@ class Localizable {
   /** @param {string} subPath  */
   txt(subPath) {
     const txt = this.txtsObj.find(subPath).text();
-    return txt !== '' ? txt : _txt(this.#rootPath + subPath, this.#lib);
+
+    return txt !== '' ? txt : Localization.txt(this.#rootPath + subPath, this.#lib);
   }
 
-  /**
-   * @template {keyof this} K
-   * @template {this[K]} V
-   * @param {K} property
-   * @param {V} value
-   */
   memoizeValue(property, value) {
     if (Object.hasOwn(this, property)) {
       delete this[property];
@@ -162,15 +140,10 @@ class Localizable {
     return value;
   }
 
-  /**
-   * @param {keyof this} property Property to update on this object
-   * @param {string} [subPath] Subpath of localization object, defaults to `">${`{@link property}`}"`
-   * @returns {string}
-   */
   memoize(property, subPath) {
     subPath ??= `>${String(property)}`;
     const value = this.txt(subPath);
-    // @ts-ignore
+
     return this.memoizeValue(property, value);
   }
 }

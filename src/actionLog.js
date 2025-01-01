@@ -237,7 +237,7 @@ class ActionLogEntry {
     if (key === 'loopEnd') return formatNumber(this.loop);
     if (key === 'town') return townNames[this.action?.townNum];
     if (key === 'action') return this.action?.label;
-    if (key === 'header') return _txt('actions>log>header');
+    if (key === 'header') return Localization.txt('actions>log>header');
     throw new Error(`Bad key ${key}`);
   }
 
@@ -282,7 +282,11 @@ class RepeatableLogEntry extends ActionLogEntry {
 
   /** @param {string} key  */
   getReplacement(key) {
-    if (key === 'loop') return this.loop === this.loopEnd ? formatNumber(this.loop) : _txt('actions>log>multiloop');
+    if (key === 'loop') {
+      return this.loop === this.loopEnd
+        ? formatNumber(this.loop)
+        : Localization.txt('actions>log>multiloop');
+    }
     if (key === 'loopEnd') return formatNumber(this.loopEnd);
     return super.getReplacement(key);
   }
@@ -330,7 +334,7 @@ class ActionStoryEntry extends UniqueLogEntry {
   }
 
   getText() {
-    return _txt('actions>log>action_story');
+    return Localization.txt('actions>log>action_story');
   }
 
   getReplacement(key) {
@@ -344,7 +348,7 @@ class ActionStoryEntry extends UniqueLogEntry {
         if (key === 'story') return storyInfo.text;
       } else {
         if (key === 'condition') return '???';
-        if (key === 'story') return _txt(`actions>log>action_story_not_found`);
+        if (key === 'story') return Localization.txt(`actions>log>action_story_not_found`);
       }
     }
 
@@ -377,11 +381,11 @@ class GlobalStoryEntry extends UniqueLogEntry {
   }
 
   getText() {
-    return _txt('actions>log>global_story');
+    return Localization.txt('actions>log>global_story');
   }
 
   getReplacement(key) {
-    if (key === 'story') return _txt(`time_controls>stories>story[num="${this.chapter}"]`);
+    if (key === 'story') return Localization.txt(`time_controls>stories>story[num="${this.chapter}"]`);
     return super.getReplacement(key);
   }
 }
@@ -429,7 +433,7 @@ class SoulstoneEntry extends RepeatableLogEntry {
   }
 
   getText() {
-    return _txt(
+    return Localization.txt(
       this.count === 1
         ? 'actions>log>soulstone'
         : Object.keys(this.stones).length === 1
@@ -440,11 +444,11 @@ class SoulstoneEntry extends RepeatableLogEntry {
 
   getReplacement(key) {
     if (key === 'count') return intToString(this.count, 1);
-    if (key === 'stat_long') return _txt(`stats>${Object.keys(this.stones)[0]}>long_form`);
-    if (key === 'stat') return _txt(`stats>${Object.keys(this.stones)[0]}>short_form`);
+    if (key === 'stat_long') return Localization.txt(`stats>${Object.keys(this.stones)[0]}>long_form`);
+    if (key === 'stat') return Localization.txt(`stats>${Object.keys(this.stones)[0]}>short_form`);
     if (key === 'stats') {
       const strs = [];
-      const template = _txt(
+      const template = Localization.txt(
         Object.keys(this.stones).length > 3 ? 'actions>log>soulstone_stat_short' : 'actions>log>soulstone_stat',
       );
       for (const stat in stats) {
@@ -452,8 +456,8 @@ class SoulstoneEntry extends RepeatableLogEntry {
           strs.push(
             template
               .replace('{count}', intToString(this.stones[stat], 1))
-              .replace('{stat_long}', _txt(`stats>${stat}>long_form`))
-              .replace('{stat}', _txt(`stats>${stat}>short_form`)),
+              .replace('{stat_long}', Localization.txt(`stats>${stat}>long_form`))
+              .replace('{stat}', Localization.txt(`stats>${stat}>short_form`)),
           );
         }
       }
@@ -540,11 +544,11 @@ class SkillEntry extends LeveledLogEntry {
   }
 
   getText() {
-    return _txt(this.toLevel === this.fromLevel + 1 ? 'actions>log>skill' : 'actions>log>skill_multi');
+    return Localization.txt(this.toLevel === this.fromLevel + 1 ? 'actions>log>skill' : 'actions>log>skill_multi');
   }
 
   getReplacement(key) {
-    if (key === 'skill') return _txt(`skills>${getXMLName(this.name)}>label`);
+    if (key === 'skill') return Localization.txt(`skills>${getXMLName(this.name)}>label`);
     return super.getReplacement(key);
   }
 }
@@ -590,15 +594,15 @@ class BuffEntry extends LeveledLogEntry {
     let tag = 'buff';
     if (this.fromLevel === 0) tag += '_from0';
     if (this.toLevel !== this.fromLevel + 1) tag += '_multi';
-    return _txt(`actions>log>${tag}`);
+    return Localization.txt(`actions>log>${tag}`);
   }
 
   /** @param {string} key */
   getReplacement(key) {
-    if (key === 'buff') return _txt(`buffs>${getXMLName(Buff.fullNames[this.name])}>label`);
+    if (key === 'buff') return Localization.txt(`buffs>${getXMLName(Buff.fullNames[this.name])}>label`);
     if (key === 'buff_cost') {
       return this.statSpendType
-        ? _txt(
+        ? Localization.txt(
           `actions>log>buff_cost_${
             this.statSpendType === 'soulstone' && Object.keys(this.soulstoneEntry.stones).length === 1
               ? 'soulstone_single'

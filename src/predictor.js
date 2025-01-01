@@ -542,7 +542,11 @@ const Koviko = {
         };
       }
       for (const stat of statList) {
-        Koviko.trackedStats['T' + stat] = { type: 'T', name: stat, display_name: _txt('stats>' + stat + '>long_form') };
+        Koviko.trackedStats['T' + stat] = {
+          type: 'T',
+          name: stat,
+          display_name: Localization.txt('stats>' + stat + '>long_form'),
+        };
       }
       for (const [key, stat] of Object.entries(Koviko.trackedStats)) {
         $('#predictorTrackedStatInput').append(
@@ -2537,7 +2541,7 @@ const Koviko = {
           break;
         case 'T':
           newStatisticValue = (state.talents[trackedStat.name] - statisticStart) / totalMinutes;
-          legend = _txt('stats>' + trackedStat.name + '>short_form');
+          legend = Localization.txt('stats>' + trackedStat.name + '>short_form');
           break;
       }
 
@@ -2663,7 +2667,7 @@ const Koviko = {
             end: getLevelFromExp(stats[i].value),
           };
 
-          tooltip += '<tr><td><b>' + _txt(`stats>${i}>short_form`).toUpperCase() + '</b></td><td>' +
+          tooltip += '<tr><td><b>' + Localization.txt(`stats>${i}>short_form`).toUpperCase() + '</b></td><td>' +
             intToString(level.end, 1) + '</td><td>(+' + intToString(level.end - level.start, 1) + ')</td></tr>';
         }
       }

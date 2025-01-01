@@ -74,7 +74,7 @@ export class StatGraph {
     const orderedStats = statList.map((s) => stats[s]);
     const datasets: Dataset[] = [{
       name: 'mana_cost_reduction',
-      label: _txt('stats>tooltip>mana_cost_reduction'),
+      label: Localization.txt('stats>tooltip>mana_cost_reduction'),
       data: ({ manaMultiplier }) => (1 - manaMultiplier) * 100,
       enabled: true,
     }];
