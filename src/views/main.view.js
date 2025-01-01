@@ -31,7 +31,7 @@ function formatTime(seconds) {
     return timeString;
   }
   if (Number.isInteger(seconds)) {
-    return (formatNumber(seconds) + globalThis.Localization.txt('time_controls>seconds')).replace(
+    return (globalThis.helpers.formatNumber(seconds) + globalThis.Localization.txt('time_controls>seconds')).replace(
       /\B(?=(\d{3})+(?!\d))/gu,
       ',',
     );
@@ -129,7 +129,7 @@ class View {
   }
 
   modifierkeychangeHandler() {
-    htmlElement('clearList').textContent = globalThis.trash.shiftDown
+    globalThis.helpers.htmlElement('clearList').textContent = globalThis.trash.shiftDown
       ? globalThis.Localization.txt('actions>tooltip>clear_disabled')
       : globalThis.Localization.txt('actions>tooltip>clear_list');
   }
@@ -148,7 +148,7 @@ class View {
     if (this.statGraph.initalized) return;
 
     this.statGraph.init(document.getElementById('statsContainer'));
-    const totalContainer = htmlElement('totalStatContainer');
+    const totalContainer = globalThis.helpers.htmlElement('totalStatContainer');
     for (const stat of statList) {
       const axisTip = this.statGraph.getAxisTip(stat);
       totalContainer.insertAdjacentHTML(
@@ -407,31 +407,43 @@ class View {
     this.updateLevelLogBar('statsContainer', `stat${stat}LevelLogBar`, level, `stat${stat}LevelBar`, levelPrc);
     this.updateLevelLogBar('statsContainer', `stat${stat}TalentLogBar`, talent, `stat${stat}TalentBar`, talentPrc);
 
-    document.getElementById(`stat${stat}Level`).textContent = intToString(level, 1);
-    document.getElementById(`stat${stat}Talent`).textContent = intToString(talent, 1);
-    document.getElementById(`stattotalLevel`).textContent = intToString(totalLevel, 1);
-    document.getElementById(`stattotalTalent`).textContent = intToString(totalTalent, 1);
-    document.getElementById(`stattotalLevel2`).textContent = formatNumber(totalLevel);
-    document.getElementById(`stattotalTalent2`).textContent = formatNumber(totalTalent);
+    document.getElementById(`stat${stat}Level`).textContent = globalThis.helpers.intToString(level, 1);
+    document.getElementById(`stat${stat}Talent`).textContent = globalThis.helpers.intToString(talent, 1);
+    document.getElementById(`stattotalLevel`).textContent = globalThis.helpers.intToString(totalLevel, 1);
+    document.getElementById(`stattotalTalent`).textContent = globalThis.helpers.intToString(totalTalent, 1);
+    document.getElementById(`stattotalLevel2`).textContent = globalThis.helpers.formatNumber(totalLevel);
+    document.getElementById(`stattotalTalent2`).textContent = globalThis.helpers.formatNumber(totalTalent);
 
     if (statShowing === stat || document.getElementById(`stat${stat}LevelExp`).innerHTML === '') {
-      document.getElementById(`stat${stat}Level2`).textContent = formatNumber(level);
-      document.getElementById(`stat${stat}LevelExp`).textContent = intToString(stats[stat].statLevelExp.exp, 1);
-      document.getElementById(`stat${stat}LevelExpNeeded`).textContent = intToString(
+      document.getElementById(`stat${stat}Level2`).textContent = globalThis.helpers.formatNumber(level);
+      document.getElementById(`stat${stat}LevelExp`).textContent = globalThis.helpers.intToString(
+        stats[stat].statLevelExp.exp,
+        1,
+      );
+      document.getElementById(`stat${stat}LevelExpNeeded`).textContent = globalThis.helpers.intToString(
         stats[stat].statLevelExp.expRequiredForNextLevel,
         1,
       );
-      document.getElementById(`stat${stat}LevelProgress`).textContent = intToString(levelPrc, 2);
+      document.getElementById(`stat${stat}LevelProgress`).textContent = globalThis.helpers.intToString(levelPrc, 2);
 
-      document.getElementById(`stat${stat}Talent2`).textContent = formatNumber(talent);
-      document.getElementById(`stat${stat}TalentExp`).textContent = intToString(stats[stat].talentLevelExp.exp, 1);
-      document.getElementById(`stat${stat}TalentExpNeeded`).textContent = intToString(
+      document.getElementById(`stat${stat}Talent2`).textContent = globalThis.helpers.formatNumber(talent);
+      document.getElementById(`stat${stat}TalentExp`).textContent = globalThis.helpers.intToString(
+        stats[stat].talentLevelExp.exp,
+        1,
+      );
+      document.getElementById(`stat${stat}TalentExpNeeded`).textContent = globalThis.helpers.intToString(
         stats[stat].talentLevelExp.expRequiredForNextLevel,
         1,
       );
-      document.getElementById(`stat${stat}TalentMult`).textContent = intToString(stats[stat].talentMult, 3);
-      document.getElementById(`stat${stat}TalentProgress`).textContent = intToString(talentPrc, 2);
-      document.getElementById(`stat${stat}TotalMult`).textContent = intToString(getTotalBonusXP(stat), 3);
+      document.getElementById(`stat${stat}TalentMult`).textContent = globalThis.helpers.intToString(
+        stats[stat].talentMult,
+        3,
+      );
+      document.getElementById(`stat${stat}TalentProgress`).textContent = globalThis.helpers.intToString(talentPrc, 2);
+      document.getElementById(`stat${stat}TotalMult`).textContent = globalThis.helpers.intToString(
+        getTotalBonusXP(stat),
+        3,
+      );
     }
   }
 
@@ -449,11 +461,11 @@ class View {
    * @param {string} [levelPrc]
    */
   updateLevelLogBar(maxContainerId, logBarId, level, levelBarId, levelPrc) {
-    const maxContainer = htmlElement(maxContainerId);
+    const maxContainer = globalThis.helpers.htmlElement(maxContainerId);
     const logLevel = level; //Math.log10(level);
     let maxValue = parseFloat(getComputedStyle(maxContainer).getPropertyValue('--max-bar-value')) || 0;
 
-    const logBar = htmlElement(logBarId);
+    const logBar = globalThis.helpers.htmlElement(logBarId);
     if (level > maxValue) {
       maxValue = this.getMaxLogBarScale(level + 1);
       maxContainer.style.setProperty('--max-bar-value', String(maxValue));
@@ -470,7 +482,7 @@ class View {
       }
     }
     maxValue = this.getMaxLogBarScale(maxValue);
-    const statsContainer = htmlElement('statsContainer');
+    const statsContainer = globalThis.helpers.htmlElement('statsContainer');
     if (skipAnimation) {
       statsContainer.classList.remove('animate-logBars');
       this.statGraph.update(true);
@@ -504,54 +516,81 @@ class View {
 
     const levelPrc = getPrcToNextSkillLevel(skill);
     document.getElementById(`skill${skill}Level`).textContent = (getSkillLevel(skill) > 9999)
-      ? toSuffix(getSkillLevel(skill))
-      : formatNumber(getSkillLevel(skill));
+      ? globalThis.helpers.toSuffix(getSkillLevel(skill))
+      : globalThis.helpers.formatNumber(getSkillLevel(skill));
     document.getElementById(`skill${skill}LevelBar`).style.width = `${levelPrc}%`;
 
     if (skillShowing === skill) {
-      document.getElementById(`skill${skill}LevelExp`).textContent = intToString(skills[skill].levelExp.exp, 1);
-      document.getElementById(`skill${skill}LevelExpNeeded`).textContent = intToString(
+      document.getElementById(`skill${skill}LevelExp`).textContent = globalThis.helpers.intToString(
+        skills[skill].levelExp.exp,
+        1,
+      );
+      document.getElementById(`skill${skill}LevelExpNeeded`).textContent = globalThis.helpers.intToString(
         skills[skill].levelExp.expRequiredForNextLevel,
         1,
       );
-      document.getElementById(`skill${skill}LevelProgress`).textContent = intToString(levelPrc, 2);
+      document.getElementById(`skill${skill}LevelProgress`).textContent = globalThis.helpers.intToString(levelPrc, 2);
 
       if (skill === 'Dark') {
-        document.getElementById('skillBonusDark').textContent = intToString(getSkillBonus('Dark'), 4);
+        document.getElementById('skillBonusDark').textContent = globalThis.helpers.intToString(
+          getSkillBonus('Dark'),
+          4,
+        );
       } else if (skill === 'Chronomancy') {
-        document.getElementById('skillBonusChronomancy').textContent = intToString(getSkillBonus('Chronomancy'), 4);
+        document.getElementById('skillBonusChronomancy').textContent = globalThis.helpers.intToString(
+          getSkillBonus('Chronomancy'),
+          4,
+        );
       } else if (skill === 'Practical') {
         document.getElementById('skillBonusPractical').textContent = getSkillBonus('Practical').toFixed(3).replace(
           /(\.\d*?[1-9])0+$/gu,
           '$1',
         );
       } else if (skill === 'Mercantilism') {
-        document.getElementById('skillBonusMercantilism').textContent = intToString(getSkillBonus('Mercantilism'), 4);
+        document.getElementById('skillBonusMercantilism').textContent = globalThis.helpers.intToString(
+          getSkillBonus('Mercantilism'),
+          4,
+        );
       } else if (skill === 'Spatiomancy') {
         document.getElementById('skillBonusSpatiomancy').textContent = getSkillBonus('Spatiomancy').toFixed(3).replace(
           /(\.\d*?[1-9])0+$/gu,
           '$1',
         );
       } else if (skill === 'Divine') {
-        document.getElementById('skillBonusDivine').textContent = intToString(getSkillBonus('Divine'), 4);
+        document.getElementById('skillBonusDivine').textContent = globalThis.helpers.intToString(
+          getSkillBonus('Divine'),
+          4,
+        );
       } else if (skill === 'Commune') {
         document.getElementById('skillBonusCommune').textContent = getSkillBonus('Commune').toFixed(3).replace(
           /(\.\d*?[1-9])0+$/gu,
           '$1',
         );
       } else if (skill === 'Wunderkind') {
-        document.getElementById('skillBonusWunderkind').textContent = intToString(getSkillBonus('Wunderkind'), 4);
+        document.getElementById('skillBonusWunderkind').textContent = globalThis.helpers.intToString(
+          getSkillBonus('Wunderkind'),
+          4,
+        );
       } else if (skill === 'Gluttony') {
         document.getElementById('skillBonusGluttony').textContent = getSkillBonus('Gluttony').toFixed(3).replace(
           /(\.\d*?[1-9])0+$/gu,
           '$1',
         );
       } else if (skill === 'Thievery') {
-        document.getElementById('skillBonusThievery').textContent = intToString(getSkillBonus('Thievery'), 4);
+        document.getElementById('skillBonusThievery').textContent = globalThis.helpers.intToString(
+          getSkillBonus('Thievery'),
+          4,
+        );
       } else if (skill === 'Leadership') {
-        document.getElementById('skillBonusLeadership').textContent = intToString(getSkillBonus('Leadership'), 4);
+        document.getElementById('skillBonusLeadership').textContent = globalThis.helpers.intToString(
+          getSkillBonus('Leadership'),
+          4,
+        );
       } else if (skill === 'Assassin') {
-        document.getElementById('skillBonusAssassin').textContent = intToString(getSkillBonus('Assassin'), 4);
+        document.getElementById('skillBonusAssassin').textContent = globalThis.helpers.intToString(
+          getSkillBonus('Assassin'),
+          4,
+        );
       }
     }
     this.adjustTooltipPosition(container.querySelector('div.showthis'));
@@ -591,7 +630,7 @@ class View {
   updateTime() {
     document.getElementById('timeBar').style.width = `${100 - timer / timeNeeded * 100}%`;
     document.getElementById('timer').textContent = `${
-      intToString(timeNeeded - timer, options.fractionalMana ? 2 : 1, true)
+      globalThis.helpers.intToString(timeNeeded - timer, options.fractionalMana ? 2 : 1, true)
     } | ${formatTime((timeNeeded - timer) / 50 / getActualGameSpeed())}`;
     this.adjustGoldCost({ varName: 'Wells', cost: Action.ManaWell.goldCost() });
   }
@@ -669,13 +708,13 @@ class View {
     );
   }
   updateTotalTicks() {
-    document.getElementById('totalTicks').textContent = `${formatNumber(actions.completedTicks)} | ${
+    document.getElementById('totalTicks').textContent = `${globalThis.helpers.formatNumber(actions.completedTicks)} | ${
       formatTime(timeCounter)
     }`;
     document.getElementById('effectiveTime').textContent = `${formatTime(effectiveTime)}`;
   }
   updateResource(resource) {
-    const element = htmlElement(`${resource}Div`, false, false);
+    const element = globalThis.helpers.htmlElement(`${resource}Div`, false, false);
     if (element) element.style.display = resources[resource] ? 'inline-block' : 'none';
 
     if (resource === 'supplies') document.getElementById('suppliesCost').textContent = String(towns[0].suppliesCost);
@@ -683,17 +722,25 @@ class View {
       document.getElementById('teamCost').textContent = `${(resources.teamMembers + 1) * 100}`;
     }
 
-    if (Number.isFinite(resources[resource])) htmlElement(resource).textContent = resources[resource];
+    if (Number.isFinite(resources[resource])) {
+      globalThis.helpers.htmlElement(resource).textContent = resources[resource];
+    }
   }
   updateResources() {
     for (const resource in resources) this.updateResource(resource);
   }
   updateActionTooltips() {
-    document.getElementById('goldInvested').textContent = intToStringRound(goldInvested);
-    document.getElementById('bankInterest').textContent = intToStringRound(goldInvested * .001);
-    document.getElementById('actionAllowedPockets').textContent = intToStringRound(towns[7].totalPockets);
-    document.getElementById('actionAllowedWarehouses').textContent = intToStringRound(towns[7].totalWarehouses);
-    document.getElementById('actionAllowedInsurance').textContent = intToStringRound(towns[7].totalInsurance);
+    document.getElementById('goldInvested').textContent = globalThis.helpers.intToStringRound(goldInvested);
+    document.getElementById('bankInterest').textContent = globalThis.helpers.intToStringRound(goldInvested * .001);
+    document.getElementById('actionAllowedPockets').textContent = globalThis.helpers.intToStringRound(
+      towns[7].totalPockets,
+    );
+    document.getElementById('actionAllowedWarehouses').textContent = globalThis.helpers.intToStringRound(
+      towns[7].totalWarehouses,
+    );
+    document.getElementById('actionAllowedInsurance').textContent = globalThis.helpers.intToStringRound(
+      towns[7].totalInsurance,
+    );
     document.getElementById('totalSurveyProgress').textContent = `${getExploreProgress()}`;
     Array.from(document.getElementsByClassName('surveySkill')).forEach((div) => {
       div.textContent = `${getExploreSkill()}`;
@@ -707,8 +754,8 @@ class View {
     if (towns[2].unlocked) {
       document.getElementById('skillSCombatContainer').style.display = 'inline-block';
       document.getElementById('skillTCombatContainer').style.display = 'inline-block';
-      document.getElementById('skillSCombatLevel').textContent = intToString(getSelfCombat(), 1);
-      document.getElementById('skillTCombatLevel').textContent = intToString(getTeamCombat(), 1);
+      document.getElementById('skillSCombatLevel').textContent = globalThis.helpers.intToString(getSelfCombat(), 1);
+      document.getElementById('skillTCombatLevel').textContent = globalThis.helpers.intToString(getTeamCombat(), 1);
     } else {
       document.getElementById('skillSCombatContainer').style.display = 'none';
       document.getElementById('skillTCombatContainer').style.display = 'none';
@@ -897,7 +944,11 @@ class View {
       .call((container) =>
         container
           .select('div.nextActionLoops > div.bold')
-          .text((action) => action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops))
+          .text((action) =>
+            action.loops > 99999
+              ? globalThis.helpers.toSuffix(action.loops)
+              : globalThis.helpers.formatNumber(action.loops)
+          )
       );
 
     if (options.predictor) {
@@ -912,11 +963,13 @@ class View {
     // definite leak - need to remove listeners and image
     for (let i = 0; i < actions.current.length; i++) {
       const action = actions.current[i];
-      const actionLoops = action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops);
+      const actionLoops = action.loops > 99999
+        ? globalThis.helpers.toSuffix(action.loops)
+        : globalThis.helpers.formatNumber(action.loops);
       const actionLoopsDone = (action.loops - action.loopsLeft) > 99999
-        ? toSuffix(action.loops - action.loopsLeft)
-        : formatNumber(action.loops - action.loopsLeft);
-      const imageName = action.name.startsWith('Assassin') ? 'assassin' : camelize(action.name);
+        ? globalThis.helpers.toSuffix(action.loops - action.loopsLeft)
+        : globalThis.helpers.formatNumber(action.loops - action.loopsLeft);
+      const imageName = action.name.startsWith('Assassin') ? 'assassin' : globalThis.helpers.camelize(action.name);
       totalDivText +=
         `<div class='curActionContainer small' onmouseover='view.mouseoverAction(${i}, true)' onmouseleave='view.mouseoverAction(${i}, false)'>
                     <div class='curActionBar' id='action${i}Bar'></div>
@@ -1013,20 +1066,25 @@ class View {
 
     // only update tooltip if it's open
     if (curActionShowing === index) {
-      document.getElementById(`action${index}ManaOrig`).textContent = intToString(
+      document.getElementById(`action${index}ManaOrig`).textContent = globalThis.helpers.intToString(
         action.manaCost() * action.loops,
         options.fractionalMana ? 3 : 1,
       );
-      document.getElementById(`action${index}ManaUsed`).textContent = intToString(
+      document.getElementById(`action${index}ManaUsed`).textContent = globalThis.helpers.intToString(
         action.manaUsed,
         options.fractionalMana ? 3 : 1,
       );
-      document.getElementById(`action${index}LastMana`).textContent = intToString(action.lastMana, 3);
-      document.getElementById(`action${index}Remaining`).textContent = intToString(
+      document.getElementById(`action${index}LastMana`).textContent = globalThis.helpers.intToString(
+        action.lastMana,
+        3,
+      );
+      document.getElementById(`action${index}Remaining`).textContent = globalThis.helpers.intToString(
         action.manaRemaining,
         options.fractionalMana ? 3 : 1,
       );
-      document.getElementById(`action${index}GoldRemaining`).textContent = formatNumber(action.goldRemaining);
+      document.getElementById(`action${index}GoldRemaining`).textContent = globalThis.helpers.formatNumber(
+        action.goldRemaining,
+      );
       document.getElementById(`action${index}TimeSpent`).textContent = formatTime(action.timeSpent);
       document.getElementById(`action${index}TotalTimeElapsed`).textContent = formatTime(action.effectiveTimeElapsed);
 
@@ -1038,7 +1096,7 @@ class View {
       for (const stat of statList) {
         if (action[`statExp${stat}`]) {
           statExpGain += `<div class='bold'>${globalThis.Localization.txt(`stats>${stat}>short_form`)}:</div> ${
-            intToString(action[`statExp${stat}`], 2)
+            globalThis.helpers.intToString(action[`statExp${stat}`], 2)
           }<br>`;
         }
       }
@@ -1100,8 +1158,8 @@ class View {
       element.id = `actionLogEntry${index}`;
       element.style.order = index;
 
-      const nextEntry = htmlElement(`actionLogEntry${index + 1}`, false, false);
-      log.insertBefore(element, nextEntry ?? htmlElement('actionLogLatest'));
+      const nextEntry = globalThis.helpers.htmlElement(`actionLogEntry${index + 1}`, false, false);
+      log.insertBefore(element, nextEntry ?? globalThis.helpers.htmlElement('actionLogLatest'));
     }
     if ((actionLog.firstNewOrUpdatedEntry ?? Infinity) <= index) {
       element.classList.add('highlight');
@@ -1128,11 +1186,11 @@ class View {
     const action = actions.current[index];
     if (action !== undefined) {
       document.getElementById(`action${index}LoopsDone`).textContent = (action.loops - action.loopsLeft) > 99999
-        ? toSuffix(action.loops - action.loopsLeft)
-        : formatNumber(action.loops - action.loopsLeft);
+        ? globalThis.helpers.toSuffix(action.loops - action.loopsLeft)
+        : globalThis.helpers.formatNumber(action.loops - action.loopsLeft);
       document.getElementById(`action${index}Loops`).textContent = action.loops > 99999
-        ? toSuffix(action.loops)
-        : formatNumber(action.loops);
+        ? globalThis.helpers.toSuffix(action.loops)
+        : globalThis.helpers.formatNumber(action.loops);
     }
   }
 
@@ -1144,7 +1202,7 @@ class View {
   ) {
     document.getElementById(`prc${varName}`).textContent = `${level}`;
     document.getElementById(`expBar${varName}`)?.style.setProperty('width', levelPrc);
-    document.getElementById(`progress${varName}`).textContent = intToString(levelPrc, 2);
+    document.getElementById(`progress${varName}`).textContent = globalThis.helpers.intToString(levelPrc, 2);
     document.getElementById(`bar${varName}`).style.width = `${level}%`;
     if (varName.startsWith('Survey') && !varName.endsWith('Global')) {
       this.updateGlobalSurvey(varName, town);
@@ -1176,40 +1234,43 @@ class View {
       const infoDiv = document.getElementById(`infoContainer${action.varName}`);
       const storyDiv = document.getElementById(`storyContainer${action.varName}`);
       if (action.allowed && getNumOnList(action.name) >= action.allowed()) {
-        addClassToDiv(actionDiv, 'capped');
+        globalThis.helpers.addClassToDiv(actionDiv, 'capped');
       } else if (action.unlocked()) {
         if (infoDiv) {
-          removeClassFromDiv(infoDiv, 'hidden');
+          globalThis.helpers.removeClassFromDiv(infoDiv, 'hidden');
           if (action.varName.startsWith('Survey')) {
-            removeClassFromDiv(document.getElementById(`infoContainer${action.varName}Global`), 'hidden');
+            globalThis.helpers.removeClassFromDiv(
+              document.getElementById(`infoContainer${action.varName}Global`),
+              'hidden',
+            );
           }
         }
-        removeClassFromDiv(actionDiv, 'locked');
-        removeClassFromDiv(actionDiv, 'capped');
+        globalThis.helpers.removeClassFromDiv(actionDiv, 'locked');
+        globalThis.helpers.removeClassFromDiv(actionDiv, 'capped');
       } else {
-        addClassToDiv(actionDiv, 'locked');
+        globalThis.helpers.addClassToDiv(actionDiv, 'locked');
         if (infoDiv) {
-          addClassToDiv(infoDiv, 'hidden');
+          globalThis.helpers.addClassToDiv(infoDiv, 'hidden');
           if (action.varName.startsWith('Survey')) {
-            addClassToDiv(document.getElementById(`infoContainer${action.varName}Global`), 'hidden');
+            globalThis.helpers.addClassToDiv(document.getElementById(`infoContainer${action.varName}Global`), 'hidden');
           }
         }
       }
       if (action.unlocked() && infoDiv) {
-        removeClassFromDiv(infoDiv, 'hidden');
+        globalThis.helpers.removeClassFromDiv(infoDiv, 'hidden');
       }
       if (action.visible()) {
-        removeClassFromDiv(actionDiv, 'hidden');
-        if (storyDiv !== null) removeClassFromDiv(storyDiv, 'hidden');
+        globalThis.helpers.removeClassFromDiv(actionDiv, 'hidden');
+        if (storyDiv !== null) globalThis.helpers.removeClassFromDiv(storyDiv, 'hidden');
       } else {
-        addClassToDiv(actionDiv, 'hidden');
-        if (storyDiv !== null) addClassToDiv(storyDiv, 'hidden');
+        globalThis.helpers.addClassToDiv(actionDiv, 'hidden');
+        if (storyDiv !== null) globalThis.helpers.addClassToDiv(storyDiv, 'hidden');
       }
       if (storyDiv !== null) {
         if (action.unlocked()) {
-          removeClassFromDiv(storyDiv, 'hidden');
+          globalThis.helpers.removeClassFromDiv(storyDiv, 'hidden');
         } else {
-          addClassToDiv(storyDiv, 'hidden');
+          globalThis.helpers.addClassToDiv(storyDiv, 'hidden');
         }
       }
     }
@@ -1312,8 +1373,9 @@ class View {
     else actionOptionsTown[townNum].style.display = '';
     townInfos[townNum].style.display = '';
     $('#TownSelect').val(townNum);
-    htmlElement('shortTownColumn').classList.remove(`zone-${townShowing + 1}`);
-    htmlElement('shortTownColumn').classList.add(`zone-${townNum + 1}`);
+
+    globalThis.helpers.htmlElement('shortTownColumn').classList.remove(`zone-${townShowing + 1}`);
+    globalThis.helpers.htmlElement('shortTownColumn').classList.add(`zone-${townNum + 1}`);
     document.getElementById('townDesc').textContent = globalThis.Localization.txt(`towns>town${townNum}>desc`);
     townShowing = townNum;
   }
@@ -1348,10 +1410,10 @@ class View {
     const isHidden = towns[townShowing].hiddenVars.has(varName);
     if ((isHidden && force !== true) || force === false) {
       towns[townShowing].hiddenVars.delete(varName);
-      htmlElement(`infoContainer${varName}`).classList.remove('user-hidden');
+      globalThis.helpers.htmlElement(`infoContainer${varName}`).classList.remove('user-hidden');
     } else if (!isHidden || force === true) {
       towns[townShowing].hiddenVars.add(varName);
-      htmlElement(`infoContainer${varName}`).classList.add('user-hidden');
+      globalThis.helpers.htmlElement(`infoContainer${varName}`).classList.add('user-hidden');
     }
   }
 
@@ -1359,11 +1421,13 @@ class View {
     const varName = updateInfo.name;
     const index = updateInfo.index;
     const town = towns[index];
-    htmlElement(`total${varName}`).textContent = String(town[`total${varName}`]);
-    htmlElement(`checked${varName}`).textContent = String(town[`checked${varName}`]);
-    htmlElement(`unchecked${varName}`).textContent = String(town[`total${varName}`] - town[`checked${varName}`]);
-    htmlElement(`goodTemp${varName}`).textContent = String(town[`goodTemp${varName}`]);
-    htmlElement(`good${varName}`).textContent = String(town[`good${varName}`]);
+    globalThis.helpers.htmlElement(`total${varName}`).textContent = String(town[`total${varName}`]);
+    globalThis.helpers.htmlElement(`checked${varName}`).textContent = String(town[`checked${varName}`]);
+    globalThis.helpers.htmlElement(`unchecked${varName}`).textContent = String(
+      town[`total${varName}`] - town[`checked${varName}`],
+    );
+    globalThis.helpers.htmlElement(`goodTemp${varName}`).textContent = String(town[`goodTemp${varName}`]);
+    globalThis.helpers.htmlElement(`good${varName}`).textContent = String(town[`good${varName}`]);
   }
 
   updateAddAmount(amount) {
@@ -1376,12 +1440,12 @@ class View {
     for (let i = 0; i < 16; i++) {
       const elem = document.getElementById(`load${i}`);
       if (elem) {
-        addClassToDiv(elem, 'unused');
+        globalThis.helpers.addClassToDiv(elem, 'unused');
       }
     }
     const elem = document.getElementById(`load${num}`);
     if (elem) {
-      removeClassFromDiv(document.getElementById(`load${num}`), 'unused');
+      globalThis.helpers.removeClassFromDiv(document.getElementById(`load${num}`), 'unused');
     }
   }
 
@@ -1389,7 +1453,7 @@ class View {
     for (let i = 0; i < loadoutnames.length; i++) {
       document.getElementById(`load${i + 1}`).textContent = loadoutnames[i];
     }
-    inputElement('renameLoadout').value = loadoutnames[curLoadout - 1];
+    globalThis.helpers.inputElement('renameLoadout').value = loadoutnames[curLoadout - 1];
   }
 
   createTownActions() {
@@ -1575,7 +1639,7 @@ class View {
     if (action.affectedBy) {
       for (let i = 0; i < action.affectedBy.length; i++) {
         extraImage += `<img src='icons/${
-          camelize(action.affectedBy[i])
+          globalThis.helpers.camelize(action.affectedBy[i])
         }.svg' class='smallIcon' draggable='false' style='position:absolute;${extraImagePositions[i]}'>`;
       }
     }
@@ -1583,7 +1647,7 @@ class View {
     const divClass = `${isTravel ? 'travelContainer' : 'actionContainer'} ${
       isTraining(action.name) || hasLimit(action.name) ? 'cappableActionContainer' : ''
     }`;
-    const imageName = action.name.startsWith('Assassin') ? 'assassin' : camelize(action.name);
+    const imageName = action.name.startsWith('Assassin') ? 'assassin' : globalThis.helpers.camelize(action.name);
     const unlockConditions = /<br>\s*Unlocked (.*?)(?:<br>|$)/is.exec(
       `${action.tooltip}${action.goldCost === undefined ? '' : action.tooltip2}`,
     )?.[1]; // I hate this but wygd
@@ -1613,7 +1677,7 @@ class View {
                     ${actionSkills}
                     <div class='bold'>${
       globalThis.Localization.txt('actions>tooltip>mana_cost')
-    }:</div> <div id='manaCost${action.varName}'>${formatNumber(action.manaCost())}</div><br>
+    }:</div> <div id='manaCost${action.varName}'>${globalThis.helpers.formatNumber(action.manaCost())}</div><br>
                     <dl class='action-stats'>${actionStats}</dl>
                     <div class='bold'>${
       globalThis.Localization.txt('actions>tooltip>exp_multiplier')
@@ -1656,7 +1720,9 @@ class View {
         `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='hideNotification("storyContainer${action.varName}")'>${action.label}
                     <br>
                     <div style='position:relative'>
-                        <img src='icons/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>
+                        <img src='icons/${
+          globalThis.helpers.camelize(action.name)
+        }.svg' class='superLargeIcon' draggable='false'>
                         <div id='storyContainer${action.varName}Notification' class='notification storyNotification'></div>
                     </div>
                     <div class='showthisstory' draggable='false'>
@@ -1678,12 +1744,16 @@ class View {
 
   adjustManaCost(actionName) {
     const action = translateClassNames(actionName);
-    document.getElementById(`manaCost${action.varName}`).textContent = formatNumber(action.manaCost());
+    document.getElementById(`manaCost${action.varName}`).textContent = globalThis.helpers.formatNumber(
+      action.manaCost(),
+    );
   }
 
   adjustExpMult(actionName) {
     const action = translateClassNames(actionName);
-    document.getElementById(`expMult${action.varName}`).textContent = formatNumber(action.expMult * 100);
+    document.getElementById(`expMult${action.varName}`).textContent = globalThis.helpers.formatNumber(
+      action.expMult * 100,
+    );
   }
 
   goldCosts = {};
@@ -1693,7 +1763,7 @@ class View {
     const amount = updateInfo.cost;
     const element = document.getElementById(`goldCost${varName}`);
     if (this.goldCosts[varName] !== amount && element) {
-      element.textContent = formatNumber(amount);
+      element.textContent = globalThis.helpers.formatNumber(amount);
       this.goldCosts[varName] = amount;
     }
   }
@@ -1816,7 +1886,7 @@ class View {
     let loopCost = action.loopCost(segment);
     while (curProgress >= loopCost && segment < action.segments) {
       document.getElementById(`expBar${segment}${action.varName}`).style.width = '0px';
-      const roundedLoopCost = intToStringRound(loopCost);
+      const roundedLoopCost = globalThis.helpers.intToStringRound(loopCost);
       if (document.getElementById(`progress${segment}${action.varName}`).textContent !== roundedLoopCost) {
         document.getElementById(`progress${segment}${action.varName}`).textContent = roundedLoopCost;
         document.getElementById(`progressNeeded${segment}${action.varName}`).textContent = roundedLoopCost;
@@ -1832,8 +1902,11 @@ class View {
       document.getElementById(`expBar${segment}${action.varName}`).style.width = `${
         100 - 100 * curProgress / loopCost
       }%`;
-      document.getElementById(`progress${segment}${action.varName}`).textContent = intToStringRound(curProgress);
-      document.getElementById(`progressNeeded${segment}${action.varName}`).textContent = intToStringRound(loopCost);
+      document.getElementById(`progress${segment}${action.varName}`).textContent = globalThis.helpers.intToStringRound(
+        curProgress,
+      );
+      document.getElementById(`progressNeeded${segment}${action.varName}`).textContent = globalThis.helpers
+        .intToStringRound(loopCost);
     }
 
     // update later segments
@@ -1842,7 +1915,9 @@ class View {
       if (document.getElementById(`progress${i}${action.varName}`).textContent !== '0') {
         document.getElementById(`progress${i}${action.varName}`).textContent = '0';
       }
-      document.getElementById(`progressNeeded${i}${action.varName}`).textContent = intToStringRound(action.loopCost(i));
+      document.getElementById(`progressNeeded${i}${action.varName}`).textContent = globalThis.helpers.intToStringRound(
+        action.loopCost(i),
+      );
     }
   }
 
@@ -1855,9 +1930,14 @@ class View {
     const dungeon = dungeons[index];
     for (let i = 0; i < dungeon.length; i++) {
       const level = dungeon[i];
-      document.getElementById(`soulstoneChance${index}_${i}`).textContent = intToString(level.ssChance * 100, 4);
+      document.getElementById(`soulstoneChance${index}_${i}`).textContent = globalThis.helpers.intToString(
+        level.ssChance * 100,
+        4,
+      );
       document.getElementById(`soulstonePrevious${index}_${i}`).textContent = level.lastStat;
-      document.getElementById(`soulstoneCompleted${index}_${i}`).textContent = formatNumber(level.completed);
+      document.getElementById(`soulstoneCompleted${index}_${i}`).textContent = globalThis.helpers.formatNumber(
+        level.completed,
+      );
     }
   }
 
@@ -1890,25 +1970,25 @@ class View {
     for (const stat of statList) {
       if (stats[stat].soulstone) {
         total += stats[stat].soulstone;
-        htmlElement(`stat${stat}SoulstoneLogBar`).parentElement.style.display = '';
+        globalThis.helpers.htmlElement(`stat${stat}SoulstoneLogBar`).parentElement.style.display = '';
         this.updateLevelLogBar('statsContainer', `stat${stat}SoulstoneLogBar`, stats[stat].soulstone);
         document.getElementById(`ss${stat}Container`).style.display = '';
-        document.getElementById(`ss${stat}`).textContent = formatNumber(stats[stat].soulstone);
-        document.getElementById(`stat${stat}SSBonus`).textContent = intToString(
+        document.getElementById(`ss${stat}`).textContent = globalThis.helpers.formatNumber(stats[stat].soulstone);
+        document.getElementById(`stat${stat}SSBonus`).textContent = globalThis.helpers.intToString(
           stats[stat].soulstone ? stats[stat].soulstoneMult : 0,
         );
-        document.getElementById(`stat${stat}ss`).textContent = intToString(stats[stat].soulstone, 1);
+        document.getElementById(`stat${stat}ss`).textContent = globalThis.helpers.intToString(stats[stat].soulstone, 1);
       } else {
-        htmlElement(`stat${stat}SoulstoneLogBar`).parentElement.style.display = 'none';
+        globalThis.helpers.htmlElement(`stat${stat}SoulstoneLogBar`).parentElement.style.display = 'none';
         document.getElementById(`ss${stat}Container`).style.display = 'none';
         document.getElementById(`stat${stat}ss`).textContent = '';
       }
     }
     if (total > 0) {
       document.getElementById(`stattotalss`).style.display = '';
-      document.getElementById(`stattotalss`).textContent = intToString(total, 1);
+      document.getElementById(`stattotalss`).textContent = globalThis.helpers.intToString(total, 1);
       document.getElementById(`sstotalContainer`).style.display = '';
-      document.getElementById(`sstotal`).textContent = formatNumber(total);
+      document.getElementById(`sstotal`).textContent = globalThis.helpers.formatNumber(total);
     } else {
       document.getElementById(`stattotalss`).style.display = 'none';
       document.getElementById(`stattotalss`).textContent = '';
@@ -1920,7 +2000,7 @@ class View {
     const town = towns[action.townNum];
     document.getElementById(`multiPartName${action.varName}`).textContent = action.getPartName();
     document.getElementById(`completed${action.varName}`).textContent = ` ${
-      formatNumber(town[`total${action.varName}`])
+      globalThis.helpers.formatNumber(town[`total${action.varName}`])
     }`;
     for (let i = 0; i < action.segments; i++) {
       const expBar = document.getElementById(`expBar${i}${action.varName}`);
@@ -1980,7 +2060,7 @@ class View {
 
   changeStatView() {
     const statsWindow = document.getElementById('statsWindow');
-    if (inputElement('regularStats').checked) {
+    if (globalThis.helpers.inputElement('regularStats').checked) {
       statsWindow.dataset.view = 'regular';
     } else {
       statsWindow.dataset.view = 'radar';
@@ -1989,8 +2069,8 @@ class View {
   }
 
   changeTheme(init) {
-    const themeInput = selectElement('themeInput');
-    const themeVariantInput = selectElement('themeVariantInput');
+    const themeInput = globalThis.helpers.selectElement('themeInput');
+    const themeVariantInput = globalThis.helpers.selectElement('themeVariantInput');
     if (init) themeInput.value = options.theme;
     if (init) themeVariantInput.value = options.themeVariant;
     options.theme = themeInput.value;
@@ -2057,71 +2137,71 @@ class View {
     document.getElementById('totalEffectiveTime').textContent = `${formatTime(totals.effectiveTime)}`;
     document.getElementById('borrowedTimeBalance').textContent = formatTime(totals.borrowedTime);
     document.getElementById('borrowedTimeDays').textContent = `${
-      formatNumber(Math.floor(totals.borrowedTime / 86400))
+      globalThis.helpers.formatNumber(Math.floor(totals.borrowedTime / 86400))
     }${globalThis.Localization.txt('time_controls>days')}`;
-    document.getElementById('totalLoops').textContent = `${formatNumber(totals.loops)}`;
-    document.getElementById('totalActions').textContent = `${formatNumber(totals.actions)}`;
+    document.getElementById('totalLoops').textContent = `${globalThis.helpers.formatNumber(totals.loops)}`;
+    document.getElementById('totalActions').textContent = `${globalThis.helpers.formatNumber(totals.actions)}`;
     if (totals.borrowedTime > 0) document.documentElement.classList.add('time-borrowed');
     else document.documentElement.classList.remove('time-borrowed');
   }
 
   updatePrestigeValues() {
     document.getElementById('currentPrestigePoints').textContent = `${
-      formatNumber(globalThis.prestige.prestigeValues['prestigeCurrentPoints'])
+      globalThis.helpers.formatNumber(globalThis.prestige.prestigeValues['prestigeCurrentPoints'])
     }`;
     document.getElementById('currentPrestigesCompleted').textContent = `${
-      formatNumber(globalThis.prestige.prestigeValues['prestigeTotalCompletions'])
+      globalThis.helpers.formatNumber(globalThis.prestige.prestigeValues['prestigeTotalCompletions'])
     }`;
     document.getElementById('maxTotalImbueSoulLevels').textContent = `${
-      formatNumber(Math.min(globalThis.prestige.prestigeValues['prestigeTotalCompletions'], 7))
+      globalThis.helpers.formatNumber(Math.min(globalThis.prestige.prestigeValues['prestigeTotalCompletions'], 7))
     }`;
 
     document.getElementById('totalPrestigePoints').textContent = `${
-      formatNumber(globalThis.prestige.prestigeValues['prestigeTotalPoints'])
+      globalThis.helpers.formatNumber(globalThis.prestige.prestigeValues['prestigeTotalPoints'])
     }`;
 
     document.getElementById('prestigePhysicalCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigePhysical'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigePhysical'))
     }`;
     document.getElementById('prestigeMentalCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeMental'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeMental'))
     }`;
     document.getElementById('prestigeCombatCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeCombat'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeCombat'))
     }`;
     document.getElementById('prestigeSpatiomancyCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeSpatiomancy'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeSpatiomancy'))
     }`;
     document.getElementById('prestigeChronomancyCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeChronomancy'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeChronomancy'))
     }`;
     document.getElementById('prestigeBarteringCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeBartering'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeBartering'))
     }`;
     document.getElementById('prestigeExpOverflowCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeExpOverflow') * 10)
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeExpOverflow') * 10)
     }`;
 
     document.getElementById('prestigePhysicalNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigePhysical'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCost('PrestigePhysical'))
     }`;
     document.getElementById('prestigeMentalNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeMental'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCost('PrestigeMental'))
     }`;
     document.getElementById('prestigeCombatNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeCombat'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCost('PrestigeCombat'))
     }`;
     document.getElementById('prestigeSpatiomancyNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeSpatiomancy'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCost('PrestigeSpatiomancy'))
     }`;
     document.getElementById('prestigeChronomancyNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeChronomancy'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCost('PrestigeChronomancy'))
     }`;
     document.getElementById('prestigeBarteringNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeBartering'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCost('PrestigeBartering'))
     }`;
     document.getElementById('prestigeExpOverflowNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeExpOverflow'))
+      globalThis.helpers.formatNumber(globalThis.prestige.getPrestigeCost('PrestigeExpOverflow'))
     }`;
   }
 }
@@ -2249,10 +2329,10 @@ function adjustActionListSize(amt) {
 
 function updateBuffCaps() {
   for (const buff of buffList) {
-    inputElement(`buff${buff}Cap`).value = String(
-      Math.min(parseInt(inputElement(`buff${buff}Cap`).value), buffHardCaps[buff]),
+    globalThis.helpers.inputElement(`buff${buff}Cap`).value = String(
+      Math.min(parseInt(globalThis.helpers.inputElement(`buff${buff}Cap`).value), buffHardCaps[buff]),
     );
-    buffCaps[buff] = parseInt(inputElement(`buff${buff}Cap`).value);
+    buffCaps[buff] = parseInt(globalThis.helpers.inputElement(`buff${buff}Cap`).value);
   }
 }
 

@@ -119,7 +119,7 @@ class Town<TN extends number> {
     // only checks unchecked items
     // IF there are unchecked items
     // AND the user has not disabled checking unchecked items OR there are no checked items left
-    const searchToggler = inputElement(`searchToggler${varName}`, false, false);
+    const searchToggler =globalThis.helpers.inputElement(`searchToggler${varName}`, false, false);
     if (
       this[`total${varName}`] - this[`checked${varName}`] > 0 &&
       ((searchToggler && !searchToggler.checked) || this[`goodTemp${varName}`] <= 0)

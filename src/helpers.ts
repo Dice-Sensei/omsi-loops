@@ -1,5 +1,3 @@
-'use strict';
-
 function precision3(num) {
   return Number(num.toPrecision(3));
 }
@@ -251,28 +249,6 @@ function valueElement(elementOrId, throwIfMissing = true, warnIfMissing = true) 
   );
 }
 
-function isValueElement(node) {
-  return node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement || node instanceof HTMLSelectElement;
-}
-
-function svgElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
-  return getElement(elementOrId, SVGElement, throwIfMissing, warnIfMissing);
-}
-
-function templateElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
-  return getElement(elementOrId, HTMLTemplateElement, throwIfMissing, warnIfMissing);
-}
-
-function cloneTemplate(templateOrId, alwaysReturnFragment = false) {
-  const template = templateElement(templateOrId);
-  const fragment = /** @type {DocumentFragment} */ (template.content.cloneNode(true));
-  if (!alwaysReturnFragment && fragment.childElementCount === 1) {
-    return fragment.firstElementChild;
-  } else {
-    return fragment;
-  }
-}
-
 const numbers =
   'zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen'
     .split(' ');
@@ -293,56 +269,6 @@ function capitalizeFirst(s) {
 
 function numberToWords(n) {
   return capitalizeFirst(number2Words(n));
-}
-
-// lzw-compress a string
-function LZWEncode(s) {
-  const dict = {};
-  const data = String(s).split('');
-  const out = [];
-  let phrase = data[0];
-  let code = 256;
-  for (let i = 1; i < data.length; i++) {
-    const currChar = data[i];
-    if (dict[phrase + currChar] === undefined) {
-      out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
-      dict[phrase + currChar] = code;
-      code++;
-      phrase = currChar;
-    } else {
-      phrase += currChar;
-    }
-  }
-  out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
-  for (let i = 0; i < out.length; i++) {
-    out[i] = String.fromCharCode(out[i]);
-  }
-  return out.join('');
-}
-
-// decompress an LZW-encoded string
-function LZWDecode(s) {
-  const dict = {};
-  const data = (String(s)).split('');
-  let currChar = data[0];
-  let oldPhrase = currChar;
-  const out = [currChar];
-  let code = 256;
-  let phrase;
-  for (let i = 1; i < data.length; i++) {
-    const currCode = data[i].charCodeAt(0);
-    if (currCode < 256) {
-      phrase = data[i];
-    } else {
-      phrase = dict[currCode] ? dict[currCode] : (oldPhrase + currChar);
-    }
-    out.push(phrase);
-    currChar = phrase.charAt(0);
-    dict[code] = oldPhrase + currChar;
-    code++;
-    oldPhrase = phrase;
-  }
-  return out.join('');
 }
 
 /** @type {(object: any, strings?: (string|number)[], map?: Record<string, number>) => any} */
@@ -417,10 +343,6 @@ async function delay(milliseconds) {
   await new Promise((r) => setTimeout(r, milliseconds));
 }
 
-function nextAnimationFrame() {
-  return new Promise((r) => requestAnimationFrame(r));
-}
-
 function nextIdle(idleRequestOptions) {
   return new Promise((r) => requestIdleCallback(r, idleRequestOptions));
 }
@@ -439,3 +361,37 @@ function beep(duration) {
     if (osc.stop) osc.stop();
   }, duration);
 }
+
+const _helpers = {
+  precision3,
+  formatNumber,
+  copyArray,
+  copyObject,
+  intToString,
+  intToStringRound,
+  numberToWords,
+  capitalizeFirst,
+  extractStrings,
+  restoreStrings,
+  delay,
+  nextIdle,
+  beep,
+  getElement,
+  htmlElement,
+  inputElement,
+  textAreaElement,
+  selectElement,
+  valueElement,
+  addClassToDiv,
+  removeClassFromDiv,
+  camelize,
+  fibonacci,
+  Mana,
+  clamp,
+} as const;
+
+declare global {
+  var helpers: typeof _helpers;
+}
+
+globalThis.helpers = _helpers;

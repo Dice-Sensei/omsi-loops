@@ -440,8 +440,8 @@ const Koviko = {
         console.error(`Unrecoverable error in background predictor worker; disabling background predictor`, data);
         this.terminateWorker();
         this.#workerDisabled = true;
-        inputElement('predictorBackgroundThreadInput').indeterminate = true;
-        inputElement('predictorBackgroundThreadInput').disabled = true;
+        globalThis.helpers.inputElement('predictorBackgroundThreadInput').indeterminate = true;
+        globalThis.helpers.inputElement('predictorBackgroundThreadInput').disabled = true;
         return;
       } else if (data.type === 'getSnapshots') {
         const { snapshotIds } = data;
@@ -519,8 +519,8 @@ const Koviko = {
        * Element that displays the total amount of mana used in the action list
        * @type {HTMLElement}
        */
-      this.totalDisplay = htmlElement('predictorTotalDisplay');
-      this.statisticDisplay = htmlElement('predictorStatisticDisplay');
+      this.totalDisplay = globalThis.helpers.htmlElement('predictorTotalDisplay');
+      this.statisticDisplay = globalThis.helpers.htmlElement('predictorStatisticDisplay');
 
       Koviko.trackedStats = [
         { type: 'R', name: 'soul', display_name: 'SS Equi %' },
@@ -566,7 +566,7 @@ const Koviko = {
           statistic.hidden = false;
         }
       }
-      selectElement('predictorTrackedStatInput').value = options.predictorTrackedStat;
+      globalThis.helpers.selectElement('predictorTrackedStatInput').value = options.predictorTrackedStat;
     }
 
     /**
@@ -595,7 +595,9 @@ const Koviko = {
          * @memberof Koviko.Predictor#helpers
          */
         getGuildRankBonus: (guild) =>
-          Math.floor(guild / 3 + .00001) >= 14 ? 10 : precision3(1 + guild / 20 + (guild ** 2) / 300),
+          Math.floor(guild / 3 + .00001) >= 14
+            ? 10
+            : globalThis.helpers.precision3(1 + guild / 20 + (guild ** 2) / 300),
 
         /**
          * Calculate the bonus given by "Wizard College"
@@ -603,7 +605,9 @@ const Koviko = {
          * @return {number} Bonus Multiplier of the Wizard College
          * @memberof Koviko.Predictor#helpers
          */
-        getWizardRankBonus: (r) => ((r.wizard >= 63) ? 5 : precision3(1 + 0.02 * Math.pow(r.wizard || 0, 1.05))),
+        getWizardRankBonus: (
+          r,
+        ) => ((r.wizard >= 63) ? 5 : globalThis.helpers.precision3(1 + 0.02 * Math.pow(r.wizard || 0, 1.05))),
 
         getSkillBonusInc: (exp) => (Math.pow(1 + getSkillLevelFromExp(exp) / 60, 0.25)),
 
@@ -653,7 +657,7 @@ const Koviko = {
         ) => (1 + getLevelFromExp(s[a.loopStats[(p.completed + offset) % a.loopStats.length]]) / 100),
 
         getTrialCost: (p, a) => (segment) =>
-          precision3(
+          globalThis.helpers.precision3(
             Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) * a.exponentScaling *
               getSkillBonus('Assassin'),
           ),
@@ -862,7 +866,7 @@ const Koviko = {
           canStart: (input) => (input.rep >= 1),
           loop: {
             cost: (p, a) => (segment) =>
-              fibonacci(2 + Math.floor((p.completed + segment) / a.segments + .0000001)) * 5000,
+              globalThis.helpers.fibonacci(2 + Math.floor((p.completed + segment) / a.segments + .0000001)) * 5000,
             tick: (p, a, s, k) => (offset) =>
               getSkillLevelFromExp(k.magic) * Math.max(getSkillLevelFromExp(k.restoration) / 50, 1) *
               h.getStatProgress(p, a, s, offset) * Math.sqrt(1 + p.total / 100),
@@ -874,7 +878,8 @@ const Koviko = {
           canStart: (input) => (input.rep >= 2),
           loop: {
             cost: (p, a) => (segment) =>
-              fibonacci(Math.floor((p.completed + segment) - p.completed / a.segments + .0000001)) * 10000,
+              globalThis.helpers.fibonacci(Math.floor((p.completed + segment) - p.completed / a.segments + .0000001)) *
+              10000,
             tick: (p, a, s, k, r) => (offset) =>
               h.getSelfCombat(r, k) * Math.sqrt(1 + p.total / 100) * h.getStatProgress(p, a, s, offset),
             effect: {
@@ -889,7 +894,9 @@ const Koviko = {
           loop: {
             max: (a) => dungeons[a.dungeonNum].length,
             cost: (p, a) => (segment) =>
-              precision3(Math.pow(2, Math.floor((p.completed + segment) / a.segments + .0000001)) * 15000),
+              globalThis.helpers.precision3(
+                Math.pow(2, Math.floor((p.completed + segment) / a.segments + .0000001)) * 15000,
+              ),
             tick: (p, a, s, k, r) => (offset) => {
               let floor = Math.floor(p.completed / a.segments + .0000001);
 
@@ -1044,7 +1051,7 @@ const Koviko = {
           affected: ['gold', 'adventures'],
           canStart: (input) => (input.guild == ''),
           loop: {
-            cost: (p) => (segment) => precision3(Math.pow(1.2, p.completed + segment)) * 5e6,
+            cost: (p) => (segment) => globalThis.helpers.precision3(Math.pow(1.2, p.completed + segment)) * 5e6,
             tick: (p, a, s, k, r) => (offset) =>
               (h.getSelfCombat(r, k) + getSkillLevelFromExp(k.magic) / 2) * h.getStatProgress(p, a, s, offset) *
               Math.sqrt(1 + p.total / 1000),
@@ -1062,7 +1069,9 @@ const Koviko = {
           loop: {
             max: (a) => dungeons[a.dungeonNum].length,
             cost: (p, a) => (segment) =>
-              precision3(Math.pow(3, Math.floor((p.completed + segment) / a.segments + .0000001)) * 5e5),
+              globalThis.helpers.precision3(
+                Math.pow(3, Math.floor((p.completed + segment) / a.segments + .0000001)) * 5e5,
+              ),
             tick: (p, a, s, k, r) => (offset) => {
               let floor = Math.floor(p.completed / a.segments + .0000001);
               return floor in dungeons[a.dungeonNum]
@@ -1085,7 +1094,7 @@ const Koviko = {
           affected: ['gold', 'crafts'],
           canStart: (input) => (input.guild == ''),
           loop: {
-            cost: (p) => (segment) => precision3(Math.pow(1.2, p.completed + segment)) * 2e6,
+            cost: (p) => (segment) => globalThis.helpers.precision3(Math.pow(1.2, p.completed + segment)) * 2e6,
             tick: (p, a, s, k) => (offset) =>
               (getSkillLevelFromExp(k.magic) / 2 + getSkillLevelFromExp(k.crafting)) *
               h.getStatProgress(p, a, s, offset) * Math.sqrt(1 + p.total / 1000),
@@ -1140,7 +1149,7 @@ const Koviko = {
           loop: {
             max: (a) => trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
-              precision3(
+              globalThis.helpers.precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
                   a.exponentScaling * getSkillBonus('Assassin'),
               ),
@@ -1200,7 +1209,9 @@ const Koviko = {
           affected: ['blood'],
           loop: {
             cost: (p, a) => (segment) =>
-              precision3(Math.pow(2, Math.floor((p.completed + segment) / a.segments + .0000001)) * 1e6),
+              globalThis.helpers.precision3(
+                Math.pow(2, Math.floor((p.completed + segment) / a.segments + .0000001)) * 1e6,
+              ),
             tick: (p, a, s, k, r) => (offset) => (h.getSelfCombat(r, k) * Math.sqrt(1 + p.total / 100) *
               (1 + getLevelFromExp(s[a.loopStats[(p.completed + offset) % a.loopStats.length]]) / 100)),
             effect: { loop: (r, k) => (r.blood++, k.combat += 1000 * (1 + getBuffLevel('Heroism') * 0.02)) },
@@ -1315,7 +1326,7 @@ const Koviko = {
           affected: ['gold', 'rep'],
           loop: {
             cost: (p, a) => (segment) =>
-              fibonacci(Math.floor((p.completed + segment) - p.completed / 3 + .0000001)) * 1000000,
+              globalThis.helpers.fibonacci(Math.floor((p.completed + segment) - p.completed / 3 + .0000001)) * 1000000,
             tick: (p, a, s, k) => (offset) =>
               getSkillLevelFromExp(k.practical) * h.getStatProgress(p, a, s, offset) * Math.sqrt(1 + p.total / 100),
             effect: {
@@ -1378,7 +1389,7 @@ const Koviko = {
             return (input.gold >= 500 && input.favor >= 10);
           },
           loop: {
-            cost: (p) => (segment) => precision3(Math.pow(1.3, p.completed + segment)) * 1e7,
+            cost: (p) => (segment) => globalThis.helpers.precision3(Math.pow(1.3, p.completed + segment)) * 1e7,
             tick: (p, a, s, k) => (offset) =>
               (getSkillLevelFromExp(k.magic) + getSkillLevelFromExp(k.practical) + getSkillLevelFromExp(k.dark) +
                 getSkillLevelFromExp(k.chronomancy) + getSkillLevelFromExp(k.pyromancy) +
@@ -1474,7 +1485,7 @@ const Koviko = {
           affected: ['giants'],
           canStart: (input) => (input.pegasus),
           loop: {
-            cost: (p, a) => (segment) => precision3(Math.pow(1.3, p.completed + a.segments) * 1e7),
+            cost: (p, a) => (segment) => globalThis.helpers.precision3(Math.pow(1.3, p.completed + a.segments) * 1e7),
             tick: (p, a, s, k, r) => (offset) =>
               h.getSelfCombat(r, k) * Math.sqrt(1 + p.total / 100) * h.getStatProgress(p, a, s, offset),
             effect: {
@@ -1491,7 +1502,8 @@ const Koviko = {
             return (input.pegasus);
           },
           effect: (r, k) => {
-            k.divine += (r.giants > 62 ? 10 : precision3(1 + 0.05 * Math.pow(r.giants || 0, 1.05))) * 50;
+            k.divine += (r.giants > 62 ? 10 : globalThis.helpers.precision3(1 + 0.05 * Math.pow(r.giants || 0, 1.05))) *
+              50;
             r.giants = 0;
           },
         },
@@ -1541,7 +1553,9 @@ const Koviko = {
           loop: {
             max: (a) => dungeons[a.dungeonNum].length,
             cost: (p, a) => (segment) =>
-              precision3(Math.pow(2, Math.floor((p.completed + segment) / a.segments + .0000001)) * 10000000),
+              globalThis.helpers.precision3(
+                Math.pow(2, Math.floor((p.completed + segment) / a.segments + .0000001)) * 10000000,
+              ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
 
@@ -1579,7 +1593,7 @@ const Koviko = {
           loop: {
             max: (a) => trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
-              precision3(
+              globalThis.helpers.precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
                   a.exponentScaling * getSkillBonus('Assassin'),
               ),
@@ -1606,7 +1620,7 @@ const Koviko = {
           affected: ['blood'],
           canStart: true,
           loop: {
-            cost: (p, a) => (segment) => precision3(Math.pow(1.3, p.completed + segment)) * 1e8,
+            cost: (p, a) => (segment) => globalThis.helpers.precision3(Math.pow(1.3, p.completed + segment)) * 1e8,
             tick: (p, a, s, k, r) => (offset) =>
               h.getSelfCombat(r, k) * h.getStatProgress(p, a, s, offset) *
               Math.sqrt(1 + p.total / 1000),
@@ -1621,7 +1635,7 @@ const Koviko = {
           canStart: true,
           loop: {
             cost: (p, a) => (segment) =>
-              fibonacci(2 + Math.floor((p.completed + segment) / a.segments + .0000001)) * 5000,
+              globalThis.helpers.fibonacci(2 + Math.floor((p.completed + segment) / a.segments + .0000001)) * 5000,
             tick: (p, a, s, k) => (offset) =>
               getSkillLevelFromExp(k.magic) * Math.max(getSkillLevelFromExp(k.restoration) / 100, 1) *
               h.getStatProgress(p, a, s, offset) * Math.sqrt(1 + p.total / 100),
@@ -1680,7 +1694,7 @@ const Koviko = {
             return ((input.rep < 0) && (input.guild == ''));
           },
           loop: {
-            cost: (p) => (segment) => precision3(Math.pow(1.2, p.completed + segment)) * 5e8,
+            cost: (p) => (segment) => globalThis.helpers.precision3(Math.pow(1.2, p.completed + segment)) * 5e8,
             tick: (p, a, s, k, r) => (offset) =>
               (getSkillLevelFromExp(k.practical) + getSkillLevelFromExp(k.thievery)) *
               h.getStatProgress(p, a, s, offset) * Math.sqrt(1 + p.total / 1000),
@@ -1762,7 +1776,7 @@ const Koviko = {
           loop: {
             max: (a) => trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
-              precision3(
+              globalThis.helpers.precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
                   a.exponentScaling * getSkillBonus('Assassin'),
               ),
@@ -1810,7 +1824,7 @@ const Koviko = {
           loop: {
             max: (a) => trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
-              precision3(
+              globalThis.helpers.precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
                   a.exponentScaling * getSkillBonus('Assassin'),
               ),
@@ -1843,7 +1857,7 @@ const Koviko = {
           loop: {
             max: (a) => trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
-              precision3(
+              globalThis.helpers.precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
                   a.exponentScaling * getSkillBonus('Assassin'),
               ),
@@ -2248,7 +2262,7 @@ const Koviko = {
         ? class WorkerRunInfo {
           async start() {
             performance.mark('enter-predictor-worker');
-            await delay(0);
+            await globalThis.helpers.delay(0);
             this.nextPause = performance.now() + 50; // pause every 50 ms
             performance.mark('start-predictor-worker');
             const initdelay = performance.measure(
@@ -2261,7 +2275,7 @@ const Koviko = {
           }
           async pauseIfNeeded() {
             if (performance.now() >= this.nextPause) {
-              await delay(0); // a backgrounded predictor only needs to pump the event queue every so often
+              await globalThis.helpers.delay(0); // a backgrounded predictor only needs to pump the event queue every so often
               this.nextPause = performance.now() + 50;
               return true;
             }
@@ -2273,7 +2287,7 @@ const Koviko = {
           async start() {
             performance.mark('enter-predictor-idle');
             performance.measure('predictor-preidle', 'start-predictor-update', 'enter-predictor-idle');
-            this.deadline = await nextIdle();
+            this.deadline = await globalThis.helpers.nextIdle();
             const timeRemaining = this.deadline.timeRemaining();
             this.lastMark = this.#mark('start-predictoridle', timeRemaining);
             return this;
@@ -2284,7 +2298,7 @@ const Koviko = {
             if (timeRemaining <= 1) {
               const pauseMark = this.#mark('pause-predictoridle', timeRemaining);
               performance.measure('predictoridle-cycle', this.lastMark.name, pauseMark.name);
-              this.deadline = await nextIdle();
+              this.deadline = await globalThis.helpers.nextIdle();
 
               timeRemaining = this.deadline.timeRemaining();
               this.lastMark = this.#mark('continue-predictoridle', timeRemaining);
@@ -2547,14 +2561,17 @@ const Koviko = {
 
       // Update the display for the total amount of mana used by the action list
       container &&
-        (this.totalDisplay.innerHTML = intToString(total) + ' | ' + this.timeString(state.resources.totalTicks) +
+        (this.totalDisplay.innerHTML = globalThis.helpers.intToString(total) + ' | ' +
+          this.timeString(state.resources.totalTicks) +
           ' | ');
       switch (trackedStat.type) {
         case 'TIME':
           container && (this.statisticDisplay.innerHTML = this.timeString(newStatisticValue || 0) + ' ' + legend);
           break;
         default:
-          container && (this.statisticDisplay.innerHTML = intToString(newStatisticValue || 0) + ' ' + legend + '/min');
+          container &&
+            (this.statisticDisplay.innerHTML = globalThis.helpers.intToString(newStatisticValue || 0) + ' ' + legend +
+              '/min');
       }
 
       if (this.resourcePerMinute > newStatisticValue) {
@@ -2669,7 +2686,8 @@ const Koviko = {
 
           tooltip += '<tr><td><b>' + globalThis.Localization.txt(`stats>${i}>short_form`).toUpperCase() +
             '</b></td><td>' +
-            intToString(level.end, 1) + '</td><td>(+' + intToString(level.end - level.start, 1) + ')</td></tr>';
+            globalThis.helpers.intToString(level.end, 1) + '</td><td>(+' +
+            globalThis.helpers.intToString(level.end - level.start, 1) + ')</td></tr>';
         }
       }
 
@@ -2683,11 +2701,11 @@ const Koviko = {
           tooltip += '<tr><td><b>';
           tooltip += this.getShortSkill(i);
           if (level.end > level.start) {
-            tooltip += '</b></td><td>' + intToString(level.end, 1) + '</td><td>(+' +
-              intToString(level.end - level.start, 1) + ')</td></tr>';
+            tooltip += '</b></td><td>' + globalThis.helpers.intToString(level.end, 1) + '</td><td>(+' +
+              globalThis.helpers.intToString(level.end - level.start, 1) + ')</td></tr>';
           } else {
             tooltip += '<td>' + Math.floor(skills[i].delta / (level.end + 1) * 100) / 100 + '%</td><td><' +
-              intToString(skills[i].delta, 1) + '></td></tr>';
+              globalThis.helpers.intToString(skills[i].delta, 1) + '></td></tr>';
           }
         }
       }
@@ -2749,8 +2767,8 @@ const Koviko = {
             default:
               tooltip += i.toUpperCase();
           }
-          tooltip += '</b></td><td>' + intToString(level.end, 1) + '</td><td>(+' +
-            intToString(level.end - level.start, 1) + ')</td></tr>';
+          tooltip += '</b></td><td>' + globalThis.helpers.intToString(level.end, 1) + '</td><td>(+' +
+            globalThis.helpers.intToString(level.end - level.start, 1) + ')</td></tr>';
         }
       }
       if (toNextLoop[currname] && toNextLoop[currname].value > 0) {
@@ -2760,15 +2778,16 @@ const Koviko = {
           '%</td><td></td></tr>';
       }
       //Timer
-      tooltip += '<tr><td><b>TIME</b></td><td>' + precision3(resources.totalTicks / 50) + '</td><td>(+' +
-        precision3(resources.actionTicks / 50) + ')</td></tr>';
+      tooltip += '<tr><td><b>TIME</b></td><td>' + globalThis.helpers.precision3(resources.totalTicks / 50) +
+        '</td><td>(+' +
+        globalThis.helpers.precision3(resources.actionTicks / 50) + ')</td></tr>';
 
       var Affec = affected.map((name) => {
         if (isNaN(resources[name])) this.updateHadNaNs = true;
         if (resources[name] != 0) {
-          return `<li class="${name}" title="${capitalizeFirst(name)}: ${
-            isNaN(resources[name]) ? '???' : formatNumber(resources[name])
-          }">${isNaN(resources[name]) ? '?' : intToString(resources[name], 1)}</li>`;
+          return `<li class="${name}" title="${globalThis.helpers.capitalizeFirst(name)}: ${
+            isNaN(resources[name]) ? '???' : globalThis.helpers.formatNumber(resources[name])
+          }">${isNaN(resources[name]) ? '?' : globalThis.helpers.intToString(resources[name], 1)}</li>`;
         } else return '';
       }).join('');
       return `<ul class='koviko ${isValidStr}'>` + Affec +

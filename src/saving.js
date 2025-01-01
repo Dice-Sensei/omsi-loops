@@ -158,7 +158,7 @@ let resources = {
   wizardCollege: false,
 };
 let hearts = [];
-const resourcesTemplate = copyObject(resources);
+const resourcesTemplate = globalThis.helpers.copyObject(resources);
 //Temp variables
 // eslint-disable-next-line prefer-const
 let guild = '';
@@ -906,7 +906,7 @@ function handleOption(option, value, init, getInput) {
 function setOption(option, value, updateUI = false) {
   const oldValue = options[option];
   options[option] = value;
-  handleOption(option, value, false, () => valueElement(`${option}Input`));
+  handleOption(option, value, false, () => globalThis.helpers.valueElement(`${option}Input`));
   if (options[option] !== oldValue) {
     save();
   }
@@ -917,7 +917,7 @@ function setOption(option, value, updateUI = false) {
 
 /** @template {OptionName} K @param {K} option @param {OptionType<K>} value */
 function loadOption(option, value, callHandler = true) {
-  const input = valueElement(`${option}Input`, false); // this is allowed to have errors
+  const input = globalThis.helpers.valueElement(`${option}Input`, false); // this is allowed to have errors
   if (!input) return;
   if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = !!value;
   else if (option === 'speedIncreaseBackground' && (typeof value !== 'number' || isNaN(value) || value < 0)) {
@@ -1051,7 +1051,7 @@ function doLoad(toLoad) {
     for (const property in buffCaps) {
       if (toLoad.buffCaps.hasOwnProperty(property)) {
         buffCaps[property] = toLoad.buffCaps[property];
-        inputElement(`buff${property}Cap`).value = buffCaps[property];
+        globalThis.helpers.inputElement(`buff${property}Cap`).value = buffCaps[property];
       }
     }
   }
@@ -1203,7 +1203,7 @@ function doLoad(toLoad) {
   curLoadout = toLoad.curLoadout;
   const elem = typeof document === 'undefined' ? undefined : document.getElementById(`load${curLoadout}`);
   if (elem) {
-    removeClassFromDiv(document.getElementById(`load${curLoadout}`), 'unused');
+    globalThis.helpers.removeClassFromDiv(document.getElementById(`load${curLoadout}`), 'unused');
   }
 
   /*if (toLoad.dungeons) {
@@ -1214,14 +1214,14 @@ function doLoad(toLoad) {
   dungeons = [[], [], []];
   const level = { ssChance: 1, completed: 0 };
   let floors = 0;
-  if (toLoad.dungeons === undefined) toLoad.dungeons = copyArray(dungeons);
+  if (toLoad.dungeons === undefined) toLoad.dungeons = globalThis.helpers.copyArray(dungeons);
   for (let i = 0; i < dungeons.length; i++) {
     floors = dungeonFloors[i];
     for (let j = 0; j < floors; j++) {
       if (toLoad.dungeons[i] != undefined && toLoad.dungeons && toLoad.dungeons[i][j]) {
         dungeons[i][j] = toLoad.dungeons[i][j];
       } else {
-        dungeons[i][j] = copyArray(level);
+        dungeons[i][j] = globalThis.helpers.copyArray(level);
       }
       dungeons[i][j].lastStat = 'NA';
     }
@@ -1229,7 +1229,7 @@ function doLoad(toLoad) {
 
   trials = [[], [], [], [], []];
   const trialLevel = { completed: 0 };
-  if (toLoad.trials === undefined) toLoad.trials = copyArray(trials);
+  if (toLoad.trials === undefined) toLoad.trials = globalThis.helpers.copyArray(trials);
   for (let i = 0; i < trials.length; i++) {
     floors = trialFloors[i];
     trials[i].highestFloor = 0;
@@ -1238,7 +1238,7 @@ function doLoad(toLoad) {
         trials[i][j] = toLoad.trials[i][j];
         if (trials[i][j].completed > 0) trials[i].highestFloor = j;
       } else {
-        trials[i][j] = copyArray(trialLevel);
+        trials[i][j] = globalThis.helpers.copyArray(trialLevel);
       }
     }
   }
@@ -1315,7 +1315,7 @@ function doLoad(toLoad) {
       if (action.type === 'limited') {
         const varName = action.varName;
         if (toLoad[`searchToggler${varName}`] !== undefined) {
-          inputElement(`searchToggler${varName}`).checked = toLoad[`searchToggler${varName}`];
+          globalThis.helpers.inputElement(`searchToggler${varName}`).checked = toLoad[`searchToggler${varName}`];
         }
         view.updateRegular({ name: action.varName, index: town.index });
       }
@@ -1430,7 +1430,7 @@ function doSave() {
         toSave[`good${varName}`] = town[`good${varName}`];
         toSave[`goodTemp${varName}`] = town[`good${varName}`];
         if (document.getElementById(`searchToggler${varName}`)) {
-          toSave[`searchToggler${varName}`] = inputElement(`searchToggler${varName}`).checked;
+          toSave[`searchToggler${varName}`] = globalThis.helpers.inputElement(`searchToggler${varName}`).checked;
         }
       }
     }
@@ -1483,15 +1483,15 @@ function currentSaveData() {
 function exportSave() {
   const saveJson = save();
   // idle loops save version 01. patch v0.94, moved from old save system to lzstring base 64
-  inputElement('exportImport').value = `ILSV01${compressToBase64(saveJson)}`;
-  inputElement('exportImport').select();
+  globalThis.helpers.inputElement('exportImport').value = `ILSV01${compressToBase64(saveJson)}`;
+  globalThis.helpers.inputElement('exportImport').select();
   if (!document.execCommand('copy')) {
     alert('Copying the save to the clipboard failed! You will need to copy the highlighted value yourself.');
   }
 }
 
 function importSave() {
-  const saveData = inputElement('exportImport').value;
+  const saveData = globalThis.helpers.inputElement('exportImport').value;
   processSave(saveData);
 }
 
@@ -1574,13 +1574,13 @@ function exportCurrentList() {
     toReturn += `${action.loops}x ${action.name}`;
     toReturn += '\n';
   }
-  textAreaElement('exportImportList').value = toReturn.slice(0, -1);
-  textAreaElement('exportImportList').select();
+  globalThis.helpers.textAreaElement('exportImportList').value = toReturn.slice(0, -1);
+  globalThis.helpers.textAreaElement('exportImportList').select();
   document.execCommand('copy');
 }
 
 function importCurrentList() {
-  const toImport = textAreaElement('exportImportList').value.split('\n');
+  const toImport = globalThis.helpers.textAreaElement('exportImportList').value.split('\n');
   actions.clearActions();
   for (let i = 0; i < toImport.length; i++) {
     if (!toImport[i]) {

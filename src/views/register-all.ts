@@ -25,7 +25,7 @@ const buffsContainer = {
           onmouseover="view.showBuff('${name}')" 
           onmouseout="view.showBuff(undefined)">
           <div class="buffNameContainer">
-            <img class="buffIcon" src="icons/${camelize(fullName)}.svg">
+            <img class="buffIcon" src="icons/${globalThis.helpers.camelize(fullName)}.svg">
             <div class="skillLabel medium bold">${globalThis.Localization.txt(`buffs>${XMLName}>label`)}</div>
             <div class="showthis">
               <span>${globalThis.Localization.txt(`buffs>${XMLName}>desc`)}</span>
@@ -664,7 +664,7 @@ const views = [
 
 globalThis.onEnableMenu = (input) => {
   const menu = input.dataset.menu;
-  htmlElement('menusMenu').classList.toggle(`disabled-${menu}`, !input.checked);
+  globalThis.helpers.htmlElement('menusMenu').classList.toggle(`disabled-${menu}`, !input.checked);
 
   const disabledMenus = getDisabledMenus();
 

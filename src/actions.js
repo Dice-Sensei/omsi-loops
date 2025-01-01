@@ -82,7 +82,7 @@ class Actions {
 
   tick(availableMana) {
     availableMana ??= 1;
-    availableMana = Mana.floor(availableMana);
+    availableMana = globalThis.helpers.Mana.floor(availableMana);
 
     const curAction = this.getNextValidAction();
     // out of actions
@@ -98,7 +98,7 @@ class Actions {
     // restrict to the number of ticks it takes to get to a next talent level.
     manaToSpend = Math.min(manaToSpend, getMaxTicksForAction(curAction, true));
     // restrict to the number of ticks it takes to finish the current action
-    manaToSpend = Math.min(manaToSpend, Mana.ceil(curAction.adjustedTicks - curAction.ticks));
+    manaToSpend = Math.min(manaToSpend, globalThis.helpers.Mana.ceil(curAction.adjustedTicks - curAction.ticks));
     // just in case
     if (manaToSpend < 0) manaToSpend = 0;
 
@@ -491,7 +491,7 @@ class Actions {
   /** @param {NextActionEntry} toAdd  */
   addActionRecord(toAdd, initialOrder = options.addActionsToTop ? 0 : -1, addAtClosestValidIndex = true) {
     if (initialOrder < 0) initialOrder += this.next.length + 1;
-    initialOrder = clamp(initialOrder, 0, this.next.length);
+    initialOrder = globalThis.helpers.clamp(initialOrder, 0, this.next.length);
     if (addAtClosestValidIndex) {
       const actionProto = getActionPrototype(toAdd.name);
       initialOrder = this.closestValidIndexForAction(actionProto?.townNum, initialOrder);
@@ -528,7 +528,7 @@ class Actions {
 
     if (initialIndex < 0 || initialIndex >= this.next.length) return -1;
 
-    resultingIndex = clamp(resultingIndex, 0, this.next.length - 1);
+    resultingIndex = globalThis.helpers.clamp(resultingIndex, 0, this.next.length - 1);
     if (moveToClosestValidIndex) {
       const townNum = (getActionPrototype(this.next[initialIndex].name))?.townNum;
       if (townNum != null) {
@@ -627,7 +627,7 @@ class Actions {
   /** @param {number} townNum @param {number} desiredIndex @param {number} [ignoreIndex]  */
   closestValidIndexForAction(townNum, desiredIndex, ignoreIndex) {
     if (desiredIndex < 0) desiredIndex += this.next.length + 1;
-    desiredIndex = clamp(desiredIndex, 0, this.next.length);
+    desiredIndex = globalThis.helpers.clamp(desiredIndex, 0, this.next.length);
     if (townNum == null) return desiredIndex;
     const { zoneSpans } = this;
     const spanIndex = zoneSpans.findIndex((zs) =>
@@ -643,7 +643,7 @@ class Actions {
     }
     for (let index = spanIndex - 1; index >= 0; index--) {
       if (zoneSpans[index]?.zones.includes(townNum)) {
-        prevValidIndex = clamp(zoneSpans[index].ignoringEnd(ignoreIndex), 0, this.next.length);
+        prevValidIndex = globalThis.helpers.clamp(zoneSpans[index].ignoringEnd(ignoreIndex), 0, this.next.length);
         break;
       }
     }
@@ -710,7 +710,7 @@ function setAdjustedTicks(action) {
     newCost += action.stats[actionStatName] * stats[actionStatName].manaMultiplier;
   }
   action.rawTicks = action.manaCost() * newCost - (options.fractionalMana ? 0 : 0.000001);
-  action.adjustedTicks = Math.max(options.fractionalMana ? 0 : 1, Mana.ceil(action.rawTicks));
+  action.adjustedTicks = Math.max(options.fractionalMana ? 0 : 1, globalThis.helpers.Mana.ceil(action.rawTicks));
 }
 
 function calcSoulstoneMult(soulstones) {
@@ -729,7 +729,7 @@ function getMaxTicksForAction(action, talentOnly = false) {
   for (const stat of statList) {
     const expToNext = getExpToLevel(stat, talentOnly);
     const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) * getTotalBonusXP(stat);
-    maxTicks = Math.min(maxTicks, Mana.ceil(expToNext / statMultiplier));
+    maxTicks = Math.min(maxTicks, globalThis.helpers.Mana.ceil(expToNext / statMultiplier));
   }
   return maxTicks;
 }
@@ -740,7 +740,7 @@ function getMaxTicksForStat(action, stat, talentOnly = false) {
   const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
   const expToNext = getExpToLevel(stat, talentOnly);
   const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) * getTotalBonusXP(stat);
-  return Mana.ceil(expToNext / statMultiplier);
+  return globalThis.helpers.Mana.ceil(expToNext / statMultiplier);
 }
 
 function addExpFromAction(action, manaCount) {

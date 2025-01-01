@@ -88,7 +88,7 @@ function animationTick(animationTime) {
 function tick() {
   const newTime = Date.now();
   gameTicksLeft += newTime - curTime;
-  if (inputElement('radarStats').checked) radarUpdateTime += newTime - curTime;
+  if (globalThis.helpers.inputElement('radarStats').checked) radarUpdateTime += newTime - curTime;
   const delta = newTime - curTime;
   curTime = newTime;
 
@@ -120,7 +120,7 @@ function executeGameTicks(deadline) {
   // convert "gameTicksLeft" (actually milliseconds) into equivalent base-mana count, aka actual game ticks
   // including the gameSpeed multiplier here because it is effectively constant over the course of a single
   // update, and it affects how many actual game ticks pass in a given span of realtime.
-  let baseManaToBurn = Mana.floor(gameTicksLeft * baseManaPerSecond * gameSpeed / 1000);
+  let baseManaToBurn = globalThis.helpers.Mana.floor(gameTicksLeft * baseManaPerSecond * gameSpeed / 1000);
   const originalManaToBurn = baseManaToBurn;
   let cleanExit = false;
 
@@ -144,7 +144,7 @@ function executeGameTicks(deadline) {
       // can't spend more mana than offline time available
       manaAvailable = Math.min(
         manaAvailable,
-        Mana.ceil(totalOfflineMs * baseManaPerSecond * gameSpeed * bonusSpeed / 1000),
+        globalThis.helpers.Mana.ceil(totalOfflineMs * baseManaPerSecond * gameSpeed * bonusSpeed / 1000),
       );
     }
 
@@ -163,7 +163,7 @@ function executeGameTicks(deadline) {
 
     // a single action may not use a partial tick, so ceil() to be sure unless fractionalMana.
     // Even with fractionalMana, we need to set a minimum so that mana usages aren't lost to floating-point precision.
-    const manaSpent = Mana.ceil(actions.tick(manaAvailable), timer / 1e15);
+    const manaSpent = globalThis.helpers.Mana.ceil(actions.tick(manaAvailable), timer / 1e15);
 
     // okay, so the current action has used manaSpent effective ticks. figure out how much of our realtime
     // that accounts for, in base ticks and in seconds.
@@ -260,8 +260,8 @@ function pauseGame(ping, message) {
     restart();
   } else if (ping) {
     if (options.pingOnPause) {
-      beep(250);
-      setTimeout(() => beep(250), 500);
+      globalThis.helpers.beep(250);
+      setTimeout(() => globalThis.helpers.beep(250), 500);
     }
     if (options.notifyOnPause) {
       showPauseNotification(message || 'Game paused!');
@@ -299,8 +299,8 @@ function prepareRestart() {
       (actions.current.filter((action) => action.loopsLeft - action.extraLoops > 0).length > 0))
   ) {
     if (options.pingOnPause) {
-      beep(250);
-      setTimeout(() => beep(250), 500);
+      globalThis.helpers.beep(250);
+      setTimeout(() => globalThis.helpers.beep(250), 500);
     }
     if (options.notifyOnPause) {
       showPauseNotification('Game paused!');
@@ -399,7 +399,7 @@ function resetResource(resource) {
 }
 
 function resetResources() {
-  resources = copyObject(resourcesTemplate);
+  resources = globalThis.helpers.copyObject(resourcesTemplate);
   if (getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige']) addResource('glasses', true);
   view.requestUpdate('updateResources', null);
 }
@@ -408,7 +408,7 @@ function changeActionAmount(amount) {
   amount = Math.max(amount, 1);
   amount = Math.min(amount, 1e12);
   actions.addAmount = amount;
-  const customInput = inputElement('amountCustom');
+  const customInput = globalThis.helpers.inputElement('amountCustom');
   if (document.activeElement !== customInput) {
     customInput.value = amount;
   }
@@ -416,7 +416,7 @@ function changeActionAmount(amount) {
 }
 
 function setCustomActionAmount() {
-  const value = parseInt(inputElement('amountCustom').value) || 1;
+  const value = parseInt(globalThis.helpers.inputElement('amountCustom').value) || 1;
   changeActionAmount(value);
 }
 
@@ -426,7 +426,7 @@ function selectLoadout(num) {
   } else {
     curLoadout = num;
   }
-  inputElement('renameLoadout').value = loadoutnames[curLoadout - 1];
+  globalThis.helpers.inputElement('renameLoadout').value = loadoutnames[curLoadout - 1];
   view.updateLoadout(curLoadout);
 }
 
@@ -443,12 +443,14 @@ function saveList() {
     return;
   }
   nameList(false);
-  loadouts[curLoadout] = copyArray(actions.next);
+  loadouts[curLoadout] = globalThis.helpers.copyArray(actions.next);
   save();
-  if ((inputElement('renameLoadout').value !== 'Saved!')) globalCustomInput = inputElement('renameLoadout').value;
-  inputElement('renameLoadout').value = 'Saved!';
+  if ((globalThis.helpers.inputElement('renameLoadout').value !== 'Saved!')) {
+    globalCustomInput = globalThis.helpers.inputElement('renameLoadout').value;
+  }
+  globalThis.helpers.inputElement('renameLoadout').value = 'Saved!';
   setTimeout(() => {
-    inputElement('renameLoadout').value = globalCustomInput;
+    globalThis.helpers.inputElement('renameLoadout').value = globalCustomInput;
   }, 1000);
 }
 
@@ -458,13 +460,13 @@ function nameList(saveGame) {
   // be saved under an old name
   // if both the old AND the new names are numeric, then we insist on a non-numeric name
   if (isNaN(parseFloat(inputElement('renameLoadout').value))) {
-    if (inputElement('renameLoadout').value.length > 30) {
-      inputElement('renameLoadout').value = '30 Letter Max';
-    } else if (inputElement('renameLoadout').value !== 'Saved!') {
-      loadoutnames[curLoadout - 1] = inputElement('renameLoadout').value;
+    if (globalThis.helpers.inputElement('renameLoadout').value.length > 30) {
+      globalThis.helpers.inputElement('renameLoadout').value = '30 Letter Max';
+    } else if (globalThis.helpers.inputElement('renameLoadout').value !== 'Saved!') {
+      loadoutnames[curLoadout - 1] = globalThis.helpers.inputElement('renameLoadout').value;
     }
   } else if (!isNaN(parseFloat(loadoutnames[curLoadout - 1]))) {
-    inputElement('renameLoadout').value = 'Enter a name!';
+    globalThis.helpers.inputElement('renameLoadout').value = 'Enter a name!';
   }
   document.getElementById(`load${curLoadout}`).textContent = loadoutnames[curLoadout - 1];
   if (saveGame) save();
@@ -474,7 +476,7 @@ function loadList() {
   if (curLoadout === 0) {
     return;
   }
-  inputElement('amountCustom').value = actions.addAmount.toString();
+  globalThis.helpers.inputElement('amountCustom').value = actions.addAmount.toString();
   actions.clearActions();
   if (loadouts[curLoadout]) {
     actions.appendActionRecords(loadouts[curLoadout]);
@@ -548,7 +550,7 @@ function capAmount(index, townNum) {
   if (action.name.startsWith('Survey')) newLoops = 500 - alreadyExisting;
   if (action.name === 'Gather Team') newLoops = 5 + Math.floor(getSkillLevel('Leadership') / 100) - alreadyExisting;
   else newLoops = towns[townNum][varName] - alreadyExisting;
-  actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
+  actions.updateAction(index, { loops: globalThis.helpers.clamp(action.loops + newLoops, 0, null) });
   view.updateNextActions();
   view.updateLockedHidden();
 }
@@ -557,7 +559,7 @@ function capTraining(index) {
   const action = actions.next[index];
   const alreadyExisting = getNumOnList(action.name) + (action.disabled ? action.loops : 0);
   const newLoops = trainingLimits - alreadyExisting;
-  actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
+  actions.updateAction(index, { loops: globalThis.helpers.clamp(action.loops + newLoops, 0, null) });
   view.updateNextActions();
   view.updateLockedHidden();
 }
@@ -583,13 +585,13 @@ function addLoop(actionId) {
       addAmount = numMax - numHave;
     }
   }
-  actions.updateAction(action.index, { loops: clamp(action.loops + addAmount, 0, 1e12) });
+  actions.updateAction(action.index, { loops: globalThis.helpers.clamp(action.loops + addAmount, 0, 1e12) });
   view.updateNextActions();
   view.updateLockedHidden();
 }
 function removeLoop(actionId) {
   const action = actions.findActionWithId(actionId);
-  actions.updateAction(action.index, { loops: clamp(action.loops - actions.addAmount, 0, 1e12) });
+  actions.updateAction(action.index, { loops: globalThis.helpers.clamp(action.loops - actions.addAmount, 0, 1e12) });
   view.updateNextActions();
   view.updateLockedHidden();
 }

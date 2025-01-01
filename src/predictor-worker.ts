@@ -1,6 +1,6 @@
 importScripts('./data.ts');
 importScripts('./Localization.ts');
-importScripts('./helpers.js');
+importScripts('./helpers.ts');
 importScripts('./actionList.js');
 importScripts('./driver.js');
 importScripts('./stats.js');
