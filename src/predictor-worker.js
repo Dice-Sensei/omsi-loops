@@ -1,16 +1,14 @@
-importScripts(
-  './data.js',
-  './localization.js',
-  './helpers.js',
-  './actionList.js',
-  './driver.js',
-  './stats.js',
-  './actions.js',
-  './town.ts',
-  './prestige.js',
-  './saving.js',
-  './predictor.js',
-);
+importScripts('./data.js');
+importScripts('./localization.js');
+importScripts('./helpers.js');
+importScripts('./actionList.js');
+importScripts('./driver.js');
+importScripts('./stats.js');
+importScripts('./actions.js');
+importScripts('./town.ts');
+importScripts('./prestige.js');
+importScripts('./saving.js');
+importScripts('./predictor.js');
 
 /**
  * @typedef {{

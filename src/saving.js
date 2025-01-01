@@ -1308,7 +1308,7 @@ function doLoad(toLoad) {
     }
   }
 
-  loadChallenge();
+  globalThis.trash.loadChallenge();
   view.initalize();
 
   for (const town of towns) {
