@@ -1,3 +1,30 @@
+namespace SearchParams {
+  const self = () => new URLSearchParams(globalThis.location.search);
+
+  type GetOptions<T extends string | null> = {
+    expected: T[];
+    fallback: T;
+  };
+
+  export const get = <T extends string | null = string | null>(name: string, options: GetOptions<T>): T => {
+    const value = self().get(name) as T;
+
+    return value && options.expected.includes(value) ? value : options.fallback;
+  };
+
+  export const set = <T extends string>(name: string, value: T | null): void => {
+    const params = self();
+
+    if (value === null) {
+      params.delete(name);
+    } else {
+      params.set(name, value);
+    }
+
+    globalThis.location.search = params.toString();
+  };
+}
+
 const Localization = {
   languages: { 'en-EN': 'English' },
   fallback: 'en-EN',
@@ -6,24 +33,15 @@ const Localization = {
   searchParam: 'language',
 
   bundles: {},
-  lastLib: null,
-
-  ready: null,
 
   async init() {
-    const params = new URLSearchParams(globalThis.location.search);
-    let language = params.get(Localization.searchParam);
-    if (language && !(language in Localization.languages)) {
-      language = Localization.fallback;
-    }
+    Localization.language = SearchParams.get(Localization.searchParam, {
+      expected: Object.keys(Localization.languages),
+      fallback: Localization.fallback,
+    });
 
-    Localization.language = language ?? Localization.fallback;
-
-    await Localization.loadLanguage(Localization.fallback);
-    await Localization.loadLanguage(Localization.language);
-  },
-  async loadLanguage(language: string): Promise<void> {
-    Localization.bundles[language] = await Localization.loadXml(language);
+    Localization.bundles[Localization.fallback] = await Localization.loadXml(Localization.fallback);
+    Localization.bundles[Localization.language] = await Localization.loadXml(Localization.language);
   },
   populate(language: string = Localization.language) {
     const elements = document.querySelectorAll<HTMLElement>('.localized');
@@ -33,10 +51,7 @@ const Localization = {
     }
   },
   change() {
-    const params = new URLSearchParams(globalThis.location.search);
-    params.set(Localization.searchParam, Localization.language);
-
-    globalThis.location.search = params.toString();
+    SearchParams.set(Localization.searchParam, Localization.language);
   },
   async loadXml(language: string): Promise<XMLDocument> {
     const response = await fetch(`locales/${language}/game.xml`);
@@ -44,27 +59,16 @@ const Localization = {
 
     return new DOMParser().parseFromString(text, 'text/xml');
   },
-  txt(path: string, language: string = Localization.language) {
-    const bundle = $(Localization.bundles[language]);
 
-    let txt;
-    if (bundle.length) txt = $(Localization.bundles[language]).find(path).text();
-
-    if (txt === '') {
-      console.warn(`Missing text in lang '${Localization.language}' for key ${path} in lib ${language}`);
-      txt = $(Localization.bundles[Localization.fallback]).find(path).text();
-
-      if (txt === '') {
-        console.warn(`Missing fallback for key ${path}`);
-        txt = `[${path}]`;
-      }
-    }
-    return txt;
+  txt: (path: string, language: string = Localization.language) => {
+    return Localization.txtsObj(path, language).text();
   },
-  txtsObj(path: string, language: string = Localization.language) {
+
+  txtsObj: (path: string, language: string = Localization.language) => {
     return $(Localization.bundles[language]).find(path);
   },
 };
+globalThis.Localization = Localization;
 
 class Localizable {
   #txtsObj: JQuery<HTMLElement>;
