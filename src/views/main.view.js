@@ -737,7 +737,7 @@ class View {
   updateNextActions() {
     const { scrollTop } = nextActionsDiv; // save the current scroll position
     if (options.predictor) {
-      Koviko.preUpdateHandler(nextActionsDiv);
+      globalThis.Koviko.preUpdateHandler(nextActionsDiv);
     }
 
     globalThis.trash.d3.select(nextActionsDiv)

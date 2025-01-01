@@ -2932,6 +2932,7 @@ const Koviko = {
     this.instance.update(nextActions, container);
   },
 };
+globalThis.Koviko = Koviko;
 
 /** @typedef {InstanceType<(typeof Koviko)["Snapshot"]>} Koviko_Snapshot */
 /** @typedef {InstanceType<(typeof Koviko)["Prediction"]>} Koviko_Prediction */

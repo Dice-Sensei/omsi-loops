@@ -889,7 +889,7 @@ const optionValueHandlers = {
   },
   predictorBackgroundThread(value, init) {
     if (!value && !init) {
-      Koviko.instance.terminateWorker();
+      globalThis.Koviko.instance.terminateWorker();
     }
   },
 };

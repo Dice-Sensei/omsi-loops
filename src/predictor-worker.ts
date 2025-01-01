@@ -1,14 +1,17 @@
 importScripts('./data.js');
+// module ready
 importScripts('./Localization.ts');
 importScripts('./helpers.js');
 importScripts('./actionList.js');
 importScripts('./driver.js');
 importScripts('./stats.js');
 importScripts('./actions.js');
+// module ready
 importScripts('./town.ts');
 importScripts('./prestige.js');
 importScripts('./saving.js');
-importScripts('./predictor.js');
+// module ready
+importScripts('./predictor.ts');
 
 /**
  * @typedef {{
@@ -50,7 +53,7 @@ console.log('starting predictor worker');
 
 loadDefaults();
 
-const predictor = Koviko.initWorkerPredictor();
+const predictor = globalThis.Koviko.initWorkerPredictor();
 /** @type {MessageToPredictor} */
 let queuedUpdate;
 
