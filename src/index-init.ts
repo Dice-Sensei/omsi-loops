@@ -1,3 +1,5 @@
+import { renderViews } from './views/register-all.ts';
+
 loadDefaults();
 
 Localization.ready.then(() => {

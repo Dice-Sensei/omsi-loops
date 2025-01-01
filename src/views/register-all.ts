@@ -1,35 +1,24 @@
-let renderViews;
-{
-  const getDisabledMenus = () => {
-    let disabledMenus = [];
+const getDisabledMenus = () => {
+  let disabledMenus = [];
 
-    try {
-      disabledMenus = JSON.parse(localStorage.getItem('disabledMenus')) ?? disabledMenus;
-    } catch {}
+  try {
+    disabledMenus = JSON.parse(localStorage.getItem('disabledMenus')) ?? disabledMenus;
+  } catch {}
 
-    return disabledMenus;
-  };
+  return disabledMenus;
+};
 
-  renderViews = () => {
-    for (const { selector, html } of views) {
-      const element = document.querySelector(selector);
-      if (!element) throw Error(`Invalid selector for view ${selector}`);
+const buffsContainer = {
+  selector: '#buffsContainer',
+  html() {
+    let html = '';
 
-      element.innerHTML = html();
-    }
-  };
+    for (const name of buffList) {
+      const fullName = Buff.fullNames[name];
+      const XMLName = getXMLName(fullName);
+      const desc2 = _txtsObj(`buffs>${XMLName}`)[0].innerHTML.includes('desc2');
 
-  const buffsContainer = {
-    selector: '#buffsContainer',
-    html() {
-      let html = '';
-
-      for (const name of buffList) {
-        const fullName = Buff.fullNames[name];
-        const XMLName = getXMLName(fullName);
-        const desc2 = _txtsObj(`buffs>${XMLName}`)[0].innerHTML.includes('desc2');
-
-        html += `
+      html += `
         <div 
           class="buffContainer showthat" 
           id="buff${name}Container" 
@@ -55,158 +44,158 @@ let renderViews;
           </div>
         </div>
       `;
-      }
+    }
 
-      return html;
-    },
-  };
+    return html;
+  },
+};
 
-  const menu = {
-    selector: '#menu',
-    html() {
-      let html = '';
-      html += menu.htmlMenusMenu();
-      html += menu.htmlChangelog();
-      html += menu.htmlSaveMenu();
-      html += menu.htmlFAQMenu();
-      html += menu.htmlOptionsMenu();
-      html += menu.htmlExtrasMenu();
-      html += menu.htmlChallengeMenu();
-      html += menu.htmlTotalsMenu();
-      html += menu.htmlPrestigeMenu();
-      return html;
-    },
-    htmlMenusMenu() {
-      const menus = [
-        'changelog',
-        'save',
-        'faq',
-        'options',
-        'extras',
-        'challenges',
-        'totals',
-        'prestige_bonus',
-      ];
-      const disabledMenus = getDisabledMenus();
-      const html = `
+const menu = {
+  selector: '#menu',
+  html() {
+    let html = '';
+    html += menu.htmlMenusMenu();
+    html += menu.htmlChangelog();
+    html += menu.htmlSaveMenu();
+    html += menu.htmlFAQMenu();
+    html += menu.htmlOptionsMenu();
+    html += menu.htmlExtrasMenu();
+    html += menu.htmlChallengeMenu();
+    html += menu.htmlTotalsMenu();
+    html += menu.htmlPrestigeMenu();
+    return html;
+  },
+  htmlMenusMenu() {
+    const menus = [
+      'changelog',
+      'save',
+      'faq',
+      'options',
+      'extras',
+      'challenges',
+      'totals',
+      'prestige_bonus',
+    ];
+    const disabledMenus = getDisabledMenus();
+    const html = `
       <li id='menusMenu' tabindex='0' style='display:inline-block;height:30px;margin-right:10px;' class='showthatH${
-        menus.map((menu) => disabledMenus.includes(menu) ? ` disabled-${menu}` : '').join('')
-      }'>
+      menus.map((menu) => disabledMenus.includes(menu) ? ` disabled-${menu}` : '').join('')
+    }'>
         <i class='fas fa-bars'></i>
         <div class='showthisH' id='menus'>
           <ul>
             ${
-        menus.map((menu) => `
+      menus.map((menu) => `
               <li>
                 <input type='checkbox' id='enableMenu_${menu}' data-menu='${menu}' onchange='onEnableMenu(this)' 
                 ${disabledMenus.includes(menu) ? '' : 'checked'}>
                         <label for='enableMenu_${menu}'>${_txt(`menu>${menu}>meta>title`)}</label>
                     </li>`).join('\n')
-      }
+    }
                 </ul>
             </div>
       </li>
         `;
-      return html;
-    },
-    /** @param {HTMLInputElement} input  */
-    versions() {
-      let html = '';
-      const versions = _txtsObj('menu>changelog>version');
-      $(versions).each((_index, version) => {
-        const caption = $(version).attr('caption');
-        const verNum = $(version).attr('verNum');
-        html += `
+    return html;
+  },
+  /** @param {HTMLInputElement} input  */
+  versions() {
+    let html = '';
+    const versions = _txtsObj('menu>changelog>version');
+    $(versions).each((_index, version) => {
+      const caption = $(version).attr('caption');
+      const verNum = $(version).attr('verNum');
+      html += `
                     <li class='showthat2' tabindex='0' ${verNum ? `data-verNum="${verNum}"` : ''}>
                         ${caption ? caption : `${_txt('menu>changelog>meta>version_prefix')} ${verNum}`}
                         <div class='showthis2'>
                             ${$(version).text()}
                         </div>
                     </li>`;
-      });
-      return html;
-    },
-    htmlChangelog() {
-      const html =
-        `<li id='changelogMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+    });
+    return html;
+  },
+  htmlChangelog() {
+    const html =
+      `<li id='changelogMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             ${_txt('menu>changelog>meta>title')}
             <ul class='showthisH' id='changelog'>
                 ${this.versions()}
             </ul>
         </li>`;
-      return html;
-    },
-    htmlSaveMenu() {
-      const html =
-        `<li id='saveMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+    return html;
+  },
+  htmlSaveMenu() {
+    const html =
+      `<li id='saveMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             ${_txt('menu>save>meta>title')}
             <div class='showthisH'>
                 <button class='button' onclick='save()'>${_txt('menu>save>manual_save')}</button>
                 <br>
                 <textarea id='exportImportList'></textarea><label for='exportImportList'> ${
-          _txt('menu>save>list_label')
-        }</label>
+        _txt('menu>save>list_label')
+      }</label>
                 <br>
                 <button class='button' style='margin-right: 2px;' onclick='exportCurrentList()'>${
-          _txt('menu>save>export_button')
-        }</button>
+        _txt('menu>save>export_button')
+      }</button>
                 <button class='button' onclick='importCurrentList()'>${_txt('menu>save>import_button')}</button>
                 <br>
                 ${_txt('menu>save>list_comment')}
                 <br><br>
                 <input id='exportImport'><label for='exportImport'> ${_txt('menu>save>input_label')}</label><br>
                 <button class='button' style='margin-top: 5px; margin-right: 2px;' onclick='exportSave()'>${
-          _txt('menu>save>export_button')
-        }</button>
+        _txt('menu>save>export_button')
+      }</button>
                 <button class='button' style='margin-top: 1px;' onclick='importSave()'>${
-          _txt('menu>save>import_button')
-        }</button><br>
+        _txt('menu>save>import_button')
+      }</button><br>
                 ${_txt('menu>save>export_comment')}<br>
                 ${_txt('menu>save>import_comment')}<br>
                 <button class='button' style='margin-top: 5px; margin-right: 2px;' onclick='exportSaveFile()'>${
-          _txt('menu>save>exportfile_button')
-        }</button>
+        _txt('menu>save>exportfile_button')
+      }</button>
                 <button class='button' style='margin-top: 1px;' onclick='openSaveFile()'>${
-          _txt('menu>save>importfile_button')
-        }</button>
+        _txt('menu>save>importfile_button')
+      }</button>
                 <input id="SaveFileInput" type='file' style="visibility:hidden;" onchange="importSaveFile(event)" />
                 <br>
             </div>
         </li>`;
-      return html;
-    },
-    FAQs() {
-      let html = '';
-      const QAs = _txtsObj('menu>faq>q_a');
-      $(QAs).each((_index, QA) => {
-        html += `
+    return html;
+  },
+  FAQs() {
+    let html = '';
+    const QAs = _txtsObj('menu>faq>q_a');
+    $(QAs).each((_index, QA) => {
+      html += `
                 <li class='showthat2' tabindex='0'>
                     ${$(QA).find('q').html()}
                     <div class='showthis2'>
                         ${$(QA).find('a').html()}
                     </div>
                 </li>`;
-      });
-      return html;
-    },
-    htmlFAQMenu() {
-      const html =
-        `<li id='faqMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+    });
+    return html;
+  },
+  htmlFAQMenu() {
+    const html =
+      `<li id='faqMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             ${_txt('menu>faq>meta>title')}
             <ul class='showthisH' id="faq">
                 ${this.FAQs()}
             </ul>
         </li>`;
-      return html;
-    },
-    htmlOptionsMenu() {
-      const html =
-        `<li id='optionsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+    return html;
+  },
+  htmlOptionsMenu() {
+    const html =
+      `<li id='optionsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             ${_txt('menu>options>meta>title')}
             <div class='showthisH'>
                 <a target='_blank' href='${_txt('menu>options>discord>link')}'>${
-          _txt('menu>options>discord>title')
-        }</a><br>
+        _txt('menu>options>discord>title')
+      }</a><br>
                 ${menu.htmlThemeMenu()}
                 ${Object.keys(Localization.supportedLang).length > 1 ? menu.htmlLocalizationMenu() : ''}
                 ${_txt('menu>options>adblock_warning')}<br>
@@ -247,45 +236,45 @@ let renderViews;
                 <br>
             </div>
         </li>`;
-      return html;
-    },
-    htmlLocalizationMenu() {
-      const lg = Localization.supportedLang;
-      let html = `${
-        _txt('menu>options>localization_title')
-      }: <select id='localization_menu' onchange='Localization.change();'>`;
-      $.each(lg, (val, str) => {
-        html += `<option value='${val}'${Localization.currentLang === val ? 'selected' : ''}>${str}</option>`;
-      });
-      html += '</select><br>';
-      return html;
-    },
-    htmlThemeMenu() {
-      const themeList = ['normal', 'dark', 'cubic', 'cubic t-dark', 'zen', 'zen t-dark'];
-      const themes = _txtsObj('menu>options>theme');
-      let html = `${_txt('menu>options>theme_title')}: <select id='themeInput' onchange='view.changeTheme();'>`;
-      $(themes).each((index, theme) => {
-        html += `<option value='${themeList[index]}'>${
-          $(theme).find(themeList[index].replaceAll(' ', '_')).text()
+    return html;
+  },
+  htmlLocalizationMenu() {
+    const lg = Localization.supportedLang;
+    let html = `${
+      _txt('menu>options>localization_title')
+    }: <select id='localization_menu' onchange='Localization.change();'>`;
+    $.each(lg, (val, str) => {
+      html += `<option value='${val}'${Localization.currentLang === val ? 'selected' : ''}>${str}</option>`;
+    });
+    html += '</select><br>';
+    return html;
+  },
+  htmlThemeMenu() {
+    const themeList = ['normal', 'dark', 'cubic', 'cubic t-dark', 'zen', 'zen t-dark'];
+    const themes = _txtsObj('menu>options>theme');
+    let html = `${_txt('menu>options>theme_title')}: <select id='themeInput' onchange='view.changeTheme();'>`;
+    $(themes).each((index, theme) => {
+      html += `<option value='${themeList[index]}'>${
+        $(theme).find(themeList[index].replaceAll(' ', '_')).text()
+      }</option>`;
+    });
+    html += '</select><br>';
+    html += `<div class='block' id='themeVariantSection'>${
+      _txt('menu>options>theme_variant_title')
+    }: <select id='themeVariantInput' onchange='view.changeTheme();'>`;
+    $(themes).each((index, theme) => {
+      $(theme).find('variants>*').each((vindex, variant) => {
+        html += `<option class='variant-${themeList[index].replaceAll(' ', '_')}' value='${variant.tagName}'>${
+          $(variant).text()
         }</option>`;
       });
-      html += '</select><br>';
-      html += `<div class='block' id='themeVariantSection'>${
-        _txt('menu>options>theme_variant_title')
-      }: <select id='themeVariantInput' onchange='view.changeTheme();'>`;
-      $(themes).each((index, theme) => {
-        $(theme).find('variants>*').each((vindex, variant) => {
-          html += `<option class='variant-${themeList[index].replaceAll(' ', '_')}' value='${variant.tagName}'>${
-            $(variant).text()
-          }</option>`;
-        });
-      });
-      html += '</select></div>';
-      return html;
-    },
-    htmlExtrasMenu() {
-      const html =
-        `<li id='extrasMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+    });
+    html += '</select></div>';
+    return html;
+  },
+  htmlExtrasMenu() {
+    const html =
+      `<li id='extrasMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             ${_txt('menu>extras>meta>title')}
             <div class='showthisH' style='padding-top:1ex'>
                 ${_txt('menu>options>extras_warning')}<br>
@@ -312,18 +301,18 @@ let renderViews;
                 ${_txt('menu>options>speedIncreaseBackground_text')}
                 <input id='speedIncreaseBackgroundInput' type='number' value='' placeholder='same' min='0' style='width: 50px;transform: translateY(-2px);' oninput='setOption("speedIncreaseBackground", parseFloat(this.value))' />
                 <div id='speedIncreaseBackgroundWarning' class='small block' style='display:none'>${
-          _txt('menu>options>speedIncreaseBackground_warning')
-        }</div>
+        _txt('menu>options>speedIncreaseBackground_warning')
+      }</div>
                 <br>
                 <button id='borrowTimeButton' class='button showthat control' onclick='borrowTime()'>${
-          _txt('menu>options>borrow_time')
-        }
+        _txt('menu>options>borrow_time')
+      }
                     <div class='showthis'>${_txt('menu>options>borrow_time_tooltip')}</div>
                 </button>
                 <div class='show-when-time-borrowed'>
                     <button id='returnTimeButton' class='button control' onclick='returnTime()'>${
-          _txt('menu>options>return_time')
-        }</button>
+        _txt('menu>options>return_time')
+      }</button>
                     ${_txt('menu>options>time_borrowed')} <span id='borrowedTimeDays'></span>
                 </div><br>
                 <div id='predictorSettings'>
@@ -347,94 +336,93 @@ let renderViews;
                     <br>
                     <input id='predictorSlowModeInput' type='checkbox' onchange='setOption("predictorSlowMode", this.checked)'>
                     <label for='predictorSlowModeInput'>${
-          _txt('predictor>slow_mode')
-            .replace(
-              '{slowMode}',
-              `<input id='predictorSlowTimerInput' type='number' value='1' min='1' style='width: 20px;' oninput='setOption("predictorSlowTimer", parseInt(this.value))'>`,
-            )
-        }</label>
+        _txt('predictor>slow_mode')
+          .replace(
+            '{slowMode}',
+            `<input id='predictorSlowTimerInput' type='number' value='1' min='1' style='width: 20px;' oninput='setOption("predictorSlowTimer", parseInt(this.value))'>`,
+          )
+      }</label>
                 </div>
             </div>
         </li>`;
-      return html;
-    },
-    htmlChallengeMenu() {
-      const html =
-        `<li id='challengesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+    return html;
+  },
+  htmlChallengeMenu() {
+    const html =
+      `<li id='challengesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             ${_txt('menu>challenges>meta>title')}
             <div class='showthisH'>
                 ${this.challenges()}
             </div>
         </li>`;
-      return html;
-    },
-    htmlTotalsMenu() {
-      const html =
-        `<li id='totalsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+    return html;
+  },
+  htmlTotalsMenu() {
+    const html =
+      `<li id='totalsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             ${_txt('menu>totals>meta>title')}
             <div class='showthisH'>
                 ${this.totals()}
             </div>
         </li>`;
-      return html;
-    },
-    htmlPrestigeMenu() {
-      const html =
-        `<li id='prestige_bonusesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+    return html;
+  },
+  htmlPrestigeMenu() {
+    const html =
+      `<li id='prestige_bonusesMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             ${_txt('menu>prestige_bonus>meta>title')}
             <div class='showthisH'>
                 ${this.prestige_bonuses()}
             </div>
         </li>`;
-      return html;
-    },
-    challenges() {
-      let html = `<div>Challenges are special modes that impose special conditions and heavy restrictions.<br> 
+    return html;
+  },
+  challenges() {
+    let html = `<div>Challenges are special modes that impose special conditions and heavy restrictions.<br> 
             They give no rewards ard are just here for fun.<br>
             It is only recommended to try them after beating the main game.<br>
             Please export and save your data locally before starting.<br>
             <b>Beginning a challenge will permanently delete your current save.</b><br>
             `;
-      if (challengeSave.challengeMode !== 0 || 1 === 1) {
-        html +=
-          `<button class='button showthat control' style='margin-top: 2px;' onclick='exitChallenge()'>Exit Challenge 
+    if (challengeSave.challengeMode !== 0 || 1 === 1) {
+      html +=
+        `<button class='button showthat control' style='margin-top: 2px;' onclick='exitChallenge()'>Exit Challenge 
                 </button>
                 <button class='button showthat control' style='margin-top: 2px;' onclick='resumeChallenge()'>Resume Challenge 
                 </button><br>`;
-      }
-      html +=
-        `<button class='button showthat control' style='margin-top: 2px;' onclick='beginChallenge(1)'>Mana Drought 
+    }
+    html += `<button class='button showthat control' style='margin-top: 2px;' onclick='beginChallenge(1)'>Mana Drought 
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:100px;'>${
-          _txt('menu>challenges>mana_drought')
-        }</div>
+      _txt('menu>challenges>mana_drought')
+    }</div>
         </button><br>
         <button class='button showthat control' style='margin-top: 2px;' onclick='beginChallenge(2)'>Noodle Arms
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:100px;'>${
-          _txt('menu>challenges>noodle_arms')
-        }</div>
+      _txt('menu>challenges>noodle_arms')
+    }</div>
         </button><br>
         <button class='button showthat control' style='margin-top: 2px;' onclick='beginChallenge(3)'>Mana Burn
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:100px;'>${
-          _txt('menu>challenges>mana_burn')
-        }</div>
+      _txt('menu>challenges>mana_burn')
+    }</div>
         </button><br>`;
-      html += `</div>`;
-      return html;
-    },
-    totals() {
-      let html = `<div>
+    html += `</div>`;
+    return html;
+  },
+  totals() {
+    let html = `<div>
         Effective Time: <div id='totalEffectiveTime'></div><br>
         Running Time: <div id='totalPlaytime'></div><br>
         <span class='show-when-time-borrowed'>${
-        _txt('menu>options>time_borrowed')
-      } <div id='borrowedTimeBalance'></div><br></span>
+      _txt('menu>options>time_borrowed')
+    } <div id='borrowedTimeBalance'></div><br></span>
         Loops: <div id='totalLoops'></div><br>
         Actions: <div id='totalActions'></div><br>
         </div>`;
-      return html;
-    },
-    prestige_bonuses() {
-      let html = `<div><br> 
+    return html;
+  },
+  prestige_bonuses() {
+    let html = `<div><br> 
         Prestige bonuses are always active.<br>
         Each time you complete the game, you receive 90 points to spend on these bonuses.<br>
         Please export and save your data locally before attempting to trigger a prestige.<br>
@@ -454,12 +442,12 @@ let renderViews;
         <br>
 
         `;
-      html += `
+    html += `
         <br>
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigePhysical")'>Prestige Physical
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-        _txt('menu>prestige_bonus>PrestigePhysical')
-      }
+      _txt('menu>prestige_bonus>PrestigePhysical')
+    }
                 <br><br>
                 Current Bonus: <div id='prestigePhysicalCurrentBonus'></div>%<br>
                 Next level cost: <div id='prestigePhysicalNextCost'></div> points<br> 
@@ -468,8 +456,8 @@ let renderViews;
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeMental")'>Prestige Mental
         <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-        _txt('menu>prestige_bonus>PrestigeMental')
-      }
+      _txt('menu>prestige_bonus>PrestigeMental')
+    }
             <br><br>
             Current Bonus: <div id='prestigeMentalCurrentBonus'></div>%<br>
             Next level cost: <div id='prestigeMentalNextCost'></div> points<br> 
@@ -479,8 +467,8 @@ let renderViews;
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeCombat")'>Prestige Combat
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-        _txt('menu>prestige_bonus>PrestigeCombat')
-      }
+      _txt('menu>prestige_bonus>PrestigeCombat')
+    }
                 <br><br>
                 Current Bonus: <div id='prestigeCombatCurrentBonus'></div>%<br>
                 Next level cost: <div id='prestigeCombatNextCost'></div> points<br> 
@@ -489,8 +477,8 @@ let renderViews;
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeSpatiomancy")'>Prestige Spatiomancy
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-        _txt('menu>prestige_bonus>PrestigeSpatiomancy')
-      }
+      _txt('menu>prestige_bonus>PrestigeSpatiomancy')
+    }
                 <br><br>
                 Current Bonus: <div id='prestigeSpatiomancyCurrentBonus'></div>%<br>
                 Next level cost: <div id='prestigeSpatiomancyNextCost'></div> points<br> 
@@ -499,8 +487,8 @@ let renderViews;
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeChronomancy")'>Prestige Chronomancy
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-        _txt('menu>prestige_bonus>PrestigeChronomancy')
-      }
+      _txt('menu>prestige_bonus>PrestigeChronomancy')
+    }
                 <br><br>
                 Current Bonus: <div id='prestigeChronomancyCurrentBonus'></div>%<br>
                 Next level cost: <div id='prestigeChronomancyNextCost'></div> points<br> 
@@ -509,8 +497,8 @@ let renderViews;
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeBartering")'>Prestige Bartering
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-        _txt('menu>prestige_bonus>PrestigeBartering')
-      }
+      _txt('menu>prestige_bonus>PrestigeBartering')
+    }
                 <br><br>
                 Current Bonus: <div id='prestigeBarteringCurrentBonus'></div>%<br>
                 Next level cost: <div id='prestigeBarteringNextCost'></div> points<br> 
@@ -519,8 +507,8 @@ let renderViews;
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeExpOverflow")'>Prestige Experience Overflow
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-        _txt('menu>prestige_bonus>PrestigeExpOverflow')
-      }
+      _txt('menu>prestige_bonus>PrestigeExpOverflow')
+    }
                 <br><br>
                 Current Bonus: <div id='prestigeExpOverflowCurrentBonus'></div>%<br>
                 Next level cost: <div id='prestigeExpOverflowNextCost'></div> points<br> 
@@ -531,35 +519,35 @@ let renderViews;
 
         <button class='button showthat control' style='margin-top: -50px;' onclick='resetAllPrestiges()'>Reset All Prestiges
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
-        _txt('menu>prestige_bonus>PrestigeResetAll')
-      }
+      _txt('menu>prestige_bonus>PrestigeResetAll')
+    }
             </div>
         </button><br>
 
         `;
-      return html;
-    },
-  };
+    return html;
+  },
+};
 
-  const timeControls = {
-    selector: '#timeControls',
-    html() {
-      const stories = () => {
-        let html = '';
-        // eslint-disable-next-line no-unused-vars
+const timeControls = {
+  selector: '#timeControls',
+  html() {
+    const stories = () => {
+      let html = '';
+      // eslint-disable-next-line no-unused-vars
 
-        _txtsObj('time_controls>stories>story').each((index, story) => {
-          html += `
+      _txtsObj('time_controls>stories>story').each((index, story) => {
+        html += `
           <div id='story${$(story).attr('num')}'>
             ${$(story).text()}
           </div>
         `;
-        });
+      });
 
-        return html;
-      };
+      return html;
+    };
 
-      return `
+    return `
       <div id='timeControlsMain'>
         <button id='pausePlay' onclick='pauseGame()'' class='button control'>
           ${_txt('time_controls>pause_button')}
@@ -606,22 +594,22 @@ let renderViews;
         </div>
       </div>
     `;
-    },
-  };
+  },
+};
 
-  const trackedResources = {
-    selector: '#trackedResources',
-    html() {
-      let html = '';
+const trackedResources = {
+  selector: '#trackedResources',
+  html() {
+    let html = '';
 
-      const resources = _txtsObj('tracked_resources>resource');
+    const resources = _txtsObj('tracked_resources>resource');
 
-      $(resources).each((_index, resource) => {
-        const hasCount = !$(resource).attr('no_count');
-        const resetOnRestart = !$(resource).attr('no_reset_on_restart');
-        const isHidden = $(resource).attr('initially_hidden');
+    $(resources).each((_index, resource) => {
+      const hasCount = !$(resource).attr('no_count');
+      const resetOnRestart = !$(resource).attr('no_reset_on_restart');
+      const isHidden = $(resource).attr('initially_hidden');
 
-        html += `
+      html += `
         <div class='showthat resource'${isHidden ? ` style='display:none' id='${$(resource).attr('id')}Div'` : ''}>
           <div class='bold'>${$(resource).find('title').text()}</div>
           ${hasCount ? `<div id='${$(resource).attr('id')}'>0</div>` : ''}
@@ -631,32 +619,40 @@ let renderViews;
           </div>
         </div>
       `;
-      });
+    });
 
-      return html;
-    },
-  };
+    return html;
+  },
+};
 
-  const views = [
-    buffsContainer,
-    menu,
-    timeControls,
-    trackedResources,
-  ];
+const views = [
+  buffsContainer,
+  menu,
+  timeControls,
+  trackedResources,
+];
 
-  window.onEnableMenu = (input) => {
-    const menu = input.dataset.menu;
-    htmlElement('menusMenu').classList.toggle(`disabled-${menu}`, !input.checked);
+globalThis.onEnableMenu = (input) => {
+  const menu = input.dataset.menu;
+  htmlElement('menusMenu').classList.toggle(`disabled-${menu}`, !input.checked);
 
-    const disabledMenus = getDisabledMenus();
+  const disabledMenus = getDisabledMenus();
 
-    const index = disabledMenus.indexOf(menu);
-    if (index === -1 && !input.checked) {
-      disabledMenus.push(menu);
-    } else if (index >= 0 && input.checked) {
-      disabledMenus.splice(index, 1);
-    }
+  const index = disabledMenus.indexOf(menu);
+  if (index === -1 && !input.checked) {
+    disabledMenus.push(menu);
+  } else if (index >= 0 && input.checked) {
+    disabledMenus.splice(index, 1);
+  }
 
-    localStorage.setItem('disabledMenus', JSON.stringify(disabledMenus));
-  };
-}
+  localStorage.setItem('disabledMenus', JSON.stringify(disabledMenus));
+};
+
+export const renderViews = () => {
+  for (const { selector, html } of views) {
+    const element = document.querySelector(selector);
+    if (!element) throw Error(`Invalid selector for view ${selector}`);
+
+    element.innerHTML = html();
+  }
+};
