@@ -1,14 +1,13 @@
-export interface MemoizedFn<This, Fn extends (this: This, ...args: any[]) => any, K = string> {
-  (this: This, ...args: Parameters<Fn>): ReturnType<Fn>;
+export type MemoizedFn<This, Fn extends (this: This, ...args: any[]) => any, K = string> = Fn & {
   cache: Map<K, ReturnType<Fn>>;
-}
+};
 
 export const memoize = <This, Fn extends (this: This, ...args: any[]) => any, K = string>(
   fn: Fn,
   createId: (this: This, ...args: Parameters<Fn>) => K = (...args) => args.join(',') as K,
 ): MemoizedFn<This, Fn, K> => {
-  const result: MemoizedFn<This, Fn, K> = function self(...args) {
-    const cache = self.cache;
+  const result = function self(...args: Parameters<Fn>) {
+    const cache = (self as MemoizedFn<This, Fn, K>).cache;
 
     const id = createId.apply(this, args);
 
@@ -17,7 +16,7 @@ export const memoize = <This, Fn extends (this: This, ...args: any[]) => any, K 
     const value = fn.apply(this, args);
     cache.set(id, value);
     return value;
-  };
+  } as MemoizedFn<This, Fn, K>;
   result.cache = new Map();
 
   return result;

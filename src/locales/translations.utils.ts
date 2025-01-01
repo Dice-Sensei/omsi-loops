@@ -5,7 +5,7 @@ import { Path } from 'a-path';
 
 export type Translations = typeof translationsEn;
 
-export const t = memoize(<P extends Path<Translations>>(path: P): Path.At<Translations, P> =>
+export const t = memoize(<const P extends Path<Translations>>(path: P): Path.At<Translations, P> =>
   Path.get(translationsEn, path)
 );
 
