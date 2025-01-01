@@ -29,11 +29,11 @@ namespace Localization {
   export const languages = { 'en-EN': 'English' };
   export const fallback = 'en-EN';
 
-  export let language: null;
   export const searchParam = 'language';
 
   export const bundles: Record<string, XMLDocument> = {};
 
+  export let language: null;
   export async function init() {
     language = SearchParams.get(searchParam, {
       expected: Object.keys(languages),
