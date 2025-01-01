@@ -1079,7 +1079,8 @@ Action.BuyGlasses = new Action('Buy Glasses', {
     return 50;
   },
   visible() {
-    return towns[0].getLevel('Wander') >= 3 && getExploreProgress() < 100 && !prestigeValues['completedAnyPrestige'];
+    return towns[0].getLevel('Wander') >= 3 && getExploreProgress() < 100 &&
+      !globalThis.prestige.prestigeValues['completedAnyPrestige'];
   },
   unlocked() {
     return towns[0].getLevel('Wander') >= 20;
@@ -1108,7 +1109,7 @@ Action.FoundGlasses = new Action('Found Glasses', {
     return 0;
   },
   visible() {
-    return getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige'];
+    return getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige'];
   },
   unlocked() {
     return false;

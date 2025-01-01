@@ -584,7 +584,7 @@ globalThis.Data.registerAll({
   hearts,
   skills,
   buffs,
-  prestigeValues,
+  prestigeValues: globalThis.prestige.prestigeValues,
   townsUnlocked,
   completedActions,
   storyFlags,
@@ -962,11 +962,11 @@ function loadDefaults() {
   initializeBuffs();
   initializeActions();
   initializeTowns();
-  prestigeValues['prestigeCurrentPoints'] = 0;
-  prestigeValues['prestigeTotalPoints'] = 0;
-  prestigeValues['prestigeTotalCompletions'] = 0;
-  prestigeValues['completedCurrentPrestige'] = false;
-  prestigeValues['completedAnyPrestige'] = false;
+  globalThis.prestige.prestigeValues['prestigeCurrentPoints'] = 0;
+  globalThis.prestige.prestigeValues['prestigeTotalPoints'] = 0;
+  globalThis.prestige.prestigeValues['prestigeTotalCompletions'] = 0;
+  globalThis.prestige.prestigeValues['completedCurrentPrestige'] = false;
+  globalThis.prestige.prestigeValues['completedAnyPrestige'] = false;
   globalThis.Data.recordDefaults();
   defaultsRecorded = true;
 }
@@ -1057,21 +1057,22 @@ function doLoad(toLoad) {
   }
 
   if (toLoad.prestigeValues !== undefined) {
-    prestigeValues['prestigeCurrentPoints'] = toLoad.prestigeValues['prestigeCurrentPoints'] === undefined
-      ? 0
-      : toLoad.prestigeValues['prestigeCurrentPoints'];
-    prestigeValues['prestigeTotalPoints'] = toLoad.prestigeValues['prestigeTotalPoints'] === undefined
-      ? 0
-      : toLoad.prestigeValues['prestigeTotalPoints'];
-    prestigeValues['prestigeTotalCompletions'] = toLoad.prestigeValues['prestigeTotalCompletions'] === undefined
-      ? 0
-      : toLoad.prestigeValues['prestigeTotalCompletions'];
-    prestigeValues['completedCurrentPrestige'] = toLoad.prestigeValues['completedCurrentPrestige'] === undefined
-      ? 0
-      : toLoad.prestigeValues['completedCurrentPrestige'];
-    prestigeValues['completedAnyPrestige'] = toLoad.prestigeValues['completedAnyPrestige'] === undefined
-      ? false
-      : toLoad.prestigeValues['completedAnyPrestige'];
+    globalThis.prestige.prestigeValues['prestigeCurrentPoints'] =
+      toLoad.prestigeValues['prestigeCurrentPoints'] === undefined ? 0 : toLoad.prestigeValues['prestigeCurrentPoints'];
+    globalThis.prestige.prestigeValues['prestigeTotalPoints'] =
+      toLoad.prestigeValues['prestigeTotalPoints'] === undefined ? 0 : toLoad.prestigeValues['prestigeTotalPoints'];
+    globalThis.prestige.prestigeValues['prestigeTotalCompletions'] =
+      toLoad.prestigeValues['prestigeTotalCompletions'] === undefined
+        ? 0
+        : toLoad.prestigeValues['prestigeTotalCompletions'];
+    globalThis.prestige.prestigeValues['completedCurrentPrestige'] =
+      toLoad.prestigeValues['completedCurrentPrestige'] === undefined
+        ? 0
+        : toLoad.prestigeValues['completedCurrentPrestige'];
+    globalThis.prestige.prestigeValues['completedAnyPrestige'] =
+      toLoad.prestigeValues['completedAnyPrestige'] === undefined
+        ? false
+        : toLoad.prestigeValues['completedAnyPrestige'];
   }
 
   for (const property in storyFlags) {
@@ -1408,7 +1409,7 @@ function doSave() {
   toSave.totalTalent = totalTalent;
   toSave.skills = skills;
   toSave.buffs = buffs;
-  toSave.prestigeValues = prestigeValues;
+  toSave.prestigeValues = globalThis.prestige.prestigeValues;
   toSave.goldInvested = goldInvested;
   toSave.stonesUsed = stonesUsed;
   toSave.version75 = true;

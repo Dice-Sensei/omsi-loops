@@ -1995,7 +1995,7 @@ const Koviko = {
         }
       }
       //Once you Surveyed everything you get free Glasses [Found Glasses]
-      if (getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige']) {
+      if (getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
         state.resources.glasses = true;
       }
 

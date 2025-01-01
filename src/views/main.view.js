@@ -1287,7 +1287,7 @@ class View {
       totalActionList.filter((action) => action.finish.toString().includes('updateBuff')).filter((action) =>
           action.unlocked()
         ).length > 0 ||
-      prestigeValues['completedAnyPrestige']
+        globalThis.prestige.prestigeValues['completedAnyPrestige']
     ) {
       document.getElementById('buffList').style.display = '';
     } else {

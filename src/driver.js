@@ -400,7 +400,7 @@ function resetResource(resource) {
 
 function resetResources() {
   resources = globalThis.helpers.copyObject(resourcesTemplate);
-  if (getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige']) addResource('glasses', true);
+  if (getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) addResource('glasses', true);
   view.requestUpdate('updateResources', null);
 }
 
