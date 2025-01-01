@@ -17,8 +17,9 @@ const setupManaDrought = () => {
     return 30;
   };
   Action.BuyManaZ1.finish = function () {
-    let spendGold = Math.min(resources.gold, 300);
-    let buyMana = Math.min(spendGold * this.goldCost(), totalMerchantMana);
+    const spendGold = Math.min(resources.gold, 300);
+    const buyMana = Math.min(spendGold * this.goldCost(), totalMerchantMana);
+
     addMana(buyMana);
     totalMerchantMana -= buyMana;
     addResource('gold', -spendGold);

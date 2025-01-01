@@ -2,6 +2,19 @@
 
 let screenSize;
 
+const DarkRitualDescription = [
+  `10% faster in Beginnersville per ritual from 1-20<br>`,
+  `5% faster in the Forest Path per ritual from 21-40<br>`,
+  `2.5% faster in Merchanton per ritual from 41-60<br>`,
+  `1.5% faster in Mt. Olympus per ritual from 61-80<br>`,
+  `1.0% faster in Valhalla per ritual from 81-100<br>`,
+  `0.5% faster in Startington per ritual from 101-150<br>`,
+  `0.5% faster in Jungle Path per ritual from 151-200<br>`,
+  `0.5% faster in Commerceville per ritual from 201-250<br>`,
+  `0.5% faster in Valley of Olympus per ritual from 251-300<br>`,
+  `0.1% faster globally per ritual from 301-666`,
+];
+
 function formatTime(seconds) {
   if (seconds > 300) {
     let second = Math.floor(seconds % 60);
@@ -715,68 +728,117 @@ class View {
       Koviko.preUpdateHandler(nextActionsDiv);
     }
 
-    const actionContainers = d3.select(nextActionsDiv)
+    globalThis.trash.d3.select(nextActionsDiv)
       .selectAll('.nextActionContainer')
       .data(
         actions.next.map((a, index) => ({
           ...a,
-          actionId: a.actionId, /* not enumerable by design */
+          actionId: a.actionId,
           index,
           action: getActionPrototype(a.name),
         })),
         (a) => a.actionId,
       )
-      .join((enter) =>
-        enter
-          .append(({ action, actionId: i }) =>
-            Rendered.html`
-                    <div
-                        id='nextActionContainer${i}'
-                        class='nextActionContainer small showthat'
-                        ondragover=${handleDragOver}
-                        ondrop=${handleDragDrop}
-                        ondragstart=${handleDragStart}
-                        ondragend=${draggedUndecorate.bind(null, i)}
-                        ondragenter=${dragOverDecorate.bind(null, i)}
-                        ondragleave=${dragExitUndecorate.bind(null, i)}
-                        draggable='true' data-action-id='${i}'
-                    >
-                        <div class='nextActionLoops'><img class='smallIcon imageDragFix'> ×
-                        <div class='bold'></div></div>
-                        <div class='nextActionButtons'>
-                            <button onclick=${
-              capAction.bind(null, i)
-            }      class='capButton actionIcon far fa-circle'></button>
-                            <button onclick=${
-              addLoop.bind(null, i)
-            }        class='plusButton actionIcon fas fa-plus'></button>
-                            <button onclick=${
-              removeLoop.bind(null, i)
-            }     class='minusButton actionIcon fas fa-minus'></button>
-                            <button onclick=${
-              split.bind(null, i)
-            }          class='splitButton actionIcon fas fa-arrows-alt-h'></button>
-                            <button onclick=${
-              collapse.bind(null, i)
-            }       class='collapseButton actionIcon fas fa-compress-alt'></button>
-                            <button onclick=${
-              moveUp.bind(null, i)
-            }         class='upButton actionIcon fas fa-sort-up'></button>
-                            <button onclick=${
-              moveDown.bind(null, i)
-            }       class='downButton actionIcon fas fa-sort-down'></button>
-                            <button onclick=${
-              disableAction.bind(null, i)
-            }  class='skipButton actionIcon far fa-times-circle'></button>
-                            <button onclick=${
-              removeAction.bind(null, i)
-            }   class='removeButton actionIcon fas fa-times'></button>
-                        </div>
-                        <ul class='koviko'></ul>
-                    </div>
-                `.firstElementChild
-          )
-      )
+      .join((enter) => {
+        enter.append(({ actionId: id }) => {
+          const actions = {
+            cap: capAction.bind(null, id),
+            plus: addLoop.bind(null, id),
+            minus: removeLoop.bind(null, id),
+            split: split.bind(null, id),
+            compress: collapse.bind(null, id),
+            up: moveUp.bind(null, id),
+            down: moveDown.bind(null, id),
+            skip: disableAction.bind(null, id),
+            remove: removeAction.bind(null, id),
+          };
+          const drags = {
+            ondrop: handleDragDrop,
+            ondragover: handleDragOver,
+            ondragstart: handleDragStart,
+            ondragend: draggedUndecorate.bind(null, id),
+            ondragenter: dragOverDecorate.bind(null, id),
+            ondragleave: dragExitUndecorate.bind(null, id),
+          };
+
+          const container = document.createElement('div');
+          container.id = `nextActionContainer${id}`;
+          container.classList.add('nextActionContainer', 'small', 'showthat');
+          container.ondragover = drags.ondragover;
+          container.ondrop = drags.ondrop;
+          container.ondragstart = drags.ondragstart;
+          container.ondragend = drags.ondragend;
+          container.ondragenter = drags.ondragenter;
+          container.ondragleave = drags.ondragleave;
+          container.draggable = true;
+          container.dataset.actionId = id;
+
+          const counter = document.createElement('div');
+          counter.classList.add('nextActionLoops');
+          counter.innerHTML = `
+            <img class='smallIcon imageDragFix'> 
+            ×
+            <div class='bold'></div>
+          `;
+
+          container.append(counter);
+
+          const buttons = document.createElement('div');
+          buttons.classList.add('nextActionButtons');
+          const capButton = document.createElement('button');
+          capButton.classList.add('capButton', 'actionIcon', 'far', 'fa-circle');
+          capButton.onclick = actions.cap;
+          buttons.append(capButton);
+
+          const plusButton = document.createElement('button');
+          plusButton.classList.add('plusButton', 'actionIcon', 'fas', 'fa-plus');
+          plusButton.onclick = actions.plus;
+          buttons.append(plusButton);
+
+          const minusButton = document.createElement('button');
+          minusButton.classList.add('minusButton', 'actionIcon', 'fas', 'fa-minus');
+          minusButton.onclick = actions.minus;
+          buttons.append(minusButton);
+
+          const splitButton = document.createElement('button');
+          splitButton.classList.add('splitButton', 'actionIcon', 'fas', 'fa-arrows-alt-h');
+          splitButton.onclick = actions.split;
+          buttons.append(splitButton);
+
+          const compressButton = document.createElement('button');
+          compressButton.classList.add('collapseButton', 'actionIcon', 'fas', 'fa-compress-alt');
+          compressButton.onclick = actions.compress;
+          buttons.append(compressButton);
+
+          const upButton = document.createElement('button');
+          upButton.classList.add('upButton', 'actionIcon', 'fas', 'fa-sort-up');
+          upButton.onclick = actions.up;
+          buttons.append(upButton);
+
+          const downButton = document.createElement('button');
+          downButton.classList.add('downButton', 'actionIcon', 'fas', 'fa-sort-down');
+          downButton.onclick = actions.down;
+          buttons.append(downButton);
+
+          const skipButton = document.createElement('button');
+          skipButton.classList.add('skipButton', 'actionIcon', 'far', 'fa-times-circle');
+          skipButton.onclick = actions.skip;
+          buttons.append(skipButton);
+
+          const removeButton = document.createElement('button');
+          removeButton.classList.add('removeButton', 'actionIcon', 'fas', 'fa-times');
+          removeButton.onclick = actions.remove;
+          buttons.append(removeButton);
+
+          container.append(buttons);
+
+          const koviko = document.createElement('ul');
+          koviko.classList.add('koviko');
+          container.append(koviko);
+
+          return container;
+        });
+      })
       .property('data-index', (_a, i) => i)
       .call((container) => {
         for (const { index } of towns) {
@@ -2059,13 +2121,30 @@ function scrollToPanel(event, target) {
 
 const curActionsDiv = document.getElementById('curActionsList');
 const nextActionsDiv = document.getElementById('nextActionsList');
+
 const actionOptionsTown = [];
+for (let i = 0; i <= 8; i++) {
+  const element = document.getElementById(`actionOptionsTown${i}`);
+  if (!element) continue;
+
+  const actionDiv = document.createElement('div');
+  actionDiv.classList.add('actionDiv');
+  element.append(actionDiv);
+
+  const travelDiv = document.createElement('div');
+  travelDiv.classList.add('travelDiv');
+  element.append(travelDiv);
+
+  actionOptionsTown[i] = element;
+}
+
 const actionStoriesTown = [];
+for (let i = 0; i <= 8; i++) {
+  actionStoriesTown[i] = document.getElementById(`actionStoriesTown${i}`);
+}
+
 const townInfos = [];
 for (let i = 0; i <= 8; i++) {
-  actionOptionsTown[i] = document.getElementById(`actionOptionsTown${i}`);
-  actionOptionsTown[i].append(Rendered.html`<div class="actionDiv"></div><div class="travelDiv">`);
-  actionStoriesTown[i] = document.getElementById(`actionStoriesTown${i}`);
   townInfos[i] = document.getElementById(`townInfo${i}`);
 }
 
@@ -2147,16 +2226,3 @@ function cumulativeOffset(element) {
     bottom: bottom,
   };
 }
-
-const DarkRitualDescription = [
-  `10% faster in Beginnersville per ritual from 1-20<br>`,
-  `5% faster in the Forest Path per ritual from 21-40<br>`,
-  `2.5% faster in Merchanton per ritual from 41-60<br>`,
-  `1.5% faster in Mt. Olympus per ritual from 61-80<br>`,
-  `1.0% faster in Valhalla per ritual from 81-100<br>`,
-  `0.5% faster in Startington per ritual from 101-150<br>`,
-  `0.5% faster in Jungle Path per ritual from 151-200<br>`,
-  `0.5% faster in Commerceville per ritual from 201-250<br>`,
-  `0.5% faster in Valley of Olympus per ritual from 251-300<br>`,
-  `0.1% faster globally per ritual from 301-666`,
-];
