@@ -1435,13 +1435,13 @@
         <calculated_shattering>
             <name>Calculated Shattering</name>
             <desc><![CDATA[
-            Practicing your Shattering technique to get through all these pots as quickly as possible seems surprisingly productive.<br>Reduces the mana cost of <span class="localized" data-lockey="actions>smash_pots>name"></span> by 1 per level.
+            Practicing your Shattering technique to get through all these pots as quickly as possible seems surprisingly productive.<br>Reduces the mana cost of <span class="localized" data-locale="actions>smash_pots>name"></span> by 1 per level.
         ]]></desc>
         </calculated_shattering>
         <no_frill_frames>
             <name>No-frill Frames</name>
             <desc><![CDATA[
-            If you dedicate a bit of time to perusing for glasses, you can find some cheaper frames. And considering you won't be using them for too long until everything starts over again, you figure it's a good idea to skimp.<br>Reduces the gold cost of <span class="localized" data-lockey="actions>buy_glasses>name"></span> by 1 per level.
+            If you dedicate a bit of time to perusing for glasses, you can find some cheaper frames. And considering you won't be using them for too long until everything starts over again, you figure it's a good idea to skimp.<br>Reduces the gold cost of <span class="localized" data-locale="actions>buy_glasses>name"></span> by 1 per level.
         ]]></desc>
         </no_frill_frames>
     </talents>

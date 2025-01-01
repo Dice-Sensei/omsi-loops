@@ -30,7 +30,7 @@ const buffsContainer = {
             <div class="showthis">
               <span>${Localization.txt(`buffs>${XMLName}>desc`)}</span>
               <br>
-              ${desc2 ? `<span class="localized" data-lockey="buffs>${XMLName}>desc2"></span>` : ''}
+              ${desc2 ? `<span class="localized" data-locale="buffs>${XMLName}>desc2"></span>` : ''}
             </div>
           </div>
           <div class="buffNumContainer">
@@ -168,96 +168,99 @@ const menu = {
     return html;
   },
   FAQs() {
-    let html = '';
-    const QAs = Localization.txtsObj('menu>faq>q_a');
-    $(QAs).each((_index, QA) => {
-      html += `
-                <li class='showthat2' tabindex='0'>
-                    ${$(QA).find('q').html()}
-                    <div class='showthis2'>
-                        ${$(QA).find('a').html()}
-                    </div>
-                </li>`;
-    });
-    return html;
+    return Array.from(Localization.txtsObj('menu>faq>q_a')).map((QA) => `
+      <li class='showthat2' tabindex='0'>
+        ${$(QA).find('q').html()}
+        <div class='showthis2'>
+          ${$(QA).find('a').html()}
+        </div>
+      </li>
+    `).join('');
   },
   htmlFAQMenu() {
-    const html =
-      `<li id='faqMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${Localization.txt('menu>faq>meta>title')}
-            <ul class='showthisH' id="faq">
-                ${this.FAQs()}
-            </ul>
-        </li>`;
-    return html;
+    return `
+      <li id='faqMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+        ${Localization.txt('menu>faq>meta>title')}
+        <ul class='showthisH' id="faq">
+          ${this.FAQs()}
+        </ul>
+      </li>
+    `;
   },
   htmlOptionsMenu() {
-    const html =
-      `<li id='optionsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
-            ${Localization.txt('menu>options>meta>title')}
-            <div class='showthisH'>
-                <a target='_blank' href='${Localization.txt('menu>options>discord>link')}'>${
-        Localization.txt('menu>options>discord>title')
-      }</a><br>
-                ${menu.htmlThemeMenu()}
-                ${Object.keys(Localization.supportedLang).length > 1 ? menu.htmlLocalizationMenu() : ''}
-                ${Localization.txt('menu>options>adblock_warning')}<br>
-                <input id='responsiveUIInput' type='checkbox' onchange='setOption("responsiveUI", this.checked)'/>
-                    <label for='responsiveUIInput'>${Localization.txt('menu>options>responsive_ui')}</label>
-                <br>
-                <input id='actionLogInput' type='checkbox' onchange='setOption("actionLog", this.checked)'/>
-                    <label for='actionLogInput'>${Localization.txt('menu>options>action_log')}</label>
-                <br>
-                <input id='highlightNewInput' type='checkbox' onchange='setOption("highlightNew", this.checked)'/>
-                    <label for='highlightNewInput'>${Localization.txt('menu>options>highlight_new')}</label>
-                <br>
-                <input id='statColorsInput' type='checkbox' onchange='setOption("statColors", this.checked)'/>
-                    <label for='statColorsInput'>${Localization.txt('menu>options>stat_colors')}</label>
-                <br>
-                <input id='statHintsInput' type='checkbox' onchange='setOption("statHints", this.checked)'/>
-                    <label for='statHintsInput'>${Localization.txt('menu>options>stat_hints')}</label>
-                <br>
-                <input id='pingOnPauseInput' type='checkbox' onchange='setOption("pingOnPause", this.checked)'/>
-                    <label for='pingOnPauseInput'>${Localization.txt('menu>options>pause_audio_cue')}</label>
-                <br>
-                <input id='notifyOnPauseInput' type='checkbox' onchange='setOption("notifyOnPause", this.checked)'/>
-                    <label for='notifyOnPauseInput'>${Localization.txt('menu>options>pause_notify_cue')}</label>
-                <br>
-                <input id='autoMaxTrainingInput' type='checkbox' onchange='setOption("autoMaxTraining", this.checked)'/>
-                    <label for='autoMaxTrainingInput'>${Localization.txt('menu>options>auto_max_training')}</label>
-                <br>
-                <input id='hotkeysInput' type='checkbox' onchange='setOption("hotkeys", this.checked)'/>
-                    <label class='showthat' for='hotkeysInput'>${Localization.txt('menu>options>hotkeys')}
-                    <div class='showthis'>${Localization.txt('menu>options>hotkeys_tooltip')}</div>
-                </label>
-                <br>
-                ${Localization.txt('menu>options>update_rate')}
-                <input id='updateRateInput' type='number' value='50' min='1' style='width: 50px;transform: translateY(-2px);' oninput='setOption("updateRate", parseInt(this.value))' />
-                <br>
-                ${Localization.txt('menu>options>autosave_rate')}
-                <input id='autosaveRateInput' type='number' value='30' min='1' style='width: 50px;transform: translateY(-2px);' oninput='setOption("autosaveRate", parseInt(this.value))' />
-                <br>
-            </div>
-        </li>`;
-    return html;
+    return `
+      <li id='optionsMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
+        ${Localization.txt('menu>options>meta>title')}
+        <div class='showthisH'>
+          <a target='_blank' href='${Localization.txt('menu>options>discord>link')}'>
+            ${Localization.txt('menu>options>discord>title')}
+          </a><br>
+          ${menu.htmlThemeMenu()}
+          ${menu.htmlLocalizationMenu()}
+          ${Localization.txt('menu>options>adblock_warning')}<br>
+          <input id='responsiveUIInput' type='checkbox' onchange='setOption("responsiveUI", this.checked)'/>
+          <label for='responsiveUIInput'>${Localization.txt('menu>options>responsive_ui')}</label>
+          <br>
+          <input id='actionLogInput' type='checkbox' onchange='setOption("actionLog", this.checked)'/>
+          <label for='actionLogInput'>${Localization.txt('menu>options>action_log')}</label>
+          <br>
+          <input id='highlightNewInput' type='checkbox' onchange='setOption("highlightNew", this.checked)'/>
+          <label for='highlightNewInput'>${Localization.txt('menu>options>highlight_new')}</label>
+          <br>
+          <input id='statColorsInput' type='checkbox' onchange='setOption("statColors", this.checked)'/>
+          <label for='statColorsInput'>${Localization.txt('menu>options>stat_colors')}</label>
+          <br>
+          <input id='statHintsInput' type='checkbox' onchange='setOption("statHints", this.checked)'/>
+          <label for='statHintsInput'>${Localization.txt('menu>options>stat_hints')}</label>
+          <br>
+          <input id='pingOnPauseInput' type='checkbox' onchange='setOption("pingOnPause", this.checked)'/>
+          <label for='pingOnPauseInput'>${Localization.txt('menu>options>pause_audio_cue')}</label>
+          <br>
+          <input id='notifyOnPauseInput' type='checkbox' onchange='setOption("notifyOnPause", this.checked)'/>
+          <label for='notifyOnPauseInput'>${Localization.txt('menu>options>pause_notify_cue')}</label>
+          <br>
+          <input id='autoMaxTrainingInput' type='checkbox' onchange='setOption("autoMaxTraining", this.checked)'/>
+          <label for='autoMaxTrainingInput'>${Localization.txt('menu>options>auto_max_training')}</label>
+          <br>
+          <input id='hotkeysInput' type='checkbox' onchange='setOption("hotkeys", this.checked)'/>
+              <label class='showthat' for='hotkeysInput'>${Localization.txt('menu>options>hotkeys')}
+              <div class='showthis'>${Localization.txt('menu>options>hotkeys_tooltip')}</div>
+          </label>
+          <br>
+          ${Localization.txt('menu>options>update_rate')}
+          <input id='updateRateInput' type='number' value='50' min='1' style='width: 50px;transform: translateY(-2px);' oninput='setOption("updateRate", parseInt(this.value))' />
+          <br>
+          ${Localization.txt('menu>options>autosave_rate')}
+          <input id='autosaveRateInput' type='number' value='30' min='1' style='width: 50px;transform: translateY(-2px);' oninput='setOption("autosaveRate", parseInt(this.value))' />
+          <br>
+        </div>
+      </li>
+    `;
   },
   htmlLocalizationMenu() {
-    const lg = Localization.supportedLang;
-    let html = `${
-      Localization.txt('menu>options>localization_title')
-    }: <select id='localization_menu' onchange='Localization.change();'>`;
-    $.each(lg, (val, str) => {
-      html += `<option value='${val}'${Localization.currentLang === val ? 'selected' : ''}>${str}</option>`;
-    });
-    html += '</select><br>';
-    return html;
+    const options = Object.entries(Localization.languages).map(([value, str]) => {
+      return `<option value='${value}'>${str}</option>`;
+    }).join('');
+
+    return `
+      <div>
+        <span>${Localization.txt('menu>options>localization_title')}:</span>
+        <select id='localization_menu' onchange='Localization.change()'>
+          ${options}
+        </select>
+      </div>
+      <br>
+    `;
   },
   htmlThemeMenu() {
     const themeList = ['normal', 'dark', 'cubic', 'cubic t-dark', 'zen', 'zen t-dark'];
+
     const themes = Localization.txtsObj('menu>options>theme');
+
     let html = `${
       Localization.txt('menu>options>theme_title')
     }: <select id='themeInput' onchange='view.changeTheme();'>`;
+
     $(themes).each((index, theme) => {
       html += `<option value='${themeList[index]}'>${
         $(theme).find(themeList[index].replaceAll(' ', '_')).text()

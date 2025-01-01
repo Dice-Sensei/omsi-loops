@@ -1,5 +1,5 @@
 importScripts('./data.js');
-importScripts('./localization.js');
+importScripts('./localization.ts');
 importScripts('./helpers.js');
 importScripts('./actionList.js');
 importScripts('./driver.js');
