@@ -381,9 +381,9 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
         } else {
           const index = actions.addAction(name, addAmount, insertAtIndex);
           view.requestUpdate('highlightAction', index);
-          if (shiftDown && hasLimit(name)) {
+          if (globalThis.trash.shiftDown && hasLimit(name)) {
             capAmount(index, townNum);
-          } else if (shiftDown && isTraining(name)) {
+          } else if (globalThis.trash.shiftDown && isTraining(name)) {
             capTraining(index);
           }
         }
@@ -501,7 +501,7 @@ function loadList() {
 }
 
 function clearList() {
-  actions.clearActions(shiftDown ? ((a) => (a.disabled || a.loops === 0)) : null);
+  actions.clearActions(globalThis.trash.shiftDown ? ((a) => (a.disabled || a.loops === 0)) : null);
   view.updateNextActions();
 }
 

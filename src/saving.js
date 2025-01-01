@@ -1,9 +1,9 @@
 function decompressFromBase64(item) {
-  return LZString.decompressFromBase64(item);
+  return globalThis.trash.LZString.decompressFromBase64(item);
 }
 
 function compressToBase64(item) {
-  return LZString.compressToBase64(item);
+  return globalThis.trash.LZString.compressToBase64(item);
 }
 
 function startGame() {

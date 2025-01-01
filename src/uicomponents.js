@@ -338,7 +338,7 @@ class ShrinkWrapElement extends WrappingElement {
     // focus does not bubble, so we have to pick it up in the capture phase
     this.addEventListener('focus', (e) => this.oldValue = this.value, { capture: true, passive: true });
     this.addEventListener('change', (e) => this.input instanceof HTMLSelectElement && this.input.blur());
-    this.mousetrap = new Mousetrap(this);
+    this.mousetrap = new globalThis.trash.Mousetrap(this);
     this.mousetrap.bind('escape', (e) => {
       this.value = this.oldValue ?? this.value;
       this.input?.blur();

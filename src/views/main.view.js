@@ -110,7 +110,7 @@ class View {
   }
 
   modifierkeychangeHandler() {
-    htmlElement('clearList').textContent = shiftDown
+    htmlElement('clearList').textContent = globalThis.trash.shiftDown
       ? _txt('actions>tooltip>clear_disabled')
       : _txt('actions>tooltip>clear_list');
   }
