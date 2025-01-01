@@ -234,7 +234,39 @@ const actionTypes = ['normal', 'progress', 'limited', 'multipart'];
  * @template {string} N The name passed to the constructor
  * @template {ActionExtras} [E=ActionExtras] The extras parameter passed to the constructor
  */
-class Action extends Localizable {
+
+class Localizable1 {
+  #txtsObj;
+  #rootPath;
+  #lib;
+
+  get rootPath() {
+    return this.#rootPath;
+  }
+  get lib() {
+    return this.#lib;
+  }
+  get txtsObj() {
+    return this.#txtsObj ??= globalThis.Localization.txtsObj(this.#rootPath, this.#lib);
+  }
+
+  constructor(rootPath, lib) {
+    this.#rootPath = rootPath;
+    this.#lib = lib;
+  }
+
+  memoize(property, subPath = `>${property}`) {
+    let value = this.txtsObj.find(subPath).text();
+    if (!value) value = globalThis.Localization.txt(this.#rootPath + subPath, this.#lib);
+
+    Object.defineProperty(this, property, { value, configurable: true });
+
+    return value;
+  }
+}
+
+
+class Action extends Localizable1 {
   /** @type {N} */
   name;
   /** @type {E extends {varName: infer VN extends string} ? VN : WithoutSpaces<N>} */
@@ -291,16 +323,16 @@ class Action extends Localizable {
   // centralized here (function will not be called by the game code if info text is not
   // applicable)
   infoText() {
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>info_text1`)}
+    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>info_text1`)}
                 <i class='fa fa-arrow-left'></i>
-                ${Localization.txt(`actions>${getXMLName(this.name)}>info_text2`)}
+                ${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>info_text2`)}
                 <i class='fa fa-arrow-left'></i>
-                ${Localization.txt(`actions>${getXMLName(this.name)}>info_text3`)}
+                ${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>info_text3`)}
                 <br><span class='bold'>${`${
-      Localization.txt('actions>tooltip>total_found')
+      globalThis.Localization.txt('actions>tooltip>total_found')
     }: `}</span><div id='total${this.varName}'></div>
                 <br><span class='bold'>${`${
-      Localization.txt('actions>tooltip>total_checked')
+      globalThis.Localization.txt('actions>tooltip>total_checked')
     }: `}</span><div id='checked${this.varName}'></div>`;
   }
 
@@ -456,24 +488,24 @@ class DungeonAction extends MultipartAction {
       for (let i = 0; i < dungeons[this.dungeonNum].length; i++) {
         ssDivContainer += `Floor ${i + 1} |
                                     <div class='bold'>${
-          Localization.txt(`actions>${getXMLName(this.name)}>chance_label`)
+          globalThis.Localization.txt(`actions>${getXMLName(this.name)}>chance_label`)
         } </div> <div id='soulstoneChance${this.dungeonNum}_${i}'></div>% -
                                     <div class='bold'>${
-          Localization.txt(`actions>${getXMLName(this.name)}>last_stat_label`)
+          globalThis.Localization.txt(`actions>${getXMLName(this.name)}>last_stat_label`)
         } </div> <div id='soulstonePrevious${this.dungeonNum}_${i}'>NA</div> -
                                     <div class='bold'>${
-          Localization.txt(`actions>${getXMLName(this.name)}>label_done`)
+          globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_done`)
         }</div> <div id='soulstoneCompleted${this.dungeonNum}_${i}'></div><br>`;
       }
     }
-    return Localization.txt(`actions>${getXMLName(this.name)}>completed_tooltip`) + ssDivContainer;
+    return globalThis.Localization.txt(`actions>${getXMLName(this.name)}>completed_tooltip`) + ssDivContainer;
   }
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`] + 0.0001) {
     const floor = Math.floor(loopCounter / this.segments + 1);
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       floor <= dungeons[this.dungeonNum].length
         ? numberToWords(floor)
-        : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
+        : globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
   }
 }
@@ -519,10 +551,10 @@ class TrialAction extends MultipartAction {
   }
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
     const floor = Math.floor((loopCounter + 0.0001) / this.segments + 1);
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       floor <= trials[this.trialNum].length
         ? numberToWords(floor)
-        : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
+        : globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
   }
   currentFloor(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
@@ -592,7 +624,7 @@ class AssassinAction extends MultipartAction {
   }
 
   getStoryTexts(
-    rawStoriesDataForAction = Localization.txtsObj(this.name.toLowerCase().replace(/ /gu, '_'))[0].children,
+    rawStoriesDataForAction = globalThis.Localization.txtsObj(this.name.toLowerCase().replace(/ /gu, '_'))[0].children,
   ) { // I hate this
     return super.getStoryTexts(rawStoriesDataForAction);
   }
@@ -1567,7 +1599,7 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
     addResource('reputation', 3);
   },
   getPartName(loopCounter = towns[0].HealLoopCounter) {
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },
@@ -4946,7 +4978,7 @@ Action.TidyUp = new MultipartAction('Tidy Up', {
     // empty.
   },
   getPartName(loopCounter = towns[4].TidyLoopCounter) {
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },
@@ -6597,7 +6629,7 @@ Action.RescueSurvivors = new MultipartAction('Rescue Survivors', {
     if (loopCounter >= 20) setStoryFlag('rescued20Survivors');
   },
   getPartName(loopCounter = towns[6].RescueLoopCounter) {
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },

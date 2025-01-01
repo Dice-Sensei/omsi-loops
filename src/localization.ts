@@ -25,77 +25,51 @@ namespace SearchParams {
   };
 }
 
-const Localization = {
-  languages: { 'en-EN': 'English' },
-  fallback: 'en-EN',
+namespace Localization {
+  export const languages = { 'en-EN': 'English' };
+  export const fallback = 'en-EN';
 
-  language: null,
-  searchParam: 'language',
+  export let language: null;
+  export const searchParam = 'language';
 
-  bundles: {},
+  export const bundles: Record<string, XMLDocument> = {};
 
-  async init() {
-    Localization.language = SearchParams.get(Localization.searchParam, {
-      expected: Object.keys(Localization.languages),
-      fallback: Localization.fallback,
+  export async function init() {
+    language = SearchParams.get(searchParam, {
+      expected: Object.keys(languages),
+      fallback: fallback,
     });
 
-    Localization.bundles[Localization.fallback] = await Localization.loadXml(Localization.fallback);
-    Localization.bundles[Localization.language] = await Localization.loadXml(Localization.language);
-  },
-  populate(language: string = Localization.language) {
+    bundles[fallback] = await loadXml(fallback);
+    bundles[language] = await loadXml(language);
+  }
+
+  export function populate(language: string = Localization.language) {
     const elements = document.querySelectorAll<HTMLElement>('.localized');
 
     for (const element of elements) {
       element.innerHTML = Localization.txt(element.dataset.locale, language);
     }
-  },
-  change() {
-    SearchParams.set(Localization.searchParam, Localization.language);
-  },
-  async loadXml(language: string): Promise<XMLDocument> {
+  }
+
+  export function change() {
+    SearchParams.set(searchParam, language);
+  }
+
+  async function loadXml(language: string): Promise<XMLDocument> {
     const response = await fetch(`locales/${language}/game.xml`);
     const text = await response.text();
 
     return new DOMParser().parseFromString(text, 'text/xml');
-  },
+  }
 
-  txt: (path: string, language: string = Localization.language) => {
+  export function txt(path: string, language: string = Localization.language) {
     return Localization.txtsObj(path, language).text();
-  },
+  }
 
-  txtsObj: (path: string, language: string = Localization.language) => {
+  export function txtsObj(path: string, language: string = Localization.language) {
     return $(Localization.bundles[language]).find(path);
-  },
-};
-globalThis.Localization = Localization;
-
-class Localizable {
-  #txtsObj: JQuery<HTMLElement>;
-  #rootPath: string;
-  #lib: string;
-
-  get rootPath() {
-    return this.#rootPath;
-  }
-  get lib() {
-    return this.#lib;
-  }
-  get txtsObj() {
-    return this.#txtsObj ??= Localization.txtsObj(this.#rootPath, this.#lib);
-  }
-
-  constructor(rootPath: string, lib: string) {
-    this.#rootPath = rootPath;
-    this.#lib = lib;
-  }
-
-  memoize(property: string, subPath: string = `>${property}`) {
-    let value = this.txtsObj.find(subPath).text();
-    if (!value) value = Localization.txt(this.#rootPath + subPath, this.#lib);
-
-    Object.defineProperty(this, property, { value, configurable: true });
-
-    return value;
   }
 }
+
+globalThis.Localization = Localization;

@@ -95,7 +95,37 @@ class LevelExp {
   }
 }
 
-class Stat extends Localizable {
+class Localizable2 {
+  #txtsObj;
+  #rootPath;
+  #lib;
+
+  get rootPath() {
+    return this.#rootPath;
+  }
+  get lib() {
+    return this.#lib;
+  }
+  get txtsObj() {
+    return this.#txtsObj ??= globalThis.Localization.txtsObj(this.#rootPath, this.#lib);
+  }
+
+  constructor(rootPath, lib) {
+    this.#rootPath = rootPath;
+    this.#lib = lib;
+  }
+
+  memoize(property, subPath = `>${property}`) {
+    let value = this.txtsObj.find(subPath).text();
+    if (!value) value = globalThis.Localization.txt(this.#rootPath + subPath, this.#lib);
+
+    Object.defineProperty(this, property, { value, configurable: true });
+
+    return value;
+  }
+}
+
+class Stat extends Localizable2 {
   /** @type {StatName} */
   name;
   statLevelExp = new LevelExp();
@@ -248,7 +278,7 @@ const Skill_increase = 1;
 const Skill_decrease = 2;
 const Skill_custom = 3;
 
-class Skill extends Localizable {
+class Skill extends Localizable2 {
   /** @type {SkillName} */
   name;
   levelExp = new LevelExp();
@@ -309,7 +339,7 @@ class Skill extends Localizable {
   }
 }
 
-class Buff extends Localizable {
+class Buff extends Localizable2 {
   // why in valhalla's name are we using localized text as a key, wtaf
   /** @readonly */
   static fullNames = /** @type {const} */ ({

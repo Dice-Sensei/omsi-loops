@@ -31,12 +31,18 @@ function formatTime(seconds) {
     return timeString;
   }
   if (Number.isInteger(seconds)) {
-    return (formatNumber(seconds) + Localization.txt('time_controls>seconds')).replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
+    return (formatNumber(seconds) + globalThis.Localization.txt('time_controls>seconds')).replace(
+      /\B(?=(\d{3})+(?!\d))/gu,
+      ',',
+    );
   }
   if (seconds < 10) {
-    return seconds.toFixed(2) + Localization.txt('time_controls>seconds');
+    return seconds.toFixed(2) + globalThis.Localization.txt('time_controls>seconds');
   }
-  return (seconds.toFixed(1) + Localization.txt('time_controls>seconds')).replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
+  return (seconds.toFixed(1) + globalThis.Localization.txt('time_controls>seconds')).replace(
+    /\B(?=(\d{3})+(?!\d))/gu,
+    ',',
+  );
 }
 
 class View {
@@ -124,8 +130,8 @@ class View {
 
   modifierkeychangeHandler() {
     htmlElement('clearList').textContent = globalThis.trash.shiftDown
-      ? Localization.txt('actions>tooltip>clear_disabled')
-      : Localization.txt('actions>tooltip>clear_list');
+      ? globalThis.Localization.txt('actions>tooltip>clear_disabled')
+      : globalThis.Localization.txt('actions>tooltip>clear_list');
   }
 
   /** @param {HTMLElement} element */
@@ -152,10 +158,10 @@ class View {
         }%;' onmouseover='view.showStat("${stat}")' onmouseout='view.showStat(undefined)'>
                 <div class='statLabelContainer'>
                     <div class='medium bold stat-name long-form' style='margin-left:18px;margin-top:5px;'>${
-          Localization.txt(`stats>${stat}>long_form`)
+          globalThis.Localization.txt(`stats>${stat}>long_form`)
         }</div>
                     <div class='medium bold stat-name short-form' style='margin-left:18px;margin-top:5px;'>${
-          Localization.txt(`stats>${stat}>short_form`)
+          globalThis.Localization.txt(`stats>${stat}>short_form`)
         }</div>
                     <div class='medium statNum stat-soulstone' style='color:var(--stat-soulstone-color);' id='stat${stat}ss'></div>
                     <div class=' statNum stat-talent'></div>
@@ -174,38 +180,38 @@ class View {
                     <div class='thinProgressBarLower soulstoneBar'><div class='statBar statSoulstoneLogBar logBar' id='stat${stat}SoulstoneLogBar'></div></div>
                 </div>
                 <div class='showthis' id='stat${stat}Tooltip' style='width:225px;'>
-                    <div class='medium bold'>${Localization.txt(`stats>${stat}>long_form`)}</div><br>${
-          Localization.txt(`stats>${stat}>blurb`)
+                    <div class='medium bold'>${globalThis.Localization.txt(`stats>${stat}>long_form`)}</div><br>${
+          globalThis.Localization.txt(`stats>${stat}>blurb`)
         }
                     <br>
                     <div class='medium bold'>${
-          Localization.txt('stats>tooltip>level')
+          globalThis.Localization.txt('stats>tooltip>level')
         }:</div> <div id='stat${stat}Level2'></div>
                     <br>
-                    <div class='medium bold'>${Localization.txt('stats>tooltip>level_exp')}:</div>
+                    <div class='medium bold'>${globalThis.Localization.txt('stats>tooltip>level_exp')}:</div>
                     <div id='stat${stat}LevelExp'></div>/<div id='stat${stat}LevelExpNeeded'></div>
                     <div class='statTooltipPerc'>(<div id='stat${stat}LevelProgress'></div>%)</div>
                     <br>
-                    <div class='medium bold'>${Localization.txt('stats>tooltip>talent')}:</div>
+                    <div class='medium bold'>${globalThis.Localization.txt('stats>tooltip>talent')}:</div>
                     <div id='stat${stat}Talent2'></div>
                     <br>
-                    <div class='medium bold'>${Localization.txt('stats>tooltip>talent_exp')}:</div>
+                    <div class='medium bold'>${globalThis.Localization.txt('stats>tooltip>talent_exp')}:</div>
                     <div id='stat${stat}TalentExp'></div>/<div id='stat${stat}TalentExpNeeded'></div>
                     <div class='statTooltipPerc'>(<div id='stat${stat}TalentProgress'></div>%)</div>
                     <br>
-                    <div class='medium bold'>${Localization.txt('stats>tooltip>talent_multiplier')}:</div>
+                    <div class='medium bold'>${globalThis.Localization.txt('stats>tooltip>talent_multiplier')}:</div>
                     x<div id='stat${stat}TalentMult'></div>
                     <br>
                     <div id='ss${stat}Container' class='ssContainer'>
                         <div class='bold'>${
-          Localization.txt('stats>tooltip>soulstone')
+          globalThis.Localization.txt('stats>tooltip>soulstone')
         }:</div> <div id='ss${stat}'></div><br>
                         <div class='medium bold'>${
-          Localization.txt('stats>tooltip>soulstone_multiplier')
+          globalThis.Localization.txt('stats>tooltip>soulstone_multiplier')
         }:</div> x<div id='stat${stat}SSBonus'></div>
                     </div><br>
                     <div class='medium bold'>${
-          Localization.txt('stats>tooltip>total_multiplier')
+          globalThis.Localization.txt('stats>tooltip>total_multiplier')
         }:</div> x<div id='stat${stat}TotalMult'></div>
                 </div>
             </div>`,
@@ -602,7 +608,7 @@ class View {
     element.innerHTML = this.getBonusText() ?? '';
   }
   getBonusText() {
-    let text = Localization.txt('time_controls>bonus_seconds>main_text');
+    let text = globalThis.Localization.txt('time_controls>bonus_seconds>main_text');
     let lastText = null;
     while (lastText !== text) {
       lastText = text;
@@ -625,32 +631,32 @@ class View {
       __proto__: null, // toString is not a valid replacement name
       get background_info() {
         if (bgSpeed < 0 || bgSpeed === fgSpeed) {
-          return Localization.txt('time_controls>bonus_seconds>background_disabled');
+          return globalThis.Localization.txt('time_controls>bonus_seconds>background_disabled');
         } else if (bgSpeed === 0) {
-          return Localization.txt('time_controls>bonus_seconds>background_0x');
+          return globalThis.Localization.txt('time_controls>bonus_seconds>background_0x');
         } else if (bgSpeed < 1) {
-          return Localization.txt('time_controls>bonus_seconds>background_regen');
+          return globalThis.Localization.txt('time_controls>bonus_seconds>background_regen');
         } else if (bgSpeed === 1) {
-          return Localization.txt('time_controls>bonus_seconds>background_1x');
+          return globalThis.Localization.txt('time_controls>bonus_seconds>background_1x');
         } else if (bgSpeed < fgSpeed) {
-          return Localization.txt('time_controls>bonus_seconds>background_slower');
+          return globalThis.Localization.txt('time_controls>bonus_seconds>background_slower');
         } else {
-          return Localization.txt('time_controls>bonus_seconds>background_faster');
+          return globalThis.Localization.txt('time_controls>bonus_seconds>background_faster');
         }
       },
       get state() {
         return `<span class='bold' id='isBonusOn'>${
-          Localization.txt(`time_controls>bonus_seconds>state>${isBonusActive() ? 'on' : 'off'}`)
+          globalThis.Localization.txt(`time_controls>bonus_seconds>state>${isBonusActive() ? 'on' : 'off'}`)
         }</span>`;
       },
       get counter_text() {
-        return `<span class='bold'>${Localization.txt('time_controls>bonus_seconds>counter_text')}</span>`;
+        return `<span class='bold'>${globalThis.Localization.txt('time_controls>bonus_seconds>counter_text')}</span>`;
       },
       get bonusSeconds() {
         return `<span id='bonusSeconds'>${formatTime(totalOfflineMs / 1000)}</span>`;
       },
       get lag_warning() {
-        return lagSpeed > 0 ? Localization.txt('time_controls>bonus_seconds>lag_warning') : '';
+        return lagSpeed > 0 ? globalThis.Localization.txt('time_controls>bonus_seconds>lag_warning') : '';
       },
       speed: fgSpeed,
       background_speed: bgSpeed,
@@ -929,22 +935,34 @@ class View {
       const action = actions.current[i];
       totalDivText += `<div id='actionTooltip${i}' style='display:none;padding-left:10px;width:90%'>` +
         `<div style='text-align:center;width:100%'>${action.label}</div><br><br>` +
-        `<b>${Localization.txt('actions>current_action>mana_original')}</b> <div id='action${i}ManaOrig'></div><br>` +
-        `<b>${Localization.txt('actions>current_action>mana_used')}</b> <div id='action${i}ManaUsed'></div><br>` +
-        `<b>${Localization.txt('actions>current_action>last_mana')}</b> <div id='action${i}LastMana'></div><br>` +
-        `<b>${Localization.txt('actions>current_action>mana_remaining')}</b> <div id='action${i}Remaining'></div><br>` +
         `<b>${
-          Localization.txt('actions>current_action>gold_remaining')
+          globalThis.Localization.txt('actions>current_action>mana_original')
+        }</b> <div id='action${i}ManaOrig'></div><br>` +
+        `<b>${
+          globalThis.Localization.txt('actions>current_action>mana_used')
+        }</b> <div id='action${i}ManaUsed'></div><br>` +
+        `<b>${
+          globalThis.Localization.txt('actions>current_action>last_mana')
+        }</b> <div id='action${i}LastMana'></div><br>` +
+        `<b>${
+          globalThis.Localization.txt('actions>current_action>mana_remaining')
+        }</b> <div id='action${i}Remaining'></div><br>` +
+        `<b>${
+          globalThis.Localization.txt('actions>current_action>gold_remaining')
         }</b> <div id='action${i}GoldRemaining'></div><br>` +
-        `<b>${Localization.txt('actions>current_action>time_spent')}</b> <div id='action${i}TimeSpent'></div><br>` +
         `<b>${
-          Localization.txt('actions>current_action>total_time_elapsed')
+          globalThis.Localization.txt('actions>current_action>time_spent')
+        }</b> <div id='action${i}TimeSpent'></div><br>` +
+        `<b>${
+          globalThis.Localization.txt('actions>current_action>total_time_elapsed')
         }</b> <div id='action${i}TotalTimeElapsed'></div><br>` +
         `<br>` +
         `<div id='action${i}ExpGain'></div>` +
         `<div id='action${i}HasFailed' style='display:none'>` +
-        `<b>${Localization.txt('actions>current_action>failed_attempts')}</b> <div id='action${i}Failed'></div><br>` +
-        `<b>${Localization.txt('actions>current_action>error')}</b> <div id='action${i}Error'></div>` +
+        `<b>${
+          globalThis.Localization.txt('actions>current_action>failed_attempts')
+        }</b> <div id='action${i}Failed'></div><br>` +
+        `<b>${globalThis.Localization.txt('actions>current_action>error')}</b> <div id='action${i}Error'></div>` +
         `</div>` +
         `</div>`;
     }
@@ -1019,7 +1037,7 @@ class View {
       }
       for (const stat of statList) {
         if (action[`statExp${stat}`]) {
-          statExpGain += `<div class='bold'>${Localization.txt(`stats>${stat}>short_form`)}:</div> ${
+          statExpGain += `<div class='bold'>${globalThis.Localization.txt(`stats>${stat}>short_form`)}:</div> ${
             intToString(action[`statExp${stat}`], 2)
           }<br>`;
         }
@@ -1296,7 +1314,7 @@ class View {
     $('#TownSelect').val(townNum);
     htmlElement('shortTownColumn').classList.remove(`zone-${townShowing + 1}`);
     htmlElement('shortTownColumn').classList.add(`zone-${townNum + 1}`);
-    document.getElementById('townDesc').textContent = Localization.txt(`towns>town${townNum}>desc`);
+    document.getElementById('townDesc').textContent = globalThis.Localization.txt(`towns>town${townNum}>desc`);
     townShowing = townNum;
   }
 
@@ -1316,7 +1334,9 @@ class View {
       actionOptionsTown[townShowing].style.display = '';
     }
 
-    document.getElementById('actionsTitle').textContent = Localization.txt(`actions>title${stories ? '_stories' : ''}`);
+    document.getElementById('actionsTitle').textContent = globalThis.Localization.txt(
+      `actions>title${stories ? '_stories' : ''}`,
+    );
     actionStoriesShowing = stories;
   }
 
@@ -1409,9 +1429,9 @@ class View {
             </div>
 
             <div class='showthis'>
-                ${Localization.txt('actions>tooltip>higher_done_percent_benefic')}<br>
+                ${globalThis.Localization.txt('actions>tooltip>higher_done_percent_benefic')}<br>
                 <div class='bold'>${
-      Localization.txt('actions>tooltip>progress_label')
+      globalThis.Localization.txt('actions>tooltip>progress_label')
     }</div> <div id='progress${action.varName}${varSuffix}'></div>%
             </div>
             <div class='hideVarButton far' onclick='view.toggleHidden("${action.varName}${varSuffix}")'></div>
@@ -1446,7 +1466,7 @@ class View {
     let gradientOffset = 0;
     let lastArcPoint = [0, -1]; // start at 12 o'clock
     for (const [stat, ratio] of statEntries) {
-      const statLabel = Localization.txt(`stats>${stat}>short_form`);
+      const statLabel = globalThis.Localization.txt(`stats>${stat}>short_form`);
       actionStats += `<dt class='stat-${stat}'>${statLabel}</dt> <dd class='stat-${stat}'>${ratio * 100}%</dd>`;
       const startRatio = totalRatio;
       totalRatio += ratio;
@@ -1483,7 +1503,11 @@ class View {
       lockedStats = `(${
         statEntries.map((
           [stat, ratio],
-        ) => /** @type {const} */ ([ratio === highestRatio, stat, Localization.txt(`stats>${stat}>short_form`)]))
+        ) => /** @type {const} */ ([
+          ratio === highestRatio,
+          stat,
+          globalThis.Localization.txt(`stats>${stat}>short_form`),
+        ]))
           .map(([isHighestStat, stat, label]) =>
             `<span class='${isHighestStat ? 'bold' : ''} stat-${stat} stat-color'>${label}</span>`
           )
@@ -1504,22 +1528,26 @@ class View {
         for (const skill of skillKeyNames) {
           if (skillList[i] === skill) {
             const xmlName = getXMLName(skill);
-            const skillLabel = `${Localization.txt(`skills>${xmlName}>label`)} ${
-              Localization.txt('stats>tooltip>exp')
+            const skillLabel = `${globalThis.Localization.txt(`skills>${xmlName}>label`)} ${
+              globalThis.Localization.txt('stats>tooltip>exp')
             }`;
             actionSkills +=
               `<div class='bold'>${skillLabel}:</div><span id='expGain${action.varName}${skill}'></span><br>`;
             if (action.teachesSkill(skill)) {
-              const learnSkill = `<div class='bold'>${Localization.txt('actions>tooltip>learn_skill')}:</div>`;
-              lockedSkills += `${learnSkill} <span>${Localization.txt(`skills>${xmlName}>label`)}</span><br>`;
+              const learnSkill = `<div class='bold'>${
+                globalThis.Localization.txt('actions>tooltip>learn_skill')
+              }:</div>`;
+              lockedSkills += `${learnSkill} <span>${
+                globalThis.Localization.txt(`skills>${xmlName}>label`)
+              }</span><br>`;
               skillDetails += `<hr>
                                 ${learnSkill} <div class='bold underline'>${
-                Localization.txt(`skills>${xmlName}>label`)
+                globalThis.Localization.txt(`skills>${xmlName}>label`)
               }</div><br>
-                                <i>${Localization.txt(`skills>${xmlName}>desc`)}</i><br>`;
-              if (Localization.txtsObj(`skills>${xmlName}>desc2`)?.length > 0) {
+                                <i>${globalThis.Localization.txt(`skills>${xmlName}>desc`)}</i><br>`;
+              if (globalThis.Localization.txtsObj(`skills>${xmlName}>desc2`)?.length > 0) {
                 skillDetails += `${
-                  Localization.txt(`skills>${xmlName}>desc2`).replace(/<br>\s*Currently.*(?:<br>|$)/sgi, '')
+                  globalThis.Localization.txt(`skills>${xmlName}>desc2`).replace(/<br>\s*Currently.*(?:<br>|$)/sgi, '')
                 }<br>`; // ugh
               }
             }
@@ -1529,11 +1557,13 @@ class View {
     }
     if (isBuffName(action.grantsBuff)) {
       const xmlName = getXMLName(Buff.fullNames[action.grantsBuff]);
-      const grantsBuff = `<div class='bold'>${Localization.txt('actions>tooltip>grants_buff')}:</div>`;
-      lockedSkills += `${grantsBuff} <span>${Localization.txt(`buffs>${xmlName}>label`)}</span><br>`;
+      const grantsBuff = `<div class='bold'>${globalThis.Localization.txt('actions>tooltip>grants_buff')}:</div>`;
+      lockedSkills += `${grantsBuff} <span>${globalThis.Localization.txt(`buffs>${xmlName}>label`)}</span><br>`;
       skillDetails += `<hr>
-                ${grantsBuff} <div class='bold underline'>${Localization.txt(`buffs>${xmlName}>label`)}</div><br>
-                <i>${Localization.txt(`buffs>${xmlName}>desc`)}</i><br>`;
+                ${grantsBuff} <div class='bold underline'>${
+        globalThis.Localization.txt(`buffs>${xmlName}>label`)
+      }</div><br>
+                <i>${globalThis.Localization.txt(`buffs>${xmlName}>desc`)}</i><br>`;
     }
     let extraImage = '';
     const extraImagePositions = [
@@ -1558,7 +1588,7 @@ class View {
       `${action.tooltip}${action.goldCost === undefined ? '' : action.tooltip2}`,
     )?.[1]; // I hate this but wygd
     const lockedText = unlockConditions
-      ? `${Localization.txt('actions>tooltip>locked_tooltip')}<br>Will unlock ${unlockConditions}`
+      ? `${globalThis.Localization.txt('actions>tooltip>locked_tooltip')}<br>Will unlock ${unlockConditions}`
       : `${action.tooltip}${action.goldCost === undefined ? '' : action.tooltip2}`;
     const totalDivText = `<button
                 id='container${action.varName}'
@@ -1582,11 +1612,11 @@ class View {
                     <br>
                     ${actionSkills}
                     <div class='bold'>${
-      Localization.txt('actions>tooltip>mana_cost')
+      globalThis.Localization.txt('actions>tooltip>mana_cost')
     }:</div> <div id='manaCost${action.varName}'>${formatNumber(action.manaCost())}</div><br>
                     <dl class='action-stats'>${actionStats}</dl>
                     <div class='bold'>${
-      Localization.txt('actions>tooltip>exp_multiplier')
+      globalThis.Localization.txt('actions>tooltip>exp_multiplier')
     }:</div><div id='expMult${action.varName}'>${action.expMult * 100}</div>%<br>
                     ${skillDetails}
                 </div>
@@ -1898,7 +1928,7 @@ class View {
         continue;
       }
       const mainStat = action.loopStats[(town[`${action.varName}LoopCounter`] + i) % action.loopStats.length];
-      document.getElementById(`mainStat${i}${action.varName}`).textContent = Localization.txt(
+      document.getElementById(`mainStat${i}${action.varName}`).textContent = globalThis.Localization.txt(
         `stats>${mainStat}>short_form`,
       );
       addStatColors(expBar, mainStat, true);
@@ -2028,7 +2058,7 @@ class View {
     document.getElementById('borrowedTimeBalance').textContent = formatTime(totals.borrowedTime);
     document.getElementById('borrowedTimeDays').textContent = `${
       formatNumber(Math.floor(totals.borrowedTime / 86400))
-    }${Localization.txt('time_controls>days')}`;
+    }${globalThis.Localization.txt('time_controls>days')}`;
     document.getElementById('totalLoops').textContent = `${formatNumber(totals.loops)}`;
     document.getElementById('totalActions').textContent = `${formatNumber(totals.actions)}`;
     if (totals.borrowedTime > 0) document.documentElement.classList.add('time-borrowed');
