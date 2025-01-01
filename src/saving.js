@@ -260,7 +260,6 @@ const buffCaps = {
   PrestigeExpOverflow: 100,
 };
 const buffs = /** @type {{[K in BuffName]: Buff}} */ ({});
-const prestigeValues = {};
 let goldInvested = 0;
 let stonesUsed;
 // eslint-disable-next-line prefer-const

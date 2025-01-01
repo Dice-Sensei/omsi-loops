@@ -472,7 +472,7 @@ const menu = {
         `;
     html += `
         <br>
-        <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigePhysical")'>Prestige Physical
+        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigePhysical")'>Prestige Physical
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       globalThis.Localization.txt('menu>prestige_bonus>PrestigePhysical')
     }
@@ -482,7 +482,7 @@ const menu = {
             </div>
         </button><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeMental")'>Prestige Mental
+        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeMental")'>Prestige Mental
         <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       globalThis.Localization.txt('menu>prestige_bonus>PrestigeMental')
     }
@@ -493,7 +493,7 @@ const menu = {
         </button><br>
 
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeCombat")'>Prestige Combat
+        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeCombat")'>Prestige Combat
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       globalThis.Localization.txt('menu>prestige_bonus>PrestigeCombat')
     }
@@ -503,7 +503,7 @@ const menu = {
             </div>
         </button><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeSpatiomancy")'>Prestige Spatiomancy
+        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeSpatiomancy")'>Prestige Spatiomancy
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       globalThis.Localization.txt('menu>prestige_bonus>PrestigeSpatiomancy')
     }
@@ -513,7 +513,7 @@ const menu = {
             </div>
         </button><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeChronomancy")'>Prestige Chronomancy
+        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeChronomancy")'>Prestige Chronomancy
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       globalThis.Localization.txt('menu>prestige_bonus>PrestigeChronomancy')
     }
@@ -523,7 +523,7 @@ const menu = {
             </div>
         </button><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeBartering")'>Prestige Bartering
+        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeBartering")'>Prestige Bartering
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       globalThis.Localization.txt('menu>prestige_bonus>PrestigeBartering')
     }
@@ -533,7 +533,7 @@ const menu = {
             </div>
         </button><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='prestigeUpgrade("PrestigeExpOverflow")'>Prestige Experience Overflow
+        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeExpOverflow")'>Prestige Experience Overflow
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       globalThis.Localization.txt('menu>prestige_bonus>PrestigeExpOverflow')
     }
@@ -545,7 +545,7 @@ const menu = {
 
         <br><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='resetAllPrestiges()'>Reset All Prestiges
+        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.resetAllPrestiges()'>Reset All Prestiges
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       globalThis.Localization.txt('menu>prestige_bonus>PrestigeResetAll')
     }

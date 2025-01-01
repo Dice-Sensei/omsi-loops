@@ -171,7 +171,7 @@ const Koviko = {
       statList.forEach((i) => {
         if (i in s) {
           var expToAdd = 0;
-          const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
+          const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
           expToAdd = ((a.stats[i] ?? 0) + overFlow) * a.expMult * (this.baseManaCost(a) / this.ticks()) *
             this.getTotalBonusXP(i, t, ss);
 
@@ -187,10 +187,10 @@ const Koviko = {
 
       var statBonus = 1;
       if (['Dex', 'Str', 'Con', 'Spd', 'Per'].includes(statName)) {
-        statBonus *= prestigeBonus('PrestigePhysical');
+        statBonus *= globalThis.prestige.prestigeBonus('PrestigePhysical');
       }
       if (['Cha', 'Int', 'Luck', 'Soul'].includes(statName)) {
-        statBonus *= prestigeBonus('PrestigeMental');
+        statBonus *= globalThis.prestige.prestigeBonus('PrestigeMental');
       }
 
       return statBonus * soulstoneBonus * (1 + Math.pow(getLevelFromTalent(t[statName]), 0.4) / 3);
@@ -630,16 +630,16 @@ const Koviko = {
          */
         getSelfCombat: (r, k) =>
           (getSkillLevelFromExp(k.combat) + getSkillLevelFromExp(k.pyromancy) * 5) * h.getArmorLevel(r, k) *
-          (1 + getBuffLevel('Feast') * 0.05) * prestigeBonus('PrestigeCombat'),
+          (1 + getBuffLevel('Feast') * 0.05) * globalThis.prestige.prestigeBonus('PrestigeCombat'),
 
         getZombieStrength: (r, k) =>
           ((getSkillLevelFromExp(k.dark) * (r.zombie || 0) / 2 * Math.max(getBuffLevel('Ritual') / 100, 1)) *
-            (1 + getBuffLevel('Feast') * 0.05)) * prestigeBonus('PrestigeCombat'),
+            (1 + getBuffLevel('Feast') * 0.05)) * globalThis.prestige.prestigeBonus('PrestigeCombat'),
 
         getTeamStrength: (r, k) =>
           ((getSkillLevelFromExp(k.combat) + getSkillLevelFromExp(k.restoration) * 4) * ((r.team || 0) / 2) *
             (r.adventures ? h.getGuildRankBonus(r.adventures) : 1) * h.getSkillBonusInc(k.leadership)) *
-          (1 + getBuffLevel('Feast') * 0.05) * prestigeBonus('PrestigeCombat'),
+          (1 + getBuffLevel('Feast') * 0.05) * globalThis.prestige.prestigeBonus('PrestigeCombat'),
 
         getTeamCombat: (r, k) => (h.getSelfCombat(r, k) + h.getZombieStrength(r, k) + h.getTeamStrength(r, k)),
 

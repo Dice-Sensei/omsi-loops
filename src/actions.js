@@ -725,7 +725,7 @@ function calcTalentMult(talent) {
 function getMaxTicksForAction(action, talentOnly = false) {
   let maxTicks = Number.MAX_SAFE_INTEGER;
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
-  const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
+  const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
   for (const stat of statList) {
     const expToNext = getExpToLevel(stat, talentOnly);
     const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) * getTotalBonusXP(stat);
@@ -737,7 +737,7 @@ function getMaxTicksForAction(action, talentOnly = false) {
 /** @param {StatName} stat  */
 function getMaxTicksForStat(action, stat, talentOnly = false) {
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
-  const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
+  const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
   const expToNext = getExpToLevel(stat, talentOnly);
   const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) * getTotalBonusXP(stat);
   return Mana.ceil(expToNext / statMultiplier);
@@ -745,7 +745,7 @@ function getMaxTicksForStat(action, stat, talentOnly = false) {
 
 function addExpFromAction(action, manaCount) {
   const adjustedExp = manaCount * action.expMult * (action.manaCost() / action.adjustedTicks);
-  const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
+  const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
   for (const stat of statList) {
     const expToAdd = ((action.stats[stat] ?? 0) + overFlow) * adjustedExp * getTotalBonusXP(stat);
 

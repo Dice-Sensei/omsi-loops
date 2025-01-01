@@ -1,13 +1,5 @@
-// Constants used as the base for Prestige exponential bonuses.
-const PRESTIGE_COMBAT_BASE = 1.20;
-const PRESTIGE_PHYSICAL_BASE = 1.20;
-const PRESTIGE_MENTAL_BASE = 1.20;
-const PRESTIGE_BARTERING_BASE = 1.10;
-const PRESTIGE_SPATIOMANCY_BASE = 1.10;
-const PRESTIGE_CHRONOMANCY_BASE = 1.05;
-const PRESTIGE_EXP_OVERFLOW_BASE = 1.00222;
+const prestigeValues: Record<string, number> = {};
 
-// All prestige button functions
 function completedCurrentGame() {
   console.log('completed current prestige');
 
@@ -22,8 +14,7 @@ function completedCurrentGame() {
   }
 }
 
-/** @param {PrestigeBuffName} prestigeSelected */
-function prestigeUpgrade(prestigeSelected) {
+function prestigeUpgrade(prestigeSelected: PrestigeBuffName) {
   // Update prestige value
   const costOfPrestige = getPrestigeCost(prestigeSelected);
   if (costOfPrestige > prestigeValues['prestigeCurrentPoints']) {
@@ -89,13 +80,12 @@ function resetAllPrestiges() {
   prestigeWithNewValues(nextPrestigeValues, nextPrestigeBuffs);
 }
 
-/**
- * @param {typeof prestigeValues} nextPrestigeValues
- * @param {{[K in PrestigeBuffName|'Imbuement3']: number}} nextPrestigeBuffs
- */
-function prestigeWithNewValues(nextPrestigeValues, nextPrestigeBuffs) {
-  let nextTotals = totals;
-  let nextOfflineMs = totalOfflineMs;
+function prestigeWithNewValues(
+  nextPrestigeValues: typeof prestigeValues,
+  nextPrestigeBuffs: { [K in PrestigeBuffName | 'Imbuement3']: number },
+) {
+  const nextTotals = totals;
+  const nextOfflineMs = totalOfflineMs;
 
   // Remove all progress and save totals
   load(false);
@@ -138,8 +128,7 @@ function prestigeConfirmation() {
   return true;
 }
 
-/** @param {PrestigeBuffName} prestigeSelected */
-function getPrestigeCost(prestigeSelected) {
+function getPrestigeCost(prestigeSelected: PrestigeBuffName) {
   var currentCost = 30;
 
   for (var i = 0; i < getBuffLevel(prestigeSelected); i++) {
@@ -149,52 +138,76 @@ function getPrestigeCost(prestigeSelected) {
   return currentCost;
 }
 
-/** @param {PrestigeBuffName} prestigeSelected */
-function getPrestigeCurrentBonus(prestigeSelected, base) {
+function getPrestigeCurrentBonus(prestigeSelected: PrestigeBuffName) {
   return prestigeBonus(prestigeSelected) > 1
-    ? prestigeBonus(prestigeSelected) * 100 - 100 // *100 - 100 is to get percent values, otherwise 1.02 will just round to 1, rather than 2%.
+    // *100 - 100 is to get percent values, otherwise 1.02 will just round to 1, rather than 2%.
+    ? prestigeBonus(prestigeSelected) * 100 - 100
     : 0;
 }
 
-// Prestige Functions
+type PrestigeBuffName =
+  | 'PrestigeBartering'
+  | 'PrestigeChronomancy'
+  | 'PrestigeCombat'
+  | 'PrestigeExpOverflow'
+  | 'PrestigeMental'
+  | 'PrestigePhysical'
+  | 'PrestigeSpatiomancy';
+type Cache = { calc: number; bonus: number };
 
-/** @type {{[B in PrestigeBuffName]?: {calc: number, bonus: number}}} */
-const prestigeCache = {};
+const prestigeCache: Record<PrestigeBuffName, Cache> = {
+  PrestigeBartering: { calc: -1, bonus: -1 },
+  PrestigeChronomancy: { calc: -1, bonus: -1 },
+  PrestigeCombat: { calc: -1, bonus: -1 },
+  PrestigeExpOverflow: { calc: -1, bonus: -1 },
+  PrestigeMental: { calc: -1, bonus: -1 },
+  PrestigePhysical: { calc: -1, bonus: -1 },
+  PrestigeSpatiomancy: { calc: -1, bonus: -1 },
+};
 
-/** @satisfies {{[B in PrestigeBuffName]: number}} */
-const prestigeBases = {
-  PrestigeBartering: PRESTIGE_BARTERING_BASE,
-  PrestigeChronomancy: PRESTIGE_CHRONOMANCY_BASE,
-  PrestigeCombat: PRESTIGE_COMBAT_BASE,
-  PrestigeExpOverflow: PRESTIGE_EXP_OVERFLOW_BASE,
-  PrestigeMental: PRESTIGE_MENTAL_BASE,
-  PrestigePhysical: PRESTIGE_PHYSICAL_BASE,
-  PrestigeSpatiomancy: PRESTIGE_SPATIOMANCY_BASE,
+const prestigeBases: Record<PrestigeBuffName, number> = {
+  PrestigeBartering: 1.1,
+  PrestigeChronomancy: 1.05,
+  PrestigeCombat: 1.2,
+  PrestigeExpOverflow: 1.00222,
+  PrestigeMental: 1.2,
+  PrestigePhysical: 1.2,
+  PrestigeSpatiomancy: 1.1,
 };
 
 /** @param {PrestigeBuffName} buff  */
 function prestigeBonus(buff) {
-  const cache = prestigeCache[buff] ??= {
-    calc: -1,
-    bonus: -1,
-  };
+  const cache = prestigeCache[buff];
+
   const level = getBuffLevel(buff);
+
   if (level !== cache.calc) {
     const base = prestigeBases[buff];
-    if (!base) {
-      console.error(`No prestige base recorded for buff ${buff}`);
-      return 1;
-    }
     cache.bonus = Math.pow(base, level);
     cache.calc = level;
   }
   return cache.bonus;
 }
 
-function adjustContentFromPrestige() {
-  return prestigeBonus('PrestigeSpatiomancy');
-}
+const _prestige = {
+  completedCurrentGame,
+  prestigeUpgrade,
+  resetAllPrestiges,
+  prestigeWithNewValues,
+  prestigeConfirmation,
+  getPrestigeCost,
+  getPrestigeCurrentBonus,
+  adjustContentFromPrestige: () => prestigeBonus('PrestigeSpatiomancy'),
+  adjustGoldCostFromPrestige: () => prestigeBonus('PrestigeBartering'),
+  prestigeBonus,
+  prestigeCache,
+  prestigeBases,
+  prestigeValues,
+  getBuffLevel,
+} as const;
 
-function adjustGoldCostFromPrestige() {
-  return prestigeBonus('PrestigeBartering');
+globalThis.prestige = _prestige;
+
+declare global {
+  var prestige: typeof _prestige;
 }

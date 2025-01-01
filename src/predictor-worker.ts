@@ -8,7 +8,7 @@ importScripts('./stats.js');
 importScripts('./actions.js');
 // module ready
 importScripts('./town.ts');
-importScripts('./prestige.js');
+importScripts('./prestige.ts');
 importScripts('./saving.js');
 // module ready
 importScripts('./predictor.ts');
