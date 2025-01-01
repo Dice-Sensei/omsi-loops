@@ -2345,17 +2345,3 @@ function updateBuffCaps() {
 function setScreenSize() {
   screenSize = document.body.scrollHeight;
 }
-
-function cumulativeOffset(element) {
-  var top = 0, bottom = 0;
-  do {
-    top += element.offsetTop || 0;
-    bottom += element.offsetBottom || 0;
-    element = element.offsetParent;
-  } while (element);
-
-  return {
-    top: top,
-    bottom: bottom,
-  };
-}
