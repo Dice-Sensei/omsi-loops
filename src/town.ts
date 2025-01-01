@@ -207,5 +207,11 @@ class Town<TN extends number> {
   }
 }
 
+declare global {
+  interface Trash {
+    Town: typeof Town;
+  }
+}
+
 globalThis.trash ??= {};
 globalThis.trash.Town = Town;
