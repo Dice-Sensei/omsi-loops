@@ -45,6 +45,12 @@ function formatTime(seconds) {
   );
 }
 
+let statShowing;
+let skillShowing;
+let buffShowing;
+let curActionShowing;
+let dungeonShowing;
+
 class View {
   initalize() {
     this.statGraph = new globalThis.trash.StatGraph();
@@ -1287,7 +1293,7 @@ class View {
       totalActionList.filter((action) => action.finish.toString().includes('updateBuff')).filter((action) =>
           action.unlocked()
         ).length > 0 ||
-        globalThis.prestige.prestigeValues['completedAnyPrestige']
+      globalThis.prestige.prestigeValues['completedAnyPrestige']
     ) {
       document.getElementById('buffList').style.display = '';
     } else {
@@ -1927,7 +1933,7 @@ class View {
   }
 
   updateSoulstoneChance(index) {
-    const dungeon = dungeons[index];
+    const dungeon = globalThis.saving.dungeons[index];
     for (let i = 0; i < dungeon.length; i++) {
       const level = dungeon[i];
       document.getElementById(`soulstoneChance${index}_${i}`).textContent = globalThis.helpers.intToString(
@@ -1942,7 +1948,7 @@ class View {
   }
 
   updateTrials() {
-    for (let i = 0; i < trials.length; i++) {
+    for (let i = 0; i < globalThis.saving.trials.length; i++) {
       this.updateTrialInfo({ trialNum: i, curFloor: 0 });
     }
   }
@@ -2324,7 +2330,7 @@ function adjustActionListSize(amt) {
   }
   document.documentElement.style.setProperty('--action-list-height', height);
   setScreenSize();
-  saveUISettings();
+  globalThis.saving.saveUISettings();
 }
 
 function updateBuffCaps() {

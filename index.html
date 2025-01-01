@@ -16,7 +16,7 @@
       <div id="loadingText" class="localized" data-locale="misc>loading">Initial load (this may take a while)...</div>
     </div>
     <header id="timeInfo" style="width: 100%; text-align: center">
-      <button id="cheat" class="button showthat control" style="display: none; margin-top: 5px" onclick="cheat()">
+      <button id="cheat" class="button showthat control" style="display: none; margin-top: 5px" onclick="globalThis.saving.cheat()">
         Cheat
       </button>
       <div
@@ -600,7 +600,7 @@
                 type="checkbox"
                 id="keepCurrentListInput"
                 class="checkbox"
-                onchange="setOption('keepCurrentList', this.checked)"
+                onchange="globalThis.saving.setOption('keepCurrentList', this.checked)"
               >
               <label
                 for="keepCurrentListInput"
@@ -611,7 +611,7 @@
                 type="checkbox"
                 id="repeatLastActionInput"
                 class="checkbox"
-                onchange="setOption('repeatLastAction', this.checked)"
+                onchange="globalThis.saving.setOption('repeatLastAction', this.checked)"
               >
               <label
                 for="repeatLastActionInput"
@@ -622,7 +622,7 @@
                 type="checkbox"
                 id="addActionsToTopInput"
                 class="checkbox"
-                onchange="setOption('addActionsToTop', this.checked)"
+                onchange="globalThis.saving.setOption('addActionsToTop', this.checked)"
               >
               <label for="addActionsToTopInput" class="localized" data-locale="actions>tooltip>add_action_top"></label>
             </div>
@@ -738,7 +738,7 @@
               <select
                 id="predictorTrackedStatInput"
                 class="button"
-                onchange="setOption('predictorTrackedStat', this.value)"
+                onchange="globalThis.saving.setOption('predictorTrackedStat', this.value)"
               >
               </select>
             </div>
@@ -887,7 +887,7 @@
         style="padding: 20px; background-color: var(--body-background); border: 1px solid var(--input-border); position: absolute; text-align: left; left: 150px; top: 150px"
       >
         <span class="localized" data-locale="tutorial"></span>
-        <button class="button" onclick="closeTutorial()">OK</button>
+        <button class="button" onclick="globalThis.saving.closeTutorial()">OK</button>
       </div>
     </div>
     <script defer type="module" src="./src/index-libs.ts"></script>
@@ -905,7 +905,7 @@
     <script defer src="./src/views/main.view.js"></script>
     <script defer type="module" src="./src/town.ts"></script>
     <script defer type="module" src="./src/prestige.ts"></script>
-    <script defer src="./src/saving.js"></script>
+    <script defer src="./src/saving.ts"></script>
     <script defer type="module" src="./src/challenges.ts"></script>
     <script defer type="module" src="./src/keyboard.hotkeys.ts"></script>
     <script defer type="module" src="./src/predictor.ts"></script>

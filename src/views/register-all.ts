@@ -133,16 +133,18 @@ const menu = {
       `<li id='saveMenu' tabindex='0' style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>
             ${globalThis.Localization.txt('menu>save>meta>title')}
             <div class='showthisH'>
-                <button class='button' onclick='save()'>${globalThis.Localization.txt('menu>save>manual_save')}</button>
+                <button class='button' onclick='globalThis.saving.save()'>${
+        globalThis.Localization.txt('menu>save>manual_save')
+      }</button>
                 <br>
                 <textarea id='exportImportList'></textarea><label for='exportImportList'> ${
         globalThis.Localization.txt('menu>save>list_label')
       }</label>
                 <br>
-                <button class='button' style='margin-right: 2px;' onclick='exportCurrentList()'>${
+                <button class='button' style='margin-right: 2px;' onclick='globalThis.saving.exportCurrentList()'>${
         globalThis.Localization.txt('menu>save>export_button')
       }</button>
-                <button class='button' onclick='importCurrentList()'>${
+                <button class='button' onclick='globalThis.saving.importCurrentList()'>${
         globalThis.Localization.txt('menu>save>import_button')
       }</button>
                 <br>
@@ -151,21 +153,21 @@ const menu = {
                 <input id='exportImport'><label for='exportImport'> ${
         globalThis.Localization.txt('menu>save>input_label')
       }</label><br>
-                <button class='button' style='margin-top: 5px; margin-right: 2px;' onclick='exportSave()'>${
+                <button class='button' style='margin-top: 5px; margin-right: 2px;' onclick='globalThis.saving.exportSave()'>${
         globalThis.Localization.txt('menu>save>export_button')
       }</button>
-                <button class='button' style='margin-top: 1px;' onclick='importSave()'>${
+                <button class='button' style='margin-top: 1px;' onclick='globalThis.saving.importSave()'>${
         globalThis.Localization.txt('menu>save>import_button')
       }</button><br>
                 ${globalThis.Localization.txt('menu>save>export_comment')}<br>
                 ${globalThis.Localization.txt('menu>save>import_comment')}<br>
-                <button class='button' style='margin-top: 5px; margin-right: 2px;' onclick='exportSaveFile()'>${
+                <button class='button' style='margin-top: 5px; margin-right: 2px;' onclick='globalThis.saving.exportSaveFile()'>${
         globalThis.Localization.txt('menu>save>exportfile_button')
       }</button>
-                <button class='button' style='margin-top: 1px;' onclick='openSaveFile()'>${
+                <button class='button' style='margin-top: 1px;' onclick='globalThis.saving.openSaveFile()'>${
         globalThis.Localization.txt('menu>save>importfile_button')
       }</button>
-                <input id="SaveFileInput" type='file' style="visibility:hidden;" onchange="importSaveFile(event)" />
+                <input id="SaveFileInput" type='file' style="visibility:hidden;" onchange="globalThis.saving.importSaveFile(event)" />
                 <br>
             </div>
         </li>`;
@@ -202,40 +204,40 @@ const menu = {
           ${menu.htmlThemeMenu()}
           ${menu.htmlLocalizationMenu()}
           ${globalThis.Localization.txt('menu>options>adblock_warning')}<br>
-          <input id='responsiveUIInput' type='checkbox' onchange='setOption("responsiveUI", this.checked)'/>
+          <input id='responsiveUIInput' type='checkbox' onchange='globalThis.saving.setOption("responsiveUI", this.checked)'/>
           <label for='responsiveUIInput'>${globalThis.Localization.txt('menu>options>responsive_ui')}</label>
           <br>
-          <input id='actionLogInput' type='checkbox' onchange='setOption("actionLog", this.checked)'/>
+          <input id='actionLogInput' type='checkbox' onchange='globalThis.saving.setOption("actionLog", this.checked)'/>
           <label for='actionLogInput'>${globalThis.Localization.txt('menu>options>action_log')}</label>
           <br>
-          <input id='highlightNewInput' type='checkbox' onchange='setOption("highlightNew", this.checked)'/>
+          <input id='highlightNewInput' type='checkbox' onchange='globalThis.saving.setOption("highlightNew", this.checked)'/>
           <label for='highlightNewInput'>${globalThis.Localization.txt('menu>options>highlight_new')}</label>
           <br>
-          <input id='statColorsInput' type='checkbox' onchange='setOption("statColors", this.checked)'/>
+          <input id='statColorsInput' type='checkbox' onchange='globalThis.saving.setOption("statColors", this.checked)'/>
           <label for='statColorsInput'>${globalThis.Localization.txt('menu>options>stat_colors')}</label>
           <br>
-          <input id='statHintsInput' type='checkbox' onchange='setOption("statHints", this.checked)'/>
+          <input id='statHintsInput' type='checkbox' onchange='globalThis.saving.setOption("statHints", this.checked)'/>
           <label for='statHintsInput'>${globalThis.Localization.txt('menu>options>stat_hints')}</label>
           <br>
-          <input id='pingOnPauseInput' type='checkbox' onchange='setOption("pingOnPause", this.checked)'/>
+          <input id='pingOnPauseInput' type='checkbox' onchange='globalThis.saving.setOption("pingOnPause", this.checked)'/>
           <label for='pingOnPauseInput'>${globalThis.Localization.txt('menu>options>pause_audio_cue')}</label>
           <br>
-          <input id='notifyOnPauseInput' type='checkbox' onchange='setOption("notifyOnPause", this.checked)'/>
+          <input id='notifyOnPauseInput' type='checkbox' onchange='globalThis.saving.setOption("notifyOnPause", this.checked)'/>
           <label for='notifyOnPauseInput'>${globalThis.Localization.txt('menu>options>pause_notify_cue')}</label>
           <br>
-          <input id='autoMaxTrainingInput' type='checkbox' onchange='setOption("autoMaxTraining", this.checked)'/>
+          <input id='autoMaxTrainingInput' type='checkbox' onchange='globalThis.saving.setOption("autoMaxTraining", this.checked)'/>
           <label for='autoMaxTrainingInput'>${globalThis.Localization.txt('menu>options>auto_max_training')}</label>
           <br>
-          <input id='hotkeysInput' type='checkbox' onchange='setOption("hotkeys", this.checked)'/>
+          <input id='hotkeysInput' type='checkbox' onchange='globalThis.saving.setOption("hotkeys", this.checked)'/>
               <label class='showthat' for='hotkeysInput'>${globalThis.Localization.txt('menu>options>hotkeys')}
               <div class='showthis'>${globalThis.Localization.txt('menu>options>hotkeys_tooltip')}</div>
           </label>
           <br>
           ${globalThis.Localization.txt('menu>options>update_rate')}
-          <input id='updateRateInput' type='number' value='50' min='1' style='width: 50px;transform: translateY(-2px);' oninput='setOption("updateRate", parseInt(this.value))' />
+          <input id='updateRateInput' type='number' value='50' min='1' style='width: 50px;transform: translateY(-2px);' oninput='globalThis.saving.setOption("updateRate", parseInt(this.value))' />
           <br>
           ${globalThis.Localization.txt('menu>options>autosave_rate')}
-          <input id='autosaveRateInput' type='number' value='30' min='1' style='width: 50px;transform: translateY(-2px);' oninput='setOption("autosaveRate", parseInt(this.value))' />
+          <input id='autosaveRateInput' type='number' value='30' min='1' style='width: 50px;transform: translateY(-2px);' oninput='globalThis.saving.setOption("autosaveRate", parseInt(this.value))' />
           <br>
         </div>
       </li>
@@ -291,33 +293,33 @@ const menu = {
             <div class='showthisH' style='padding-top:1ex'>
                 ${globalThis.Localization.txt('menu>options>extras_warning')}<br>
                 <br>
-                <input id='fractionalManaInput' type='checkbox' onchange='setOption("fractionalMana", this.checked)'/>
+                <input id='fractionalManaInput' type='checkbox' onchange='globalThis.saving.setOption("fractionalMana", this.checked)'/>
                     <label for='fractionalManaInput'>${
         globalThis.Localization.txt('menu>options>fractional_mana')
       }</label>
                 <br>
-                <input id='predictorInput' type='checkbox' onchange='setOption("predictor", this.checked)'/>
+                <input id='predictorInput' type='checkbox' onchange='globalThis.saving.setOption("predictor", this.checked)'/>
                     <label for='predictorInput'>${globalThis.Localization.txt('menu>options>predictor')}</label>
                 <br>
                 <div class='control'>
-                    <input type='checkbox' id='speedIncrease10xInput' onchange='setOption("speedIncrease10x", this.checked)'>
+                    <input type='checkbox' id='speedIncrease10xInput' onchange='globalThis.saving.setOption("speedIncrease10x", this.checked)'>
                     <label for='speedIncrease10xInput'>${
         globalThis.Localization.txt('menu>options>speedIncrease10x_text')
       }</label>
                 </div>
                 <br>
                 <div class='control'>
-                    <input type='checkbox' id='speedIncrease20xInput' onchange='setOption("speedIncrease20x", this.checked)'>
+                    <input type='checkbox' id='speedIncrease20xInput' onchange='globalThis.saving.setOption("speedIncrease20x", this.checked)'>
                     <label for='speedIncrease20xInput'>${
         globalThis.Localization.txt('menu>options>speedIncrease20x_text')
       }</label>
                 </div>
                 <br>
                 ${globalThis.Localization.txt('menu>options>speedIncreaseCustom_text')}
-                <input id='speedIncreaseCustomInput' type='number' value='5' min='1' style='width: 50px;transform: translateY(-2px);' oninput='setOption("speedIncreaseCustom", parseInt(this.value))' />
+                <input id='speedIncreaseCustomInput' type='number' value='5' min='1' style='width: 50px;transform: translateY(-2px);' oninput='globalThis.saving.setOption("speedIncreaseCustom", parseInt(this.value))' />
                 <br>
                 ${globalThis.Localization.txt('menu>options>speedIncreaseBackground_text')}
-                <input id='speedIncreaseBackgroundInput' type='number' value='' placeholder='same' min='0' style='width: 50px;transform: translateY(-2px);' oninput='setOption("speedIncreaseBackground", parseFloat(this.value))' />
+                <input id='speedIncreaseBackgroundInput' type='number' value='' placeholder='same' min='0' style='width: 50px;transform: translateY(-2px);' oninput='globalThis.saving.setOption("speedIncreaseBackground", parseFloat(this.value))' />
                 <div id='speedIncreaseBackgroundWarning' class='small block' style='display:none'>${
         globalThis.Localization.txt('menu>options>speedIncreaseBackground_warning')
       }</div>
@@ -337,7 +339,7 @@ const menu = {
                     <br>
                     <b>${globalThis.Localization.txt('predictor>settings')}</b>
                     <br>
-                    <input id='predictorBackgroundThreadInput' type='checkbox' onchange='setOption("predictorBackgroundThread", this.checked)'>
+                    <input id='predictorBackgroundThreadInput' type='checkbox' onchange='globalThis.saving.setOption("predictorBackgroundThread", this.checked)'>
                     <label for='predictorBackgroundThreadInput'>${
         globalThis.Localization.txt('predictor>background_thread')
       }</label>
@@ -345,29 +347,29 @@ const menu = {
                     <label for='predictorTimePrecisionInput'>${
         globalThis.Localization.txt('predictor>time_precision')
       }</label>
-                    <input id='predictorTimePrecisionInput' type='number' value='1' min='1' max='10' style='width: 50px;' oninput='setOption("predictorTimePrecision", parseInt(this.value))'>
+                    <input id='predictorTimePrecisionInput' type='number' value='1' min='1' max='10' style='width: 50px;' oninput='globalThis.saving.setOption("predictorTimePrecision", parseInt(this.value))'>
                     <br>
                     <label for='predictorNextPrecisionInput'>${
         globalThis.Localization.txt('predictor>next_precision')
       }</label>
-                    <input id='predictorNextPrecisionInput' type='number' value='2' min='1' max='10' style='width: 50px;' oninput='setOption("predictorNextPrecision", parseInt(this.value))'>
+                    <input id='predictorNextPrecisionInput' type='number' value='2' min='1' max='10' style='width: 50px;' oninput='globalThis.saving.setOption("predictorNextPrecision", parseInt(this.value))'>
                     <br>
                     <label for='predictorActionWidthInput'>${
         globalThis.Localization.txt('predictor>action_list_width')
       }</label>
-                    <input id='predictorActionWidthInput' type='number' value='500' min='100' max='4000' style='width: 50px; margin-left:40px' oninput='setOption("predictorActionWidth", parseInt(this.value))'>
+                    <input id='predictorActionWidthInput' type='number' value='500' min='100' max='4000' style='width: 50px; margin-left:40px' oninput='globalThis.saving.setOption("predictorActionWidth", parseInt(this.value))'>
                     <br>
-                    <input id='predictorRepeatPredictionInput' type='checkbox' onchange='setOption("predictorRepeatPrediction", this.checked)'>
+                    <input id='predictorRepeatPredictionInput' type='checkbox' onchange='globalThis.saving.setOption("predictorRepeatPrediction", this.checked)'>
                     <label for='predictorRepeatPredictionInput'>${
         globalThis.Localization.txt('predictor>repeat_last_action')
       }</label>
                     <br>
-                    <input id='predictorSlowModeInput' type='checkbox' onchange='setOption("predictorSlowMode", this.checked)'>
+                    <input id='predictorSlowModeInput' type='checkbox' onchange='globalThis.saving.setOption("predictorSlowMode", this.checked)'>
                     <label for='predictorSlowModeInput'>${
         globalThis.Localization.txt('predictor>slow_mode')
           .replace(
             '{slowMode}',
-            `<input id='predictorSlowTimerInput' type='number' value='1' min='1' style='width: 20px;' oninput='setOption("predictorSlowTimer", parseInt(this.value))'>`,
+            `<input id='predictorSlowTimerInput' type='number' value='1' min='1' style='width: 20px;' oninput='globalThis.saving.setOption("predictorSlowTimer", parseInt(this.value))'>`,
           )
       }</label>
                 </div>
@@ -414,25 +416,26 @@ const menu = {
             `;
     if (challengeSave.challengeMode !== 0 || 1 === 1) {
       html +=
-        `<button class='button showthat control' style='margin-top: 2px;' onclick='exitChallenge()'>Exit Challenge 
+        `<button class='button showthat control' style='margin-top: 2px;' onclick='globalThis.saving.exitChallenge()'>Exit Challenge 
                 </button>
-                <button class='button showthat control' style='margin-top: 2px;' onclick='resumeChallenge()'>Resume Challenge 
+                <button class='button showthat control' style='margin-top: 2px;' onclick='globalThis.saving.resumeChallenge()'>Resume Challenge 
                 </button><br>`;
     }
-    html += `<button class='button showthat control' style='margin-top: 2px;' onclick='beginChallenge(1)'>Mana Drought 
+    html +=
+      `<button class='button showthat control' style='margin-top: 2px;' onclick='globalThis.saving.beginChallenge(1)'>Mana Drought 
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:100px;'>${
-      globalThis.Localization.txt('menu>challenges>mana_drought')
-    }</div>
+        globalThis.Localization.txt('menu>challenges>mana_drought')
+      }</div>
         </button><br>
-        <button class='button showthat control' style='margin-top: 2px;' onclick='beginChallenge(2)'>Noodle Arms
+        <button class='button showthat control' style='margin-top: 2px;' onclick='globalThis.saving.beginChallenge(2)'>Noodle Arms
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:100px;'>${
-      globalThis.Localization.txt('menu>challenges>noodle_arms')
-    }</div>
+        globalThis.Localization.txt('menu>challenges>noodle_arms')
+      }</div>
         </button><br>
-        <button class='button showthat control' style='margin-top: 2px;' onclick='beginChallenge(3)'>Mana Burn
+        <button class='button showthat control' style='margin-top: 2px;' onclick='globalThis.saving.beginChallenge(3)'>Mana Burn
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:100px;'>${
-      globalThis.Localization.txt('menu>challenges>mana_burn')
-    }</div>
+        globalThis.Localization.txt('menu>challenges>mana_burn')
+      }</div>
         </button><br>`;
     html += `</div>`;
     return html;
@@ -607,19 +610,19 @@ const timeControls = {
       </div>
       <div id='timeControlsOptions'>
         <div class='control'>
-          <input type='checkbox' id='pauseBeforeRestartInput' onchange='setOption("pauseBeforeRestart", this.checked)'>
+          <input type='checkbox' id='pauseBeforeRestartInput' onchange='globalThis.saving.setOption("pauseBeforeRestart", this.checked)'>
           <label for='pauseBeforeRestartInput'>${
       globalThis.Localization.txt('time_controls>pause_before_restart')
     }</label>
         </div>
         <div class='control'>
-          <input type='checkbox' id='pauseOnFailedLoopInput' onchange='setOption("pauseOnFailedLoop", this.checked)'>
+          <input type='checkbox' id='pauseOnFailedLoopInput' onchange='globalThis.saving.setOption("pauseOnFailedLoop", this.checked)'>
           <label for='pauseOnFailedLoopInput'>${
       globalThis.Localization.txt('time_controls>pause_on_failed_loop')
     }</label>
         </div>
         <div class='control'>
-          <input type='checkbox' id='pauseOnCompleteInput' onchange='setOption("pauseOnComplete", this.checked)'>
+          <input type='checkbox' id='pauseOnCompleteInput' onchange='globalThis.saving.setOption("pauseOnComplete", this.checked)'>
           <label for='pauseOnCompleteInput'>${globalThis.Localization.txt('time_controls>pause_on_complete')}</label>
         </div>
       </div>

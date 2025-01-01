@@ -88,7 +88,7 @@ function prestigeWithNewValues(
   const nextOfflineMs = totalOfflineMs;
 
   // Remove all progress and save totals
-  load(false);
+  globalThis.saving.load(false);
   clearList();
   restart();
   pauseGame();
@@ -108,11 +108,11 @@ function prestigeWithNewValues(
   totals = nextTotals;
   totalOfflineMs = nextOfflineMs;
   view.updatePrestigeValues();
-  save();
+  globalThis.saving.save();
 }
 
 function prestigeConfirmation() {
-  save();
+  globalThis.saving.save();
   if (globalThis.localStorage[defaultSaveName] && globalThis.localStorage[defaultSaveName] !== '') {
     if (confirm(`Prestiging will reset all of your progress, but retain prestige points. Are you sure?`)) {
       for (const town of towns) {

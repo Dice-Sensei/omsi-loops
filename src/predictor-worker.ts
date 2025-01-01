@@ -7,7 +7,7 @@ importScripts('./stats.js');
 importScripts('./actions.js');
 importScripts('./town.ts');
 importScripts('./prestige.ts');
-importScripts('./saving.js');
+importScripts('./saving.ts');
 importScripts('./predictor.ts');
 
 // to moduleify
@@ -56,7 +56,7 @@ importScripts('./predictor.ts');
 
 console.log('starting predictor worker');
 
-loadDefaults();
+globalThis.saving.loadDefaults();
 
 const predictor = globalThis.Koviko.initWorkerPredictor();
 /** @type {MessageToPredictor} */

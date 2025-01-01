@@ -479,7 +479,7 @@ class DungeonAction extends MultipartAction {
   completedTooltip() {
     let ssDivContainer = '';
     if (this.dungeonNum < 3) {
-      for (let i = 0; i < dungeons[this.dungeonNum].length; i++) {
+      for (let i = 0; i < globalThis.saving.dungeons[this.dungeonNum].length; i++) {
         ssDivContainer += `Floor ${i + 1} |
                                     <div class='bold'>${
           globalThis.Localization.txt(`actions>${getXMLName(this.name)}>chance_label`)
@@ -497,7 +497,7 @@ class DungeonAction extends MultipartAction {
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`] + 0.0001) {
     const floor = Math.floor(loopCounter / this.segments + 1);
     return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
-      floor <= dungeons[this.dungeonNum].length
+      floor <= globalThis.saving.dungeons[this.dungeonNum].length
         ? globalThis.helpers.numberToWords(floor)
         : globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
@@ -1720,7 +1720,7 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
   },
   canStart(loopCounter = towns[this.townNum].SDungeonLoopCounter) {
     const curFloor = Math.floor(loopCounter / this.segments + 0.0000001);
-    return resources.reputation >= 2 && curFloor < dungeons[this.dungeonNum].length;
+    return resources.reputation >= 2 && curFloor < globalThis.saving.dungeons[this.dungeonNum].length;
   },
   loopCost(segment, loopCounter = towns[this.townNum].SDungeonLoopCounter) {
     return globalThis.helpers.precision3(
@@ -1730,7 +1730,7 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
   tickProgress(offset, loopCounter = towns[this.townNum].SDungeonLoopCounter) {
     const floor = Math.floor(loopCounter / this.segments + 0.0000001);
     return (getSelfCombat() + getSkillLevel('Magic')) *
-      Math.sqrt(1 + dungeons[this.dungeonNum][floor].completed / 200);
+      Math.sqrt(1 + globalThis.saving.dungeons[this.dungeonNum][floor].completed / 200);
   },
   loopsFinished() {
     const curFloor = Math.floor((towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001 - 1);
@@ -1757,7 +1757,7 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
 });
 DungeonAction.prototype.finishDungeon = function finishDungeon(floorNum) {
   const dungeonNum = this.dungeonNum;
-  const floor = dungeons[dungeonNum][floorNum];
+  const floor = globalThis.saving.dungeons[dungeonNum][floorNum];
   if (!floor) {
     return false;
   }
@@ -3413,7 +3413,7 @@ Action.LargeDungeon = new DungeonAction('Large Dungeon', 1, {
   },
   canStart(loopCounter = towns[this.townNum].LDungeonLoopCounter) {
     const curFloor = Math.floor(loopCounter / this.segments + 0.0000001);
-    return resources.teamMembers >= 1 && curFloor < dungeons[this.dungeonNum].length;
+    return resources.teamMembers >= 1 && curFloor < globalThis.saving.dungeons[this.dungeonNum].length;
   },
   loopCost(segment, loopCounter = towns[this.townNum].LDungeonLoopCounter) {
     return globalThis.helpers.precision3(
@@ -3423,7 +3423,7 @@ Action.LargeDungeon = new DungeonAction('Large Dungeon', 1, {
   tickProgress(offset, loopCounter = towns[this.townNum].LDungeonLoopCounter) {
     const floor = Math.floor(loopCounter / this.segments + 0.0000001);
     return (getTeamCombat() + getSkillLevel('Magic')) *
-      Math.sqrt(1 + dungeons[this.dungeonNum][floor].completed / 200);
+      Math.sqrt(1 + globalThis.saving.dungeons[this.dungeonNum][floor].completed / 200);
   },
   loopsFinished(loopCounter = towns[this.townNum].LDungeonLoopCounter) {
     const curFloor = Math.floor(loopCounter / this.segments + 0.0000001 - 1);
@@ -6242,7 +6242,7 @@ Action.TheSpire = new DungeonAction('The Spire', 2, {
   },
   canStart(loopCounter = towns[this.townNum].TheSpireLoopCounter) {
     const curFloor = Math.floor(loopCounter / this.segments + 0.0000001);
-    return curFloor < dungeons[this.dungeonNum].length;
+    return curFloor < globalThis.saving.dungeons[this.dungeonNum].length;
   },
   loopCost(segment, loopCounter = towns[this.townNum].TheSpireLoopCounter) {
     return globalThis.helpers.precision3(
@@ -6252,7 +6252,7 @@ Action.TheSpire = new DungeonAction('The Spire', 2, {
   tickProgress(_offset, loopCounter = towns[this.townNum].TheSpireLoopCounter) {
     const floor = Math.floor(loopCounter / this.segments + 0.0000001);
     return getTeamCombat() * (1 + 0.1 * resources.pylons) *
-      Math.sqrt(1 + dungeons[this.dungeonNum][floor].completed / 200);
+      Math.sqrt(1 + globalThis.saving.dungeons[this.dungeonNum][floor].completed / 200);
   },
   grantsBuff: 'Aspirant',
   loopsFinished(loopCounter = towns[this.townNum].TheSpireLoopCounter) {

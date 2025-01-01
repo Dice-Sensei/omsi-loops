@@ -45,7 +45,7 @@ function getActualGameSpeed() {
 }
 
 function refreshDungeons(manaSpent) {
-  for (const dungeon of dungeons) {
+  for (const dungeon of globalThis.saving.dungeons) {
     for (const level of dungeon) {
       const chance = level.ssChance;
       if (chance < 1) level.ssChance = Math.min(chance + 0.0000001 * manaSpent, 1);
@@ -95,7 +95,7 @@ function tick() {
   // save even when paused
   if (curTime - lastSave > options.autosaveRate * 1000) {
     lastSave = curTime;
-    save();
+    globalThis.saving.save();
   }
 
   // don't do any updates until we've got enough time built up to match the refresh rate setting
@@ -212,6 +212,7 @@ function executeGameTicks(deadline) {
   view.update();
 }
 
+let mainTickLoop;
 function recalcInterval(fps) {
   windowFps = fps;
   if (mainTickLoop !== undefined) {
@@ -225,6 +226,7 @@ function recalcInterval(fps) {
   }
 }
 
+let gameIsStopped = false;
 function stopGame() {
   gameIsStopped = true;
   view.requestUpdate('updateTime', null);
@@ -232,7 +234,7 @@ function stopGame() {
   view.update();
   document.title = '*PAUSED* Idle Loops';
   document.getElementById('pausePlay').textContent = globalThis.Localization.txt('time_controls>play_button');
-  if (needsDataSnapshots()) {
+  if (globalThis.saving.needsDataSnapshots()) {
     globalThis.Data.updateSnapshot('stop', 'base');
   }
   if (options.predictor) {
@@ -242,7 +244,7 @@ function stopGame() {
 
 function pauseGame(ping, message) {
   gameIsStopped = !gameIsStopped;
-  if (needsDataSnapshots()) {
+  if (globalThis.saving.needsDataSnapshots()) {
     globalThis.Data.discardToSnapshot('base', 1);
     globalThis.Data.recordSnapshot('pause');
   }
@@ -250,7 +252,7 @@ function pauseGame(ping, message) {
   view.requestUpdate('updateCurrentActionBar', actions.currentPos);
   view.update();
   if (!gameIsStopped && options.notifyOnPause) {
-    clearPauseNotification();
+    globalThis.saving.clearPauseNotification();
   }
   document.title = gameIsStopped ? '*PAUSED* Idle Loops' : 'Idle Loops';
   document.getElementById('pausePlay').textContent = globalThis.Localization.txt(
@@ -264,7 +266,7 @@ function pauseGame(ping, message) {
       setTimeout(() => globalThis.helpers.beep(250), 500);
     }
     if (options.notifyOnPause) {
-      showPauseNotification(message || 'Game paused!');
+      globalThis.saving.showPauseNotification(message || 'Game paused!');
     }
   }
 }
@@ -303,7 +305,7 @@ function prepareRestart() {
       setTimeout(() => globalThis.helpers.beep(250), 500);
     }
     if (options.notifyOnPause) {
-      showPauseNotification('Game paused!');
+      globalThis.saving.showPauseNotification('Game paused!');
     }
     if (curAction) {
       actions.completedTicks += actions.getNextValidAction().ticks;
@@ -323,7 +325,7 @@ function restart() {
   timer = 0;
   timeCounter = 0;
   effectiveTime = 0;
-  timeNeeded = timeNeededInitial;
+  timeNeeded = globalThis.saving.timeNeededInitial;
   document.title = 'Idle Loops';
   currentLoop = totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
   resetResources();
@@ -335,7 +337,7 @@ function restart() {
   actions.restart();
   view.requestUpdate('updateCurrentActionsDivs');
   view.requestUpdate('updateTrials', null);
-  if (needsDataSnapshots()) {
+  if (globalThis.saving.needsDataSnapshots()) {
     globalThis.Data.updateSnapshot('restart', 'base');
   }
 }
@@ -400,7 +402,9 @@ function resetResource(resource) {
 
 function resetResources() {
   resources = globalThis.helpers.copyObject(resourcesTemplate);
-  if (getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) addResource('glasses', true);
+  if (getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
+    addResource('glasses', true);
+  }
   view.requestUpdate('updateResources', null);
 }
 
@@ -439,12 +443,12 @@ function loadLoadout(num) {
 let globalCustomInput = '';
 function saveList() {
   if (curLoadout === 0) {
-    save();
+    globalThis.saving.save();
     return;
   }
   nameList(false);
   loadouts[curLoadout] = globalThis.helpers.copyArray(actions.next);
-  save();
+  globalThis.saving.save();
   if ((globalThis.helpers.inputElement('renameLoadout').value !== 'Saved!')) {
     globalCustomInput = globalThis.helpers.inputElement('renameLoadout').value;
   }
@@ -469,7 +473,7 @@ function nameList(saveGame) {
     globalThis.helpers.inputElement('renameLoadout').value = 'Enter a name!';
   }
   document.getElementById(`load${curLoadout}`).textContent = loadoutnames[curLoadout - 1];
-  if (saveGame) save();
+  if (saveGame) globalThis.saving.save();
 }
 
 function loadList() {
@@ -784,7 +788,7 @@ function toggleOffline() {
       'time_controls>bonus_seconds>state>off',
     );
   }
-  setOption('bonusIsActive', bonusActive, true);
+  globalThis.saving.setOption('bonusIsActive', bonusActive, true);
   view.requestUpdate('updateTime', null);
 }
 

@@ -17,61 +17,10 @@ function cheat() {
   else gameSpeed = 1;
 }
 
-function cheatBonus() {
-  totalOfflineMs = 1000000000000000;
-}
-
-function cheatSurvey() {
-  for (let i = 0; i < 9; i++) {
-    const varName = 'SurveyZ' + i;
-    towns[i][`exp${varName}`] = 505000;
-    view.updateProgressAction({ name: varName, town: towns[i] });
-  }
-}
-
-function cheatProgress() {
-  for (const action of totalActionList) {
-    if (action.type == 'progress') {
-      towns[action.townNum][`exp${action.varName}`] = 505000;
-      view.updateProgressAction({ name: action.varName, town: towns[action.townNum] });
-    }
-  }
-  stonesUsed = { 1: 250, 3: 250, 5: 250, 6: 250 };
-}
-
-function cheatTalent(stat, targetTalentLevel) {
-  if (stat === 'all' || stat === 'All') {
-    for (const stat of statList) {
-      stats[stat].talentLevelExp.setLevel(targetTalentLevel);
-    }
-  } else stats[stat].talentLevelExp.setLevel(targetTalentLevel);
-  view.updateStats();
-}
-
-function cheatSoulstone(stat, targetSS) {
-  if (stat === 'all' || stat === 'All') {
-    for (const stat in stats) {
-      stats[stat].soulstone = targetSS;
-    }
-  } else stats[stat].soulstone = targetSS;
-  view.updateSoulstones();
-}
-
-function cheatSkill(skill, targetSkillLevel) {
-  if (skill === 'all' || skill === 'All') {
-    for (const skill of skillList) {
-      skills[skill].levelExp.setLevel(targetSkillLevel);
-    }
-  } else skills[skill].levelExp.setLevel(targetSkillLevel);
-  view.updateSkills();
-}
-
-let mainTickLoop;
 const defaultSaveName = 'idleLoops1';
 const challengeSaveName = 'idleLoopsChallenge';
 let saveName = defaultSaveName;
 
-const selfIsWorker = typeof window === 'undefined';
 const selfIsGame = typeof View !== 'undefined';
 
 const timeNeededInitial = 5 * 50;
@@ -80,7 +29,6 @@ let timer = timeNeededInitial;
 // eslint-disable-next-line prefer-const
 let timeNeeded = timeNeededInitial;
 // eslint-disable-next-line prefer-const
-let gameIsStopped = false;
 const view = selfIsGame ? new View() : null;
 const actions = new Actions();
 const actionLog = selfIsGame ? new ActionLog() : null;
@@ -268,11 +216,7 @@ let townShowing = 0;
 let actionStoriesShowing = false;
 let townsUnlocked = [];
 let completedActions = [];
-let statShowing;
-let skillShowing;
-let buffShowing;
-let curActionShowing;
-let dungeonShowing;
+
 let trainingLimits = 10;
 let storyShowing = 0;
 let storyMax = 0;
@@ -544,7 +488,6 @@ let challengeSave = {
 };
 
 let totalMerchantMana = 7500;
-
 // eslint-disable-next-line prefer-const
 let curAdvGuildSegment = 0;
 // eslint-disable-next-line prefer-const
@@ -562,6 +505,29 @@ let curGodsSegment = 0;
 
 /** @type {AnyAction[]} */
 let totalActionList = [];
+
+let curs = {
+  totalMerchantMana: 7500,
+  curAdvGuildSegment: 0,
+  curCraftGuildSegment: 0,
+  curWizCollegeSegment: 0,
+  curFightFrostGiantsSegment: 0,
+  curFightJungleMonstersSegment: 0,
+  curThievesGuildSegment: 0,
+  curGodsSegment: 0,
+  bonusSpeed: 1,
+  bonusActive: false,
+  currentLoop: 0,
+  offlineRatio: 1,
+  windowFps: 50,
+  totals: {
+    time: 0,
+    effectiveTime: 0,
+    borrowedTime: 0,
+    loops: 0,
+    actions: 0,
+  },
+};
 
 function initializeActions() {
   totalActionList.length = 0;
@@ -1477,10 +1443,6 @@ function save() {
   return saveJson;
 }
 
-function currentSaveData() {
-  return `ILSV01${compressToBase64(globalThis.localStorage[saveName])}`;
-}
-
 function exportSave() {
   const saveJson = save();
   // idle loops save version 01. patch v0.94, moved from old save system to lzstring base 64
@@ -1651,3 +1613,52 @@ function resumeChallenge() {
     restart();
   }
 }
+
+const _saving = {
+  towns,
+  curs,
+  save,
+  exportSave,
+  importSave,
+  exportSaveFile,
+  openSaveFile,
+  importSaveFile,
+  exportCurrentList,
+  importCurrentList,
+  beginChallenge,
+  exitChallenge,
+  resumeChallenge,
+  saveName,
+  challengeSaveName,
+  challengeSave,
+  dungeons,
+  trials,
+  stats,
+  totalTalent,
+  skills,
+  buffs,
+  goldInvested,
+  stonesUsed,
+  loadoutnames,
+  options,
+  storyMax,
+  storyReqs,
+  storyVars,
+  unreadActionStories,
+  actionLog,
+  buffCaps,
+  totalOfflineMs,
+  totals,
+  loadDefaults,
+  needsDataSnapshots,
+  closeTutorial,
+  startGame,
+  cheat,
+  timeNeededInitial,
+};
+
+declare global {
+  var saving: typeof _saving;
+}
+
+globalThis.saving = _saving;
