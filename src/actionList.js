@@ -265,7 +265,6 @@ class Localizable1 {
   }
 }
 
-
 class Action extends Localizable1 {
   /** @type {N} */
   name;
@@ -431,19 +430,14 @@ class MultipartAction extends Action {
   }
 
   static {
-    // listing these means they won't get stored even if memoized
     Data.omitProperties(this.prototype, ['segmentNames', 'altSegmentNames', 'segmentModifiers']);
   }
 
-  /** @param {number} segment  */
   getSegmentName(segment) {
     return this.segmentNames[segment % this.segmentNames.length];
   }
 
-  /** @param {number} offset /** @param {number} [loopCounter] @param {number} [totalCompletions] */
   canMakeProgress(offset, loopCounter, totalCompletions) {
-    // some actions with a tickProgress (like Small Dungeon) will throw an exception if tickProgress
-    // is called after they're already complete. Turn that into a boolean.
     try {
       return this.tickProgress(offset, loopCounter, totalCompletions) > 0;
     } catch {

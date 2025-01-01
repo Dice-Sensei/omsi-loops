@@ -164,15 +164,15 @@ class Stat extends Localizable2 {
   }
 
   get blurb() {
-    return this.memoize('blurb');
+    return this.memoize('blurb', '>blurb');
   }
 
   get short_form() {
-    return this.memoize('short_form');
+    return this.memoize('short_form', '>short_form');
   }
 
   get long_form() {
-    return this.memoize('long_form');
+    return this.memoize('long_form', '>long_form');
   }
 
   #soulstoneCalc;
@@ -300,13 +300,13 @@ class Skill extends Localizable2 {
   }
 
   get label() {
-    return this.memoize('label');
+    return this.memoize('label', '>label');
   }
   get desc() {
-    return this.memoize('desc');
+    return this.memoize('desc', '>desc');
   }
   get desc2() {
-    return this.memoize('desc2');
+    return this.memoize('desc2', '>desc2');
   }
 
   toJSON() {
@@ -340,8 +340,6 @@ class Skill extends Localizable2 {
 }
 
 class Buff extends Localizable2 {
-  // why in valhalla's name are we using localized text as a key, wtaf
-  /** @readonly */
   static fullNames = /** @type {const} */ ({
     Ritual: 'Dark Ritual',
     Imbuement: 'Imbue Mind',
@@ -359,20 +357,19 @@ class Buff extends Localizable2 {
     PrestigeExpOverflow: 'Prestige - Experience Overflow',
   });
 
-  /** @type {BuffName} */
   name;
   amt = 0;
 
   get label() {
-    return this.memoize('label');
+    return this.memoize('label', '>label');
   }
   get desc() {
-    return this.memoize('desc');
+    return this.memoize('desc', '>desc');
   }
 
-  /** @param {BuffName} name */
   constructor(name) {
     super(`buffs>${getXMLName(Buff.fullNames[name])}`);
+
     Object.defineProperty(this, 'name', { value: name });
   }
 }
