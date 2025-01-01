@@ -577,9 +577,9 @@ function addSkillExp(name, amount) {
   skills[name].levelExp.addExp(amount);
   const newLevel = getSkillLevel(name);
   if (oldLevel !== newLevel) {
-    actionLog.addSkillLevel(actions.currentAction, name, newLevel, oldLevel);
+    globalThis.saving.actionLog.addSkillLevel(actions.currentAction, name, newLevel, oldLevel);
   }
-  view.requestUpdate('updateSkill', name);
+  globalThis.saving.view.requestUpdate('updateSkill', name);
 }
 
 /** @param {Partial<Record<SkillName, number | (() => number)>>} list  */
@@ -613,9 +613,9 @@ function addBuffAmt(name, amount, action, spendType, statsSpent) {
   buffs[name].amt += amount;
   if (amount === 0) buffs[name].amt = 0; // for presetige, reset to 0 when passed in.
   if (action) {
-    actionLog.addBuff(action, name, buffs[name].amt, oldBuffLevel, spendType, statsSpent);
+    globalThis.saving.actionLog.addBuff(action, name, buffs[name].amt, oldBuffLevel, spendType, statsSpent);
   }
-  view.requestUpdate('updateBuff', name);
+  globalThis.saving.view.requestUpdate('updateBuff', name);
 }
 
 const talentMultiplierCache = {

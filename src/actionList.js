@@ -1769,8 +1769,8 @@ DungeonAction.prototype.finishDungeon = function finishDungeon(floorNum) {
     const countToAdd = Math.floor(Math.pow(10, dungeonNum) * getSkillBonus('Divine'));
     stats[statToAdd].soulstone = (stats[statToAdd].soulstone ?? 0) + countToAdd;
     floor.ssChance *= 0.98;
-    view.requestUpdate('updateSoulstones', null);
-    actionLog.addSoulstones(this, statToAdd, countToAdd);
+    globalThis.saving.view.requestUpdate('updateSoulstones', null);
+    globalThis.saving.actionLog.addSoulstones(this, statToAdd, countToAdd);
     return true;
   }
   return false;
@@ -4351,8 +4351,8 @@ Action.MineSoulstones = new Action('Mine Soulstones', {
       const statToAdd = statList[Math.floor(Math.random() * statList.length)];
       const countToAdd = Math.floor(getSkillBonus('Divine'));
       stats[statToAdd].soulstone += countToAdd;
-      actionLog.addSoulstones(this, statToAdd, countToAdd);
-      view.requestUpdate('updateSoulstones', null);
+      globalThis.saving.actionLog.addSoulstones(this, statToAdd, countToAdd);
+      globalThis.saving.view.requestUpdate('updateSoulstones', null);
     });
   },
 });

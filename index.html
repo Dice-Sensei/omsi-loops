@@ -16,7 +16,12 @@
       <div id="loadingText" class="localized" data-locale="misc>loading">Initial load (this may take a while)...</div>
     </div>
     <header id="timeInfo" style="width: 100%; text-align: center">
-      <button id="cheat" class="button showthat control" style="display: none; margin-top: 5px" onclick="globalThis.saving.cheat()">
+      <button
+        id="cheat"
+        class="button showthat control"
+        style="display: none; margin-top: 5px"
+        onclick="globalThis.saving.cheat()"
+      >
         Cheat
       </button>
       <div
@@ -843,7 +848,7 @@
               id="actionLogLoadPrevious"
               class="small italic localized"
               data-locale="actions>log>load_previous"
-              onclick="actionLog.loadHistory(5)"
+              onclick="globalThis.saving.actionLog.loadHistory(5)"
             >
             </li>
             <li id="actionLogLatest" class="small italic localized" data-locale="actions>log>latest"></li>
@@ -897,7 +902,6 @@
     <script defer type="module" src="./src/Localization.ts"></script>
     <script defer type="module" src="./src/helpers.ts"></script>
     <script defer src="./src/actionList.js"></script>
-    <script defer src="./src/actionLog.js"></script>
     <script defer type="module" src="./src/interval.ts"></script>
     <script defer src="./src/driver.js"></script>
     <script defer src="./src/stats.js"></script>
