@@ -44,7 +44,7 @@ class Town<TN extends number> {
   hiddenVars: Set<string> = new Set();
 
   static {
-    Data.omitProperties(this.prototype, ['hiddenVars']);
+    globalThis.Data.omitProperties(this.prototype, ['hiddenVars']);
   }
 
   unlocked() {
@@ -197,7 +197,6 @@ class Town<TN extends number> {
           this.totalActionList.push(...this.totalActionList.splice(0, lateGameActionCount));
           lateGameActionCount = 0;
         }
-        // @ts-ignore
         this.totalActionList.push(action);
         if (action.type === 'limited') this.createVars(action.varName);
         if (action.type === 'progress') this.createProgressVars(action.varName, action.progressScaling);

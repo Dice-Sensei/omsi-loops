@@ -77,7 +77,7 @@ class Actions {
   currentAction;
 
   static {
-    Data.omitProperties(this.prototype, ['next']);
+    globalThis.Data.omitProperties(this.prototype, ['next']);
   }
 
   tick(availableMana) {

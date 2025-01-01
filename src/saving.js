@@ -576,7 +576,7 @@ let dungeons = [[], [], []];
 let trials = [[], [], [], [], []];
 
 // register all the object variables assigned in this file
-Data.registerAll({
+globalThis.Data.registerAll({
   actions,
   towns,
   stats,
@@ -634,7 +634,7 @@ function virtualizeGlobalVariables(variables) {
       configurable: true,
     });
   }
-  return Data.register('globals', globals);
+  return globalThis.Data.register('globals', globals);
 }
 
 /** @type {Notification} */
@@ -955,7 +955,7 @@ function clearSave() {
 let defaultsRecorded = false;
 function loadDefaults() {
   if (defaultsRecorded) {
-    Data.resetToDefaults();
+    globalThis.Data.resetToDefaults();
   }
   initializeStats();
   initializeSkills();
@@ -967,7 +967,7 @@ function loadDefaults() {
   prestigeValues['prestigeTotalCompletions'] = 0;
   prestigeValues['completedCurrentPrestige'] = false;
   prestigeValues['completedAnyPrestige'] = false;
-  Data.recordDefaults();
+  globalThis.Data.recordDefaults();
   defaultsRecorded = true;
 }
 
@@ -1384,7 +1384,7 @@ function doLoad(toLoad) {
 
   adjustAll();
 
-  Data.recordBase();
+  globalThis.Data.recordBase();
 
   view.updateLoadoutNames();
   view.changeStatView();

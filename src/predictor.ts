@@ -404,7 +404,7 @@ const Koviko = {
 
         this.#worker.onmessage = this.handleWorkerMessage.bind(this);
         this.#worker.postMessage({ type: 'setOptions', options });
-        this.#worker.postMessage({ type: 'verifyDefaultIds', idRefs: Data.exportDefaultIds() });
+        this.#worker.postMessage({ type: 'verifyDefaultIds', idRefs: globalThis.Data.exportDefaultIds() });
       }
       return this.#worker;
     }
@@ -2179,8 +2179,8 @@ const Koviko = {
         finalIndex,
         affected,
       } = runData;
-      Data.recordSnapshot('predictor-worker');
-      this.backgroundSnapshot = Data.getSnapshot(-1);
+      globalThis.Data.recordSnapshot('predictor-worker');
+      this.backgroundSnapshot = globalThis.Data.getSnapshot(-1);
       const snapshotHeritage = this.backgroundSnapshot.getHeritage().map((s) => s.id);
       this.worker.postMessage({ type: 'setOptions', options });
       this.worker.postMessage({

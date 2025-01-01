@@ -1,17 +1,22 @@
-importScripts('./data.js');
-// module ready
+importScripts('./data.ts');
 importScripts('./Localization.ts');
 importScripts('./helpers.js');
 importScripts('./actionList.js');
 importScripts('./driver.js');
 importScripts('./stats.js');
 importScripts('./actions.js');
-// module ready
 importScripts('./town.ts');
 importScripts('./prestige.ts');
 importScripts('./saving.js');
-// module ready
 importScripts('./predictor.ts');
+
+// to moduleify
+// - helpers.js
+// - actionList.js
+// - driver.js
+// - stats.js
+// - actions.js
+// - saving.js
 
 /**
  * @typedef {{
@@ -84,7 +89,7 @@ function handleMessage(data) {
       // console.debug("set options");
       break;
     case 'verifyDefaultIds':
-      if (!Data.verifyDefaultIds(data.idRefs)) {
+      if (!globalThis.Data.verifyDefaultIds(data.idRefs)) {
         postMessage({ type: 'error', message: 'default id verification failed' });
       }
       // console.debug("default ids verified");
@@ -93,23 +98,23 @@ function handleMessage(data) {
       if (data.resetToDefaults) {
         // when the main thread has reason to believe that none of the cached snapshots will be useful
         // anymore, it will send resetToDefaults to clear Data.snapshotStack.
-        Data.resetToDefaults();
+        globalThis.Data.resetToDefaults();
       }
       const { snapshotExports } = data;
       let loadCount = 0;
       try {
         for (const exportToLoad of snapshotExports) {
-          if (Data.getSnapshotIndex({ id: exportToLoad.id }) >= 0) {
+          if (globalThis.Data.getSnapshotIndex({ id: exportToLoad.id }) >= 0) {
             // already loaded, skip
             console.debug(`Already loaded snapshot ${exportToLoad.id}`);
             continue;
           }
           // console.debug(`importing snapshot ${exportToLoad.id}`);
-          Data.importSnapshot(exportToLoad);
+          globalThis.Data.importSnapshot(exportToLoad);
           loadCount++;
         }
       } catch (e) {
-        if (e instanceof SnapshotMissingError) {
+        if (e instanceof globalThis.SnapshotMissingError) {
           console.error(`missing snapshot ${e.id}?`, e);
           postMessage({ type: 'error', message: e.message });
         } else {
@@ -128,13 +133,13 @@ function handleMessage(data) {
     case 'startUpdate':
       const { runData, snapshotHeritage } = data;
       const id = snapshotHeritage.at(-1);
-      if (Data.getSnapshotIndex({ id }) >= 0) {
+      if (globalThis.Data.getSnapshotIndex({ id }) >= 0) {
         // console.debug(`Loading snapshot ${id}`);
-        Data.getSnapshot({ id }).applyState();
+        globalThis.Data.getSnapshot({ id }).applyState();
         predictor.workerUpdate(runData);
         // console.debug("started update");
       } else {
-        const requiredSnapshots = snapshotHeritage.filter((id) => Data.getSnapshotIndex({ id }) === -1);
+        const requiredSnapshots = snapshotHeritage.filter((id) => globalThis.Data.getSnapshotIndex({ id }) === -1);
         // console.debug(`Requesting ${requiredSnapshots.length} snapshots for heritage of length ${snapshotHeritage.length}: ${requiredSnapshots.join(", ")}`, snapshotHeritage);
         queuedUpdate = data;
         postMessage({ type: 'getSnapshots', snapshotIds: requiredSnapshots });

@@ -103,22 +103,6 @@ function tick() {
     return;
   }
 
-  // if (document.getElementById("rewindButton")?.matches(":active")) {
-  //     addOffline(gameTicksLeft * offlineRatio);
-  //     gameTicksLeft = 0;
-  //     if (Data.snapshotStack.length > 2) {
-  //         Data.revertToSnapshot(-1);
-  //         view.requestUpdate("updateTime", null);
-  //         view.requestUpdate("updateCurrentActionLoops", actions.currentPos);
-  //         view.requestUpdate("updateCurrentActionBar", actions.currentPos);
-  //         view.updateStats();
-  //         view.updateSkills();
-  //         view.updateBuffs();
-  //     }
-  //     view.update();
-  //     return;
-  // }
-
   if (gameIsStopped) {
     addOffline(gameTicksLeft * offlineRatio);
     updateLag(0);
@@ -128,7 +112,6 @@ function tick() {
   }
 
   const deadline = performance.now() + 1000 / windowFps; // don't go past the current frame update time
-  // Data.recordSnapshot("tick");
 
   executeGameTicks(deadline);
 }
@@ -250,7 +233,7 @@ function stopGame() {
   document.title = '*PAUSED* Idle Loops';
   document.getElementById('pausePlay').textContent = globalThis.Localization.txt('time_controls>play_button');
   if (needsDataSnapshots()) {
-    Data.updateSnapshot('stop', 'base');
+    globalThis.Data.updateSnapshot('stop', 'base');
   }
   if (options.predictor) {
     view.requestUpdate('updateNextActions');
@@ -260,8 +243,8 @@ function stopGame() {
 function pauseGame(ping, message) {
   gameIsStopped = !gameIsStopped;
   if (needsDataSnapshots()) {
-    Data.discardToSnapshot('base', 1);
-    Data.recordSnapshot('pause');
+    globalThis.Data.discardToSnapshot('base', 1);
+    globalThis.Data.recordSnapshot('pause');
   }
   view.requestUpdate('updateTime', null);
   view.requestUpdate('updateCurrentActionBar', actions.currentPos);
@@ -353,7 +336,7 @@ function restart() {
   view.requestUpdate('updateCurrentActionsDivs');
   view.requestUpdate('updateTrials', null);
   if (needsDataSnapshots()) {
-    Data.updateSnapshot('restart', 'base');
+    globalThis.Data.updateSnapshot('restart', 'base');
   }
 }
 
