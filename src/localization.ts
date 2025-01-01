@@ -86,24 +86,12 @@ class Localizable {
     this.#lib = lib;
   }
 
-  txt(subPath: string) {
-    const txt = this.txtsObj.find(subPath).text();
-
-    return txt !== '' ? txt : Localization.txt(this.#rootPath + subPath, this.#lib);
-  }
-
-  memoizeValue(property: string, value: string) {
-    if (Object.hasOwn(this, property)) {
-      delete this[property];
-    }
+  memoize(property: string, subPath: string = `>${property}`) {
+    let value = this.txtsObj.find(subPath).text();
+    if (!value) value = Localization.txt(this.#rootPath + subPath, this.#lib);
 
     Object.defineProperty(this, property, { value, configurable: true });
+
     return value;
-  }
-
-  memoize(property: string, subPath: string = `>${property}`) {
-    const value = this.txt(subPath);
-
-    return this.memoizeValue(property, value);
   }
 }

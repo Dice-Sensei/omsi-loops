@@ -377,32 +377,25 @@ class MultipartAction extends Action {
 
   /** @returns {string[]} */
   get segmentNames() {
-    return this.memoizeValue(
-      'segmentNames',
-      Array.from(
-        this.txtsObj.find('>segment_names>name'),
-      ).map((elt) => elt.textContent),
-    );
+    this._segmentNames ??= Array.from(this.txtsObj.find('>segment_names>name')).map((e) => e.textContent);
+
+    return this._segmentNames;
   }
 
   /** @returns {string[]} */
   get altSegmentNames() {
-    return this.memoizeValue(
-      'altSegmentNames',
-      Array.from(
-        this.txtsObj.find('>segment_alt_names>name'),
-      ).map((elt) => elt.textContent),
-    );
+    this._altSegmentNames ??= Array.from(this.txtsObj.find('>segment_alt_names>name')).map((e) => e.textContent);
+
+    return this._altSegmentNames;
   }
 
   /** @returns {string[]} */
   get segmentModifiers() {
-    return this.memoizeValue(
-      'segmentModifiers',
-      Array.from(
-        this.txtsObj.find('>segment_modifiers>segment_modifier'),
-      ).map((elt) => elt.textContent),
+    this._segmentModifiers ??= Array.from(this.txtsObj.find('>segment_modifiers>segment_modifier')).map((e) =>
+      e.textContent
     );
+
+    return this._segmentModifiers;
   }
 
   static {
