@@ -22,8 +22,8 @@ const buffsContainer = {
         <div 
           class="buffContainer showthat" 
           id="buff${name}Container" 
-          onmouseover="view.showBuff('${name}')" 
-          onmouseout="view.showBuff(undefined)">
+          onmouseover="globalThis.saving.view.showBuff('${name}')" 
+          onmouseout="globalThis.saving.view.showBuff(undefined)">
           <div class="buffNameContainer">
             <img class="buffIcon" src="icons/${globalThis.helpers.camelize(fullName)}.svg">
             <div class="skillLabel medium bold">${globalThis.Localization.txt(`buffs>${XMLName}>label`)}</div>
@@ -265,7 +265,7 @@ const menu = {
 
     let html = `${
       globalThis.Localization.txt('menu>options>theme_title')
-    }: <select id='themeInput' onchange='view.changeTheme();'>`;
+    }: <select id='themeInput' onchange='globalThis.saving.view.changeTheme();'>`;
 
     $(themes).each((index, theme) => {
       html += `<option value='${themeList[index]}'>${
@@ -275,7 +275,7 @@ const menu = {
     html += '</select><br>';
     html += `<div class='block' id='themeVariantSection'>${
       globalThis.Localization.txt('menu>options>theme_variant_title')
-    }: <select id='themeVariantInput' onchange='view.changeTheme();'>`;
+    }: <select id='themeVariantInput' onchange='globalThis.saving.view.changeTheme();'>`;
     $(themes).each((index, theme) => {
       $(theme).find('variants>*').each((vindex, variant) => {
         html += `<option class='variant-${themeList[index].replaceAll(' ', '_')}' value='${variant.tagName}'>${
@@ -590,19 +590,19 @@ const timeControls = {
         <button class='button showthatO control' onclick='globalThis.driver.toggleOffline()'>
           ${globalThis.Localization.txt('time_controls>bonus_seconds>title')}
           <div class='showthis' id='bonusText' style='max-width:500px;color:var(--default-color);'>
-            ${view.getBonusText()}
+            ${globalThis.saving.view.getBonusText()}
           </div>
         </button>
         <div class='control'>
-          <div tabindex='0' id='story_control' class='showthatH' onmouseover='view.updateStory(storyShowing)' onfocus='view.updateStory(storyShowing)' style='height:30px;'>
+          <div tabindex='0' id='story_control' class='showthatH' onmouseover='globalThis.saving.view.updateStory(storyShowing)' onfocus='globalThis.saving.view.updateStory(storyShowing)' style='height:30px;'>
             <div class='large bold'>
               ${globalThis.Localization.txt('time_controls>story_title')}
             </div>
             <div id='newStory' style='color:var(--alert-color);display:none;'>(!)</div>
             <div id='story_tooltip' class='showthisH' style='width:400px;'>
-              <button style='margin-left:175px;' class='actionIcon fa fa-arrow-left control' id='storyLeft' onclick='view.updateStory(storyShowing-1)'></button>
+              <button style='margin-left:175px;' class='actionIcon fa fa-arrow-left control' id='storyLeft' onclick='globalThis.saving.view.updateStory(storyShowing-1)'></button>
               <div style='' id='storyPage' class='bold control'></div>
-              <button style='' class='actionIcon fa fa-arrow-right control' id='storyRight' onclick='view.updateStory(storyShowing+1)'></button>
+              <button style='' class='actionIcon fa fa-arrow-right control' id='storyRight' onclick='globalThis.saving.view.updateStory(storyShowing+1)'></button>
               ${stories()}
             </div>
           </div>
@@ -684,7 +684,7 @@ globalThis.onEnableMenu = (input) => {
 export const renderViews = () => {
   for (const { selector, html } of views) {
     const element = document.querySelector(selector);
-    if (!element) throw Error(`Invalid selector for view ${selector}`);
+    if (!element) throw Error(`Invalid selector for globalThis.saving.view ${selector}`);
 
     element.innerHTML = html();
   }

@@ -2224,7 +2224,7 @@ const Koviko = {
 
         if (this.updateHadNaNs) {
           this.updateHadNaNs = false;
-          view.requestUpdate('updateNextActions');
+          globalThis.saving.view.requestUpdate('updateNextActions');
         }
         // console.debug(`Performed update ${id} in ${updateTime.duration}`, updateTime);
       } else {

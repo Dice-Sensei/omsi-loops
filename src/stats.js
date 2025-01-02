@@ -577,7 +577,7 @@ function addSkillExp(name, amount) {
   skills[name].levelExp.addExp(amount);
   const newLevel = getSkillLevel(name);
   if (oldLevel !== newLevel) {
-    globalThis.saving.actionLog.addSkillLevel(actions.currentAction, name, newLevel, oldLevel);
+    globalThis.saving.actionLog.addSkillLevel(globalThis.saving.actions.currentAction, name, newLevel, oldLevel);
   }
   globalThis.saving.view.requestUpdate('updateSkill', name);
 }

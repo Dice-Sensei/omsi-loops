@@ -25,7 +25,7 @@ function moveToTown(townNum: number | undefined): void {
   if (townNum === undefined) return;
   if (!townsUnlocked.includes(townNum)) return;
 
-  view.showTown(townNum);
+  globalThis.saving.view.showTown(townNum);
 }
 
 Keyboard
@@ -133,13 +133,13 @@ Keyboard
     combination: '9',
   }, {
     onDown: {
-      fn: () => globalThis.driver.changeActionAmount(actions.addAmount * 10),
+      fn: () => globalThis.driver.changeActionAmount(globalThis.saving.actions.addAmount * 10),
       description: t('shortcuts.changeActionExponent10'),
     },
     combination: '0',
   }, {
     onDown: {
-      fn: () => globalThis.driver.changeActionAmount(Math.floor(actions.addAmount / 10)),
+      fn: () => globalThis.driver.changeActionAmount(Math.floor(globalThis.saving.actions.addAmount / 10)),
       description: t('shortcuts.changeActionExponent01'),
     },
     combination: 'backspace',
@@ -195,13 +195,13 @@ Keyboard
     combination: ['left', 'a'],
   }, {
     onDown: {
-      fn: () => view.showActions(true),
+      fn: () => globalThis.saving.view.showActions(true),
       description: t('shortcuts.showActions'),
     },
     combination: ['shift+right', 'shift+d'],
   }, {
     onDown: {
-      fn: () => view.showActions(false),
+      fn: () => globalThis.saving.view.showActions(false),
       description: t('shortcuts.hideActions'),
     },
     combination: ['shift+left', 'shift+a'],
@@ -209,8 +209,8 @@ Keyboard
     onDown: {
       fn: () => {
         actions.undoLast();
-        view.updateNextActions();
-        view.updateLockedHidden();
+        globalThis.saving.view.updateNextActions();
+        globalThis.saving.view.updateLockedHidden();
       },
       description: t('shortcuts.undoLastAction'),
     },

@@ -10,7 +10,7 @@ function completedCurrentGame() {
     prestigeValues['completedCurrentPrestige'] = true;
     prestigeValues['completedAnyPrestige'] = true;
 
-    view.updatePrestigeValues();
+    globalThis.saving.view.updatePrestigeValues();
   }
 }
 
@@ -97,7 +97,7 @@ function prestigeWithNewValues(
   for (const [key, value] of Object.entries(nextPrestigeBuffs)) {
     globalThis.stats.addBuffAmt(key, 0); // Set them to 0
     globalThis.stats.addBuffAmt(key, value); // Then set them to actual value
-    view.requestUpdate('updateBuff', key);
+    globalThis.saving.view.requestUpdate('updateBuff', key);
   }
 
   prestigeValues['prestigeCurrentPoints'] = nextPrestigeValues.prestigeCurrentPoints.valueOf();
@@ -107,20 +107,23 @@ function prestigeWithNewValues(
   prestigeValues['completedAnyPrestige'] = nextPrestigeValues.completedAnyPrestige.valueOf();
   totals = nextTotals;
   totalOfflineMs = nextOfflineMs;
-  view.updatePrestigeValues();
+  globalThis.saving.view.updatePrestigeValues();
   globalThis.saving.save();
 }
 
 function prestigeConfirmation() {
   globalThis.saving.save();
-  if (globalThis.localStorage[defaultSaveName] && globalThis.localStorage[defaultSaveName] !== '') {
+  if (
+    globalThis.localStorage[globalThis.saving.defaultSaveName] &&
+    globalThis.localStorage[globalThis.saving.defaultSaveName] !== ''
+  ) {
     if (confirm(`Prestiging will reset all of your progress, but retain prestige points. Are you sure?`)) {
-      for (const town of towns) {
+      for (const town of globalThis.saving.towns) {
         // this should be done in a more logical way but for now, just make sure to clear these out
         town?.hiddenVars?.clear();
       }
-      globalThis.localStorage['prestigeBackup'] = globalThis.localStorage[defaultSaveName];
-      globalThis.localStorage[defaultSaveName] = '';
+      globalThis.localStorage['prestigeBackup'] = globalThis.localStorage[globalThis.saving.defaultSaveName];
+      globalThis.localStorage[globalThis.saving.defaultSaveName] = '';
     } else {
       return false;
     }

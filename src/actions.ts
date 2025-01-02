@@ -174,10 +174,10 @@ class Actions {
             partUpdateRequired = true;
             if (curAction.canStart && !curAction.canStart()) {
               this.completedTicks += curAction.ticks;
-              view.requestUpdate('updateTotalTicks', null);
+              globalThis.saving.view.requestUpdate('updateTotalTicks', null);
               curAction.loopsLeft = 0;
               curAction.ticks = 0;
-              curAction.manaRemaining = timeNeeded - timer;
+              curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
               curAction.goldRemaining = resources.gold;
               curAction.finish();
               totals.actions++;
@@ -197,9 +197,9 @@ class Actions {
         }
       }
 
-      view.requestUpdate('updateMultiPartSegments', curAction);
+      globalThis.saving.view.requestUpdate('updateMultiPartSegments', curAction);
       if (partUpdateRequired) {
-        view.requestUpdate('updateMultiPart', curAction);
+        globalThis.saving.view.requestUpdate('updateMultiPart', curAction);
       }
     }
 
@@ -228,7 +228,7 @@ class Actions {
       this.completedTicks += curAction.adjustedTicks;
       curAction.finish();
       totals.actions++;
-      curAction.manaRemaining = timeNeeded - timer;
+      curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
 
       if (curAction.cost) {
         curAction.cost();
@@ -236,9 +236,9 @@ class Actions {
       curAction.goldRemaining = resources.gold;
 
       this.adjustTicksNeeded();
-      view.requestUpdate('updateCurrentActionLoops', this.currentPos);
+      globalThis.saving.view.requestUpdate('updateCurrentActionLoops', this.currentPos);
     }
-    view.requestUpdate('updateCurrentActionBar', this.currentPos);
+    globalThis.saving.view.requestUpdate('updateCurrentActionBar', this.currentPos);
     if (curAction.loopsLeft === 0) {
       if (
         !this.current[this.currentPos + 1] && options.repeatLastAction &&
@@ -265,7 +265,7 @@ class Actions {
       curAction.ticks = 0;
       curAction.timeSpent = 0;
       curAction.effectiveTimeElapsed = 0;
-      view.requestUpdate('updateCurrentActionBar', this.currentPos);
+      globalThis.saving.view.requestUpdate('updateCurrentActionBar', this.currentPos);
       return undefined;
     }
     while (
@@ -274,7 +274,7 @@ class Actions {
       (isMultipartAction(curAction) && !curAction.canMakeProgress(0))
     ) {
       curAction.errorMessage = this.getErrorMessage(curAction);
-      view.requestUpdate('updateCurrentActionBar', this.currentPos);
+      globalThis.saving.view.requestUpdate('updateCurrentActionBar', this.currentPos);
       this.currentPos++;
       this.currentAction = null;
       if (this.currentPos >= this.current.length) {
@@ -313,7 +313,7 @@ class Actions {
     this.currentAction = null;
     curTown = 0;
     towns[0].suppliesCost = 300;
-    view.requestUpdate('updateResource', 'supplies');
+    globalThis.saving.view.requestUpdate('updateResource', 'supplies');
     curAdvGuildSegment = 0;
     curCraftGuildSegment = 0;
     curWizCollegeSegment = 0;
@@ -380,10 +380,10 @@ class Actions {
       globalThis.driver.pauseGame();
     }
     this.adjustTicksNeeded();
-    view.requestUpdate('updateMultiPartActions');
-    view.requestUpdate('updateNextActions');
-    view.requestUpdate('updateTime');
-    view.requestUpdate('updateActionTooltips');
+    globalThis.saving.view.requestUpdate('updateMultiPartActions');
+    globalThis.saving.view.requestUpdate('updateNextActions');
+    globalThis.saving.view.requestUpdate('updateTime');
+    globalThis.saving.view.requestUpdate('updateActionTooltips');
   }
 
   adjustTicksNeeded() {
@@ -394,7 +394,7 @@ class Actions {
       remainingTicks += action.loopsLeft * action.adjustedTicks;
     }
     this.totalNeeded = this.completedTicks + remainingTicks;
-    view.requestUpdate('updateTotalTicks', null);
+    globalThis.saving.view.requestUpdate('updateTotalTicks', null);
   }
 
   /** @type {ZoneSpan[]} */
@@ -778,7 +778,7 @@ function actionStory(loopCompletedActions) {
 
 function getNumOnList(actionName) {
   let count = 0;
-  for (const action of actions.next) {
+  for (const action of globalThis.saving.actions.next) {
     if (!action.disabled && action.name === actionName) {
       count += action.loops;
     }
@@ -788,7 +788,7 @@ function getNumOnList(actionName) {
 
 function getOtherSurveysOnList(surveyName) {
   let count = 0;
-  for (const action of actions.next) {
+  for (const action of globalThis.saving.actions.next) {
     if (!action.disabled && action.name.startsWith('Survey') && action.name != surveyName) {
       count += action.loops;
     }
@@ -798,7 +798,7 @@ function getOtherSurveysOnList(surveyName) {
 
 function getNumOnCurList(actionName) {
   let count = 0;
-  for (const action of actions.current) {
+  for (const action of globalThis.saving.actions.current) {
     if (action.name === actionName) {
       count += action.loops;
     }

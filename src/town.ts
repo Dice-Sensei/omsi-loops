@@ -66,7 +66,7 @@ class Town<TN extends number> {
       const varName = this.varNames[i];
       this[`goodTemp${varName}`] = this[`good${varName}`];
       this[`lootFrom${varName}`] = 0;
-      view.requestUpdate('updateRegular', { name: varName, index: this.index });
+      globalThis.saving.view.requestUpdate('updateRegular', { name: varName, index: this.index });
     }
   }
 
@@ -85,15 +85,15 @@ class Town<TN extends number> {
     }
     const level = this.getLevel(varName);
     if (level !== prevLevel) {
-      view.requestUpdate('updateLockedHidden', null);
+      globalThis.saving.view.requestUpdate('updateLockedHidden', null);
       globalThis.driver.adjustAll();
       for (const action of totalActionList) {
         if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
-          view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
+          globalThis.saving.view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
         }
       }
     }
-    view.requestUpdate('updateProgressAction', { name: varName, town: towns[curTown] });
+    globalThis.saving.view.requestUpdate('updateProgressAction', { name: varName, town: towns[curTown] });
   }
 
   getPrcToNext(varName) {
@@ -133,7 +133,7 @@ class Town<TN extends number> {
       this[`goodTemp${varName}`]--;
       this[`lootFrom${varName}`] += rewardFunc();
     }
-    view.requestUpdate('updateRegular', { name: varName, index: this.index });
+    globalThis.saving.view.requestUpdate('updateRegular', { name: varName, index: this.index });
   }
 
   createVars(varName) {

@@ -46,15 +46,15 @@ function refreshDungeons(manaSpent) {
 }
 
 function singleTick() {
-  timer++;
+  globalThis.saving.timer++;
   globalThis.driver.timeCounter += 1 / globalThis.driver.baseManaPerSecond;
   globalThis.driver.effectiveTime += 1 / globalThis.driver.baseManaPerSecond;
 
-  actions.tick();
+  globalThis.saving.actions.tick();
 
   refreshDungeons(1);
 
-  if (shouldRestart || timer >= timeNeeded) {
+  if (shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
     loopEnd();
     prepareRestart();
   }
@@ -98,7 +98,7 @@ function tick() {
   if (gameIsStopped) {
     addOffline(gameTicksLeft * offlineRatio);
     updateLag(0);
-    view.update();
+    globalThis.saving.view.update();
     gameTicksLeft = 0;
     return;
   }
@@ -150,7 +150,7 @@ function executeGameTicks(deadline) {
     totalMultiplier *= speedMult;
 
     // limit to only how much time we have available
-    manaAvailable = Math.min(manaAvailable, timeNeeded - timer);
+    manaAvailable = Math.min(manaAvailable, globalThis.saving.timeNeeded - globalThis.saving.timer);
 
     // don't run more than 1 tick
     if (shouldRestart) {
@@ -159,7 +159,10 @@ function executeGameTicks(deadline) {
 
     // a single action may not use a partial tick, so ceil() to be sure unless fractionalMana.
     // Even with fractionalMana, we need to set a minimum so that mana usages aren't lost to floating-point precision.
-    const manaSpent = globalThis.helpers.Mana.ceil(actions.tick(manaAvailable), timer / 1e15);
+    const manaSpent = globalThis.helpers.Mana.ceil(
+      globalThis.saving.actions.tick(manaAvailable),
+      globalThis.saving.timer / 1e15,
+    );
 
     // okay, so the current action has used manaSpent effective ticks. figure out how much of our realtime
     // that accounts for, in base ticks and in seconds.
@@ -167,7 +170,7 @@ function executeGameTicks(deadline) {
     const timeSpent = baseManaSpent / globalThis.driver.gameSpeed / globalThis.driver.baseManaPerSecond;
 
     // update timers
-    timer += manaSpent; // number of effective mana ticks
+    globalThis.saving.timer += manaSpent; // number of effective mana ticks
     globalThis.driver.timeCounter += timeSpent; // realtime seconds
     globalThis.driver.effectiveTime += timeSpent * globalThis.driver.gameSpeed * bonusSpeed; // "seconds" modified only by gameSpeed and offline bonus
     baseManaToBurn -= baseManaSpent; // burn spent mana
@@ -180,7 +183,7 @@ function executeGameTicks(deadline) {
 
     refreshDungeons(manaSpent);
 
-    if (shouldRestart || timer >= timeNeeded) {
+    if (shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
       cleanExit = true;
       loopEnd();
       prepareRestart();
@@ -189,7 +192,7 @@ function executeGameTicks(deadline) {
   }
 
   if (radarUpdateTime > 100) {
-    view.updateStatGraphNeeded = true;
+    globalThis.saving.view.updateStatGraphNeeded = true;
     radarUpdateTime %= 100;
   }
 
@@ -205,7 +208,7 @@ function executeGameTicks(deadline) {
     updateLag(0);
   }
 
-  view.update();
+  globalThis.saving.view.update();
 }
 
 let mainTickLoop;
@@ -225,16 +228,16 @@ function recalcInterval(fps) {
 let gameIsStopped = false;
 function stopGame() {
   gameIsStopped = true;
-  view.requestUpdate('updateTime', null);
-  view.requestUpdate('updateCurrentActionBar', actions.currentPos);
-  view.update();
+  globalThis.saving.view.requestUpdate('updateTime', null);
+  globalThis.saving.view.requestUpdate('updateCurrentActionBar', actions.currentPos);
+  globalThis.saving.view.update();
   document.title = '*PAUSED* Idle Loops';
   document.getElementById('pausePlay').textContent = globalThis.Localization.txt('time_controls>play_button');
   if (globalThis.saving.needsDataSnapshots()) {
     globalThis.Data.updateSnapshot('stop', 'base');
   }
   if (options.predictor) {
-    view.requestUpdate('updateNextActions');
+    globalThis.saving.view.requestUpdate('updateNextActions');
   }
 }
 
@@ -244,9 +247,9 @@ function pauseGame(ping, message) {
     globalThis.Data.discardToSnapshot('base', 1);
     globalThis.Data.recordSnapshot('pause');
   }
-  view.requestUpdate('updateTime', null);
-  view.requestUpdate('updateCurrentActionBar', actions.currentPos);
-  view.update();
+  globalThis.saving.view.requestUpdate('updateTime', null);
+  globalThis.saving.view.requestUpdate('updateCurrentActionBar', actions.currentPos);
+  globalThis.saving.view.update();
   if (!gameIsStopped && options.notifyOnPause) {
     globalThis.saving.clearPauseNotification();
   }
@@ -254,7 +257,7 @@ function pauseGame(ping, message) {
   document.getElementById('pausePlay').textContent = globalThis.Localization.txt(
     `time_controls>${gameIsStopped ? 'play_button' : 'pause_button'}`,
   );
-  if (!gameIsStopped && (shouldRestart || timer >= timeNeeded)) {
+  if (!gameIsStopped && (shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded)) {
     restart();
   } else if (ping) {
     if (options.pingOnPause) {
@@ -272,7 +275,7 @@ function loopEnd() {
     totals.time += globalThis.driver.timeCounter;
     totals.effectiveTime += globalThis.driver.effectiveTime;
     totals.loops++;
-    view.requestUpdate('updateTotals', null);
+    globalThis.saving.view.requestUpdate('updateTotals', null);
     const loopCompletedActions = actions.current.slice(0, actions.currentPos);
     if (
       actions.current[actions.currentPos] !== undefined &&
@@ -283,8 +286,8 @@ function loopEnd() {
     globalThis.actions.markActionsComplete(loopCompletedActions);
     globalThis.actions.actionStory(loopCompletedActions);
     if (options.highlightNew) {
-      view.requestUpdate('removeAllHighlights', null);
-      view.requestUpdate('highlightIncompleteActions', null);
+      globalThis.saving.view.requestUpdate('removeAllHighlights', null);
+      globalThis.saving.view.requestUpdate('highlightIncompleteActions', null);
     }
   }
 }
@@ -305,10 +308,10 @@ function prepareRestart() {
     }
     if (curAction) {
       actions.completedTicks += actions.getNextValidAction().ticks;
-      view.requestUpdate('updateTotalTicks', null);
+      globalThis.saving.view.requestUpdate('updateTotalTicks', null);
     }
     for (let i = 0; i < actions.current.length; i++) {
-      view.requestUpdate('updateCurrentActionBar', i);
+      globalThis.saving.view.requestUpdate('updateCurrentActionBar', i);
     }
     stopGame();
   } else {
@@ -318,10 +321,10 @@ function prepareRestart() {
 
 function restart() {
   shouldRestart = false;
-  timer = 0;
+  globalThis.saving.timer = 0;
   globalThis.driver.timeCounter = 0;
   globalThis.driver.effectiveTime = 0;
-  timeNeeded = globalThis.saving.timeNeededInitial;
+  globalThis.saving.timeNeeded = globalThis.saving.timeNeededInitial;
   document.title = 'Idle Loops';
   currentLoop = totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
   resetResources();
@@ -329,10 +332,10 @@ function restart() {
   for (let i = 0; i < towns.length; i++) {
     towns[i].restart();
   }
-  view.requestUpdate('updateSkills');
+  globalThis.saving.view.requestUpdate('updateSkills');
   actions.restart();
-  view.requestUpdate('updateCurrentActionsDivs');
-  view.requestUpdate('updateTrials', null);
+  globalThis.saving.view.requestUpdate('updateCurrentActionsDivs');
+  globalThis.saving.view.requestUpdate('updateTrials', null);
   if (globalThis.saving.needsDataSnapshots()) {
     globalThis.Data.updateSnapshot('restart', 'base');
   }
@@ -341,7 +344,7 @@ function restart() {
 function manualRestart() {
   loopEnd();
   restart();
-  view.update();
+  globalThis.saving.view.update();
 }
 
 function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
@@ -361,10 +364,10 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
         }
         if (isTravelAction) {
           const index = actions.addAction(name, 1, insertAtIndex);
-          view.requestUpdate('highlightAction', index);
+          globalThis.saving.view.requestUpdate('highlightAction', index);
         } else {
           const index = actions.addAction(name, addAmount, insertAtIndex);
-          view.requestUpdate('highlightAction', index);
+          globalThis.saving.view.requestUpdate('highlightAction', index);
           if (globalThis.trash.shiftDown && globalThis.actionList.hasLimit(name)) {
             capAmount(index, townNum);
           } else if (globalThis.trash.shiftDown && globalThis.actionList.isTraining(name)) {
@@ -374,8 +377,8 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
       }
     }
   }
-  view.updateNextActions();
-  view.updateLockedHidden();
+  globalThis.saving.view.updateNextActions();
+  globalThis.saving.view.updateLockedHidden();
 }
 
 // mana and resources
@@ -387,16 +390,16 @@ function addMana(amount) {
 function addResource(resource, amount) {
   if (Number.isFinite(amount)) resources[resource] += amount;
   else resources[resource] = amount;
-  view.requestUpdate('updateResource', resource);
+  globalThis.saving.view.requestUpdate('updateResource', resource);
 
   if (resource === 'teamMembers' || resource === 'armor' || resource === 'zombie') {
-    view.requestUpdate('updateTeamCombat', null);
+    globalThis.saving.view.requestUpdate('updateTeamCombat', null);
   }
 }
 
 function resetResource(resource) {
   resources[resource] = resourcesTemplate[resource];
-  view.requestUpdate('updateResource', resource);
+  globalThis.saving.view.requestUpdate('updateResource', resource);
 }
 
 function resetResources() {
@@ -404,7 +407,7 @@ function resetResources() {
   if (globalThis.actionList.getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
     addResource('glasses', true);
   }
-  view.requestUpdate('updateResources', null);
+  globalThis.saving.view.requestUpdate('updateResources', null);
 }
 
 function changeActionAmount(amount) {
@@ -415,7 +418,7 @@ function changeActionAmount(amount) {
   if (document.activeElement !== customInput) {
     customInput.value = amount;
   }
-  view.updateAddAmount(amount);
+  globalThis.saving.view.updateAddAmount(amount);
 }
 
 function setCustomActionAmount() {
@@ -430,12 +433,12 @@ function selectLoadout(num) {
     curLoadout = num;
   }
   globalThis.helpers.inputElement('renameLoadout').value = loadoutnames[curLoadout - 1];
-  view.updateLoadout(curLoadout);
+  globalThis.saving.view.updateLoadout(curLoadout);
 }
 
 function loadLoadout(num) {
   curLoadout = num;
-  view.updateLoadout(curLoadout);
+  globalThis.saving.view.updateLoadout(curLoadout);
   loadList();
 }
 
@@ -484,13 +487,13 @@ function loadList() {
   if (loadouts[curLoadout]) {
     actions.appendActionRecords(loadouts[curLoadout]);
   }
-  view.updateNextActions();
-  view.adjustDarkRitualText();
+  globalThis.saving.view.updateNextActions();
+  globalThis.saving.view.adjustDarkRitualText();
 }
 
 function clearList() {
   actions.clearActions(globalThis.trash.shiftDown ? ((a) => (a.disabled || a.loops === 0)) : null);
-  view.updateNextActions();
+  globalThis.saving.view.updateNextActions();
 }
 
 function unlockTown(townNum) {
@@ -498,8 +501,8 @@ function unlockTown(townNum) {
     townsUnlocked.push(townNum);
     townsUnlocked.sort();
     // refresh current
-    view.showTown(townNum);
-    view.requestUpdate('updateTravelMenu', null);
+    globalThis.saving.view.showTown(townNum);
+    globalThis.saving.view.requestUpdate('updateTravelMenu', null);
   }
   let cNum = challengeSave.challengeMode;
   if (cNum !== 0) {
@@ -529,7 +532,7 @@ function adjustAll() {
   globalThis.actionList.adjustInsurance();
   globalThis.actionList.adjustAllRocks();
   globalThis.actionList.adjustTrainingExpMult();
-  view.requestUpdate('adjustManaCost', 'Continue On');
+  globalThis.saving.view.requestUpdate('adjustManaCost', 'Continue On');
 }
 
 function capAction(actionId) {
@@ -554,8 +557,8 @@ function capAmount(index, townNum) {
     newLoops = 5 + Math.floor(globalThis.stats.getSkillLevel('Leadership') / 100) - alreadyExisting;
   } else newLoops = towns[townNum][varName] - alreadyExisting;
   actions.updateAction(index, { loops: globalThis.helpers.clamp(action.loops + newLoops, 0, null) });
-  view.updateNextActions();
-  view.updateLockedHidden();
+  globalThis.saving.view.updateNextActions();
+  globalThis.saving.view.updateLockedHidden();
 }
 
 function capTraining(index) {
@@ -563,8 +566,8 @@ function capTraining(index) {
   const alreadyExisting = globalThis.actions.getNumOnList(action.name) + (action.disabled ? action.loops : 0);
   const newLoops = trainingLimits - alreadyExisting;
   actions.updateAction(index, { loops: globalThis.helpers.clamp(action.loops + newLoops, 0, null) });
-  view.updateNextActions();
-  view.updateLockedHidden();
+  globalThis.saving.view.updateNextActions();
+  globalThis.saving.view.updateLockedHidden();
 }
 
 function capAllTraining() {
@@ -589,25 +592,25 @@ function addLoop(actionId) {
     }
   }
   actions.updateAction(action.index, { loops: globalThis.helpers.clamp(action.loops + addAmount, 0, 1e12) });
-  view.updateNextActions();
-  view.updateLockedHidden();
+  globalThis.saving.view.updateNextActions();
+  globalThis.saving.view.updateLockedHidden();
 }
 function removeLoop(actionId) {
   const action = actions.findActionWithId(actionId);
   actions.updateAction(action.index, { loops: globalThis.helpers.clamp(action.loops - actions.addAmount, 0, 1e12) });
-  view.updateNextActions();
-  view.updateLockedHidden();
+  globalThis.saving.view.updateNextActions();
+  globalThis.saving.view.updateLockedHidden();
 }
 function split(actionId) {
   const action = actions.findActionWithId(actionId);
   actions.splitAction(action.index);
-  view.updateNextActions();
+  globalThis.saving.view.updateNextActions();
 }
 
 function collapse(actionId) {
   const action = actions.findActionWithId(actionId);
   actions.updateAction(action.index, { collapsed: !action.collapsed });
-  view.updateNextActions();
+  globalThis.saving.view.updateNextActions();
 }
 
 function showNotification(name) {
@@ -677,7 +680,7 @@ function moveQueuedAction(initialIndex, resultingIndex) {
 
   actions.moveAction(initialIndex, resultingIndex, true);
 
-  view.updateNextActions();
+  globalThis.saving.view.updateNextActions();
 }
 
 function moveUp(actionId) {
@@ -686,7 +689,7 @@ function moveUp(actionId) {
     return;
   }
   actions.moveAction(index, index - 1);
-  view.updateNextActions();
+  globalThis.saving.view.updateNextActions();
 }
 function moveDown(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
@@ -694,7 +697,7 @@ function moveDown(actionId) {
     return;
   }
   actions.moveAction(index, index + 1);
-  view.updateNextActions();
+  globalThis.saving.view.updateNextActions();
 }
 function disableAction(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
@@ -707,29 +710,29 @@ function disableAction(actionId) {
   } else {
     actions.updateAction(index, { disabled: true });
   }
-  view.updateNextActions();
-  view.requestUpdate('updateLockedHidden', null);
+  globalThis.saving.view.updateNextActions();
+  globalThis.saving.view.requestUpdate('updateLockedHidden', null);
 }
 function removeAction(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
   actions.removeAction(index);
-  view.updateNextActions();
-  view.requestUpdate('updateLockedHidden', null);
+  globalThis.saving.view.updateNextActions();
+  globalThis.saving.view.requestUpdate('updateLockedHidden', null);
 }
 
 function borrowTime() {
   addOffline(86400_000);
   totals.borrowedTime += 86400;
-  view.requestUpdate('updateOffline', null);
-  view.requestUpdate('updateTotals', null);
+  globalThis.saving.view.requestUpdate('updateOffline', null);
+  globalThis.saving.view.requestUpdate('updateTotals', null);
 }
 
 function returnTime() {
   if (totalOfflineMs >= 86400_000) {
     addOffline(-86400_000);
     totals.borrowedTime -= 86400;
-    view.requestUpdate('updateOffline', null);
-    view.requestUpdate('updateTotals', null);
+    globalThis.saving.view.requestUpdate('updateOffline', null);
+    globalThis.saving.view.requestUpdate('updateTotals', null);
   }
 }
 
@@ -739,7 +742,7 @@ function updateLag(manaSpent) {
   if (manaSpent === 0) { // cancel lag display
     if (globalThis.driver.lagSpeed !== 0) {
       globalThis.driver.lagSpeed = 0;
-      view.requestUpdate('updateBonusText', null);
+      globalThis.saving.view.requestUpdate('updateBonusText', null);
     }
     return;
   }
@@ -755,7 +758,7 @@ function updateLag(manaSpent) {
   const now = performance.now();
   const measuredSpeed = lagSpent / (now - lagStart) * 1000 / globalThis.driver.baseManaPerSecond;
   globalThis.driver.lagSpeed = measuredSpeed;
-  view.requestUpdate('updateBonusText', null);
+  globalThis.saving.view.requestUpdate('updateBonusText', null);
 }
 
 function addOffline(num) {
@@ -767,7 +770,7 @@ function addOffline(num) {
     if (totalOfflineMs < 0) {
       totalOfflineMs = 0;
     }
-    view.requestUpdate('updateOffline', null);
+    globalThis.saving.view.requestUpdate('updateOffline', null);
   }
 }
 
@@ -788,7 +791,7 @@ function toggleOffline() {
     );
   }
   globalThis.saving.setOption('bonusIsActive', bonusActive, true);
-  view.requestUpdate('updateTime', null);
+  globalThis.saving.view.requestUpdate('updateTime', null);
 }
 
 function isBonusActive() {
@@ -796,7 +799,7 @@ function isBonusActive() {
 }
 
 function checkExtraSpeed() {
-  view.requestUpdate('updateBonusText', null);
+  globalThis.saving.view.requestUpdate('updateBonusText', null);
   if (
     typeof options.speedIncreaseBackground === 'number' && !isNaN(options.speedIncreaseBackground) &&
     options.speedIncreaseBackground >= 0 && !document.hasFocus() &&

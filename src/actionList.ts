@@ -573,7 +573,10 @@ class TrialAction extends MultipartAction {
     if (finishedFloor > trials[this.trialNum].highestFloor || trials[this.trialNum].highestFloor === undefined) {
       trials[this.trialNum].highestFloor = finishedFloor;
     }
-    view.requestUpdate('updateTrialInfo', { trialNum: this.trialNum, curFloor: this.currentFloor(loopCounter) });
+    globalThis.saving.view.requestUpdate('updateTrialInfo', {
+      trialNum: this.trialNum,
+      curFloor: this.currentFloor(loopCounter),
+    });
     this.floorReward();
   }
 }
@@ -708,7 +711,7 @@ function SurveyAction(townNum) {
     },
     finish() {
       if (towns[this.townNum].getLevel('Survey') != 100) {
-        globalThis.driver.addResource('map', -1);
+        globalThis.saving.viewalThis.driver.addResource('map', -1);
         globalThis.driver.addResource('completedMap', 1);
         towns[this.townNum].finishProgress(this.varName, getExploreSkill());
         view.requestUpdate('updateActionTooltips', null);
@@ -1871,11 +1874,11 @@ Action.Haggle = new Action('Haggle', {
     if (towns[0].suppliesCost < 0) {
       towns[0].suppliesCost = 0;
     }
-    view.requestUpdate('updateResource', 'supplies');
+    globalThis.saving.view.requestUpdate('updateResource', 'supplies');
   },
   story(completed) {
-    if (completed >= 15) globalThis.view.setStoryFlag('haggle15TimesInALoop');
-    if (completed >= 16) globalThis.view.setStoryFlag('haggle16TimesInALoop');
+    if (completed >= 15) globalThis.globalThis.saving.view.setStoryFlag('haggle15TimesInALoop');
+    if (completed >= 16) globalThis.globalThis.saving.view.setStoryFlag('haggle16TimesInALoop');
     globalThis.view.setStoryFlag('haggle');
   },
 });
@@ -2271,7 +2274,7 @@ Action.OldShortcut = new Action('Old Shortcut', {
   },
   finish() {
     towns[1].finishProgress(this.varName, 100);
-    view.requestUpdate('adjustManaCost', 'Continue On');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Continue On');
   },
 });
 
@@ -2315,9 +2318,9 @@ Action.TalkToHermit = new Action('Talk To Hermit', {
   },
   finish() {
     towns[1].finishProgress(this.varName, 50 * (1 + towns[1].getLevel('Shortcut') / 100));
-    view.requestUpdate('adjustManaCost', 'Learn Alchemy');
-    view.requestUpdate('adjustManaCost', 'Gather Herbs');
-    view.requestUpdate('adjustManaCost', 'Practical Magic');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Learn Alchemy');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Gather Herbs');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Practical Magic');
   },
 });
 
@@ -2355,9 +2358,9 @@ Action.PracticalMagic = new Action('Practical Magic', {
   },
   finish() {
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustManaCost', 'Wild Mana');
-    view.requestUpdate('adjustManaCost', 'Smash Pots');
-    view.requestUpdate('adjustGoldCosts', null);
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Wild Mana');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Smash Pots');
+    globalThis.saving.view.requestUpdate('adjustGoldCosts', null);
   },
 });
 
@@ -2404,7 +2407,7 @@ Action.LearnAlchemy = new Action('Learn Alchemy', {
   },
   finish() {
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustExpGain', Action.MageLessons);
+    globalThis.saving.view.requestUpdate('adjustExpGain', Action.MageLessons);
   },
 });
 
@@ -2714,8 +2717,8 @@ Action.TalkToWitch = new Action('Talk To Witch', {
   },
   finish() {
     towns[1].finishProgress(this.varName, 100);
-    view.requestUpdate('adjustManaCost', 'Dark Magic');
-    view.requestUpdate('adjustManaCost', 'Dark Ritual');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Dark Magic');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Dark Ritual');
   },
 });
 
@@ -2763,8 +2766,8 @@ Action.DarkMagic = new Action('Dark Magic', {
   },
   finish() {
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustGoldCost', { varName: 'Pots', cost: Action.SmashPots.goldCost() });
-    view.requestUpdate('adjustGoldCost', { varName: 'WildMana', cost: Action.WildMana.goldCost() });
+    globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'Pots', cost: Action.SmashPots.goldCost() });
+    globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'WildMana', cost: Action.WildMana.goldCost() });
   },
 });
 
@@ -2813,8 +2816,8 @@ Action.DarkRitual = new MultipartAction('Dark Ritual', {
   loopsFinished() {
     const spent = sacrificeSoulstones(this.goldCost());
     globalThis.stats.addBuffAmt('Ritual', 1, this, 'soulstone', spent);
-    view.requestUpdate('updateSoulstones', null);
-    view.requestUpdate('adjustGoldCost', { varName: 'DarkRitual', cost: this.goldCost() });
+    globalThis.saving.view.requestUpdate('updateSoulstones', null);
+    globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'DarkRitual', cost: this.goldCost() });
   },
   getPartName() {
     return 'Perform Dark Ritual';
@@ -2829,8 +2832,8 @@ Action.DarkRitual = new MultipartAction('Dark Ritual', {
     return Math.ceil(50 * (globalThis.stats.getBuffLevel('Ritual') + 1) * globalThis.stats.getSkillBonus('Commune'));
   },
   finish() {
-    view.requestUpdate('updateBuff', 'Ritual');
-    view.requestUpdate('adjustExpGain', Action.DarkMagic);
+    globalThis.saving.view.requestUpdate('updateBuff', 'Ritual');
+    globalThis.saving.view.requestUpdate('adjustExpGain', Action.DarkMagic);
     if (towns[1].DarkRitualLoopCounter >= 0) globalThis.view.setStoryFlag('darkRitualThirdSegmentReached');
   },
 });
@@ -4581,8 +4584,8 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
     const spent = sacrificeSoulstones(this.goldCost());
     trainingLimits++;
     globalThis.stats.addBuffAmt('Imbuement', 1, this, 'soulstone', spent);
-    view.requestUpdate('updateSoulstones', null);
-    view.requestUpdate('adjustGoldCost', { varName: 'ImbueMind', cost: this.goldCost() });
+    globalThis.saving.view.requestUpdate('updateSoulstones', null);
+    globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'ImbueMind', cost: this.goldCost() });
   },
   getPartName() {
     return 'Imbue Mind';
@@ -4597,7 +4600,7 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
     return 20 * (globalThis.stats.getBuffLevel('Imbuement') + 1);
   },
   finish() {
-    view.requestUpdate('updateBuff', 'Imbuement');
+    globalThis.saving.view.requestUpdate('updateBuff', 'Imbuement');
     if (options.autoMaxTraining) globalThis.driver.capAllTraining();
     if (towns[3].ImbueMindLoopCounter >= 0) globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
   },
@@ -4667,9 +4670,9 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
       stats[stat].talentLevelExp.setLevel(targetTalentLevel);
       spent[stat] = currentTalentLevel - targetTalentLevel;
     }
-    view.updateStats();
+    globalThis.saving.view.updateStats();
     globalThis.stats.addBuffAmt('Imbuement2', 1, this, 'talent', spent);
-    view.requestUpdate('adjustGoldCost', { varName: 'ImbueBody', cost: this.goldCost() });
+    globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'ImbueBody', cost: this.goldCost() });
   },
   getPartName() {
     return 'Imbue Body';
@@ -4684,7 +4687,7 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
     return globalThis.stats.getBuffLevel('Imbuement2') + 1;
   },
   finish() {
-    view.requestUpdate('updateBuff', 'Imbuement2');
+    globalThis.saving.view.requestUpdate('updateBuff', 'Imbuement2');
   },
 });
 
@@ -5186,9 +5189,9 @@ Action.Mercantilism = new Action('Mercantilism', {
   },
   finish() {
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustManaCost', 'Buy Mana Z1');
-    view.requestUpdate('adjustManaCost', 'Buy Mana Z3');
-    view.requestUpdate('adjustManaCost', 'Buy Mana Z5');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Buy Mana Z1');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Buy Mana Z3');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Buy Mana Z5');
   },
 });
 
@@ -5381,8 +5384,8 @@ Action.WizardCollege = new MultipartAction('Wizard College', {
   },
   segmentFinished() {
     curWizCollegeSegment++;
-    view.requestUpdate('adjustManaCost', 'Restoration');
-    view.requestUpdate('adjustManaCost', 'Spatiomancy');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Restoration');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Spatiomancy');
     globalThis.view.increaseStoryVarTo('maxWizardGuildSegmentCleared', curWizCollegeSegment);
   },
   getPartName() {
@@ -5528,12 +5531,12 @@ Action.Spatiomancy = new Action('Spatiomancy', {
     const oldSpatioSkill = globalThis.stats.getSkillLevel('Spatiomancy');
     globalThis.stats.handleSkillExp(this.skills);
     if (globalThis.stats.getSkillLevel('Spatiomancy') !== oldSpatioSkill) {
-      view.requestUpdate('adjustManaCost', 'Mana Geyser');
-      view.requestUpdate('adjustManaCost', 'Mana Well');
+      globalThis.saving.view.requestUpdate('adjustManaCost', 'Mana Geyser');
+      globalThis.saving.view.requestUpdate('adjustManaCost', 'Mana Well');
       globalThis.driver.adjustAll();
       for (const action of totalActionList) {
         if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
-          view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
+          globalThis.saving.view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
         }
       }
     }
@@ -5941,8 +5944,8 @@ Action.GreatFeast = new MultipartAction('Great Feast', {
   loopsFinished() {
     const spent = sacrificeSoulstones(this.goldCost());
     globalThis.stats.addBuffAmt('Feast', 1, this, 'soulstone', spent);
-    view.requestUpdate('updateSoulstones', null);
-    view.requestUpdate('adjustGoldCost', { varName: 'GreatFeast', cost: this.goldCost() });
+    globalThis.saving.view.requestUpdate('updateSoulstones', null);
+    globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'GreatFeast', cost: this.goldCost() });
   },
   getPartName() {
     return 'Host Great Feast';
@@ -5957,7 +5960,7 @@ Action.GreatFeast = new MultipartAction('Great Feast', {
     return Math.ceil(5000 * (globalThis.stats.getBuffLevel('Feast') + 1) * globalThis.stats.getSkillBonus('Gluttony'));
   },
   finish() {
-    view.requestUpdate('updateBuff', 'Feast');
+    globalThis.saving.view.requestUpdate('updateBuff', 'Feast');
   },
 });
 
@@ -5992,7 +5995,7 @@ Action.FallFromGrace = new Action('Fall From Grace', {
   },
   finish() {
     if (resources.reputation >= 0) resources.reputation = -1;
-    view.requestUpdate('updateResource', 'reputation');
+    globalThis.saving.view.requestUpdate('updateResource', 'reputation');
     globalThis.view.setStoryFlag('fellFromGrace');
     globalThis.driver.unlockTown(5);
   },
@@ -6147,7 +6150,7 @@ Action.DestroyPylons = new Action('Destroy Pylons', {
   finish() {
     towns[5].finishRegular(this.varName, 100, () => {
       globalThis.driver.addResource('pylons', 1);
-      //view.requestUpdate("adjustManaCost", "The Spire");
+      //globalThis.saving.view.requestUpdate("adjustManaCost", "The Spire");
       return 1;
     });
   },
@@ -6236,7 +6239,10 @@ Action.DarkSacrifice = new Action('Dark Sacrifice', {
   },
   finish() {
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustGoldCost', { varName: 'DarkRitual', cost: Action.DarkRitual.goldCost() });
+    globalThis.saving.view.requestUpdate('adjustGoldCost', {
+      varName: 'DarkRitual',
+      cost: Action.DarkRitual.goldCost(),
+    });
   },
 });
 
@@ -6308,7 +6314,7 @@ Action.TheSpire = new DungeonAction('The Spire', 2, {
   },
   finish() {
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('updateBuff', 'Aspirant');
+    globalThis.saving.view.requestUpdate('updateBuff', 'Aspirant');
     globalThis.view.setStoryFlag('spireAttempted');
     if (resources.pylons >= 10) globalThis.view.setStoryFlag('spire10Pylons');
     if (resources.pylons >= 25) globalThis.view.setStoryFlag('spire20Pylons');
@@ -6927,7 +6933,7 @@ function adjustPockets() {
   town.totalPockets = Math.floor(
     base * globalThis.stats.getSkillMod('Spatiomancy', 1100, 1300, .5) + base * globalThis.stats.getSurveyBonus(town),
   );
-  view.requestUpdate('updateActionTooltips', null);
+  globalThis.saving.view.requestUpdate('updateActionTooltips', null);
 }
 function adjustWarehouses() {
   let town = towns[7];
@@ -6935,7 +6941,7 @@ function adjustWarehouses() {
   town.totalWarehouses = Math.floor(
     base * globalThis.stats.getSkillMod('Spatiomancy', 1200, 1400, .5) + base * globalThis.stats.getSurveyBonus(town),
   );
-  view.requestUpdate('updateActionTooltips', null);
+  globalThis.saving.view.requestUpdate('updateActionTooltips', null);
 }
 function adjustInsurance() {
   let town = towns[7];
@@ -6943,7 +6949,7 @@ function adjustInsurance() {
   town.totalInsurance = Math.floor(
     base * globalThis.stats.getSkillMod('Spatiomancy', 1300, 1500, .5) + base * globalThis.stats.getSurveyBonus(town),
   );
-  view.requestUpdate('updateActionTooltips', null);
+  globalThis.saving.view.requestUpdate('updateActionTooltips', null);
 }
 
 Action.ExplorersGuild = new Action('Explorers Guild', {
@@ -6996,7 +7002,7 @@ Action.ExplorersGuild = new Action('Explorers Guild', {
       globalThis.view.setStoryFlag('mapTurnedIn');
     }
     guild = 'Explorer';
-    view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
+    globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
   },
 });
 function fullyExploredZones() {
@@ -7116,7 +7122,7 @@ function exchangeMap() {
         }
       }
     }
-    view.requestUpdate('updateProgressAction', { name: 'SurveyZ' + rand, town: towns[rand] });
+    globalThis.saving.view.requestUpdate('updateProgressAction', { name: 'SurveyZ' + rand, town: towns[rand] });
     globalThis.driver.addResource('completedMap', -1);
   }
 }
@@ -7196,7 +7202,7 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
   },
   finish() {
     guild = 'Thieves';
-    view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
+    globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
     globalThis.stats.handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('thiefGuildTestsTaken');
     if (curThievesGuildSegment >= 3) globalThis.view.setStoryFlag('thiefGuildRankEReached');
@@ -7297,7 +7303,7 @@ Action.PickPockets = new Action('Pick Pockets', {
   finish() {
     towns[7].finishProgress(this.varName, 30 * getThievesGuildRank().bonus);
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustExpGain', Action.ThievesGuild);
+    globalThis.saving.view.requestUpdate('adjustExpGain', Action.ThievesGuild);
     const goldGain = Math.floor(this.goldCost() * getThievesGuildRank().bonus);
     globalThis.driver.addResource('gold', goldGain);
     return goldGain;
@@ -7359,7 +7365,7 @@ Action.RobWarehouse = new Action('Rob Warehouse', {
   finish() {
     towns[7].finishProgress(this.varName, 20 * getThievesGuildRank().bonus);
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustExpGain', Action.ThievesGuild);
+    globalThis.saving.view.requestUpdate('adjustExpGain', Action.ThievesGuild);
     const goldGain = Math.floor(this.goldCost() * getThievesGuildRank().bonus);
     globalThis.driver.addResource('gold', goldGain);
     return goldGain;
@@ -7421,7 +7427,7 @@ Action.InsuranceFraud = new Action('Insurance Fraud', {
   finish() {
     towns[7].finishProgress(this.varName, 10 * getThievesGuildRank().bonus);
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustExpGain', Action.ThievesGuild);
+    globalThis.saving.view.requestUpdate('adjustExpGain', Action.ThievesGuild);
     const goldGain = Math.floor(this.goldCost() * getThievesGuildRank().bonus);
     globalThis.driver.addResource('gold', goldGain);
     return goldGain;
@@ -7543,7 +7549,7 @@ Action.Invest = new Action('Invest', {
     globalThis.driver.resetResource('gold');
     if (storyFlags.investedOne) globalThis.view.setStoryFlag('investedTwo');
     globalThis.view.setStoryFlag('investedOne');
-    view.requestUpdate('updateActionTooltips', null);
+    globalThis.saving.view.requestUpdate('updateActionTooltips', null);
   },
 });
 
@@ -7846,15 +7852,15 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
     for (const stat of statList) {
       stats[stat].talentLevelExp.setLevel(0);
       stats[stat].soulstone = 0;
-      view.requestUpdate('updateStat', stat);
+      globalThis.saving.view.requestUpdate('updateStat', stat);
     }
     buffs['Imbuement'].amt = 0;
     buffs['Imbuement2'].amt = 0;
     trainingLimits = 10;
     globalThis.stats.addBuffAmt('Imbuement3', 1, this, 'imbuement3');
-    view.updateBuffs();
-    view.updateStats();
-    view.requestUpdate('updateSoulstones', null);
+    globalThis.saving.view.updateBuffs();
+    globalThis.saving.view.updateStats();
+    globalThis.saving.view.requestUpdate('updateSoulstones', null);
   },
   getPartName() {
     return 'Imbue Soul';
@@ -7866,7 +7872,7 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
     return globalThis.stats.getBuffLevel('Imbuement') > 499 && globalThis.stats.getBuffLevel('Imbuement2') > 499;
   },
   finish() {
-    view.requestUpdate('updateBuff', 'Imbuement3');
+    globalThis.saving.view.requestUpdate('updateBuff', 'Imbuement3');
     globalThis.driver.capAllTraining();
     adjustTrainingExpMult();
   },
@@ -7877,7 +7883,7 @@ function adjustTrainingExpMult() {
     const actionProto = getActionPrototype(actionName);
     // @ts-ignore shh we're pretending it's frozen
     actionProto.expMult = 4 + globalThis.stats.getBuffLevel('Imbuement3');
-    view.adjustExpMult(actionName);
+    globalThis.saving.view.adjustExpMult(actionName);
   }
 }
 

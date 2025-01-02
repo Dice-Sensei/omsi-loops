@@ -29,7 +29,7 @@ class ActionLog {
       if (this.earliestShownEntry > entry.entryIndex + 1) {
         this.loadHistoryBackTo(entry.entryIndex + 1);
       }
-      view.requestUpdate('updateActionLogEntry', entry.entryIndex);
+      globalThis.saving.view.requestUpdate('updateActionLogEntry', entry.entryIndex);
     }
     return entry;
   }
@@ -59,7 +59,7 @@ class ActionLog {
     this.#uniqueEntries = {};
     this.firstNewOrUpdatedEntry = null;
     this.earliestShownEntry = null;
-    view.requestUpdate('updateActionLogEntry', 'clear');
+    globalThis.saving.view.requestUpdate('updateActionLogEntry', 'clear');
   }
 
   /** @param {unknown} data  */
@@ -82,7 +82,7 @@ class ActionLog {
   loadHistoryBackTo(index) {
     this.earliestShownEntry ??= this.entries.length;
     while (this.earliestShownEntry > Math.max(0, index)) {
-      view.requestUpdate('updateActionLogEntry', --this.earliestShownEntry);
+      globalThis.saving.view.requestUpdate('updateActionLogEntry', --this.earliestShownEntry);
     }
   }
 
@@ -635,7 +635,6 @@ class BuffEntry extends LeveledLogEntry {
   }
 }
 
-// Globals!!!!!
 const actionLogEntryTypeMap = {
   'story': ActionStoryEntry,
   'global': GlobalStoryEntry,
@@ -651,11 +650,13 @@ let saveName = defaultSaveName;
 const selfIsGame = typeof globalThis?.view?.View !== 'undefined';
 
 const timeNeededInitial = 5 * 50;
-let timer = timeNeededInitial;
-let timeNeeded = timeNeededInitial;
 const view = selfIsGame ? new globalThis.view.View() : null;
+
+// Globals!!!!!
 const actions = new globalThis.actions.Actions();
+
 const actionLog = selfIsGame ? new ActionLog() : null;
+
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 
 let curTown = 0;
@@ -1055,57 +1056,8 @@ let curGodsSegment = 0;
 
 let totalActionList = [];
 
-let curs = {
-  totalMerchantMana: 7500,
-  curAdvGuildSegment: 0,
-  curCraftGuildSegment: 0,
-  curWizCollegeSegment: 0,
-  curFightFrostGiantsSegment: 0,
-  curFightJungleMonstersSegment: 0,
-  curThievesGuildSegment: 0,
-  curGodsSegment: 0,
-  bonusSpeed: 1,
-  bonusActive: false,
-  currentLoop: 0,
-  offlineRatio: 1,
-  windowFps: 50,
-  totals: {
-    time: 0,
-    effectiveTime: 0,
-    borrowedTime: 0,
-    loops: 0,
-    actions: 0,
-  },
-};
-
 let dungeons = [[], [], []];
 let trials = [[], [], [], [], []];
-const globalVariables = virtualizeGlobalVariables({
-  timer,
-  timeNeeded,
-  curTown,
-  totalTalent,
-  shouldRestart,
-  guild,
-  escapeStarted,
-  portalUsed,
-  stoneLoc,
-  goldInvested,
-  stonesUsed,
-  trainingLimits,
-  storyMax,
-  unreadActionStories,
-  totalMerchantMana,
-  curAdvGuildSegment,
-  curCraftGuildSegment,
-  curWizCollegeSegment,
-  curFightFrostGiantsSegment,
-  curFightJungleMonstersSegment,
-  curThievesGuildSegment,
-  curGodsSegment,
-  dungeons,
-  trials,
-});
 
 globalThis.Data.registerAll({
   actions,
@@ -1478,8 +1430,8 @@ function closeTutorial() {
 }
 
 function clearSave() {
-  globalThis.localStorage[defaultSaveName] = '';
-  globalThis.localStorage[challengeSaveName] = '';
+  globalThis.localStorage[globalThis.saving.defaultSaveName] = '';
+  globalThis.localStorage[globalThis.saving.challengeSaveName] = '';
   location.reload();
 }
 
@@ -2181,7 +2133,6 @@ function resumeChallenge() {
 
 const _saving = {
   towns,
-  curs,
   save,
   exportSave,
   importSave,
@@ -2221,7 +2172,10 @@ const _saving = {
   closeTutorial,
   startGame,
   cheat,
+  defaultSaveName,
   timeNeededInitial,
+  timer: timeNeededInitial,
+  timeNeeded: timeNeededInitial,
 };
 
 declare global {

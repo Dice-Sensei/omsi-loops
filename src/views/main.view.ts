@@ -80,13 +80,13 @@ class View {
     this.updateTrials();
     if (storyMax >= 12) {
       setInterval(() => {
-        view.updateStories();
-        view.updateLockedHidden();
+        globalThis.saving.view.updateStories();
+        globalThis.saving.view.updateLockedHidden();
       }, 20000);
     } else {
       setInterval(() => {
-        view.updateStories();
-        view.updateLockedHidden();
+        globalThis.saving.view.updateStories();
+        globalThis.saving.view.updateLockedHidden();
       }, 2000);
     }
     globalThis.driver.adjustAll();
@@ -159,7 +159,7 @@ class View {
         'beforebegin',
         `<div class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${
           axisTip[1] + 3
-        }%;' onmouseover='view.showStat("${stat}")' onmouseout='view.showStat(undefined)'>
+        }%;' onmouseover='view.showStat("${stat}")' onmouseout='globalThis.saving.view.showStat(undefined)'>
                 <div class='statLabelContainer'>
                     <div class='medium bold stat-name long-form' style='margin-left:18px;margin-top:5px;'>${
           globalThis.Localization.txt(`stats>${stat}>long_form`)
@@ -267,7 +267,7 @@ class View {
     highlightAction: [],
   };
 
-  // requesting an update will call that update on the next view.update tick (based off player set UPS)
+  // requesting an update will call that update on the next globalThis.saving.view.update tick (based off player set UPS)
   requestUpdate(category, target) {
     if (!this.requests[category].includes(target)) this.requests[category].push(target);
   }
@@ -637,10 +637,18 @@ class View {
   }
 
   updateTime() {
-    document.getElementById('timeBar').style.width = `${100 - timer / timeNeeded * 100}%`;
+    document.getElementById('timeBar').style.width = `${
+      100 - globalThis.saving.timer / globalThis.saving.timeNeeded * 100
+    }%`;
     document.getElementById('timer').textContent = `${
-      globalThis.helpers.intToString(timeNeeded - timer, options.fractionalMana ? 2 : 1, true)
-    } | ${formatTime((timeNeeded - timer) / 50 / globalThis.driver.getActualGameSpeed())}`;
+      globalThis.helpers.intToString(
+        globalThis.saving.timeNeeded - globalThis.saving.timer,
+        options.fractionalMana ? 2 : 1,
+        true,
+      )
+    } | ${
+      formatTime((globalThis.saving.timeNeeded - globalThis.saving.timer) / 50 / globalThis.driver.getActualGameSpeed())
+    }`;
     this.adjustGoldCost({ varName: 'Wells', cost: globalThis.actionList.Action.ManaWell.goldCost() });
   }
   updateOffline() {
@@ -990,7 +998,7 @@ class View {
         : globalThis.helpers.formatNumber(action.loops - action.loopsLeft);
       const imageName = action.name.startsWith('Assassin') ? 'assassin' : globalThis.helpers.camelize(action.name);
       totalDivText +=
-        `<div class='curActionContainer small' onmouseover='view.mouseoverAction(${i}, true)' onmouseleave='view.mouseoverAction(${i}, false)'>
+        `<div class='curActionContainer small' onmouseover='globalThis.saving.view.mouseoverAction(${i}, truglobalThis.saving.viewonmouseleave='view.mouseoverAction(${i}, false)'>
                     <div class='curActionBar' id='action${i}Bar'></div>
                     <div class='actionSelectedIndicator' id='action${i}Selected'></div>
                     <img src='icons/${imageName}.svg' class='smallIcon'>
@@ -1198,7 +1206,7 @@ class View {
     }
     nextActionsDiv.style.display = isShowing ? 'none' : '';
     document.getElementById('actionTooltipContainer').style.display = isShowing ? '' : 'none';
-    view.updateCurrentActionBar(index);
+    globalThis.saving.view.updateCurrentActionBar(index);
   }
 
   updateCurrentActionLoops(index) {
@@ -1517,7 +1525,7 @@ class View {
       globalThis.Localization.txt('actions>tooltip>progress_label')
     }</div> <div id='progress${action.varName}${varSuffix}'></div>%
             </div>
-            <div class='hideVarButton far' onclick='view.toggleHidden("${action.varName}${varSuffix}")'></div>
+            <div class='hideVarButton far' onclick='globalThis.saving.view.toggleHidden("${action.varName}${varSuffix}")'></div>
         </div>`;
     const progressDiv = document.createElement('div');
     progressDiv.className = 'townContainer progressType';
@@ -1683,8 +1691,8 @@ class View {
                 ondragstart='globalThis.driver.handleDirectActionDragStart(event, "${action.name}", ${action.townNum}, "${action.varName}", false)'
                 ondragend='globalThis.driver.handleDirectActionDragEnd("${action.varName}")'
                 onclick='globalThis.driver.addActionToList("${action.name}", ${action.townNum})'
-                onmouseover='view.updateAction("${action.varName}")'
-                onmouseout='view.updateAction(undefined)'
+                onmouseover='.updateAction("${action.varName}")'
+                onmouseout='.updateAction(undefined)'
             >
                 <label>${action.label}</label><br>
                 <div style='position:relative'>
@@ -1821,7 +1829,7 @@ class View {
                 <input type='checkbox' id='searchToggler${action.varName}' style='margin-left:10px;'>
                 <label for='searchToggler${action.varName}'> Lootable first</label>
                 <div class='showthis'>${action.infoText()}</div>
-                <div class='hideVarButton far' onclick='view.toggleHidden("${action.varName}")'></div>
+                <div class='hideVarButton far' onclick='.toggleHidden("${action.varName}")'></div>
             </div><br>`;
 
     const infoDiv = document.createElement('div');
@@ -1853,7 +1861,7 @@ class View {
     const completedTooltip = action.completedTooltip ? action.completedTooltip() : '';
     let mouseOver = '';
     if (varName === 'SDungeon') {
-      mouseOver = "onmouseover='view.showDungeon(0)' onmouseout='view.showDungeon(undefined)'";
+      mouseOver = "onmouseover='.showDungeon(0)' onmouseout='viewwDungeon(undefined)'";
     } else if (varName === 'LDungeon') {
       mouseOver = "onmouseover='view.showDungeon(1)' onmouseout='view.showDungeon(undefined)'";
     } else if (varName === 'TheSpire') {

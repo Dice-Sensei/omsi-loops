@@ -45,20 +45,20 @@ const setupNoodleArms = () => {
 const setupManaBurn = () => {
   restart = function () {
     shouldRestart = false;
-    timer = 0;
+    globalThis.saving.timer = 0;
     globalThis.driver.timeCounter = 0;
     globalThis.driver.effectiveTime = 0;
-    timeNeeded = 4320000 - totals.effectiveTime * 50;
+    globalThis.saving.timeNeeded = 4320000 - totals.effectiveTime * 50;
     document.title = 'Idle Loops';
     globalThis.driver.resetResources();
     globalThis.stats.restartStats();
     for (let i = 0; i < towns.length; i++) {
       towns[i].restart();
     }
-    view.requestUpdate('updateSkills');
-    actions.restart();
-    view.requestUpdate('updateCurrentActionsDivs');
-    view.requestUpdate('updateTrials', null);
+    globalThis.saving.view.requestUpdate('updateSkills');
+    globalThis.saving.actions.restart();
+    globalThis.saving.view.requestUpdate('updateCurrentActionsDivs');
+    globalThis.saving.view.requestUpdate('updateTrials', null);
   };
 };
 

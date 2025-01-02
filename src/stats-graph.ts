@@ -293,7 +293,7 @@ export class StatGraph {
           .attr('r', this.graphObject.options.elements.point.radius)
       );
 
-    view.updateStatGraphNeeded = false;
+    globalThis.saving.view.updateStatGraphNeeded = false;
   }
 }
 
