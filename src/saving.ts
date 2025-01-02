@@ -1,4 +1,3 @@
-// @ts-check
 class ActionLog {
   /** @type {ActionLogEntry[]} */
   entries = [];
@@ -636,11 +635,7 @@ class BuffEntry extends LeveledLogEntry {
   }
 }
 
-/** @typedef {typeof actionLogEntryTypeMap} ActionLogEntryTypeMap */
-/** @typedef {keyof ActionLogEntryTypeMap} ActionLogEntryTypeName */
-/** @typedef {ActionLogEntryTypeMap[ActionLogEntryTypeName]} ActionLogEntryType */
-/** @typedef {InstanceType<ActionLogEntryType>} ActionLogEntryInstance */
-
+// Globals!!!!!
 const actionLogEntryTypeMap = {
   'story': ActionStoryEntry,
   'global': GlobalStoryEntry,
@@ -649,25 +644,6 @@ const actionLogEntryTypeMap = {
   'buff': BuffEntry,
 };
 
-function decompressFromBase64(item) {
-  return globalThis.trash.LZString.decompressFromBase64(item);
-}
-
-function compressToBase64(item) {
-  return globalThis.trash.LZString.compressToBase64(item);
-}
-
-function startGame() {
-  // load calls recalcInterval, which will start the callbacks
-  load();
-  globalThis.view.setScreenSize();
-}
-
-function cheat() {
-  if (globalThis.driver.gameSpeed === 1) globalThis.driver.gameSpeed = 20;
-  else globalThis.driver.gameSpeed = 1;
-}
-
 const defaultSaveName = 'idleLoops1';
 const challengeSaveName = 'idleLoopsChallenge';
 let saveName = defaultSaveName;
@@ -675,58 +651,21 @@ let saveName = defaultSaveName;
 const selfIsGame = typeof globalThis?.view?.View !== 'undefined';
 
 const timeNeededInitial = 5 * 50;
-// eslint-disable-next-line prefer-const
 let timer = timeNeededInitial;
-// eslint-disable-next-line prefer-const
 let timeNeeded = timeNeededInitial;
-// eslint-disable-next-line prefer-const
 const view = selfIsGame ? new globalThis.view.View() : null;
 const actions = new globalThis.actions.Actions();
 const actionLog = selfIsGame ? new ActionLog() : null;
-/**
- * @template {number} Count Number of towns
- * @template {any[]} [Towns=[]] Tuple of towns
- * @typedef {Towns["length"] extends Count ? Towns : TownList<Count, [...Towns, Town<Towns["length"]> & Record<string, number>]>} TownList
- */
-
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
-// accessor for typed towns with vars. CANNOT be used in actionList.ts, will cause circular references
-/** @type {<const TN extends TownNum>(townNum: TN) => Town<TN> & TownVars<TN>} */
-function _town(townNum) {
-  // @ts-ignore
-  return towns[townNum];
-}
 
-// Both of the following express the same thing, but the first introduces a dependency on the action list.
-/* * @typedef {TownNumOf<AnyAction>} TownNum */
-/** @typedef {NumOfTown<towns[number]>} TownNum */
-
-/** @type {TownNum} */
 let curTown = 0;
-
-function initializeTowns() {
-  for (let i = 0; i <= 8; i++) {
-    // @ts-ignore
-    towns[i] = new globalThis.trash.Town(i);
-  }
-}
-
 const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
 
-/** @typedef {typeof statList[number]} StatName */
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
 
 let totalTalent = 0;
-// eslint-disable-next-line prefer-const
 let shouldRestart = true;
 
-// let prestigeValues = {};
-// let prestigeCurrentPoints = 0;
-// let prestigeTotalPoints = 0;
-// let completedCurrentPrestige = false;
-// let completedAnyPrestige = true; // Set to false once method is setup to complete Current game
-
-// eslint-disable-next-line prefer-const
 let resources = {
   gold: 0,
   reputation: 0,
@@ -758,17 +697,13 @@ let resources = {
 };
 let hearts = [];
 const resourcesTemplate = globalThis.helpers.copyObject(resources);
-//Temp variables
-// eslint-disable-next-line prefer-const
 let guild = '';
 let escapeStarted = false;
 let portalUsed = false;
 let stoneLoc = 0;
 
 let curLoadout = 0;
-/** @type {NextActionEntry[][]} */
 let loadouts;
-/** @type {string[] & {"-1"?: string}} */
 let loadoutnames;
 const skillList = /** @type {const} */ ([
   'Combat',
@@ -790,7 +725,6 @@ const skillList = /** @type {const} */ ([
   'Leadership',
   'Assassin',
 ]);
-/** @typedef {typeof skillList[number]} SkillName */
 const skills = /** @type {{[K in SkillName]: Skill}} */ ({});
 const buffList = /** @type {const} */ ([
   'Ritual',
@@ -808,21 +742,6 @@ const buffList = /** @type {const} */ ([
   'PrestigeBartering',
   'PrestigeExpOverflow',
 ]);
-/** @typedef {typeof buffList[number]} BuffName */
-/** @typedef {Extract<BuffName, `Prestige${string}`>} PrestigeBuffName */
-
-/** @returns {name is StatName} */
-function isStatName(name) {
-  return statList.includes(name);
-}
-/** @returns {name is SkillName} */
-function isSkillName(name) {
-  return skillList.includes(name);
-}
-/** @returns {name is BuffName} */
-function isBuffName(name) {
-  return buffList.includes(name);
-}
 
 const dungeonFloors = [6, 9, 20];
 const trialFloors = [50, 100, 7, 1000, 25];
@@ -861,9 +780,7 @@ const buffCaps = {
 const buffs = /** @type {{[K in BuffName]: Buff}} */ ({});
 let goldInvested = 0;
 let stonesUsed;
-// eslint-disable-next-line prefer-const
 let townShowing = 0;
-// eslint-disable-next-line prefer-const
 let actionStoriesShowing = false;
 let townsUnlocked = [];
 let completedActions = [];
@@ -873,7 +790,6 @@ let storyShowing = 0;
 let storyMax = 0;
 let unreadActionStories;
 
-/** @typedef {keyof typeof storyFlags} StoryFlagName */
 const storyFlags = {
   maxSQuestsInALoop: false,
   realMaxSQuestsInALoop: false,
@@ -1085,20 +1001,13 @@ const storyFlags = {
   fightGods17: false,
   fightGods18: false,
 };
-const storyReqs = storyFlags; // compatibility alias, can be removed when we're sure it won't break anything
+const storyReqs = storyFlags;
 
-/** @typedef {keyof typeof storyVars} StoryVarName */
 const storyVars = {
   maxWizardGuildSegmentCleared: -1,
   maxZombiesRaised: -1,
 };
 
-/**
- * @satisfies {{
- *  storyFlags: {[K in StoryFlagName]?: (loadingFlags: Record<string, boolean>, loadingVars: Record<string, number>) => boolean},
- *  storyVars: {[K in StoryVarName]?: (loadingFlags: Record<string, boolean>, loadingVars: Record<string, number>) => number},
- * }}
- */
 const storyInitializers = {
   storyFlags: {},
   storyVars: {
@@ -1118,7 +1027,6 @@ const storyInitializers = {
 
 const curDate = new Date();
 let totalOfflineMs = 0;
-// eslint-disable-next-line prefer-const
 let bonusSpeed = 1;
 let bonusActive = false;
 let currentLoop = 0;
@@ -1132,29 +1040,19 @@ let totals = {
   actions: 0,
 };
 
-/** @type {{challengeMode?: number, inChallenge?: boolean}} */
 let challengeSave = {
   challengeMode: 0,
   inChallenge: false,
 };
-
 let totalMerchantMana = 7500;
-// eslint-disable-next-line prefer-const
 let curAdvGuildSegment = 0;
-// eslint-disable-next-line prefer-const
 let curCraftGuildSegment = 0;
-// eslint-disable-next-line prefer-const
 let curWizCollegeSegment = 0;
-// eslint-disable-next-line prefer-const
 let curFightFrostGiantsSegment = 0;
-// eslint-disable-next-line prefer-const
 let curFightJungleMonstersSegment = 0;
-// eslint-disable-next-line prefer-const
 let curThievesGuildSegment = 0;
-// eslint-disable-next-line prefer-const
 let curGodsSegment = 0;
 
-/** @type {AnyAction[]} */
 let totalActionList = [];
 
 let curs = {
@@ -1180,38 +1078,8 @@ let curs = {
   },
 };
 
-function initializeActions() {
-  totalActionList.length = 0;
-  for (const prop in globalThis.actionList.Action) {
-    const action = globalThis.actionList.Action[prop];
-    totalActionList.push(action);
-  }
-}
-
 let dungeons = [[], [], []];
-/** @type {(any[] & {highestFloor?:number})[]} */
 let trials = [[], [], [], [], []];
-
-// register all the object variables assigned in this file
-globalThis.Data.registerAll({
-  actions,
-  towns,
-  stats,
-  resources,
-  hearts,
-  skills,
-  buffs,
-  prestigeValues: globalThis.prestige.prestigeValues,
-  townsUnlocked,
-  completedActions,
-  storyFlags,
-  storyVars,
-  totals,
-});
-
-// If we want to be able to iterate through the scalar global variables, they have to be assigned to an object. If we want to read or write them programmatically, we have to
-// be able to access a syntactic variable via indirection, which can only be done by eval (or its cousin, new Function).
-// the shorthand object initializer syntax here is just an easy way to get variable names into a call.
 const globalVariables = virtualizeGlobalVariables({
   timer,
   timeNeeded,
@@ -1239,22 +1107,22 @@ const globalVariables = virtualizeGlobalVariables({
   trials,
 });
 
-function virtualizeGlobalVariables(variables) {
-  const globals = Data.rootObjects.globals ?? {};
-  for (const name in variables) {
-    const get = /** @type {() => any} */ (new Function(`return ${name};`));
-    const set = /** @type {(any) => void} */ (new Function('v__', `${name} = v__`));
-    Object.defineProperty(globals, name, {
-      get,
-      set,
-      enumerable: true,
-      configurable: true,
-    });
-  }
-  return globalThis.Data.register('globals', globals);
-}
+globalThis.Data.registerAll({
+  actions,
+  towns,
+  stats,
+  resources,
+  hearts,
+  skills,
+  buffs,
+  prestigeValues: globalThis.prestige.prestigeValues,
+  townsUnlocked,
+  completedActions,
+  storyFlags,
+  storyVars,
+  totals,
+});
 
-/** @type {Notification} */
 let pauseNotification = null;
 
 const options = {
@@ -1294,14 +1162,6 @@ const options = {
   predictorBackgroundThread: true,
 };
 
-/** @satisfies {readonly {[K in OptionName]: OptionType<K> extends number ? K : never}[OptionName][]} */
-/** @typedef {keyof typeof options} OptionName */
-/** @template {OptionName} N @typedef {typeof options[N]} OptionType */
-/** @typedef {{[K in OptionName]: OptionType<K> extends number ? K : never}[OptionName]} NumericOptionName */
-/** @typedef {{[K in OptionName]: OptionType<K> extends string ? K : never}[OptionName]} StringOptionName */
-/** @typedef {{[K in OptionName]: OptionType<K> extends boolean ? K : never}[OptionName]} BooleanOptionName */
-
-/** @satisfies {NumericOptionName[]} */
 const numericOptions = [
   'speedIncreaseCustom',
   'speedIncreaseBackground',
@@ -1312,69 +1172,12 @@ const numericOptions = [
   'predictorActionWidth',
   'predictorSlowTimer',
 ];
-/** @satisfies {readonly StringOptionName[]} */
 const stringOptions = [
   'theme',
   'themeVariant',
   'predictorTrackedStat',
 ];
 
-/** @param {string} option @returns {option is NumericOptionName} */
-function isNumericOption(option) {
-  return numericOptions.includes(/** @type {NumericOptionName} */ (option));
-}
-
-/** @param {string} option @returns {option is StringOptionName} */
-function isStringOption(option) {
-  return stringOptions.includes(/** @type {StringOptionName} */ (option));
-}
-
-/** @param {string} option @returns {option is BooleanOptionName} */
-function isBooleanOption(option) {
-  // I'm explicitly deciding to leave this open-ended, so unknown options are treated as booleans
-  return !numericOptions.includes(/** @type {NumericOptionName} */ (option)) &&
-    !stringOptions.includes(/** @type {StringOptionName} */ (option));
-}
-
-// legacy predictor settings are in localStorage, use them as defaults if they exist
-function importPredictorSettings() {
-  /** @type {Record<string, OptionName>} */
-  const settingsMap = {
-    __proto__: null,
-    timePrecision: 'predictorTimePrecision',
-    nextPrecision: 'predictorNextPrecision',
-    actionWidth: 'predictorActionWidth',
-    repeatPrediction: 'predictorRepeatPrediction',
-    slowMode: 'predictorSlowMode',
-    slowTimer: 'predictorSlowTimer',
-  };
-  /** @type {Partial<typeof options>} */
-  const newOptions = {};
-  for (const [originalSetting, newOption] of Object.entries(settingsMap)) {
-    const value = localStorage.getItem(originalSetting);
-    if (value != null) {
-      // has a setting
-      if (isNumericOption(newOption)) {
-        const numericValue = parseInt(value);
-        if (isFinite(numericValue)) {
-          newOptions[newOption] = numericValue;
-        }
-      } else if (isStringOption(newOption)) {
-        newOptions[newOption] = value;
-      } else {
-        newOptions[newOption] = value === 'true';
-      }
-    }
-  }
-  return newOptions;
-}
-if (selfIsGame) {
-  Object.assign(options, importPredictorSettings()); // override hardcoded defaults if not in worker
-}
-
-// The original forks will throw exceptions if there are unexpected properties in the options element. This list lets us
-// check to see if a given option should go into "options" in the save, otherwise it belongs in "extraOptions".
-/** @satisfies {Record<OptionName, boolean>} */
 const isStandardOption = {
   theme: true,
   themeVariant: false,
@@ -1412,8 +1215,6 @@ const isStandardOption = {
   predictorBackgroundThread: false,
 };
 
-// Some options set or clear an indicator class on the root element so CSS can respond. Record these here.
-/** @type {Partial<Record<OptionName, string>>} */
 const optionIndicatorClasses = {
   responsiveUI: 'responsive',
   statColors: 'use-stat-colors',
@@ -1421,7 +1222,6 @@ const optionIndicatorClasses = {
   predictor: 'usePredictor',
 };
 
-/** @type {{[K in OptionName]?: (value: OptionType<K>, init: boolean, getInput: () => HTMLValueElement) => void}} */
 const optionValueHandlers = {
   notifyOnPause(value, init, getInput) {
     const input = /** @type {HTMLInputElement} */ (getInput());
@@ -1510,7 +1310,123 @@ const optionValueHandlers = {
   },
 };
 
-/** @type {<K extends OptionName>(option: K, value: OptionType<K>, init: boolean, getInput: () => HTMLValueElement) => void} */
+if (selfIsGame) {
+  Object.assign(options, importPredictorSettings()); // override hardcoded defaults if not in worker
+}
+// Globals!!!!!
+
+function decompressFromBase64(item) {
+  return globalThis.trash.LZString.decompressFromBase64(item);
+}
+
+function compressToBase64(item) {
+  return globalThis.trash.LZString.compressToBase64(item);
+}
+
+function startGame() {
+  // load calls recalcInterval, which will start the callbacks
+  load();
+  globalThis.view.setScreenSize();
+}
+
+function cheat() {
+  if (globalThis.driver.gameSpeed === 1) globalThis.driver.gameSpeed = 20;
+  else globalThis.driver.gameSpeed = 1;
+}
+
+function _town(townNum) {
+  // @ts-ignore
+  return towns[townNum];
+}
+
+function initializeTowns() {
+  for (let i = 0; i <= 8; i++) {
+    // @ts-ignore
+    towns[i] = new globalThis.trash.Town(i);
+  }
+}
+
+function isStatName(name) {
+  return statList.includes(name);
+}
+
+function isSkillName(name) {
+  return skillList.includes(name);
+}
+
+function isBuffName(name) {
+  return buffList.includes(name);
+}
+
+function initializeActions() {
+  totalActionList.length = 0;
+  for (const prop in globalThis.actionList.Action) {
+    const action = globalThis.actionList.Action[prop];
+    totalActionList.push(action);
+  }
+}
+
+function virtualizeGlobalVariables(variables) {
+  const globals = Data.rootObjects.globals ?? {};
+  for (const name in variables) {
+    const get = /** @type {() => any} */ (new Function(`return ${name};`));
+    const set = /** @type {(any) => void} */ (new Function('v__', `${name} = v__`));
+    Object.defineProperty(globals, name, {
+      get,
+      set,
+      enumerable: true,
+      configurable: true,
+    });
+  }
+  return globalThis.Data.register('globals', globals);
+}
+
+function isNumericOption(option) {
+  return numericOptions.includes(/** @type {NumericOptionName} */ (option));
+}
+
+function isStringOption(option) {
+  return stringOptions.includes(/** @type {StringOptionName} */ (option));
+}
+
+function isBooleanOption(option) {
+  // I'm explicitly deciding to leave this open-ended, so unknown options are treated as booleans
+  return !numericOptions.includes(/** @type {NumericOptionName} */ (option)) &&
+    !stringOptions.includes(/** @type {StringOptionName} */ (option));
+}
+
+function importPredictorSettings() {
+  /** @type {Record<string, OptionName>} */
+  const settingsMap = {
+    __proto__: null,
+    timePrecision: 'predictorTimePrecision',
+    nextPrecision: 'predictorNextPrecision',
+    actionWidth: 'predictorActionWidth',
+    repeatPrediction: 'predictorRepeatPrediction',
+    slowMode: 'predictorSlowMode',
+    slowTimer: 'predictorSlowTimer',
+  };
+  /** @type {Partial<typeof options>} */
+  const newOptions = {};
+  for (const [originalSetting, newOption] of Object.entries(settingsMap)) {
+    const value = localStorage.getItem(originalSetting);
+    if (value != null) {
+      // has a setting
+      if (isNumericOption(newOption)) {
+        const numericValue = parseInt(value);
+        if (isFinite(numericValue)) {
+          newOptions[newOption] = numericValue;
+        }
+      } else if (isStringOption(newOption)) {
+        newOptions[newOption] = value;
+      } else {
+        newOptions[newOption] = value === 'true';
+      }
+    }
+  }
+  return newOptions;
+}
+
 function handleOption(option, value, init, getInput) {
   optionValueHandlers[option]?.(value, init, getInput);
   // The handler can change the value of the option. Recheck when setting or clearing the indicator class.
@@ -1519,7 +1435,6 @@ function handleOption(option, value, init, getInput) {
   }
 }
 
-/** @template {OptionName} K @param {K} option @param {OptionType<K>} value */
 function setOption(option, value, updateUI = false) {
   const oldValue = options[option];
   options[option] = value;
@@ -1532,7 +1447,6 @@ function setOption(option, value, updateUI = false) {
   }
 }
 
-/** @template {OptionName} K @param {K} option @param {OptionType<K>} value */
 function loadOption(option, value, callHandler = true) {
   const input = globalThis.helpers.valueElement(`${option}Input`, false); // this is allowed to have errors
   if (!input) return;
