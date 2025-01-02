@@ -210,7 +210,7 @@ function executeGameTicks(deadline) {
 
   globalThis.saving.view.update();
 }
-
+let windowFps = 50;
 let mainTickLoop;
 function recalcInterval(fps) {
   windowFps = fps;
@@ -326,7 +326,7 @@ function restart() {
   globalThis.driver.effectiveTime = 0;
   globalThis.saving.timeNeeded = globalThis.saving.timeNeededInitial;
   document.title = 'Idle Loops';
-  currentLoop = totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
+  globalThis.saving.vals.currentLoop = totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
   resetResources();
   globalThis.stats.restartStats();
   for (let i = 0; i < towns.length; i++) {
@@ -794,6 +794,8 @@ function toggleOffline() {
   globalThis.saving.view.requestUpdate('updateTime', null);
 }
 
+let bonusSpeed = 1;
+let bonusActive = false;
 function isBonusActive() {
   return bonusActive && bonusSpeed !== 1;
 }

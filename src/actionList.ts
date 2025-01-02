@@ -3285,17 +3285,17 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
       Math.sqrt(1 + totalCompletions / 1000);
   },
   loopsFinished() {
-    if (curAdvGuildSegment >= 0) globalThis.view.setStoryFlag('advGuildRankEReached');
-    if (curAdvGuildSegment >= 3) globalThis.view.setStoryFlag('advGuildRankDReached');
-    if (curAdvGuildSegment >= 6) globalThis.view.setStoryFlag('advGuildRankCReached');
-    if (curAdvGuildSegment >= 9) globalThis.view.setStoryFlag('advGuildRankBReached');
-    if (curAdvGuildSegment >= 12) globalThis.view.setStoryFlag('advGuildRankAReached');
-    if (curAdvGuildSegment >= 15) globalThis.view.setStoryFlag('advGuildRankSReached');
-    if (curAdvGuildSegment >= 27) globalThis.view.setStoryFlag('advGuildRankUReached');
-    if (curAdvGuildSegment >= 39) globalThis.view.setStoryFlag('advGuildRankGodlikeReached');
+    if (globalThis.saving.vals.curAdvGuildSegment >= 0) globalThis.view.setStoryFlag('advGuildRankEReached');
+    if (globalThis.saving.vals.curAdvGuildSegment >= 3) globalThis.view.setStoryFlag('advGuildRankDReached');
+    if (globalThis.saving.vals.curAdvGuildSegment >= 6) globalThis.view.setStoryFlag('advGuildRankCReached');
+    if (globalThis.saving.vals.curAdvGuildSegment >= 9) globalThis.view.setStoryFlag('advGuildRankBReached');
+    if (globalThis.saving.vals.curAdvGuildSegment >= 12) globalThis.view.setStoryFlag('advGuildRankAReached');
+    if (globalThis.saving.vals.curAdvGuildSegment >= 15) globalThis.view.setStoryFlag('advGuildRankSReached');
+    if (globalThis.saving.vals.curAdvGuildSegment >= 27) globalThis.view.setStoryFlag('advGuildRankUReached');
+    if (globalThis.saving.vals.curAdvGuildSegment >= 39) globalThis.view.setStoryFlag('advGuildRankGodlikeReached');
   },
   segmentFinished() {
-    curAdvGuildSegment++;
+    globalThis.saving.vals.curAdvGuildSegment++;
     globalThis.driver.addMana(200);
   },
   getPartName() {
@@ -3331,13 +3331,14 @@ function getAdvGuildRank(offset) {
     'UU',
     'UUU',
     'UUUU',
-  ][Math.floor(curAdvGuildSegment / 3 + 0.00001)];
+  ][Math.floor(globalThis.saving.vals.curAdvGuildSegment / 3 + 0.00001)];
 
-  const segment = (offset === undefined ? 0 : offset - (curAdvGuildSegment % 3)) + curAdvGuildSegment;
+  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curAdvGuildSegment % 3)) +
+    globalThis.saving.vals.curAdvGuildSegment;
   let bonus = globalThis.helpers.precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][curAdvGuildSegment % 3];
+      name += ['-', '', '+'][globalThis.saving.vals.curAdvGuildSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -3519,17 +3520,17 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
       Math.sqrt(1 + totalCompletions / 1000);
   },
   loopsFinished() {
-    if (curCraftGuildSegment >= 0) globalThis.view.setStoryFlag('craftGuildRankEReached');
-    if (curCraftGuildSegment >= 3) globalThis.view.setStoryFlag('craftGuildRankDReached');
-    if (curCraftGuildSegment >= 6) globalThis.view.setStoryFlag('craftGuildRankCReached');
-    if (curCraftGuildSegment >= 9) globalThis.view.setStoryFlag('craftGuildRankBReached');
-    if (curCraftGuildSegment >= 12) globalThis.view.setStoryFlag('craftGuildRankAReached');
-    if (curCraftGuildSegment >= 15) globalThis.view.setStoryFlag('craftGuildRankSReached');
-    if (curCraftGuildSegment >= 27) globalThis.view.setStoryFlag('craftGuildRankUReached');
-    if (curCraftGuildSegment >= 39) globalThis.view.setStoryFlag('craftGuildRankGodlikeReached');
+    if (globalThis.saving.vals.curCraftGuildSegment >= 0) globalThis.view.setStoryFlag('craftGuildRankEReached');
+    if (globalThis.saving.vals.curCraftGuildSegment >= 3) globalThis.view.setStoryFlag('craftGuildRankDReached');
+    if (globalThis.saving.vals.curCraftGuildSegment >= 6) globalThis.view.setStoryFlag('craftGuildRankCReached');
+    if (globalThis.saving.vals.curCraftGuildSegment >= 9) globalThis.view.setStoryFlag('craftGuildRankBReached');
+    if (globalThis.saving.vals.curCraftGuildSegment >= 12) globalThis.view.setStoryFlag('craftGuildRankAReached');
+    if (globalThis.saving.vals.curCraftGuildSegment >= 15) globalThis.view.setStoryFlag('craftGuildRankSReached');
+    if (globalThis.saving.vals.curCraftGuildSegment >= 27) globalThis.view.setStoryFlag('craftGuildRankUReached');
+    if (globalThis.saving.vals.curCraftGuildSegment >= 39) globalThis.view.setStoryFlag('craftGuildRankGodlikeReached');
   },
   segmentFinished() {
-    curCraftGuildSegment++;
+    globalThis.saving.vals.curCraftGuildSegment++;
     globalThis.stats.handleSkillExp(this.skills);
     globalThis.driver.addResource('gold', 10);
   },
@@ -3566,13 +3567,14 @@ function getCraftGuildRank(offset) {
     'UU',
     'UUU',
     'UUUU',
-  ][Math.floor(curCraftGuildSegment / 3 + 0.00001)];
+  ][Math.floor(globalThis.saving.vals.curCraftGuildSegment / 3 + 0.00001)];
 
-  const segment = (offset === undefined ? 0 : offset - (curCraftGuildSegment % 3)) + curCraftGuildSegment;
+  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curCraftGuildSegment % 3)) +
+    globalThis.saving.vals.curCraftGuildSegment;
   let bonus = globalThis.helpers.precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][curCraftGuildSegment % 3];
+      name += ['-', '', '+'][globalThis.saving.vals.curCraftGuildSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -5383,10 +5385,10 @@ Action.WizardCollege = new MultipartAction('Wizard College', {
     // empty.
   },
   segmentFinished() {
-    curWizCollegeSegment++;
+    globalThis.saving.vals.curWizCollegeSegment++;
     globalThis.saving.view.requestUpdate('adjustManaCost', 'Restoration');
     globalThis.saving.view.requestUpdate('adjustManaCost', 'Spatiomancy');
-    globalThis.view.increaseStoryVarTo('maxWizardGuildSegmentCleared', curWizCollegeSegment);
+    globalThis.view.increaseStoryVarTo('maxWizardGuildSegmentCleared', globalThis.saving.vals.curWizCollegeSegment);
   },
   getPartName() {
     return `${getWizCollegeRank().name}`;
@@ -5426,12 +5428,13 @@ function getWizCollegeRank(offset) {
     'Grand Magus',
     'Archmagus',
     'Member of The Council of the Seven',
-  ][Math.floor(curWizCollegeSegment / 3 + 0.00001)];
-  const segment = (offset === undefined ? 0 : offset - (curWizCollegeSegment % 3)) + curWizCollegeSegment;
+  ][Math.floor(globalThis.saving.vals.curWizCollegeSegment / 3 + 0.00001)];
+  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curWizCollegeSegment % 3)) +
+    globalThis.saving.vals.curWizCollegeSegment;
   let bonus = globalThis.helpers.precision3(1 + 0.02 * Math.pow(segment, 1.05));
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][curWizCollegeSegment % 3];
+      name += ['-', '', '+'][globalThis.saving.vals.curWizCollegeSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -5793,17 +5796,23 @@ Action.FightFrostGiants = new MultipartAction('Fight Frost Giants', {
     globalThis.stats.handleSkillExp(this.skills);
   },
   segmentFinished() {
-    curFightFrostGiantsSegment++;
-    if (curFightFrostGiantsSegment >= 6) globalThis.view.setStoryFlag('giantGuildRankEReached');
-    if (curFightFrostGiantsSegment >= 12) globalThis.view.setStoryFlag('giantGuildRankDReached');
-    if (curFightFrostGiantsSegment >= 18) globalThis.view.setStoryFlag('giantGuildRankCReached');
-    if (curFightFrostGiantsSegment >= 24) globalThis.view.setStoryFlag('giantGuildRankBReached');
-    if (curFightFrostGiantsSegment >= 30) globalThis.view.setStoryFlag('giantGuildRankAReached');
-    if (curFightFrostGiantsSegment >= 36) globalThis.view.setStoryFlag('giantGuildRankSReached');
-    if (curFightFrostGiantsSegment >= 42) globalThis.view.setStoryFlag('giantGuildRankSSReached');
-    if (curFightFrostGiantsSegment >= 48) globalThis.view.setStoryFlag('giantGuildRankSSSReached');
-    if (curFightFrostGiantsSegment >= 54) globalThis.view.setStoryFlag('giantGuildRankUReached');
-    if (curFightFrostGiantsSegment >= 60) globalThis.view.setStoryFlag('giantGuildRankGodlikeReached');
+    globalThis.saving.vals.curFightFrostGiantsSegment++;
+    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 6) globalThis.view.setStoryFlag('giantGuildRankEReached');
+    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 12) globalThis.view.setStoryFlag('giantGuildRankDReached');
+    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 18) globalThis.view.setStoryFlag('giantGuildRankCReached');
+    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 24) globalThis.view.setStoryFlag('giantGuildRankBReached');
+    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 30) globalThis.view.setStoryFlag('giantGuildRankAReached');
+    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 36) globalThis.view.setStoryFlag('giantGuildRankSReached');
+    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 42) {
+      globalThis.view.setStoryFlag('giantGuildRankSSReached');
+    }
+    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 48) {
+      globalThis.view.setStoryFlag('giantGuildRankSSSReached');
+    }
+    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 54) globalThis.view.setStoryFlag('giantGuildRankUReached');
+    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 60) {
+      globalThis.view.setStoryFlag('giantGuildRankGodlikeReached');
+    }
   },
   getPartName() {
     return `${getFrostGiantsRank().name}`;
@@ -5843,12 +5852,13 @@ function getFrostGiantsRank(offset) {
     'Captain', //U
     'Rear Admiral',
     'Vice Admiral', //godlike
-  ][Math.floor(curFightFrostGiantsSegment / 3 + 0.00001)];
-  const segment = (offset === undefined ? 0 : offset - (curFightFrostGiantsSegment % 3)) + curFightFrostGiantsSegment;
+  ][Math.floor(globalThis.saving.vals.curFightFrostGiantsSegment / 3 + 0.00001)];
+  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curFightFrostGiantsSegment % 3)) +
+    globalThis.saving.vals.curFightFrostGiantsSegment;
   let bonus = globalThis.helpers.precision3(1 + 0.05 * Math.pow(segment, 1.05));
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][curFightFrostGiantsSegment % 3];
+      name += ['-', '', '+'][globalThis.saving.vals.curFightFrostGiantsSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -6559,22 +6569,40 @@ Action.FightJungleMonsters = new MultipartAction('Fight Jungle Monsters', {
     globalThis.stats.handleSkillExp(this.skills);
   },
   segmentFinished() {
-    curFightJungleMonstersSegment++;
+    globalThis.saving.vals.curFightJungleMonstersSegment++;
     globalThis.driver.addResource('blood', 1);
     //Since the action stories are for having *slain* the beast,
     //unlock *after* the last segment of the beast in question.
     //I.e., the sloth fight is segments 6, 7 and 8, so the unlock
     //happens when the 8th segment is done and the current segment
     //is 9 or more.
-    if (curFightJungleMonstersSegment > 8) globalThis.view.setStoryFlag('monsterGuildRankDReached');
-    if (curFightJungleMonstersSegment > 14) globalThis.view.setStoryFlag('monsterGuildRankCReached');
-    if (curFightJungleMonstersSegment > 20) globalThis.view.setStoryFlag('monsterGuildRankBReached');
-    if (curFightJungleMonstersSegment > 26) globalThis.view.setStoryFlag('monsterGuildRankAReached');
-    if (curFightJungleMonstersSegment > 32) globalThis.view.setStoryFlag('monsterGuildRankSReached');
-    if (curFightJungleMonstersSegment > 38) globalThis.view.setStoryFlag('monsterGuildRankSSReached');
-    if (curFightJungleMonstersSegment > 44) globalThis.view.setStoryFlag('monsterGuildRankSSSReached');
-    if (curFightJungleMonstersSegment > 50) globalThis.view.setStoryFlag('monsterGuildRankUReached');
-    if (curFightJungleMonstersSegment > 56) globalThis.view.setStoryFlag('monsterGuildRankGodlikeReached');
+    if (globalThis.saving.vals.curFightJungleMonstersSegment > 8) {
+      globalThis.view.setStoryFlag('monsterGuildRankDReached');
+    }
+    if (globalThis.saving.vals.curFightJungleMonstersSegment > 14) {
+      globalThis.view.setStoryFlag('monsterGuildRankCReached');
+    }
+    if (globalThis.saving.vals.curFightJungleMonstersSegment > 20) {
+      globalThis.view.setStoryFlag('monsterGuildRankBReached');
+    }
+    if (globalThis.saving.vals.curFightJungleMonstersSegment > 26) {
+      globalThis.view.setStoryFlag('monsterGuildRankAReached');
+    }
+    if (globalThis.saving.vals.curFightJungleMonstersSegment > 32) {
+      globalThis.view.setStoryFlag('monsterGuildRankSReached');
+    }
+    if (globalThis.saving.vals.curFightJungleMonstersSegment > 38) {
+      globalThis.view.setStoryFlag('monsterGuildRankSSReached');
+    }
+    if (globalThis.saving.vals.curFightJungleMonstersSegment > 44) {
+      globalThis.view.setStoryFlag('monsterGuildRankSSSReached');
+    }
+    if (globalThis.saving.vals.curFightJungleMonstersSegment > 50) {
+      globalThis.view.setStoryFlag('monsterGuildRankUReached');
+    }
+    if (globalThis.saving.vals.curFightJungleMonstersSegment > 56) {
+      globalThis.view.setStoryFlag('monsterGuildRankGodlikeReached');
+    }
     // Additional thing?
   },
   getPartName() {
@@ -6614,13 +6642,13 @@ function getFightJungleMonstersRank(offset) {
     'Gorilla', //U
     'Hippo',
     'Elephant', //godlike
-  ][Math.floor(curFightJungleMonstersSegment / 3 + 0.00001)];
-  const segment = (offset === undefined ? 0 : offset - (curFightJungleMonstersSegment % 3)) +
-    curFightJungleMonstersSegment;
+  ][Math.floor(globalThis.saving.vals.curFightJungleMonstersSegment / 3 + 0.00001)];
+  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curFightJungleMonstersSegment % 3)) +
+    globalThis.saving.vals.curFightJungleMonstersSegment;
   let bonus = globalThis.helpers.precision3(1 + 0.05 * Math.pow(segment, 1.05));
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][curFightJungleMonstersSegment % 3];
+      name += ['-', '', '+'][globalThis.saving.vals.curFightJungleMonstersSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -7184,7 +7212,7 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
   loopsFinished() {
   },
   segmentFinished() {
-    curThievesGuildSegment++;
+    globalThis.saving.vals.curThievesGuildSegment++;
     globalThis.stats.handleSkillExp(this.skills);
     globalThis.driver.addResource('gold', 10);
   },
@@ -7205,14 +7233,16 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
     globalThis.stats.handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('thiefGuildTestsTaken');
-    if (curThievesGuildSegment >= 3) globalThis.view.setStoryFlag('thiefGuildRankEReached');
-    if (curThievesGuildSegment >= 6) globalThis.view.setStoryFlag('thiefGuildRankDReached');
-    if (curThievesGuildSegment >= 9) globalThis.view.setStoryFlag('thiefGuildRankCReached');
-    if (curThievesGuildSegment >= 12) globalThis.view.setStoryFlag('thiefGuildRankBReached');
-    if (curThievesGuildSegment >= 15) globalThis.view.setStoryFlag('thiefGuildRankAReached');
-    if (curThievesGuildSegment >= 18) globalThis.view.setStoryFlag('thiefGuildRankSReached');
-    if (curThievesGuildSegment >= 30) globalThis.view.setStoryFlag('thiefGuildRankUReached');
-    if (curThievesGuildSegment >= 42) globalThis.view.setStoryFlag('thiefGuildRankGodlikeReached');
+    if (globalThis.saving.vals.curThievesGuildSegment >= 3) globalThis.view.setStoryFlag('thiefGuildRankEReached');
+    if (globalThis.saving.vals.curThievesGuildSegment >= 6) globalThis.view.setStoryFlag('thiefGuildRankDReached');
+    if (globalThis.saving.vals.curThievesGuildSegment >= 9) globalThis.view.setStoryFlag('thiefGuildRankCReached');
+    if (globalThis.saving.vals.curThievesGuildSegment >= 12) globalThis.view.setStoryFlag('thiefGuildRankBReached');
+    if (globalThis.saving.vals.curThievesGuildSegment >= 15) globalThis.view.setStoryFlag('thiefGuildRankAReached');
+    if (globalThis.saving.vals.curThievesGuildSegment >= 18) globalThis.view.setStoryFlag('thiefGuildRankSReached');
+    if (globalThis.saving.vals.curThievesGuildSegment >= 30) globalThis.view.setStoryFlag('thiefGuildRankUReached');
+    if (globalThis.saving.vals.curThievesGuildSegment >= 42) {
+      globalThis.view.setStoryFlag('thiefGuildRankGodlikeReached');
+    }
   },
 });
 function getThievesGuildRank(offset) {
@@ -7231,13 +7261,14 @@ function getThievesGuildRank(offset) {
     'UU',
     'UUU',
     'UUUU',
-  ][Math.floor(curThievesGuildSegment / 3 + 0.00001)];
+  ][Math.floor(globalThis.saving.vals.curThievesGuildSegment / 3 + 0.00001)];
 
-  const segment = (offset === undefined ? 0 : offset - (curThievesGuildSegment % 3)) + curThievesGuildSegment;
+  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curThievesGuildSegment % 3)) +
+    globalThis.saving.vals.curThievesGuildSegment;
   let bonus = globalThis.helpers.precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][curThievesGuildSegment % 3];
+      name += ['-', '', '+'][globalThis.saving.vals.curThievesGuildSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -8114,9 +8145,9 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
     globalThis.stats.handleSkillExp(this.skills);
   },
   segmentFinished() {
-    curGodsSegment++;
+    globalThis.saving.vals.curGodsSegment++;
     //Round 7 is segments 55 through 63
-    switch (curGodsSegment) {
+    switch (globalThis.saving.vals.curGodsSegment) {
       case 1:
         globalThis.view.setStoryFlag('fightGods01');
         break;

@@ -8,7 +8,7 @@ const setupManaDrought = () => {
   globalThis.driver.gameSpeed = 2;
 
   globalThis.actionList.Action.BuyManaZ1.canStart = function () {
-    return totalMerchantMana > 0;
+    return globalThis.saving.vals.totalMerchantMana > 0;
   };
   globalThis.actionList.Action.BuyManaZ1.manaCost = function () {
     return 1;
@@ -18,10 +18,10 @@ const setupManaDrought = () => {
   };
   globalThis.actionList.Action.BuyManaZ1.finish = function () {
     const spendGold = Math.min(resources.gold, 300);
-    const buyMana = Math.min(spendGold * this.goldCost(), totalMerchantMana);
+    const buyMana = Math.min(spendGold * this.goldCost(), globalThis.saving.vals.totalMerchantMana);
 
     globalThis.driver.addMana(buyMana);
-    totalMerchantMana -= buyMana;
+    globalThis.saving.vals.totalMerchantMana -= buyMana;
     globalThis.driver.addResource('gold', -spendGold);
   };
 

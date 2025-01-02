@@ -194,7 +194,7 @@ class ActionLogEntry {
    */
   constructor(type, action, loop) {
     this.type = type;
-    this.loop = typeof loop === 'number' && loop >= 0 ? loop : currentLoop;
+    this.loop = typeof loop === 'number' && loop >= 0 ? loop : globalThis.saving.vals.currentLoop;
     this.actionName = typeof action === 'string' ? action : action?.name ?? null;
   }
   /** @returns {any[]} */
@@ -204,7 +204,7 @@ class ActionLogEntry {
   load(data) {
     const [_type, actionName, loop, ...rest] = data;
     this.actionName = typeof actionName === 'string' ? /** @type {ActionName|ActionId} */ (actionName) : null;
-    this.loop = typeof loop === 'number' && loop >= 0 ? loop : currentLoop;
+    this.loop = typeof loop === 'number' && loop >= 0 ? loop : globalThis.saving.vals.currentLoop;
     return rest;
   }
   createElement() {
@@ -1028,11 +1028,7 @@ const storyInitializers = {
 
 const curDate = new Date();
 let totalOfflineMs = 0;
-let bonusSpeed = 1;
-let bonusActive = false;
-let currentLoop = 0;
 const offlineRatio = 1;
-let windowFps = 50;
 let totals = {
   time: 0,
   effectiveTime: 0,
@@ -1045,37 +1041,22 @@ let challengeSave = {
   challengeMode: 0,
   inChallenge: false,
 };
-let totalMerchantMana = 7500;
-let curAdvGuildSegment = 0;
-let curCraftGuildSegment = 0;
-let curWizCollegeSegment = 0;
-let curFightFrostGiantsSegment = 0;
-let curFightJungleMonstersSegment = 0;
-let curThievesGuildSegment = 0;
-let curGodsSegment = 0;
+
+let vals = {
+  currentLoop: 0,
+  totalMerchantMana: 7500,
+  curAdvGuildSegment: 0,
+  curCraftGuildSegment: 0,
+  curWizCollegeSegment: 0,
+  curFightFrostGiantsSegment: 0,
+  curFightJungleMonstersSegment: 0,
+  curThievesGuildSegment: 0,
+  curGodsSegment: 0,
+};
 
 let totalActionList = [];
-
 let dungeons = [[], [], []];
 let trials = [[], [], [], [], []];
-
-globalThis.Data.registerAll({
-  actions,
-  towns,
-  stats,
-  resources,
-  hearts,
-  skills,
-  buffs,
-  prestigeValues: globalThis.prestige.prestigeValues,
-  townsUnlocked,
-  completedActions,
-  storyFlags,
-  storyVars,
-  totals,
-});
-
-let pauseNotification = null;
 
 const options = {
   theme: 'normal',
@@ -1113,6 +1094,25 @@ const options = {
   predictorTrackedStat: 'Rsoul',
   predictorBackgroundThread: true,
 };
+// Globals!!!!!
+
+globalThis.Data.registerAll({
+  actions,
+  towns,
+  stats,
+  resources,
+  hearts,
+  skills,
+  buffs,
+  prestigeValues: globalThis.prestige.prestigeValues,
+  townsUnlocked,
+  completedActions,
+  storyFlags,
+  storyVars,
+  totals,
+});
+
+let pauseNotification = null;
 
 const numericOptions = [
   'speedIncreaseCustom',
@@ -1265,7 +1265,6 @@ const optionValueHandlers = {
 if (selfIsGame) {
   Object.assign(options, importPredictorSettings()); // override hardcoded defaults if not in worker
 }
-// Globals!!!!!
 
 function decompressFromBase64(item) {
   return globalThis.trash.LZString.decompressFromBase64(item);
@@ -1832,7 +1831,7 @@ function doLoad(toLoad) {
     totals.loops = toLoad.totals.loops === undefined ? 0 : toLoad.totals.loops;
     totals.actions = toLoad.totals.actions === undefined ? 0 : toLoad.totals.actions;
   } else totals = { time: 0, effectiveTime: 0, borrowedTime: 0, loops: 0, actions: 0 };
-  currentLoop = totals.loops;
+  globalThis.saving.vals.currentLoop = totals.loops;
   view.updateTotals();
   console.log('Updating prestige values from load');
   view.updatePrestigeValues();
@@ -2172,10 +2171,12 @@ const _saving = {
   closeTutorial,
   startGame,
   cheat,
+  setOption,
   defaultSaveName,
   timeNeededInitial,
   timer: timeNeededInitial,
   timeNeeded: timeNeededInitial,
+  vals,
 };
 
 declare global {

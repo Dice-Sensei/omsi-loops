@@ -314,13 +314,13 @@ class Actions {
     curTown = 0;
     towns[0].suppliesCost = 300;
     globalThis.saving.view.requestUpdate('updateResource', 'supplies');
-    curAdvGuildSegment = 0;
-    curCraftGuildSegment = 0;
-    curWizCollegeSegment = 0;
-    curFightFrostGiantsSegment = 0;
-    curFightJungleMonstersSegment = 0;
-    curThievesGuildSegment = 0;
-    curGodsSegment = 0;
+    globalThis.saving.vals.curAdvGuildSegment = 0;
+    globalThis.saving.vals.curCraftGuildSegment = 0;
+    globalThis.saving.vals.curWizCollegeSegment = 0;
+    globalThis.saving.vals.curFightFrostGiantsSegment = 0;
+    globalThis.saving.vals.curFightJungleMonstersSegment = 0;
+    globalThis.saving.vals.curThievesGuildSegment = 0;
+    globalThis.saving.vals.curGodsSegment = 0;
     for (const town of towns) {
       for (const action of town.totalActionList) {
         if (action.type === 'multipart') {
@@ -334,7 +334,7 @@ class Actions {
     escapeStarted = false;
     portalUsed = false;
     stoneLoc = 0;
-    totalMerchantMana = 7500;
+    globalThis.saving.vals.totalMerchantMana = 7500;
     if (options.keepCurrentList && this.current?.length > 0) {
       this.currentPos = 0;
       this.completedTicks = 0;
