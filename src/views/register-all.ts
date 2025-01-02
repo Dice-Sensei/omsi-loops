@@ -324,13 +324,13 @@ const menu = {
         globalThis.Localization.txt('menu>options>speedIncreaseBackground_warning')
       }</div>
                 <br>
-                <button id='borrowTimeButton' class='button showthat control' onclick='borrowTime()'>${
+                <button id='borrowTimeButton' class='button showthat control' onclick='globalThis.driver.borrowTime()'>${
         globalThis.Localization.txt('menu>options>borrow_time')
       }
                     <div class='showthis'>${globalThis.Localization.txt('menu>options>borrow_time_tooltip')}</div>
                 </button>
                 <div class='show-when-time-borrowed'>
-                    <button id='returnTimeButton' class='button control' onclick='returnTime()'>${
+                    <button id='returnTimeButton' class='button control' onclick='globalThis.driver.returnTime()'>${
         globalThis.Localization.txt('menu>options>return_time')
       }</button>
                     ${globalThis.Localization.txt('menu>options>time_borrowed')} <span id='borrowedTimeDays'></span>
@@ -578,16 +578,16 @@ const timeControls = {
 
     return `
       <div id='timeControlsMain'>
-        <button id='pausePlay' onclick='pauseGame()'' class='button control'>
+        <button id='pausePlay' onclick='globalThis.driver.pauseGame()'' class='button control'>
           ${globalThis.Localization.txt('time_controls>pause_button')}
         </button>
-        <button onclick='manualRestart()' class='button showthatO control'>
+        <button onclick='globalThis.driver.manualRestart()' class='button showthatO control'>
           ${globalThis.Localization.txt('time_controls>restart_button')}
           <div class='showthis' style='color:var(--default-color);width:230px;'>
           ${globalThis.Localization.txt('time_controls>restart_text')}</div>
         </button>
         <input id='bonusIsActiveInput' type='checkbox' onchange='setOption("bonusIsActive", this.checked)'/>
-        <button class='button showthatO control' onclick='toggleOffline()'>
+        <button class='button showthatO control' onclick='globalThis.driver.toggleOffline()'>
           ${globalThis.Localization.txt('time_controls>bonus_seconds>title')}
           <div class='showthis' id='bonusText' style='max-width:500px;color:var(--default-color);'>
             ${view.getBonusText()}

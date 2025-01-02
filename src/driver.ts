@@ -1,9 +1,8 @@
 'use strict';
 
-// eslint-disable-next-line prefer-const
+//globals!!!
 let gameSpeed = 1;
 const baseManaPerSecond = 50;
-
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
 let refund = false;
@@ -12,6 +11,7 @@ let timeCounter = 0;
 let effectiveTime = 0;
 let lastSave = Date.now();
 let lagSpeed = 0;
+//globals!!!
 
 function getSpeedMult(zone = curTown) {
   let speedMult = 1;
@@ -820,3 +820,70 @@ function checkExtraSpeed() {
   if (options.speedIncrease20x === true) bonusSpeed = 20;
   if (bonusSpeed < options.speedIncreaseCustom) bonusSpeed = options.speedIncreaseCustom;
 }
+
+const _driver = {
+  getSpeedMult,
+  getActualGameSpeed,
+  refreshDungeons,
+  singleTick,
+  animationTick,
+  tick,
+  executeGameTicks,
+  recalcInterval,
+  stopGame,
+  pauseGame,
+  loopEnd,
+  prepareRestart,
+  restart,
+  manualRestart,
+  addActionToList,
+  addMana,
+  addResource,
+  resetResource,
+  resetResources,
+  changeActionAmount,
+  setCustomActionAmount,
+  selectLoadout,
+  loadLoadout,
+  saveList,
+  nameList,
+  loadList,
+  clearList,
+  unlockTown,
+  adjustAll,
+  capAction,
+  capAmount,
+  capTraining,
+  capAllTraining,
+  addLoop,
+  removeLoop,
+  split,
+  collapse,
+  showNotification,
+  hideNotification,
+  hideActionIcons,
+  showActionIcons,
+  handleDragStart,
+  handleDirectActionDragStart,
+  handleDirectActionDragEnd,
+  handleDragOver,
+  handleDragDrop,
+  moveQueuedAction,
+  moveUp,
+  moveDown,
+  disableAction,
+  removeAction,
+  borrowTime,
+  returnTime,
+  updateLag,
+  addOffline,
+  toggleOffline,
+  isBonusActive,
+  checkExtraSpeed,
+};
+
+declare global {
+  var driver: typeof _driver;
+}
+
+globalThis.driver = _driver;

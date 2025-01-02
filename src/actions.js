@@ -205,8 +205,8 @@ class Actions {
 
     curAction.ticks += manaToSpend;
     curAction.manaUsed += manaToSpend;
-    curAction.timeSpent += manaToSpend / baseManaPerSecond / getSpeedMult();
-    curAction.effectiveTimeElapsed += manaToSpend / baseManaPerSecond / getSpeedMult();
+    curAction.timeSpent += manaToSpend / baseManaPerSecond / globalThis.driver.getSpeedMult();
+    curAction.effectiveTimeElapsed += manaToSpend / baseManaPerSecond / globalThis.driver.getSpeedMult();
 
     // exp gets added here, where it can factor in to adjustTicksNeeded
     addExpFromAction(curAction, manaToSpend);
@@ -376,7 +376,7 @@ class Actions {
       }
     }
     if (this.current.length === 0) {
-      pauseGame();
+      globalThis.driver.pauseGame();
     }
     this.adjustTicksNeeded();
     view.requestUpdate('updateMultiPartActions');

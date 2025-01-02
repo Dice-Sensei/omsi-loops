@@ -2429,7 +2429,7 @@ const Koviko = {
 
                 // Calculate time spent
                 // @ts-ignore
-                let temp = (currentMana - state.resources.mana) / getSpeedMult(state.resources.town);
+                let temp = (currentMana - state.resources.mana) / globalThis.driver.getSpeedMult(state.resources.town);
                 state.resources.totalTicks += temp;
                 state.resources.actionTicks += temp;
 

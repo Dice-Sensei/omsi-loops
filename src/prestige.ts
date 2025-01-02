@@ -89,9 +89,9 @@ function prestigeWithNewValues(
 
   // Remove all progress and save totals
   globalThis.saving.load(false);
-  clearList();
-  restart();
-  pauseGame();
+  globalThis.driver.clearList();
+  globalThis.driver.restart();
+  globalThis.driver.pauseGame();
 
   // Regain prestige values and Totals
   for (const [key, value] of Object.entries(nextPrestigeBuffs)) {

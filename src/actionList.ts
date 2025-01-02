@@ -655,12 +655,12 @@ class AssassinAction extends MultipartAction {
     return 'Assassination';
   }
   loopsFinished() {
-    addResource('heart', 1);
+    globalThis.driver.addResource('heart', 1);
     hearts.push(this.varName);
   }
   finish() {
     let rep = Math.min((this.townNum + 1) * -250 + getSkillLevel('Assassin'), 0);
-    addResource('reputation', rep);
+    globalThis.driver.addResource('reputation', rep);
   }
   visible() {
     return getSkillLevel('Assassin') > 0;
@@ -707,12 +707,12 @@ function SurveyAction(townNum) {
     },
     finish() {
       if (towns[this.townNum].getLevel('Survey') != 100) {
-        addResource('map', -1);
-        addResource('completedMap', 1);
+        globalThis.driver.addResource('map', -1);
+        globalThis.driver.addResource('completedMap', 1);
         towns[this.townNum].finishProgress(this.varName, getExploreSkill());
         view.requestUpdate('updateActionTooltips', null);
       } else if (options.pauseOnComplete) {
-        pauseGame(true, 'Survey complete! (Game paused)');
+        globalThis.driver.pauseGame(true, 'Survey complete! (Game paused)');
       }
     },
   });
@@ -816,7 +816,7 @@ function HaulAction(townNum) {
     finish() {
       stoneLoc = this.townNum;
       towns[this.townNum].finishRegular(this.varName, 1000, () => {
-        addResource('stone', true);
+        globalThis.driver.addResource('stone', true);
       });
     },
     storyReqs(storyNum) {
@@ -905,8 +905,8 @@ Action.Map = new Action('Map', {
     return 15;
   },
   finish() {
-    addResource('gold', -this.goldCost());
-    addResource('map', 1);
+    globalThis.driver.addResource('gold', -this.goldCost());
+    globalThis.driver.addResource('map', 1);
   },
 });
 lateGameActions.push('Map');
@@ -997,7 +997,7 @@ Action.SmashPots = new Action('Smash Pots', {
   finish() {
     towns[0].finishRegular(this.varName, 10, () => {
       const manaGain = this.goldCost();
-      addMana(manaGain);
+      globalThis.driver.addMana(manaGain);
       return manaGain;
     });
   },
@@ -1043,7 +1043,7 @@ Action.PickLocks = new Action('Pick Locks', {
   finish() {
     towns[0].finishRegular(this.varName, 10, () => {
       const goldGain = this.goldCost();
-      addResource('gold', goldGain);
+      globalThis.driver.addResource('gold', goldGain);
       return goldGain;
     });
   },
@@ -1073,7 +1073,7 @@ Action.BuyGlasses = new Action('Buy Glasses', {
     return resources.gold >= 10;
   },
   cost() {
-    addResource('gold', -10);
+    globalThis.driver.addResource('gold', -10);
   },
   manaCost() {
     return 50;
@@ -1086,7 +1086,7 @@ Action.BuyGlasses = new Action('Buy Glasses', {
     return towns[0].getLevel('Wander') >= 20;
   },
   finish() {
-    addResource('glasses', true);
+    globalThis.driver.addResource('glasses', true);
   },
   story(completed) {
     globalThis.view.setStoryFlag('glassesBought');
@@ -1149,8 +1149,8 @@ Action.BuyManaZ1 = new Action('Buy Mana Z1', {
     return Math.floor(50 * getSkillBonus('Mercantilism') * globalThis.prestige.adjustGoldCostFromPrestige());
   },
   finish() {
-    addMana(resources.gold * this.goldCost());
-    resetResource('gold');
+    globalThis.driver.addMana(resources.gold * this.goldCost());
+    globalThis.driver.resetResource('gold');
   },
 });
 
@@ -1286,7 +1286,7 @@ Action.ShortQuest = new Action('Short Quest', {
   finish() {
     towns[0].finishRegular(this.varName, 5, () => {
       const goldGain = this.goldCost();
-      addResource('gold', goldGain);
+      globalThis.driver.addResource('gold', goldGain);
       return goldGain;
     });
   },
@@ -1388,9 +1388,9 @@ Action.LongQuest = new Action('Long Quest', {
   },
   finish() {
     towns[0].finishRegular(this.varName, 5, () => {
-      addResource('reputation', 1);
+      globalThis.driver.addResource('reputation', 1);
       const goldGain = this.goldCost();
-      addResource('gold', goldGain);
+      globalThis.driver.addResource('gold', goldGain);
       return goldGain;
     });
   },
@@ -1430,7 +1430,7 @@ Action.ThrowParty = new Action('Throw Party', {
     return resources.reputation >= 2;
   },
   cost() {
-    addResource('reputation', -2);
+    globalThis.driver.addResource('reputation', -2);
   },
   visible() {
     return towns[this.townNum].getLevel('Secrets') >= 20;
@@ -1591,7 +1591,7 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
       Math.sqrt(1 + totalCompletions / 100);
   },
   loopsFinished() {
-    addResource('reputation', 3);
+    globalThis.driver.addResource('reputation', 3);
   },
   getPartName(loopCounter = towns[0].HealLoopCounter) {
     return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
@@ -1662,7 +1662,7 @@ Action.FightMonsters = new MultipartAction('Fight Monsters', {
     // empty
   },
   segmentFinished() {
-    addResource('gold', 20);
+    globalThis.driver.addResource('gold', 20);
   },
   getPartName(loopCounter = towns[0].FightLoopCounter) {
     const monster = Math.floor(loopCounter / 3 + 0.0000001);
@@ -1804,7 +1804,7 @@ Action.BuySupplies = new Action('Buy Supplies', {
     return resources.gold >= towns[0].suppliesCost && !resources.supplies;
   },
   cost() {
-    addResource('gold', -towns[0].suppliesCost);
+    globalThis.driver.addResource('gold', -towns[0].suppliesCost);
   },
   visible() {
     return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 15;
@@ -1813,7 +1813,7 @@ Action.BuySupplies = new Action('Buy Supplies', {
     return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 35;
   },
   finish() {
-    addResource('supplies', true);
+    globalThis.driver.addResource('supplies', true);
   },
   story(completed) {
     globalThis.view.setStoryFlag('suppliesBought');
@@ -1848,7 +1848,7 @@ Action.Haggle = new Action('Haggle', {
     return resources.reputation >= 1;
   },
   cost() {
-    addResource('reputation', -1);
+    globalThis.driver.addResource('reputation', -1);
   },
   visible() {
     return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 15;
@@ -1896,7 +1896,7 @@ Action.StartJourney = new Action('Start Journey', {
     return resources.supplies;
   },
   cost() {
-    addResource('supplies', false);
+    globalThis.driver.addResource('supplies', false);
   },
   visible() {
     return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 15;
@@ -1905,7 +1905,7 @@ Action.StartJourney = new Action('Start Journey', {
     return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 35;
   },
   finish() {
-    unlockTown(1);
+    globalThis.driver.unlockTown(1);
   },
   story(completed) {
     globalThis.view.unlockGlobalStory(3);
@@ -1943,7 +1943,7 @@ Action.HitchRide = new Action('Hitch Ride', {
     return getExploreProgress() >= 25;
   },
   finish() {
-    unlockTown(2);
+    globalThis.driver.unlockTown(2);
   },
 });
 
@@ -1980,8 +1980,8 @@ Action.OpenRift = new Action('Open Rift', {
   },
   finish() {
     handleSkillExp(this.skills);
-    addResource('supplies', false);
-    unlockTown(5);
+    globalThis.driver.addResource('supplies', false);
+    globalThis.driver.unlockTown(5);
   },
 });
 
@@ -2090,7 +2090,7 @@ Action.WildMana = new Action('Wild Mana', {
   finish() {
     towns[1].finishRegular(this.varName, 10, () => {
       const manaGain = this.goldCost();
-      addMana(manaGain);
+      globalThis.driver.addMana(manaGain);
       return manaGain;
     });
   },
@@ -2128,7 +2128,7 @@ Action.GatherHerbs = new Action('Gather Herbs', {
   },
   finish() {
     towns[1].finishRegular(this.varName, 10, () => {
-      addResource('herbs', 1);
+      globalThis.driver.addResource('herbs', 1);
       return 1;
     });
   },
@@ -2168,7 +2168,7 @@ Action.Hunt = new Action('Hunt', {
   },
   finish() {
     towns[1].finishRegular(this.varName, 10, () => {
-      addResource('hide', 1);
+      globalThis.driver.addResource('hide', 1);
       return 1;
     });
   },
@@ -2375,7 +2375,7 @@ Action.LearnAlchemy = new Action('Learn Alchemy', {
     return resources.herbs >= 10;
   },
   cost() {
-    addResource('herbs', -10);
+    globalThis.driver.addResource('herbs', -10);
   },
   manaCost() {
     return Math.ceil(5000 * (1 - towns[1].getLevel('Hermit') * 0.005));
@@ -2422,7 +2422,7 @@ Action.BrewPotions = new Action('Brew Potions', {
     return resources.herbs >= 10 && resources.reputation >= 5;
   },
   cost() {
-    addResource('herbs', -10);
+    globalThis.driver.addResource('herbs', -10);
   },
   manaCost() {
     return Math.ceil(4000);
@@ -2434,7 +2434,7 @@ Action.BrewPotions = new Action('Brew Potions', {
     return getSkillLevel('Alchemy') >= 10;
   },
   finish() {
-    addResource('potions', 1);
+    globalThis.driver.addResource('potions', 1);
     handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('potionBrewed');
     if (resources.potions >= 50) {
@@ -2737,7 +2737,7 @@ Action.DarkMagic = new Action('Dark Magic', {
     return resources.reputation <= 0;
   },
   cost() {
-    addResource('reputation', -1);
+    globalThis.driver.addResource('reputation', -1);
   },
   visible() {
     return towns[1].getLevel('Witch') >= 10;
@@ -2961,7 +2961,7 @@ Action.ContinueOn = new Action('Continue On', {
     return true;
   },
   finish() {
-    unlockTown(2);
+    globalThis.driver.unlockTown(2);
   },
   story(completed) {
     globalThis.view.unlockGlobalStory(4);
@@ -3057,8 +3057,8 @@ Action.Gamble = new Action('Gamble', {
     return resources.gold >= 20 && resources.reputation >= -5;
   },
   cost() {
-    addResource('gold', -20);
-    addResource('reputation', -1);
+    globalThis.driver.addResource('gold', -20);
+    globalThis.driver.addResource('reputation', -1);
   },
   manaCost() {
     return 1000;
@@ -3072,7 +3072,7 @@ Action.Gamble = new Action('Gamble', {
   finish() {
     towns[2].finishRegular(this.varName, 10, () => {
       let goldGain = Math.floor(60 * getSkillBonus('Thievery'));
-      addResource('gold', goldGain);
+      globalThis.driver.addResource('gold', goldGain);
       return 60;
     });
   },
@@ -3114,7 +3114,7 @@ Action.GetDrunk = new Action('Get Drunk', {
     return resources.reputation >= -3;
   },
   cost() {
-    addResource('reputation', -1);
+    globalThis.driver.addResource('reputation', -1);
   },
   manaCost() {
     return 1000;
@@ -3161,9 +3161,9 @@ Action.BuyManaZ3 = new Action('Buy Mana Z3', {
     return Math.floor(50 * getSkillBonus('Mercantilism') * globalThis.prestige.adjustGoldCostFromPrestige());
   },
   finish() {
-    addMana(resources.gold * this.goldCost());
+    globalThis.driver.addMana(resources.gold * this.goldCost());
     globalThis.view.setStoryFlag('manaZ3Bought');
-    resetResource('gold');
+    globalThis.driver.resetResource('gold');
   },
 });
 
@@ -3200,8 +3200,8 @@ Action.SellPotions = new Action('Sell Potions', {
   },
   finish() {
     if (resources.potions >= 20) globalThis.view.setStoryFlag('sell20PotionsInALoop');
-    addResource('gold', resources.potions * getSkillLevel('Alchemy'));
-    resetResource('potions');
+    globalThis.driver.addResource('gold', resources.potions * getSkillLevel('Alchemy'));
+    globalThis.driver.resetResource('potions');
     globalThis.view.setStoryFlag('potionSold');
     if (getSkillLevel('Alchemy') >= 100) globalThis.view.setStoryFlag('sellPotionFor100Gold');
     if (getSkillLevel('Alchemy') >= 1000) globalThis.view.setStoryFlag('sellPotionFor1kGold');
@@ -3274,7 +3274,7 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
   },
   segmentFinished() {
     curAdvGuildSegment++;
-    addMana(200);
+    globalThis.driver.addMana(200);
   },
   getPartName() {
     return `Rank ${getAdvGuildRank().name}`;
@@ -3357,7 +3357,7 @@ Action.GatherTeam = new Action('Gather Team', {
   },
   cost() {
     // cost comes after finish
-    addResource('gold', -(resources.teamMembers) * 100);
+    globalThis.driver.addResource('gold', -(resources.teamMembers) * 100);
   },
   manaCost() {
     return 2000;
@@ -3369,7 +3369,7 @@ Action.GatherTeam = new Action('Gather Team', {
     return towns[2].getLevel('Drunk') >= 20;
   },
   finish() {
-    addResource('teamMembers', 1);
+    globalThis.driver.addResource('teamMembers', 1);
     globalThis.view.setStoryFlag('teammateGathered');
     if (resources.teamMembers >= 5) globalThis.view.setStoryFlag('fullParty');
   },
@@ -3509,7 +3509,7 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
   segmentFinished() {
     curCraftGuildSegment++;
     handleSkillExp(this.skills);
-    addResource('gold', 10);
+    globalThis.driver.addResource('gold', 10);
   },
   getPartName() {
     return `Rank ${getCraftGuildRank().name}`;
@@ -3590,7 +3590,7 @@ Action.CraftArmor = new Action('Craft Armor', {
     return resources.hide >= 2;
   },
   cost() {
-    addResource('hide', -2);
+    globalThis.driver.addResource('hide', -2);
   },
   manaCost() {
     return 1000;
@@ -3602,7 +3602,7 @@ Action.CraftArmor = new Action('Craft Armor', {
     return towns[2].getLevel('Drunk') >= 30;
   },
   finish() {
-    addResource('armor', 1);
+    globalThis.driver.addResource('armor', 1);
     globalThis.view.setStoryFlag('armorCrafted');
     if (resources.armor >= 10) globalThis.view.setStoryFlag('craft10Armor');
     if (resources.armor >= 25) globalThis.view.setStoryFlag('craft20Armor');
@@ -3835,7 +3835,7 @@ Action.BuyPickaxe = new Action('Buy Pickaxe', {
     return resources.gold >= 200;
   },
   cost() {
-    addResource('gold', -200);
+    globalThis.driver.addResource('gold', -200);
   },
   manaCost() {
     return 3000;
@@ -3847,7 +3847,7 @@ Action.BuyPickaxe = new Action('Buy Pickaxe', {
     return towns[2].getLevel('City') >= 90;
   },
   finish() {
-    addResource('pickaxe', true);
+    globalThis.driver.addResource('pickaxe', true);
     globalThis.view.setStoryFlag('pickaxeBought');
   },
 });
@@ -3948,7 +3948,7 @@ Action.StartTrek = new Action('Start Trek', {
     return towns[2].getLevel('City') >= 60;
   },
   finish() {
-    unlockTown(3);
+    globalThis.driver.unlockTown(3);
   },
   story(completed) {
     globalThis.view.unlockGlobalStory(5);
@@ -3973,7 +3973,7 @@ Action.Underworld = new Action('Underworld', {
     return 1;
   },
   cost() {
-    addResource('gold', -500);
+    globalThis.driver.addResource('gold', -500);
   },
   manaCost() {
     return 50000;
@@ -3991,7 +3991,7 @@ Action.Underworld = new Action('Underworld', {
     return 500;
   },
   finish() {
-    unlockTown(7);
+    globalThis.driver.unlockTown(7);
     globalThis.view.setStoryFlag('charonPaid');
   },
 });
@@ -4082,7 +4082,7 @@ Action.ManaGeyser = new Action('Mana Geyser', {
   },
   finish() {
     towns[3].finishRegular(this.varName, 100, () => {
-      addMana(5000);
+      globalThis.driver.addMana(5000);
       return 5000;
     });
   },
@@ -4202,7 +4202,7 @@ Action.LoopingPotion = new Action('Looping Potion', {
     return resources.herbs >= 400;
   },
   cost() {
-    addResource('herbs', -400);
+    globalThis.driver.addResource('herbs', -400);
   },
   manaCost() {
     return Math.ceil(30000);
@@ -4214,7 +4214,7 @@ Action.LoopingPotion = new Action('Looping Potion', {
     return getSkillLevel('Alchemy') >= 200;
   },
   finish() {
-    addResource('loopingPotion', true);
+    globalThis.driver.addResource('loopingPotion', true);
     handleSkillExp(this.skills);
   },
   story(completed) {
@@ -4404,7 +4404,7 @@ Action.HuntTrolls = new MultipartAction('Hunt Trolls', {
   },
   loopsFinished() {
     handleSkillExp(this.skills);
-    addResource('blood', 1);
+    globalThis.driver.addResource('blood', 1);
     if (resources.blood >= 6) globalThis.view.setStoryFlag('slay6TrollsInALoop');
     if (resources.blood >= 20) globalThis.view.setStoryFlag('slay20TrollsInALoop');
   },
@@ -4502,7 +4502,7 @@ Action.TakeArtifacts = new Action('Take Artifacts', {
   },
   finish() {
     towns[3].finishRegular(this.varName, 25, () => {
-      addResource('artifacts', 1);
+      globalThis.driver.addResource('artifacts', 1);
     });
   },
 });
@@ -4575,7 +4575,7 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
   },
   finish() {
     view.requestUpdate('updateBuff', 'Imbuement');
-    if (options.autoMaxTraining) capAllTraining();
+    if (options.autoMaxTraining) globalThis.driver.capAllTraining();
     if (towns[3].ImbueMindLoopCounter >= 0) globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
   },
 });
@@ -4696,11 +4696,11 @@ Action.FaceJudgement = new Action('Face Judgement', {
     if (resources.reputation >= 50) {
       globalThis.view.setStoryFlag('acceptedIntoValhalla');
       globalThis.view.unlockGlobalStory(6);
-      unlockTown(4);
+      globalThis.driver.unlockTown(4);
     } else if (resources.reputation <= -50) {
       globalThis.view.setStoryFlag('castIntoShadowRealm');
       globalThis.view.unlockGlobalStory(7);
-      unlockTown(5);
+      globalThis.driver.unlockTown(5);
     } else {
       globalThis.view.setStoryFlag('ignoredByGods');
     }
@@ -4728,7 +4728,7 @@ Action.Guru = new Action('Guru', {
     return 100000;
   },
   cost() {
-    addResource('herbs', -1000);
+    globalThis.driver.addResource('herbs', -1000);
   },
   canStart() {
     return resources.herbs >= 1000;
@@ -4740,7 +4740,7 @@ Action.Guru = new Action('Guru', {
     return getExploreProgress() >= 100;
   },
   finish() {
-    unlockTown(4);
+    globalThis.driver.unlockTown(4);
     globalThis.view.setStoryFlag('spokeToGuru');
   },
 });
@@ -4788,7 +4788,7 @@ Action.GuidedTour = new Action('Guided Tour', {
     return resources.gold >= 10;
   },
   cost() {
-    addResource('gold', -10);
+    globalThis.driver.addResource('gold', -10);
   },
   manaCost() {
     return 2500;
@@ -4876,8 +4876,8 @@ Action.Donate = new Action('Donate', {
     return towns[4].getLevel('Canvassed') >= 5;
   },
   finish() {
-    addResource('gold', -20);
-    addResource('reputation', 1);
+    globalThis.driver.addResource('gold', -20);
+    globalThis.driver.addResource('reputation', 1);
     globalThis.view.setStoryFlag('donatedToCharity');
   },
 });
@@ -4911,7 +4911,7 @@ Action.AcceptDonations = new Action('Accept Donations', {
     return resources.reputation > 0;
   },
   cost() {
-    addResource('reputation', -1);
+    globalThis.driver.addResource('reputation', -1);
   },
   manaCost() {
     return 2000;
@@ -4925,7 +4925,7 @@ Action.AcceptDonations = new Action('Accept Donations', {
   finish() {
     globalThis.view.setStoryFlag('receivedDonation');
     towns[4].finishRegular(this.varName, 5, () => {
-      addResource('gold', 20);
+      globalThis.driver.addResource('gold', 20);
       return 20;
     });
   },
@@ -4971,8 +4971,8 @@ Action.TidyUp = new MultipartAction('Tidy Up', {
     return getSkillLevel('Practical') * Math.sqrt(1 + totalCompletions / 100);
   },
   loopsFinished(loopCounter = towns[4].TidyLoopCounter) {
-    addResource('reputation', 1);
-    addResource('gold', 5);
+    globalThis.driver.addResource('reputation', 1);
+    globalThis.driver.addResource('gold', 5);
     globalThis.view.setStoryFlag('tidiedUp');
   },
   segmentFinished() {
@@ -5025,8 +5025,8 @@ Action.BuyManaZ5 = new Action('Buy Mana Z5', {
     return Math.floor(50 * getSkillBonus('Mercantilism') * globalThis.prestige.adjustGoldCostFromPrestige());
   },
   finish() {
-    addMana(resources.gold * this.goldCost());
-    resetResource('gold');
+    globalThis.driver.addMana(resources.gold * this.goldCost());
+    globalThis.driver.resetResource('gold');
     globalThis.view.setStoryFlag('manaZ5Bought');
   },
 });
@@ -5051,7 +5051,7 @@ Action.SellArtifact = new Action('Sell Artifact', {
     return resources.artifacts >= 1;
   },
   cost() {
-    addResource('artifacts', -1);
+    globalThis.driver.addResource('artifacts', -1);
   },
   manaCost() {
     return 500;
@@ -5064,7 +5064,7 @@ Action.SellArtifact = new Action('Sell Artifact', {
   },
   finish() {
     globalThis.view.setStoryFlag('artifactSold');
-    addResource('gold', 50);
+    globalThis.driver.addResource('gold', 50);
   },
 });
 
@@ -5091,7 +5091,7 @@ Action.GiftArtifact = new Action('Gift Artifact', {
     return resources.artifacts >= 1;
   },
   cost() {
-    addResource('artifacts', -1);
+    globalThis.driver.addResource('artifacts', -1);
   },
   manaCost() {
     return 500;
@@ -5104,7 +5104,7 @@ Action.GiftArtifact = new Action('Gift Artifact', {
   },
   finish() {
     globalThis.view.setStoryFlag('artifactDonated');
-    addResource('favors', 1);
+    globalThis.driver.addResource('favors', 1);
     if (resources['favors'] >= 20) globalThis.view.setStoryFlag('donated20Artifacts');
     if (resources['favors'] >= 50) globalThis.view.setStoryFlag('donated40Artifacts');
   },
@@ -5141,7 +5141,7 @@ Action.Mercantilism = new Action('Mercantilism', {
     return 10000; // Temp
   },
   cost() {
-    addResource('reputation', -1);
+    globalThis.driver.addResource('reputation', -1);
   },
   visible() {
     return towns[4].getLevel('Tour') >= 20;
@@ -5264,8 +5264,8 @@ Action.EnchantArmor = new Action('Enchant Armor', {
     return resources.favors >= 1 && resources.armor >= 1;
   },
   cost() {
-    addResource('favors', -1);
-    addResource('armor', -1);
+    globalThis.driver.addResource('favors', -1);
+    globalThis.driver.addResource('armor', -1);
   },
   visible() {
     return towns[4].getLevel('Tour') >= 30;
@@ -5275,7 +5275,7 @@ Action.EnchantArmor = new Action('Enchant Armor', {
   },
   finish() {
     handleSkillExp(this.skills);
-    addResource('enchantments', 1);
+    globalThis.driver.addResource('enchantments', 1);
     globalThis.view.setStoryFlag('armorEnchanted');
     if (resources['enchantments'] >= 10) globalThis.view.setStoryFlag('enchanted10Armor');
     if (resources['enchantments'] >= 25) globalThis.view.setStoryFlag('enchanted20Armor');
@@ -5325,8 +5325,8 @@ Action.WizardCollege = new MultipartAction('Wizard College', {
     return resources.gold >= 500 && resources.favors >= 10;
   },
   cost() {
-    addResource('gold', -500);
-    addResource('favors', -10);
+    globalThis.driver.addResource('gold', -500);
+    globalThis.driver.addResource('favors', -10);
   },
   loopCost(segment, loopCounter = towns[4][`${this.varName}LoopCounter`]) {
     return globalThis.helpers.precision3(Math.pow(1.3, loopCounter + segment)) * 1e7; // Temp
@@ -5493,7 +5493,7 @@ Action.Spatiomancy = new Action('Spatiomancy', {
     if (getSkillLevel('Spatiomancy') !== oldSpatioSkill) {
       view.requestUpdate('adjustManaCost', 'Mana Geyser');
       view.requestUpdate('adjustManaCost', 'Mana Well');
-      adjustAll();
+      globalThis.driver.adjustAll();
       for (const action of totalActionList) {
         if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
           view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
@@ -5587,7 +5587,7 @@ Action.BuildHousing = new Action('Build Housing', {
     return towns[4].getLevel('Citizen') >= 100;
   },
   finish() {
-    addResource('houses', 1);
+    globalThis.driver.addResource('houses', 1);
     handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('houseBuilt');
     if (resources.houses >= 10 && getCraftGuildRank().name == 'Godlike') {
@@ -5635,7 +5635,7 @@ Action.CollectTaxes = new Action('Collect Taxes', {
   },
   finish() {
     const goldGain = Math.floor(resources.houses * getSkillLevel('Mercantilism') / 10);
-    addResource('gold', goldGain);
+    globalThis.driver.addResource('gold', goldGain);
     globalThis.view.setStoryFlag('collectedTaxes');
     if (resources.houses >= 50) {
       globalThis.view.setStoryFlag('collected50Taxes');
@@ -5674,8 +5674,8 @@ Action.Pegasus = new Action('Pegasus', {
     return resources.gold >= 200 && resources.favors >= 20;
   },
   cost() {
-    addResource('favors', -20);
-    addResource('gold', -200);
+    globalThis.driver.addResource('favors', -20);
+    globalThis.driver.addResource('gold', -200);
   },
   visible() {
     return towns[4].getLevel('Tour') >= 70;
@@ -5684,7 +5684,7 @@ Action.Pegasus = new Action('Pegasus', {
     return towns[4].getLevel('Tour') >= 90;
   },
   finish() {
-    addResource('pegasus', true);
+    globalThis.driver.addResource('pegasus', true);
     globalThis.view.setStoryFlag('acquiredPegasus');
     if (resources.teamMembers >= 5) {
       globalThis.view.setStoryFlag('acquiredPegasusWithTeam');
@@ -5957,7 +5957,7 @@ Action.FallFromGrace = new Action('Fall From Grace', {
     if (resources.reputation >= 0) resources.reputation = -1;
     view.requestUpdate('updateResource', 'reputation');
     globalThis.view.setStoryFlag('fellFromGrace');
-    unlockTown(5);
+    globalThis.driver.unlockTown(5);
   },
 });
 
@@ -6058,7 +6058,7 @@ Action.ManaWell = new Action('Mana Well', {
   finish() {
     towns[5].finishRegular(this.varName, 100, () => {
       let wellMana = this.goldCost();
-      addMana(wellMana);
+      globalThis.driver.addMana(wellMana);
       if (wellMana === 0) {
         globalThis.view.setStoryFlag('drewDryWell');
       } else {
@@ -6107,7 +6107,7 @@ Action.DestroyPylons = new Action('Destroy Pylons', {
   },
   finish() {
     towns[5].finishRegular(this.varName, 100, () => {
-      addResource('pylons', 1);
+      globalThis.driver.addResource('pylons', 1);
       //view.requestUpdate("adjustManaCost", "The Spire");
       return 1;
     });
@@ -6140,7 +6140,7 @@ Action.RaiseZombie = new Action('Raise Zombie', {
     return resources.blood >= 1;
   },
   cost() {
-    addResource('blood', -1);
+    globalThis.driver.addResource('blood', -1);
   },
   manaCost() {
     return 10000;
@@ -6154,7 +6154,7 @@ Action.RaiseZombie = new Action('Raise Zombie', {
   finish() {
     globalThis.view.setStoryFlag('attemptedRaiseZombie');
     handleSkillExp(this.skills);
-    addResource('zombie', 1);
+    globalThis.driver.addResource('zombie', 1);
     globalThis.view.increaseStoryVarTo('maxZombiesRaised', resources.zombie);
   },
 });
@@ -6184,7 +6184,7 @@ Action.DarkSacrifice = new Action('Dark Sacrifice', {
     return resources.blood >= 1;
   },
   cost() {
-    addResource('blood', -1);
+    globalThis.driver.addResource('blood', -1);
   },
   manaCost() {
     return 20000;
@@ -6301,7 +6301,7 @@ Action.PurchaseSupplies = new Action('Purchase Supplies', {
     return resources.gold >= 500 && !resources.supplies;
   },
   cost() {
-    addResource('gold', -500);
+    globalThis.driver.addResource('gold', -500);
   },
   visible() {
     return towns[5].getLevel('Meander') >= 50;
@@ -6311,7 +6311,7 @@ Action.PurchaseSupplies = new Action('Purchase Supplies', {
   },
   finish() {
     globalThis.view.setStoryFlag('suppliesPurchased');
-    addResource('supplies', true);
+    globalThis.driver.addResource('supplies', true);
   },
 });
 
@@ -6349,7 +6349,7 @@ Action.DeadTrial = new TrialAction('Dead Trial', 4, {
   },
   floorReward() {
     //Rewards given per floor
-    addResource('zombie', 1);
+    globalThis.driver.addResource('zombie', 1);
   },
   canStart() {
     return this.currentFloor() < trialFloors[this.trialNum];
@@ -6392,7 +6392,7 @@ Action.JourneyForth = new Action('Journey Forth', {
     return resources.supplies;
   },
   cost() {
-    addResource('supplies', false);
+    globalThis.driver.addResource('supplies', false);
   },
   visible() {
     return towns[5].getLevel('Meander') >= 75;
@@ -6401,7 +6401,7 @@ Action.JourneyForth = new Action('Journey Forth', {
     return towns[5].getLevel('Meander') >= 100;
   },
   finish() {
-    unlockTown(6);
+    globalThis.driver.unlockTown(6);
   },
   story(completed) {
     globalThis.view.unlockGlobalStory(8);
@@ -6455,7 +6455,7 @@ Action.ExploreJungle = new Action('Explore Jungle', {
   },
   finish() {
     towns[6].finishProgress(this.varName, 20 * getFightJungleMonstersRank().bonus);
-    addResource('herbs', 1);
+    globalThis.driver.addResource('herbs', 1);
   },
 });
 
@@ -6515,7 +6515,7 @@ Action.FightJungleMonsters = new MultipartAction('Fight Jungle Monsters', {
   },
   segmentFinished() {
     curFightJungleMonstersSegment++;
-    addResource('blood', 1);
+    globalThis.driver.addResource('blood', 1);
     //Since the action stories are for having *slain* the beast,
     //unlock *after* the last segment of the beast in question.
     //I.e., the sloth fight is segments 6, 7 and 8, so the unlock
@@ -6626,7 +6626,7 @@ Action.RescueSurvivors = new MultipartAction('Rescue Survivors', {
       Math.sqrt(1 + totalCompletions / 100);
   },
   loopsFinished(loopCounter = towns[6].RescueLoopCounter) {
-    addResource('reputation', 4);
+    globalThis.driver.addResource('reputation', 4);
     globalThis.view.setStoryFlag('survivorRescued');
     if (loopCounter >= 6) globalThis.view.setStoryFlag('rescued6Survivors');
     if (loopCounter >= 20) globalThis.view.setStoryFlag('rescued20Survivors');
@@ -6678,8 +6678,8 @@ Action.PrepareBuffet = new Action('Prepare Buffet', {
     return resources.herbs >= 10 && resources.blood > 0;
   },
   cost() {
-    addResource('herbs', -10);
-    addResource('blood', -1);
+    globalThis.driver.addResource('herbs', -10);
+    globalThis.driver.addResource('blood', -1);
   },
   manaCost() {
     return 30000;
@@ -6728,7 +6728,7 @@ Action.Totem = new Action('Totem', {
     return resources.loopingPotion;
   },
   cost() {
-    addResource('loopingPotion', false);
+    globalThis.driver.addResource('loopingPotion', false);
   },
   manaCost() {
     return 30000;
@@ -6778,7 +6778,7 @@ Action.Escape = new Action('Escape', {
     return towns[6].getLevel('ExploreJungle') >= 100;
   },
   finish() {
-    unlockTown(7);
+    globalThis.driver.unlockTown(7);
   },
   story(completed) {
     globalThis.view.unlockGlobalStory(10);
@@ -6822,7 +6822,7 @@ Action.OpenPortal = new Action('Open Portal', {
     portalUsed = true;
     globalThis.view.setStoryFlag('portalOpened');
     handleSkillExp(this.skills);
-    unlockTown(1);
+    globalThis.driver.unlockTown(1);
   },
 });
 
@@ -6879,7 +6879,7 @@ Action.Excursion = new Action('Excursion', {
   finish() {
     if (guild === 'Thieves' || guild === 'Explorer') globalThis.view.setStoryFlag('excursionAsGuildmember');
     towns[7].finishProgress(this.varName, 50 * (resources.glasses ? 2 : 1));
-    addResource('gold', -1 * this.goldCost());
+    globalThis.driver.addResource('gold', -1 * this.goldCost());
   },
 });
 function adjustPockets() {
@@ -6945,7 +6945,7 @@ Action.ExplorersGuild = new Action('Explorers Guild', {
   finish() {
     globalThis.view.setStoryFlag('explorerGuildTestTaken');
     if (getExploreSkill() == 0) towns[this.townNum].finishProgress('SurveyZ' + this.townNum, 100);
-    if (resources.map === 0) addResource('map', 30);
+    if (resources.map === 0) globalThis.driver.addResource('map', 30);
     if (resources.completedMap > 0) {
       exchangeMap();
       globalThis.view.setStoryFlag('mapTurnedIn');
@@ -7072,7 +7072,7 @@ function exchangeMap() {
       }
     }
     view.requestUpdate('updateProgressAction', { name: 'SurveyZ' + rand, town: towns[rand] });
-    addResource('completedMap', -1);
+    globalThis.driver.addResource('completedMap', -1);
   }
 }
 
@@ -7135,7 +7135,7 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
   segmentFinished() {
     curThievesGuildSegment++;
     handleSkillExp(this.skills);
-    addResource('gold', 10);
+    globalThis.driver.addResource('gold', 10);
   },
   getPartName() {
     return `Rank ${getThievesGuildRank().name}`;
@@ -7254,7 +7254,7 @@ Action.PickPockets = new Action('Pick Pockets', {
     handleSkillExp(this.skills);
     view.requestUpdate('adjustExpGain', Action.ThievesGuild);
     const goldGain = Math.floor(this.goldCost() * getThievesGuildRank().bonus);
-    addResource('gold', goldGain);
+    globalThis.driver.addResource('gold', goldGain);
     return goldGain;
   },
 });
@@ -7316,7 +7316,7 @@ Action.RobWarehouse = new Action('Rob Warehouse', {
     handleSkillExp(this.skills);
     view.requestUpdate('adjustExpGain', Action.ThievesGuild);
     const goldGain = Math.floor(this.goldCost() * getThievesGuildRank().bonus);
-    addResource('gold', goldGain);
+    globalThis.driver.addResource('gold', goldGain);
     return goldGain;
   },
 });
@@ -7378,7 +7378,7 @@ Action.InsuranceFraud = new Action('Insurance Fraud', {
     handleSkillExp(this.skills);
     view.requestUpdate('adjustExpGain', Action.ThievesGuild);
     const goldGain = Math.floor(this.goldCost() * getThievesGuildRank().bonus);
-    addResource('gold', goldGain);
+    globalThis.driver.addResource('gold', goldGain);
     return goldGain;
   },
 });
@@ -7495,7 +7495,7 @@ Action.Invest = new Action('Invest', {
     handleSkillExp(this.skills);
     goldInvested += resources.gold;
     if (goldInvested > 999999999999) goldInvested = 999999999999;
-    resetResource('gold');
+    globalThis.driver.resetResource('gold');
     if (storyFlags.investedOne) globalThis.view.setStoryFlag('investedTwo');
     globalThis.view.setStoryFlag('investedOne');
     view.requestUpdate('updateActionTooltips', null);
@@ -7544,7 +7544,7 @@ Action.CollectInterest = new Action('Collect Interest', {
   finish() {
     handleSkillExp(this.skills);
     let interestGold = Math.floor(goldInvested * .001);
-    addResource('gold', interestGold);
+    globalThis.driver.addResource('gold', interestGold);
     globalThis.view.setStoryFlag('interestCollected');
     if (interestGold >= 1000) globalThis.view.setStoryFlag('collected1KInterest');
     if (interestGold >= 1000000) globalThis.view.setStoryFlag('collected1MInterest');
@@ -7584,7 +7584,7 @@ Action.Seminar = new Action('Seminar', {
     return resources.gold >= 1000;
   },
   cost() {
-    addResource('gold', -1000);
+    globalThis.driver.addResource('gold', -1000);
   },
   visible() {
     return towns[this.townNum].getLevel('Survey') >= 100;
@@ -7630,7 +7630,7 @@ Action.PurchaseKey = new Action('Purchase Key', {
     return resources.gold >= 1000000 && !resources.key;
   },
   cost() {
-    addResource('gold', -1000000);
+    globalThis.driver.addResource('gold', -1000000);
   },
   visible() {
     return true;
@@ -7642,7 +7642,7 @@ Action.PurchaseKey = new Action('Purchase Key', {
     return 1000000;
   },
   finish() {
-    addResource('key', true);
+    globalThis.driver.addResource('key', true);
     globalThis.view.setStoryFlag('keyBought');
   },
 });
@@ -7735,7 +7735,7 @@ Action.LeaveCity = new Action('Leave City', {
     return 100000;
   },
   cost() {
-    addResource('key', false);
+    globalThis.driver.addResource('key', false);
   },
   canStart() {
     return resources.key;
@@ -7747,7 +7747,7 @@ Action.LeaveCity = new Action('Leave City', {
     return true;
   },
   finish() {
-    unlockTown(8);
+    globalThis.driver.unlockTown(8);
   },
   story(completed) {
     globalThis.view.unlockGlobalStory(11);
@@ -7821,7 +7821,7 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
   },
   finish() {
     view.requestUpdate('updateBuff', 'Imbuement3');
-    capAllTraining();
+    globalThis.driver.capAllTraining();
     adjustTrainingExpMult();
   },
 });
@@ -7882,7 +7882,7 @@ Action.BuildTower = new Action('Build Tower', {
   finish() {
     stonesUsed[stoneLoc]++;
     towns[this.townNum].finishProgress(this.varName, 505);
-    addResource('stone', false);
+    globalThis.driver.addResource('stone', false);
     if (towns[this.townNum].getLevel(this.varName) >= 100) stonesUsed = { 1: 250, 3: 250, 5: 250, 6: 250 };
     adjustRocks(stoneLoc);
   },
@@ -7963,7 +7963,7 @@ Action.GodsTrial = new TrialAction('Gods Trial', 1, {
 
     if (this.currentFloor() === trialFloors[this.trialNum]) { //warning: the predictor assumes the old behavior, but this is clearly the intended
       globalThis.view.setStoryFlag('trailGodsAllDone');
-      addResource('power', 1);
+      globalThis.driver.addResource('power', 1);
     }
   },
   visible() {
@@ -8050,7 +8050,7 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
     return getSelfCombat();
   },
   floorReward() {
-    addResource('power', 1);
+    globalThis.driver.addResource('power', 1);
   },
   visible() {
     return towns[this.townNum].getLevel('BuildTower') >= 100;
@@ -8155,7 +8155,7 @@ Action.RestoreTime = new Action('Restore Time', {
     return towns[this.townNum].getLevel('BuildTower') >= 100;
   },
   finish() {
-    addResource('reputation', 9999999);
+    globalThis.driver.addResource('reputation', 9999999);
     globalThis.prestige.completedCurrentGame();
   },
   story(completed) {

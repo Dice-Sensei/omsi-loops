@@ -89,7 +89,7 @@ class View {
         view.updateLockedHidden();
       }, 2000);
     }
-    adjustAll();
+    globalThis.driver.adjustAll();
     this.updateActionTooltips();
     this.initActionLog();
     document.body.removeEventListener('mouseover', this.mouseoverHandler);
@@ -635,7 +635,7 @@ class View {
     document.getElementById('timeBar').style.width = `${100 - timer / timeNeeded * 100}%`;
     document.getElementById('timer').textContent = `${
       globalThis.helpers.intToString(timeNeeded - timer, options.fractionalMana ? 2 : 1, true)
-    } | ${formatTime((timeNeeded - timer) / 50 / getActualGameSpeed())}`;
+    } | ${formatTime((timeNeeded - timer) / 50 / globalThis.driver.getActualGameSpeed())}`;
     this.adjustGoldCost({ varName: 'Wells', cost: globalThis.actionList.Action.ManaWell.goldCost() });
   }
   updateOffline() {
@@ -689,7 +689,9 @@ class View {
       },
       get state() {
         return `<span class='bold' id='isBonusOn'>${
-          globalThis.Localization.txt(`time_controls>bonus_seconds>state>${isBonusActive() ? 'on' : 'off'}`)
+          globalThis.Localization.txt(
+            `time_controls>bonus_seconds>state>${globalThis.driver.isBonusActive() ? 'on' : 'off'}`,
+          )
         }</span>`;
       },
       get counter_text() {
@@ -805,20 +807,20 @@ class View {
       .join((enter) => {
         enter.append(({ actionId: id }) => {
           const actions = {
-            cap: capAction.bind(null, id),
-            plus: addLoop.bind(null, id),
-            minus: removeLoop.bind(null, id),
-            split: split.bind(null, id),
-            compress: collapse.bind(null, id),
-            up: moveUp.bind(null, id),
-            down: moveDown.bind(null, id),
-            skip: disableAction.bind(null, id),
-            remove: removeAction.bind(null, id),
+            cap: globalThis.driver.capAction.bind(null, id),
+            plus: globalThis.driver.addLoop.bind(null, id),
+            minus: globalThis.driver.removeLoop.bind(null, id),
+            split: globalThis.driver.split.bind(null, id),
+            compress: globalThis.driver.collapse.bind(null, id),
+            up: globalThis.driver.moveUp.bind(null, id),
+            down: globalThis.driver.moveDown.bind(null, id),
+            skip: globalThis.driver.disableAction.bind(null, id),
+            remove: globalThis.driver.removeAction.bind(null, id),
           };
           const drags = {
-            ondrop: handleDragDrop,
-            ondragover: handleDragOver,
-            ondragstart: handleDragStart,
+            ondrop: globalThis.driver.handleDragDrop,
+            ondragover: globalThis.driver.handleDragOver,
+            ondragstart: globalThis.driver.handleDragStart,
             ondragend: draggedUndecorate.bind(null, id),
             ondragenter: dragOverDecorate.bind(null, id),
             ondragleave: dragExitUndecorate.bind(null, id),
@@ -1339,7 +1341,7 @@ class View {
           if (document.getElementById(divName).children[2].innerHTML !== storyTooltipText) {
             document.getElementById(divName).children[2].innerHTML = storyTooltipText;
             if (!init) {
-              showNotification(divName);
+              globalThis.driver.showNotification(divName);
               if (!unreadActionStories.includes(divName)) unreadActionStories.push(divName);
             }
             if (allStoriesForActionUnlocked) {
@@ -1664,10 +1666,10 @@ class View {
                 id='container${action.varName}'
                 class='${divClass} actionOrTravelContainer ${action.type}ActionContainer showthat'
                 draggable='true'
-                ondragover='handleDragOver(event)'
-                ondragstart='handleDirectActionDragStart(event, "${action.name}", ${action.townNum}, "${action.varName}", false)'
-                ondragend='handleDirectActionDragEnd("${action.varName}")'
-                onclick='addActionToList("${action.name}", ${action.townNum})'
+                ondragover='globalThis.driver.handleDragOver(event)'
+                ondragstart='globalThis.driver.handleDirectActionDragStart(event, "${action.name}", ${action.townNum}, "${action.varName}", false)'
+                ondragend='globalThis.driver.handleDirectActionDragEnd("${action.varName}")'
+                onclick='globalThis.driver.addActionToList("${action.name}", ${action.townNum})'
                 onmouseover='view.updateAction("${action.varName}")'
                 onmouseout='view.updateAction(undefined)'
             >
@@ -1723,7 +1725,7 @@ class View {
       }
 
       const storyDivText =
-        `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='hideNotification("storyContainer${action.varName}")'>${action.label}
+        `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='globalThis.driver.hideNotification("storyContainer${action.varName}")'>${action.label}
                     <br>
                     <div style='position:relative'>
                         <img src='icons/${
@@ -2316,7 +2318,7 @@ function draggedUndecorate(i) {
   if (document.getElementById(`nextActionContainer${i}`)) {
     document.getElementById(`nextActionContainer${i}`).classList.remove('draggedAction');
   }
-  showActionIcons();
+  globalThis.driver.showActionIcons();
 }
 
 function adjustActionListSize(amt) {

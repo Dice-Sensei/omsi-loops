@@ -73,7 +73,7 @@ class Town<TN extends number> {
   finishProgress(varName, expGain) {
     // return if capped, for performance
     if (this[`exp${varName}`] === 505000) {
-      if (options.pauseOnComplete) pauseGame(true, 'Progress complete! (Game paused)');
+      if (options.pauseOnComplete) globalThis.driver.pauseGame(true, 'Progress complete! (Game paused)');
       else return;
     }
 
@@ -86,7 +86,7 @@ class Town<TN extends number> {
     const level = this.getLevel(varName);
     if (level !== prevLevel) {
       view.requestUpdate('updateLockedHidden', null);
-      adjustAll();
+      globalThis.driver.adjustAll();
       for (const action of totalActionList) {
         if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
           view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });

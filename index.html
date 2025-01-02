@@ -586,13 +586,13 @@
               </div>
               <div id="nextActionsAmountButtons">
                 <div class="bold localized" data-locale="actions>tooltip>amount"></div>
-                <button class="button change-amount" onclick="changeActionAmount(1)">1</button>
-                <button class="button change-amount" onclick="changeActionAmount(5)">5</button>
-                <button class="button change-amount" onclick="changeActionAmount(10)">10</button>
+                <button class="button change-amount" onclick="globalThis.driver.changeActionAmount(1)">1</button>
+                <button class="button change-amount" onclick="globalThis.driver.changeActionAmount(5)">5</button>
+                <button class="button change-amount" onclick="globalThis.driver.changeActionAmount(10)">10</button>
                 <input
                   id="amountCustom"
-                  oninput="setCustomActionAmount()"
-                  onblur="setCustomActionAmount()"
+                  oninput="globalThis.driver.setCustomActionAmount()"
+                  onblur="globalThis.driver.setCustomActionAmount()"
                   value="1"
                   style="width: 75px; position: relative; left: 0; top: -2px; border: 1px solid var(--input-border); height: 16px"
                 >
@@ -636,7 +636,7 @@
                 id="maxTraining"
                 class="button localized"
                 style="margin-right: 0px; display: none"
-                onclick="capAllTraining()"
+                onclick="globalThis.driver.capAllTraining()"
                 data-locale="actions>tooltip>max_training"
               >
               </button>
@@ -644,84 +644,159 @@
                 id="clearList"
                 class="button localized"
                 style="margin-right: 0px"
-                onclick="clearList()"
+                onclick="globalThis.driver.clearList()"
                 data-locale="actions>tooltip>clear_list"
               >
               </button>
               <div tabindex="0" class="showthatloadout">
                 Manage Loadouts
                 <div class="showthisloadout">
-                  <button class="loadoutbutton unused" id="load1" onclick="selectLoadout(1)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load1"
+                    onclick="globalThis.driver.selectLoadout(1)"
+                    style="width: 200px"
+                  >
                     Loadout 1
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load2" onclick="selectLoadout(2)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load2"
+                    onclick="globalThis.driver.selectLoadout(2)"
+                    style="width: 200px"
+                  >
                     Loadout 2
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load3" onclick="selectLoadout(3)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load3"
+                    onclick="globalThis.driver.selectLoadout(3)"
+                    style="width: 200px"
+                  >
                     Loadout 3
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load4" onclick="selectLoadout(4)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load4"
+                    onclick="globalThis.driver.selectLoadout(4)"
+                    style="width: 200px"
+                  >
                     Loadout 4
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load5" onclick="selectLoadout(5)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load5"
+                    onclick="globalThis.driver.selectLoadout(5)"
+                    style="width: 200px"
+                  >
                     Loadout 5
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load6" onclick="selectLoadout(6)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load6"
+                    onclick="globalThis.driver.selectLoadout(6)"
+                    style="width: 200px"
+                  >
                     Loadout 6
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load7" onclick="selectLoadout(7)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load7"
+                    onclick="globalThis.driver.selectLoadout(7)"
+                    style="width: 200px"
+                  >
                     Loadout 7
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load8" onclick="selectLoadout(8)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load8"
+                    onclick="globalThis.driver.selectLoadout(8)"
+                    style="width: 200px"
+                  >
                     Loadout 8
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load9" onclick="selectLoadout(9)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load9"
+                    onclick="globalThis.driver.selectLoadout(9)"
+                    style="width: 200px"
+                  >
                     Loadout 9
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load10" onclick="selectLoadout(10)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load10"
+                    onclick="globalThis.driver.selectLoadout(10)"
+                    style="width: 200px"
+                  >
                     Loadout 10
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load11" onclick="selectLoadout(11)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load11"
+                    onclick="globalThis.driver.selectLoadout(11)"
+                    style="width: 200px"
+                  >
                     Loadout 11
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load12" onclick="selectLoadout(12)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load12"
+                    onclick="globalThis.driver.selectLoadout(12)"
+                    style="width: 200px"
+                  >
                     Loadout 12
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load13" onclick="selectLoadout(13)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load13"
+                    onclick="globalThis.driver.selectLoadout(13)"
+                    style="width: 200px"
+                  >
                     Loadout 13
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load14" onclick="selectLoadout(14)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load14"
+                    onclick="globalThis.driver.selectLoadout(14)"
+                    style="width: 200px"
+                  >
                     Loadout 14
                   </button>
                   <br>
-                  <button class="loadoutbutton unused" id="load15" onclick="selectLoadout(15)" style="width: 200px">
+                  <button
+                    class="loadoutbutton unused"
+                    id="load15"
+                    onclick="globalThis.driver.selectLoadout(15)"
+                    style="width: 200px"
+                  >
                     Loadout 15
                   </button>
                   <br>
                   <button
                     class="loadoutbutton localized"
                     style="margin-bottom: 5px; margin-top: 3px"
-                    onclick="saveList()"
+                    onclick="globalThis.driver.saveList()"
                     data-locale="actions>tooltip>save_loadout"
                   >
                   </button>
                   <button
                     class="loadoutbutton localized"
                     style="margin-bottom: 5px"
-                    onclick="loadList()"
+                    onclick="globalThis.driver.loadList()"
                     data-locale="actions>tooltip>load_loadout"
                   >
                   </button>
@@ -734,7 +809,7 @@
                   <button
                     class="loadoutbutton"
                     style="margin-bottom: 5px; margin-top: 3px; margin-right: -4px"
-                    onclick="nameList(true)"
+                    onclick="globalThis.driver.nameList(true)"
                   >
                     Rename
                   </button>
@@ -903,7 +978,7 @@
     <script defer type="module" src="./src/helpers.ts"></script>
     <script defer type="module" src="./src/actionList.ts"></script>
     <script defer type="module" src="./src/interval.ts"></script>
-    <script defer src="./src/driver.js"></script>
+    <script defer src="./src/driver.ts"></script>
     <script defer src="./src/stats.js"></script>
     <script defer src="./src/actions.js"></script>
     <!-- ready to module -->

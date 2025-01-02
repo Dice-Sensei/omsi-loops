@@ -20,9 +20,9 @@ const setupManaDrought = () => {
     const spendGold = Math.min(resources.gold, 300);
     const buyMana = Math.min(spendGold * this.goldCost(), totalMerchantMana);
 
-    addMana(buyMana);
+    globalThis.driver.addMana(buyMana);
     totalMerchantMana -= buyMana;
-    addResource('gold', -spendGold);
+    globalThis.driver.addResource('gold', -spendGold);
   };
 
   globalThis.actionList.Action.BuyManaZ3.visible = function () {
@@ -50,7 +50,7 @@ const setupManaBurn = () => {
     effectiveTime = 0;
     timeNeeded = 4320000 - totals.effectiveTime * 50;
     document.title = 'Idle Loops';
-    resetResources();
+    globalThis.driver.resetResources();
     restartStats();
     for (let i = 0; i < towns.length; i++) {
       towns[i].restart();

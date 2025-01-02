@@ -2,7 +2,7 @@ importScripts('./data.ts');
 importScripts('./Localization.ts');
 importScripts('./helpers.ts');
 importScripts('./actionList.ts');
-importScripts('./driver.js');
+importScripts('./driver.ts');
 importScripts('./stats.js');
 importScripts('./actions.js');
 importScripts('./town.ts');
@@ -11,7 +11,6 @@ importScripts('./saving.ts');
 importScripts('./predictor.ts');
 
 // to moduleify
-// - driver.js
 // - stats.js
 // - actions.js
 // - saving.js

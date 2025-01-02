@@ -1447,7 +1447,7 @@ const optionValueHandlers = {
     }
   },
   updateRate(value, init) {
-    if (!init) recalcInterval(value);
+    if (!init) globalThis.driver.recalcInterval(value);
   },
   actionLog(value, init) {
     document.getElementById('actionLogContainer').style.display = value ? '' : 'none';
@@ -1456,11 +1456,11 @@ const optionValueHandlers = {
   predictor(value, init) {
     localStorage['loadPredictor'] = value || '';
   },
-  speedIncrease10x: checkExtraSpeed,
-  speedIncrease20x: checkExtraSpeed,
-  speedIncreaseCustom: checkExtraSpeed,
+  speedIncrease10x: globalThis.driver.checkExtraSpeed,
+  speedIncrease20x: globalThis.driver.checkExtraSpeed,
+  speedIncreaseCustom: globalThis.driver.checkExtraSpeed,
   speedIncreaseBackground(value, init) {
-    checkExtraSpeed();
+    globalThis.driver.checkExtraSpeed();
     if (typeof value === 'number' && !isNaN(value) && value < 1 && value >= 0) {
       document.getElementById('speedIncreaseBackgroundWarning').style.display = '';
     } else {
@@ -1468,8 +1468,8 @@ const optionValueHandlers = {
     }
   },
   bonusIsActive(value, init) {
-    if (!value !== !isBonusActive()) {
-      toggleOffline();
+    if (!value !== !globalThis.driver.isBonusActive()) {
+      globalThis.driver.toggleOffline();
     }
   },
   repeatLastAction() {
@@ -1953,7 +1953,7 @@ function doLoad(toLoad) {
   } else {
     unreadActionStories = toLoad.unreadActionStories;
     for (const name of unreadActionStories) {
-      showNotification(name);
+      globalThis.driver.showNotification(name);
     }
   }
 
@@ -1970,7 +1970,7 @@ function doLoad(toLoad) {
   view.updatePrestigeValues();
 
   // capped at 1 month of gain
-  addOffline(Math.min(Math.floor((Date.now() - Date.parse(toLoad.date)) * offlineRatio), 2678400000));
+  globalThis.driver.addOffline(Math.min(Math.floor((Date.now() - Date.parse(toLoad.date)) * offlineRatio), 2678400000));
 
   if (toLoad.version75 === undefined) {
     const total = towns[0].totalSDungeon;
@@ -1996,9 +1996,9 @@ function doLoad(toLoad) {
     location.reload();
   }
 
-  if (globalThis.actionList.getExploreProgress() >= 100) addResource('glasses', true);
+  if (globalThis.actionList.getExploreProgress() >= 100) globalThis.driver.addResource('glasses', true);
 
-  adjustAll();
+  globalThis.driver.adjustAll();
 
   globalThis.Data.recordBase();
 
@@ -2008,8 +2008,8 @@ function doLoad(toLoad) {
   view.updateMultiPartActions();
   view.updateStories(true);
   view.update();
-  recalcInterval(options.updateRate);
-  pauseGame();
+  globalThis.driver.recalcInterval(options.updateRate);
+  globalThis.driver.pauseGame();
 }
 
 function doSave() {
@@ -2125,8 +2125,8 @@ function processSave(saveData) {
   actions.clearActions();
   actions.current = [];
   load(null, saveJson);
-  pauseGame();
-  restart();
+  globalThis.driver.pauseGame();
+  globalThis.driver.restart();
 }
 
 let overquotaWarned = false;
@@ -2235,8 +2235,8 @@ function beginChallenge(challengeNum) {
   load(true);
   totalOfflineMs = 1000000;
   save();
-  pauseGame();
-  restart();
+  globalThis.driver.pauseGame();
+  globalThis.driver.restart();
 }
 
 function exitChallenge() {
@@ -2258,8 +2258,8 @@ function resumeChallenge() {
     saveName = challengeSaveName;
     load(true);
     save();
-    pauseGame();
-    restart();
+    globalThis.driver.pauseGame();
+    globalThis.driver.restart();
   }
 }
 

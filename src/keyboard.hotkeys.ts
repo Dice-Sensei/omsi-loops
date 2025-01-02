@@ -31,133 +31,133 @@ function moveToTown(townNum: number | undefined): void {
 Keyboard
   .listens([{
     onDown: {
-      fn: () => pauseGame(),
+      fn: () => globalThis.driver.pauseGame(),
       description: t('shortcuts.pauseGame'),
     },
     combination: 'space',
   }, {
     onDown: {
-      fn: () => manualRestart(),
+      fn: () => globalThis.driver.manualRestart(),
       description: t('shortcuts.manualRestart'),
     },
     combination: 'r',
   }, {
     onDown: {
-      fn: () => toggleOffline(),
+      fn: () => globalThis.driver.toggleOffline(),
       description: t('shortcuts.toggleOffline'),
     },
     combination: 'b',
   }, {
     onDown: {
-      fn: () => loadLoadout(1),
+      fn: () => globalThis.driver.loadLoadout(1),
       description: t('shortcuts.loadLoadout1'),
     },
     combination: 'shift+1',
   }, {
     onDown: {
-      fn: () => loadLoadout(2),
+      fn: () => globalThis.driver.loadLoadout(2),
       description: t('shortcuts.loadLoadout2'),
     },
     combination: 'shift+2',
   }, {
     onDown: {
-      fn: () => loadLoadout(3),
+      fn: () => globalThis.driver.loadLoadout(3),
       description: t('shortcuts.loadLoadout3'),
     },
     combination: 'shift+3',
   }, {
     onDown: {
-      fn: () => loadLoadout(4),
+      fn: () => globalThis.driver.loadLoadout(4),
       description: t('shortcuts.loadLoadout4'),
     },
     combination: 'shift+4',
   }, {
     onDown: {
-      fn: () => loadLoadout(5),
+      fn: () => globalThis.driver.loadLoadout(5),
       description: t('shortcuts.loadLoadout5'),
     },
     combination: 'shift+5',
   }, {
     onDown: {
-      fn: () => changeActionAmount(1),
+      fn: () => globalThis.driver.changeActionAmount(1),
       description: t('shortcuts.changeActionAmount1'),
     },
     combination: '1',
   }, {
     onDown: {
-      fn: () => changeActionAmount(2),
+      fn: () => globalThis.driver.changeActionAmount(2),
       description: t('shortcuts.changeActionAmount2'),
     },
     combination: '2',
   }, {
     onDown: {
-      fn: () => changeActionAmount(3),
+      fn: () => globalThis.driver.changeActionAmount(3),
       description: t('shortcuts.changeActionAmount3'),
     },
     combination: '3',
   }, {
     onDown: {
-      fn: () => changeActionAmount(4),
+      fn: () => globalThis.driver.changeActionAmount(4),
       description: t('shortcuts.changeActionAmount4'),
     },
     combination: '4',
   }, {
     onDown: {
-      fn: () => changeActionAmount(5),
+      fn: () => globalThis.driver.changeActionAmount(5),
       description: t('shortcuts.changeActionAmount5'),
     },
     combination: '5',
   }, {
     onDown: {
-      fn: () => changeActionAmount(6),
+      fn: () => globalThis.driver.changeActionAmount(6),
       description: t('shortcuts.changeActionAmount6'),
     },
     combination: '6',
   }, {
     onDown: {
-      fn: () => changeActionAmount(7),
+      fn: () => globalThis.driver.changeActionAmount(7),
       description: t('shortcuts.changeActionAmount7'),
     },
     combination: '7',
   }, {
     onDown: {
-      fn: () => changeActionAmount(8),
+      fn: () => globalThis.driver.changeActionAmount(8),
       description: t('shortcuts.changeActionAmount8'),
     },
     combination: '8',
   }, {
     onDown: {
-      fn: () => changeActionAmount(9),
+      fn: () => globalThis.driver.changeActionAmount(9),
       description: t('shortcuts.changeActionAmount9'),
     },
     combination: '9',
   }, {
     onDown: {
-      fn: () => changeActionAmount(actions.addAmount * 10),
+      fn: () => globalThis.driver.changeActionAmount(actions.addAmount * 10),
       description: t('shortcuts.changeActionExponent10'),
     },
     combination: '0',
   }, {
     onDown: {
-      fn: () => changeActionAmount(Math.floor(actions.addAmount / 10)),
+      fn: () => globalThis.driver.changeActionAmount(Math.floor(actions.addAmount / 10)),
       description: t('shortcuts.changeActionExponent01'),
     },
     combination: 'backspace',
   }, {
     onDown: {
-      fn: () => saveList(),
+      fn: () => globalThis.driver.saveList(),
       description: t('shortcuts.saveLoadout'),
     },
     combination: 'shift+s',
   }, {
     onDown: {
-      fn: () => loadList(),
+      fn: () => globalThis.driver.loadList(),
       description: t('shortcuts.loadLoadout'),
     },
     combination: 'shift+l',
   }, {
     onDown: {
-      fn: () => clearList(),
+      fn: () => globalThis.driver.clearList(),
       description: t('shortcuts.clearLoadout'),
     },
     combination: 'shift+c',
@@ -221,11 +221,11 @@ Listeners.add('focus', () => {
   setShiftKey(false);
   setControlKey(false);
 
-  checkExtraSpeed();
+  globalThis.driver.checkExtraSpeed();
 });
 
 Listeners.add('blur', () => {
-  checkExtraSpeed();
+  globalThis.driver.checkExtraSpeed();
 });
 
 declare global {
