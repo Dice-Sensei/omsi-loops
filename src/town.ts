@@ -119,7 +119,7 @@ class Town<TN extends number> {
     // only checks unchecked items
     // IF there are unchecked items
     // AND the user has not disabled checking unchecked items OR there are no checked items left
-    const searchToggler =globalThis.helpers.inputElement(`searchToggler${varName}`, false, false);
+    const searchToggler = globalThis.helpers.inputElement(`searchToggler${varName}`, false, false);
     if (
       this[`total${varName}`] - this[`checked${varName}`] > 0 &&
       ((searchToggler && !searchToggler.checked) || this[`goodTemp${varName}`] <= 0)
@@ -186,13 +186,13 @@ class Town<TN extends number> {
     for (const action of totalActionList) {
       if (this.index === action.townNum) {
         if (inLateGameActions) {
-          if (lateGameActions.includes(action.name)) {
+          if (globalThis.actionList.lateGameActions.includes(action.name)) {
             lateGameActionCount++;
           } else {
             inLateGameActions = false;
           }
         }
-        if (!inLateGameActions && lateGameActionCount > 0 && isTravel(action.name)) {
+        if (!inLateGameActions && lateGameActionCount > 0 && globalThis.actionList.isTravel(action.name)) {
           // shift late-game actions to end of action button list
           this.totalActionList.push(...this.totalActionList.splice(0, lateGameActionCount));
           lateGameActionCount = 0;

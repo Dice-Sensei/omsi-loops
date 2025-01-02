@@ -638,7 +638,7 @@ class View {
     document.getElementById('timer').textContent = `${
       globalThis.helpers.intToString(timeNeeded - timer, options.fractionalMana ? 2 : 1, true)
     } | ${formatTime((timeNeeded - timer) / 50 / getActualGameSpeed())}`;
-    this.adjustGoldCost({ varName: 'Wells', cost: Action.ManaWell.goldCost() });
+    this.adjustGoldCost({ varName: 'Wells', cost: globalThis.actionList.Action.ManaWell.goldCost() });
   }
   updateOffline() {
     document.getElementById('bonusSeconds').textContent = formatTime(totalOfflineMs / 1000);
@@ -747,9 +747,9 @@ class View {
     document.getElementById('actionAllowedInsurance').textContent = globalThis.helpers.intToStringRound(
       towns[7].totalInsurance,
     );
-    document.getElementById('totalSurveyProgress').textContent = `${getExploreProgress()}`;
+    document.getElementById('totalSurveyProgress').textContent = `${globalThis.actionList.getExploreProgress()}`;
     Array.from(document.getElementsByClassName('surveySkill')).forEach((div) => {
-      div.textContent = `${getExploreSkill()}`;
+      div.textContent = `${globalThis.actionList.getExploreSkill()}`;
     });
     for (const town of towns) {
       const varName = town.progressVars.find((v) => v.startsWith('Survey'));
@@ -800,7 +800,7 @@ class View {
           ...a,
           actionId: a.actionId,
           index,
-          action: getActionPrototype(a.name),
+          action: globalThis.actionList.getActionPrototype(a.name),
         })),
         (a) => a.actionId,
       )
@@ -909,14 +909,14 @@ class View {
         for (const { index } of towns) {
           container.classed(`zone-${index + 1}`, (a) => a.action.townNum === index);
         }
-        for (const type of actionTypes) {
+        for (const type of globalThis.actionList.actionTypes) {
           container.classed(`action-type-${type}`, (a) => a.action.type === type);
         }
       })
-      .classed('action-has-limit', (a) => hasLimit(a.name))
-      .classed('action-is-training', (a) => isTraining(a.name))
+      .classed('action-has-limit', (a) => globalThis.actionList.hasLimit(a.name))
+      .classed('action-is-training', (a) => globalThis.actionList.isTraining(a.name))
       .classed('action-is-singular', (a) => a.action.allowed?.() === 1)
-      .classed('action-is-travel', (a) => getPossibleTravel(a.name).length > 0)
+      .classed('action-is-travel', (a) => globalThis.actionList.getPossibleTravel(a.name).length > 0)
       .classed('action-disabled', (a) => !actions.isValidAndEnabled(a))
       .classed('user-disabled', (a) => !!a.disabled)
       .classed('user-collapsed', (a) => !!a.collapsed)
@@ -927,7 +927,7 @@ class View {
       })
       .style('background', ({ action }) => {
         const { townNum } = action;
-        const travelNums = getPossibleTravel(action.name);
+        const travelNums = globalThis.actionList.getPossibleTravel(action.name);
         let color = this.zoneTints[townNum];
         if (travelNums.length === 1) {
           color = `linear-gradient(${color} 49%, ${this.zoneTints[townNum + travelNums[0]]} 51%)`;
@@ -1216,11 +1216,11 @@ class View {
   }
 
   updateGlobalSurvey(varName, town) {
-    const expToNext = getExploreExpToNextProgress();
-    const expSinceLast = getExploreExpSinceLastProgress();
+    const expToNext = globalThis.actionList.getExploreExpToNextProgress();
+    const expSinceLast = globalThis.actionList.getExploreExpSinceLastProgress();
     this.updateProgressAction(
       { name: `${varName}Global`, town },
-      getExploreProgress(),
+      globalThis.actionList.getExploreProgress(),
       `${expSinceLast * 100 / (expSinceLast + expToNext)}%`,
     );
   }
@@ -1469,12 +1469,12 @@ class View {
     }
     for (const varName of towns.flatMap((t) => t.allVarNames)) {
       const action = totalActionList.find((a) => a.varName === varName);
-      if (isActionOfType(action, 'limited')) this.createTownInfo(action);
-      if (isActionOfType(action, 'progress')) {
+      if (globalThis.actionList.isActionOfType(action, 'limited')) this.createTownInfo(action);
+      if (globalThis.actionList.isActionOfType(action, 'progress')) {
         if (action.name.startsWith('Survey')) this.createGlobalSurveyProgress(action);
         this.createActionProgress(action);
       }
-      if (isActionOfType(action, 'multipart')) this.createMultiPartPBar(action);
+      if (globalThis.actionList.isActionOfType(action, 'multipart')) this.createMultiPartPBar(action);
     }
     if (options.highlightNew) this.highlightIncompleteActions();
   }
@@ -1597,7 +1597,7 @@ class View {
       for (let i = 0; i < l; i++) {
         for (const skill of skillKeyNames) {
           if (skillList[i] === skill) {
-            const xmlName = getXMLName(skill);
+            const xmlName = globalThis.actionList.getXMLName(skill);
             const skillLabel = `${globalThis.Localization.txt(`skills>${xmlName}>label`)} ${
               globalThis.Localization.txt('stats>tooltip>exp')
             }`;
@@ -1626,7 +1626,7 @@ class View {
       }
     }
     if (isBuffName(action.grantsBuff)) {
-      const xmlName = getXMLName(Buff.fullNames[action.grantsBuff]);
+      const xmlName = globalThis.actionList.getXMLName(Buff.fullNames[action.grantsBuff]);
       const grantsBuff = `<div class='bold'>${globalThis.Localization.txt('actions>tooltip>grants_buff')}:</div>`;
       lockedSkills += `${grantsBuff} <span>${globalThis.Localization.txt(`buffs>${xmlName}>label`)}</span><br>`;
       skillDetails += `<hr>
@@ -1649,9 +1649,11 @@ class View {
         }.svg' class='smallIcon' draggable='false' style='position:absolute;${extraImagePositions[i]}'>`;
       }
     }
-    const isTravel = getTravelNum(action.name) != 0;
+    const isTravel = globalThis.actionList.getTravelNum(action.name) != 0;
     const divClass = `${isTravel ? 'travelContainer' : 'actionContainer'} ${
-      isTraining(action.name) || hasLimit(action.name) ? 'cappableActionContainer' : ''
+      globalThis.actionList.isTraining(action.name) || globalThis.actionList.hasLimit(action.name)
+        ? 'cappableActionContainer'
+        : ''
     }`;
     const imageName = action.name.startsWith('Assassin') ? 'assassin' : globalThis.helpers.camelize(action.name);
     const unlockConditions = /<br>\s*Unlocked (.*?)(?:<br>|$)/is.exec(
@@ -1749,14 +1751,14 @@ class View {
   }
 
   adjustManaCost(actionName) {
-    const action = translateClassNames(actionName);
+    const action = globalThis.actionList.translateClassNames(actionName);
     document.getElementById(`manaCost${action.varName}`).textContent = globalThis.helpers.formatNumber(
       action.manaCost(),
     );
   }
 
   adjustExpMult(actionName) {
-    const action = translateClassNames(actionName);
+    const action = globalThis.actionList.translateClassNames(actionName);
     document.getElementById(`expMult${action.varName}`).textContent = globalThis.helpers.formatNumber(
       action.expMult * 100,
     );
@@ -1774,7 +1776,7 @@ class View {
     }
   }
   adjustGoldCosts() {
-    for (const action of actionsWithGoldCost) {
+    for (const action of globalThis.actionList.actionsWithGoldCost) {
       this.adjustGoldCost({ varName: action.varName, cost: action.goldCost() });
     }
   }
@@ -2096,7 +2098,7 @@ class View {
   createTravelMenu() {
     let travelMenu = $('#TownSelect');
     travelMenu.empty();
-    townNames.forEach((town, index) => {
+    globalThis.actionList.townNames.forEach((town, index) => {
       travelMenu.append(`"<option value=${index} class='zone-${index + 1}' hidden=''>${town}</option>`);
     });
     travelMenu.change(function () {

@@ -15,7 +15,7 @@ const buffsContainer = {
 
     for (const name of buffList) {
       const fullName = Buff.fullNames[name];
-      const XMLName = getXMLName(fullName);
+      const XMLName = globalThis.actionList.getXMLName(fullName);
       const desc2 = globalThis.Localization.txtsObj(`buffs>${XMLName}`)[0].innerHTML.includes('desc2');
 
       html += `

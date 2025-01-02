@@ -162,7 +162,7 @@ class ActionLogEntry {
   actionName;
 
   get action() {
-    return getActionPrototype(this.actionName) || null;
+    return globalThis.actionList.getActionPrototype(this.actionName) || null;
   }
 
   get repeatable() {
@@ -235,7 +235,7 @@ class ActionLogEntry {
     if (key === 'loop') return globalThis.helpers.formatNumber(this.loop);
     if (key === 'loopStart') return globalThis.helpers.formatNumber(this.loop);
     if (key === 'loopEnd') return globalThis.helpers.formatNumber(this.loop);
-    if (key === 'town') return townNames[this.action?.townNum];
+    if (key === 'town') return globalThis.actionList.townNames[this.action?.townNum];
     if (key === 'action') return this.action?.label;
     if (key === 'header') return globalThis.Localization.txt('actions>log>header');
     throw new Error(`Bad key ${key}`);
@@ -339,7 +339,7 @@ class ActionStoryEntry extends UniqueLogEntry {
 
   getReplacement(key) {
     if (key === 'condition' || key === 'story') {
-      const storyInfo = getActionPrototype(this.actionName)?.getStoryTexts()?.find(({ num }) =>
+      const storyInfo = globalThis.actionList.getActionPrototype(this.actionName)?.getStoryTexts()?.find(({ num }) =>
         num === this.storyIndex
       );
 
@@ -550,7 +550,9 @@ class SkillEntry extends LeveledLogEntry {
   }
 
   getReplacement(key) {
-    if (key === 'skill') return globalThis.Localization.txt(`skills>${getXMLName(this.name)}>label`);
+    if (key === 'skill') {
+      return globalThis.Localization.txt(`skills>${globalThis.actionList.getXMLName(this.name)}>label`);
+    }
     return super.getReplacement(key);
   }
 }
@@ -601,7 +603,9 @@ class BuffEntry extends LeveledLogEntry {
 
   /** @param {string} key */
   getReplacement(key) {
-    if (key === 'buff') return globalThis.Localization.txt(`buffs>${getXMLName(Buff.fullNames[this.name])}>label`);
+    if (key === 'buff') {
+      return globalThis.Localization.txt(`buffs>${globalThis.actionList.getXMLName(Buff.fullNames[this.name])}>label`);
+    }
     if (key === 'buff_cost') {
       return this.statSpendType
         ? globalThis.Localization.txt(
@@ -1176,8 +1180,8 @@ let curs = {
 
 function initializeActions() {
   totalActionList.length = 0;
-  for (const prop in Action) {
-    const action = Action[prop];
+  for (const prop in globalThis.actionList.Action) {
+    const action = globalThis.actionList.Action[prop];
     totalActionList.push(action);
   }
 }
@@ -1992,7 +1996,7 @@ function doLoad(toLoad) {
     location.reload();
   }
 
-  if (getExploreProgress() >= 100) addResource('glasses', true);
+  if (globalThis.actionList.getExploreProgress() >= 100) addResource('glasses', true);
 
   adjustAll();
 
@@ -2197,12 +2201,12 @@ function importCurrentList() {
     const name = /** @type {ActionName} */ (toImport[i].substr(toImport[i].indexOf('x') + 1).trim());
     const loops = toImport[i].substr(0, toImport[i].indexOf('x'));
     try {
-      const action = getActionPrototype(name);
+      const action = globalThis.actionList.getActionPrototype(name);
       if (action.unlocked()) {
         actions.addActionRecord({ name, loops: Number(loops), disabled: false }, -1, false);
       }
     } catch (e) {
-      if (e instanceof ClassNameNotFoundError) {
+      if (e instanceof globalThis.actionList.ClassNameNotFoundError) {
         console.log(e.message);
       } else {
         throw e;

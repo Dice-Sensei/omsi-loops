@@ -357,7 +357,7 @@ class Actions {
         if (action.loops === 0 || action.disabled) {
           continue;
         }
-        const toAdd = /** @type {AnyActionEntry} */ (translateClassNames(action.name));
+        const toAdd = /** @type {AnyActionEntry} */ (globalThis.actionList.translateClassNames(action.name));
 
         toAdd.loopsType = action.loopsType ?? (isMultipartAction(toAdd) ? 'maxEffort' : 'actions');
         if (isMultipartAction(toAdd) && action.loopsType === 'actions') action.loopsType = 'maxEffort';
@@ -404,11 +404,11 @@ class Actions {
       let currentStartIndex = 0;
       this.#zoneSpans = [];
       for (const [index, action] of this.next.entries()) {
-        const actionProto = getActionPrototype(action.name);
+        const actionProto = globalThis.actionList.getActionPrototype(action.name);
         if (action.disabled || !action.loops || !actionProto) {
           continue;
         }
-        const travelDeltas = getPossibleTravel(action.name);
+        const travelDeltas = globalThis.actionList.getPossibleTravel(action.name);
         if (!travelDeltas.length) continue;
         if (currentZones.length > 1 && currentZones.includes(actionProto.townNum)) {
           currentZones = [actionProto.townNum];
@@ -455,7 +455,7 @@ class Actions {
 
   /** @param {NextActionEntry} action @param {(action: Readonly<NextActionEntry>, actionProto: Readonly<AnyAction>) => boolean} [additionalTest]  */
   static isValidAndEnabled(action, additionalTest) {
-    const actionProto = getActionPrototype(action?.name);
+    const actionProto = globalThis.actionList.getActionPrototype(action?.name);
     return actionProto && !action.disabled && action.loops > 0 &&
       (!additionalTest || additionalTest(action, actionProto));
   }
@@ -493,7 +493,7 @@ class Actions {
     if (initialOrder < 0) initialOrder += this.next.length + 1;
     initialOrder = globalThis.helpers.clamp(initialOrder, 0, this.next.length);
     if (addAtClosestValidIndex) {
-      const actionProto = getActionPrototype(toAdd.name);
+      const actionProto = globalThis.actionList.getActionPrototype(toAdd.name);
       initialOrder = this.closestValidIndexForAction(actionProto?.townNum, initialOrder);
     }
     // Number.isFinite(), unlike isFinite(), doesn't coerce its argument so it also functions as a typecheck
@@ -530,7 +530,7 @@ class Actions {
 
     resultingIndex = globalThis.helpers.clamp(resultingIndex, 0, this.next.length - 1);
     if (moveToClosestValidIndex) {
-      const townNum = (getActionPrototype(this.next[initialIndex].name))?.townNum;
+      const townNum = (globalThis.actionList.getActionPrototype(this.next[initialIndex].name))?.townNum;
       if (townNum != null) {
         resultingIndex = this.closestValidIndexForAction(townNum, resultingIndex, initialIndex);
       }
@@ -578,7 +578,7 @@ class Actions {
     targetIndex ??= index;
 
     if (splitToClosestValidIndex) {
-      const townNum = getActionPrototype(action.name)?.townNum;
+      const townNum = globalThis.actionList.getActionPrototype(action.name)?.townNum;
       if (townNum != null) {
         targetIndex = this.closestValidIndexForAction(townNum, targetIndex);
       }
@@ -761,7 +761,7 @@ function addExpFromAction(action, manaCount) {
 
 function markActionsComplete(loopCompletedActions) {
   loopCompletedActions.forEach((action) => {
-    let varName = Action[withoutSpaces(action.name)].varName;
+    let varName = globalThis.actionList.Action[globalThis.actionList.withoutSpaces(action.name)].varName;
     if (!completedActions.includes(varName)) completedActions.push(varName);
   });
 }

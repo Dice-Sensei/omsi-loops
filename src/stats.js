@@ -368,7 +368,7 @@ class Buff extends Localizable2 {
   }
 
   constructor(name) {
-    super(`buffs>${getXMLName(Buff.fullNames[name])}`);
+    super(`buffs>${globalThis.actionList.getXMLName(Buff.fullNames[name])}`);
 
     Object.defineProperty(this, 'name', { value: name });
   }
@@ -533,7 +533,7 @@ function getSurveyBonus(town) {
 }
 
 function getArmorLevel() {
-  return 1 + ((resources.armor + 3 * resources.enchantments) * getCraftGuildRank().bonus) / 5;
+  return 1 + ((resources.armor + 3 * resources.enchantments) * globalThis.actionList.getCraftGuildRank().bonus) / 5;
 }
 
 function getSelfCombat() {
@@ -554,7 +554,7 @@ function getZombieStrength() {
 function getTeamStrength() {
   return ((getSkillLevel('Combat') + getSkillLevel('Restoration') * 4) *
     (resources.teamMembers / 2) *
-    getAdvGuildRank().bonus * getSkillBonus('Leadership') *
+    globalThis.actionList.getAdvGuildRank().bonus * getSkillBonus('Leadership') *
     (1 + getBuffLevel('Feast') * .05)) *
     globalThis.prestige.prestigeBonus('PrestigeCombat');
 }

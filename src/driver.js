@@ -366,9 +366,9 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
         } else {
           const index = actions.addAction(name, addAmount, insertAtIndex);
           view.requestUpdate('highlightAction', index);
-          if (globalThis.trash.shiftDown && hasLimit(name)) {
+          if (globalThis.trash.shiftDown && globalThis.actionList.hasLimit(name)) {
             capAmount(index, townNum);
-          } else if (globalThis.trash.shiftDown && isTraining(name)) {
+          } else if (globalThis.trash.shiftDown && globalThis.actionList.isTraining(name)) {
             capTraining(index);
           }
         }
@@ -402,7 +402,7 @@ function resetResource(resource) {
 
 function resetResources() {
   resources = globalThis.helpers.copyObject(resourcesTemplate);
-  if (getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
+  if (globalThis.actionList.getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
     addResource('glasses', true);
   }
   view.requestUpdate('updateResources', null);
@@ -511,41 +511,41 @@ function unlockTown(townNum) {
 }
 
 function adjustAll() {
-  adjustPots();
-  adjustLocks();
-  adjustSQuests();
-  adjustLQuests();
-  adjustWildMana();
-  adjustHerbs();
-  adjustHunt();
-  adjustSuckers();
-  adjustGeysers();
-  adjustMineSoulstones();
-  adjustArtifacts();
-  adjustDonations();
-  adjustWells();
-  adjustPylons();
-  adjustPockets();
-  adjustWarehouses();
-  adjustInsurance();
-  adjustAllRocks();
-  adjustTrainingExpMult();
+  globalThis.actionList.adjustPots();
+  globalThis.actionList.adjustLocks();
+  globalThis.actionList.adjustSQuests();
+  globalThis.actionList.adjustLQuests();
+  globalThis.actionList.adjustWildMana();
+  globalThis.actionList.adjustHerbs();
+  globalThis.actionList.adjustHunt();
+  globalThis.actionList.adjustSuckers();
+  globalThis.actionList.adjustGeysers();
+  globalThis.actionList.adjustMineSoulstones();
+  globalThis.actionList.adjustArtifacts();
+  globalThis.actionList.adjustDonations();
+  globalThis.actionList.adjustWells();
+  globalThis.actionList.adjustPylons();
+  globalThis.actionList.adjustPockets();
+  globalThis.actionList.adjustWarehouses();
+  globalThis.actionList.adjustInsurance();
+  globalThis.actionList.adjustAllRocks();
+  globalThis.actionList.adjustTrainingExpMult();
   view.requestUpdate('adjustManaCost', 'Continue On');
 }
 
 function capAction(actionId) {
   const action = actions.findActionWithId(actionId);
   if (!action) return;
-  if (hasLimit(action.name)) {
-    return capAmount(action.index, getActionPrototype(action.name).townNum);
-  } else if (isTraining(action.name)) {
+  if (globalThis.actionList.hasLimit(action.name)) {
+    return capAmount(action.index, globalThis.actionList.getActionPrototype(action.name).townNum);
+  } else if (globalThis.actionList.isTraining(action.name)) {
     return capTraining(action.index);
   }
 }
 
 function capAmount(index, townNum) {
   const action = actions.next[index];
-  const varName = `good${getActionPrototype(action.name)?.varName}`;
+  const varName = `good${globalThis.actionList.getActionPrototype(action.name)?.varName}`;
   let alreadyExisting;
   //if (action.name.startsWith("Survey")) alreadyExisting = getOtherSurveysOnList("") + (action.disabled ? action.loops : 0);
   //else
@@ -571,7 +571,7 @@ function capTraining(index) {
 function capAllTraining() {
   for (const [index, action] of actions.next.entries()) {
     // @ts-ignore
-    if (trainingActions.includes(action.name)) {
+    if (globalThis.actionList.trainingActions.includes(action.name)) {
       //console.log("Training Action on list: " + action.name);
       capTraining(index);
     }
@@ -580,7 +580,7 @@ function capAllTraining() {
 
 function addLoop(actionId) {
   const action = actions.findActionWithId(actionId);
-  const theClass = getActionPrototype(action.name);
+  const theClass = globalThis.actionList.getActionPrototype(action.name);
   let addAmount = actions.addAmount;
   if (theClass.allowed) {
     const numMax = theClass.allowed();
@@ -700,7 +700,7 @@ function moveDown(actionId) {
 function disableAction(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
   const action = actions.next[index];
-  const translated = getActionPrototype(action.name);
+  const translated = globalThis.actionList.getActionPrototype(action.name);
   if (action.disabled) {
     if (!translated.allowed || getNumOnList(action.name) + action.loops <= translated.allowed()) {
       actions.updateAction(index, { disabled: false });

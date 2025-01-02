@@ -7,16 +7,16 @@ enum ChallengeMode {
 const setupManaDrought = () => {
   gameSpeed = 2;
 
-  Action.BuyManaZ1.canStart = function () {
+  globalThis.actionList.Action.BuyManaZ1.canStart = function () {
     return totalMerchantMana > 0;
   };
-  Action.BuyManaZ1.manaCost = function () {
+  globalThis.actionList.Action.BuyManaZ1.manaCost = function () {
     return 1;
   };
-  Action.BuyManaZ1.goldCost = function () {
+  globalThis.actionList.Action.BuyManaZ1.goldCost = function () {
     return 30;
   };
-  Action.BuyManaZ1.finish = function () {
+  globalThis.actionList.Action.BuyManaZ1.finish = function () {
     const spendGold = Math.min(resources.gold, 300);
     const buyMana = Math.min(spendGold * this.goldCost(), totalMerchantMana);
 
@@ -25,10 +25,10 @@ const setupManaDrought = () => {
     addResource('gold', -spendGold);
   };
 
-  Action.BuyManaZ3.visible = function () {
+  globalThis.actionList.Action.BuyManaZ3.visible = function () {
     return false;
   };
-  Action.BuyManaZ5.visible = function () {
+  globalThis.actionList.Action.BuyManaZ5.visible = function () {
     return false;
   };
 };
