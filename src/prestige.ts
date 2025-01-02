@@ -84,8 +84,8 @@ function prestigeWithNewValues(
   nextPrestigeValues: typeof prestigeValues,
   nextPrestigeBuffs: { [K in PrestigeBuffName | 'Imbuement3']: number },
 ) {
-  const nextTotals = totals;
-  const nextOfflineMs = totalOfflineMs;
+  const nextTotals = globalThis.saving.vals.totals;
+  const nextOfflineMs = globalThis.saving.vals.totalOfflineMs;
 
   // Remove all progress and save totals
   globalThis.saving.load(false);
@@ -105,8 +105,8 @@ function prestigeWithNewValues(
   prestigeValues['prestigeTotalCompletions'] = nextPrestigeValues.prestigeTotalCompletions.valueOf();
   prestigeValues['completedCurrentPrestige'] = nextPrestigeValues.completedCurrentPrestige.valueOf();
   prestigeValues['completedAnyPrestige'] = nextPrestigeValues.completedAnyPrestige.valueOf();
-  totals = nextTotals;
-  totalOfflineMs = nextOfflineMs;
+  globalThis.saving.vals.totals = nextTotals;
+  globalThis.saving.vals.totalOfflineMs = nextOfflineMs;
   globalThis.saving.view.updatePrestigeValues();
   globalThis.saving.save();
 }

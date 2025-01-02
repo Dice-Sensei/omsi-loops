@@ -96,7 +96,7 @@ function tick() {
   }
 
   if (gameIsStopped) {
-    addOffline(gameTicksLeft * offlineRatio);
+    addOffline(gameTicksLeft);
     updateLag(0);
     globalThis.saving.view.update();
     gameTicksLeft = 0;
@@ -139,7 +139,8 @@ function executeGameTicks(deadline) {
       manaAvailable = Math.min(
         manaAvailable,
         globalThis.helpers.Mana.ceil(
-          totalOfflineMs * globalThis.driver.baseManaPerSecond * globalThis.driver.gameSpeed * bonusSpeed / 1000,
+          globalThis.saving.vals.totalOfflineMs * globalThis.driver.baseManaPerSecond * globalThis.driver.gameSpeed *
+            bonusSpeed / 1000,
         ),
       );
     }
@@ -199,7 +200,7 @@ function executeGameTicks(deadline) {
   if (!gameIsStopped && baseManaToBurn * bonusSpeed >= 10) {
     if (!cleanExit || globalThis.driver.lagSpeed > 0) {
       // lagging. refund all backlog as bonus time to clear the queue
-      addOffline(gameTicksLeft * offlineRatio);
+      addOffline(gameTicksLeft);
       gameTicksLeft = 0;
     }
     updateLag((originalManaToBurn - baseManaToBurn) * bonusSpeed);
@@ -728,7 +729,7 @@ function borrowTime() {
 }
 
 function returnTime() {
-  if (totalOfflineMs >= 86400_000) {
+  if (globalThis.saving.vals.totalOfflineMs >= 86400_000) {
     addOffline(-86400_000);
     totals.borrowedTime -= 86400;
     globalThis.saving.view.requestUpdate('updateOffline', null);
@@ -763,19 +764,19 @@ function updateLag(manaSpent) {
 
 function addOffline(num) {
   if (num) {
-    if (totalOfflineMs + num < 0 && bonusSpeed > 1) {
+    if (globalThis.saving.vals.totalOfflineMs + num < 0 && bonusSpeed > 1) {
       toggleOffline();
     }
-    totalOfflineMs += num;
-    if (totalOfflineMs < 0) {
-      totalOfflineMs = 0;
+    globalThis.saving.vals.totalOfflineMs += num;
+    if (globalThis.saving.vals.totalOfflineMs < 0) {
+      globalThis.saving.vals.totalOfflineMs = 0;
     }
     globalThis.saving.view.requestUpdate('updateOffline', null);
   }
 }
 
 function toggleOffline() {
-  if (totalOfflineMs === 0) return;
+  if (globalThis.saving.vals.totalOfflineMs === 0) return;
   if (!isBonusActive()) {
     bonusSpeed = 5;
     bonusActive = true;

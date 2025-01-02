@@ -1026,9 +1026,6 @@ const storyInitializers = {
   },
 };
 
-const curDate = new Date();
-let totalOfflineMs = 0;
-const offlineRatio = 1;
 let totals = {
   time: 0,
   effectiveTime: 0,
@@ -1052,6 +1049,7 @@ let vals = {
   curFightJungleMonstersSegment: 0,
   curThievesGuildSegment: 0,
   curGodsSegment: 0,
+  totalOfflineMs: 0,
 };
 
 let totalActionList = [];
@@ -1805,7 +1803,7 @@ function doLoad(toLoad) {
     }
   }
 
-  totalOfflineMs = toLoad.totalOfflineMs === undefined ? 0 : toLoad.totalOfflineMs; // must load before options
+  globalThis.saving.vals.totalOfflineMs = toLoad.totalOfflineMs === undefined ? 0 : toLoad.totalOfflineMs; // must load before options
 
   for (const option of Object.keys(options)) {
     loadOption(option, options[option]);
@@ -1837,7 +1835,7 @@ function doLoad(toLoad) {
   view.updatePrestigeValues();
 
   // capped at 1 month of gain
-  globalThis.driver.addOffline(Math.min(Math.floor((Date.now() - Date.parse(toLoad.date)) * offlineRatio), 2678400000));
+  globalThis.driver.addOffline(Math.min(Math.floor(Date.now() - Date.parse(toLoad.date)), 2678400000));
 
   if (toLoad.version75 === undefined) {
     const total = towns[0].totalSDungeon;
@@ -1940,7 +1938,7 @@ function doSave() {
   toSave.buffCaps = buffCaps;
 
   toSave.date = new Date();
-  toSave.totalOfflineMs = totalOfflineMs;
+  toSave.totalOfflineMs = globalThis.saving.vals.totalOfflineMs;
   toSave.totals = totals;
 
   toSave.challengeSave = challengeSave;
@@ -2100,7 +2098,7 @@ function beginChallenge(challengeNum) {
   challengeSave.challengeMode = challengeNum;
   saveName = challengeSaveName;
   load(true);
-  totalOfflineMs = 1000000;
+  globalThis.saving.vals.totalOfflineMs = 1000000;
   save();
   globalThis.driver.pauseGame();
   globalThis.driver.restart();
@@ -2164,7 +2162,6 @@ const _saving = {
   actions,
   view,
   buffCaps,
-  totalOfflineMs,
   totals,
   loadDefaults,
   needsDataSnapshots,

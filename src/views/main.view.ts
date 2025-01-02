@@ -652,10 +652,10 @@ class View {
     this.adjustGoldCost({ varName: 'Wells', cost: globalThis.actionList.Action.ManaWell.goldCost() });
   }
   updateOffline() {
-    document.getElementById('bonusSeconds').textContent = formatTime(totalOfflineMs / 1000);
+    document.getElementById('bonusSeconds').textContent = formatTime(globalThis.saving.vals.totalOfflineMs / 1000);
     const returnTimeButton = document.getElementById('returnTimeButton');
     if (returnTimeButton instanceof HTMLButtonElement) {
-      returnTimeButton.disabled = totalOfflineMs < 86400_000;
+      returnTimeButton.disabled = globalThis.saving.vals.totalOfflineMs < 86400_000;
     }
   }
   updateBonusText() {
@@ -711,7 +711,7 @@ class View {
         return `<span class='bold'>${globalThis.Localization.txt('time_controls>bonus_seconds>counter_text')}</span>`;
       },
       get bonusSeconds() {
-        return `<span id='bonusSeconds'>${formatTime(totalOfflineMs / 1000)}</span>`;
+        return `<span id='bonusSeconds'>${formatTime(globalThis.saving.vals.totalOfflineMs / 1000)}</span>`;
       },
       get lag_warning() {
         return globalThis.driver.lagSpeed > 0
