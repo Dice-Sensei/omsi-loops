@@ -1,7 +1,7 @@
 importScripts('./data.ts');
 importScripts('./Localization.ts');
 importScripts('./helpers.ts');
-importScripts('./actionList.js');
+importScripts('./actionList.ts');
 importScripts('./driver.js');
 importScripts('./stats.js');
 importScripts('./actions.js');
@@ -11,8 +11,6 @@ importScripts('./saving.ts');
 importScripts('./predictor.ts');
 
 // to moduleify
-// - helpers.js
-// - actionList.js
 // - driver.js
 // - stats.js
 // - actions.js

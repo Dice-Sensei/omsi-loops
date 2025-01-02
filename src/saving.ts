@@ -688,7 +688,7 @@ const actionLog = selfIsGame ? new ActionLog() : null;
  */
 
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
-// accessor for typed towns with vars. CANNOT be used in actionList.js, will cause circular references
+// accessor for typed towns with vars. CANNOT be used in actionList.ts, will cause circular references
 /** @type {<const TN extends TownNum>(townNum: TN) => Town<TN> & TownVars<TN>} */
 function _town(townNum) {
   // @ts-ignore
