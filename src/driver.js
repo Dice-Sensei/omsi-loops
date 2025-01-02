@@ -630,7 +630,7 @@ function showActionIcons() {
 
 function handleDragStart(event) {
   const index = event.target.getAttribute('data-action-id');
-  draggedDecorate(index);
+  globalThis.view.draggedDecorate(index);
   event.dataTransfer.setData('text/html', index);
   hideActionIcons();
 }
@@ -657,7 +657,7 @@ function handleDragOver(event) {
 function handleDragDrop(event) {
   const idOfDroppedOverElement = event.target.getAttribute('data-action-id');
   const indexOfDroppedOverElement = actions.findIndexOfActionWithId(idOfDroppedOverElement);
-  dragExitUndecorate(idOfDroppedOverElement);
+  globalThis.view.dragExitUndecorate(idOfDroppedOverElement);
   const initialId = event.dataTransfer.getData('text/html');
   if (initialId === '') {
     const actionData = JSON.parse(event.dataTransfer.getData('actionData'));

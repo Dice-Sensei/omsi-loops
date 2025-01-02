@@ -658,7 +658,7 @@ function compressToBase64(item) {
 function startGame() {
   // load calls recalcInterval, which will start the callbacks
   load();
-  setScreenSize();
+  globalThis.view.setScreenSize();
 }
 
 function cheat() {

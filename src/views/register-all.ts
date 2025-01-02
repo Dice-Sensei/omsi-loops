@@ -40,7 +40,7 @@ const buffsContainer = {
               id="buff${name}Cap" 
               class="buffmaxinput" 
               value="${buffHardCaps[name]}" 
-              onchange="updateBuffCaps()">
+              onchange="globalThis.view.updateBuffCaps()">
           </div>
         </div>
       `;

@@ -1,7 +1,5 @@
 'use strict';
 
-let screenSize;
-
 const DarkRitualDescription = [
   `10% faster in Beginnersville per ritual from 1-20<br>`,
   `5% faster in the Forest Path per ritual from 21-40<br>`,
@@ -2345,5 +2343,30 @@ function updateBuffCaps() {
 }
 
 function setScreenSize() {
-  screenSize = document.body.scrollHeight;
+  _view.screenSize = document.body.scrollHeight;
 }
+
+const _view = {
+  screenSize: undefined,
+  DarkRitualDescription,
+  formatTime,
+  setScreenSize,
+  updateBuffCaps,
+  adjustActionListSize,
+  unlockGlobalStory,
+  setStoryFlag,
+  unlockStory,
+  increaseStoryVarTo,
+  scrollToPanel,
+  addStatColors,
+  dragOverDecorate,
+  dragExitUndecorate,
+  draggedDecorate,
+  draggedUndecorate,
+  townInfos,
+  actionOptionsTown,
+  actionStoriesTown,
+  View,
+};
+
+globalThis.view = _view;
