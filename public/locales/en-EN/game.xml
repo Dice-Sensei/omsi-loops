@@ -1073,7 +1073,7 @@
                 <off>OFF</off>
             </state>
             <counter_text>Total Bonus Seconds</counter_text>
-            <lag_warning><![CDATA[<p><b>Lag detected!</b> Current effective game speed is {lagSpeed}x.</p>]]></lag_warning>
+            <lag_warning><![CDATA[<p><b>Lag detected!</b> Current effective game speed is {globalThis.driver.lagSpeed}x.</p>]]></lag_warning>
         </bonus_seconds>
     </time_controls>
     <stats>

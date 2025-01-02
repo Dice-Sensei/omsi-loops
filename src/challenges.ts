@@ -5,7 +5,7 @@ enum ChallengeMode {
 }
 
 const setupManaDrought = () => {
-  gameSpeed = 2;
+  globalThis.driver.gameSpeed = 2;
 
   globalThis.actionList.Action.BuyManaZ1.canStart = function () {
     return totalMerchantMana > 0;
@@ -46,12 +46,12 @@ const setupManaBurn = () => {
   restart = function () {
     shouldRestart = false;
     timer = 0;
-    timeCounter = 0;
-    effectiveTime = 0;
+    globalThis.driver.timeCounter = 0;
+    globalThis.driver.effectiveTime = 0;
     timeNeeded = 4320000 - totals.effectiveTime * 50;
     document.title = 'Idle Loops';
     globalThis.driver.resetResources();
-    restartStats();
+    globalThis.stats.restartStats();
     for (let i = 0; i < towns.length; i++) {
       towns[i].restart();
     }

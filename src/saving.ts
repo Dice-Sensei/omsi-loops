@@ -664,15 +664,15 @@ function startGame() {
 }
 
 function cheat() {
-  if (gameSpeed === 1) gameSpeed = 20;
-  else gameSpeed = 1;
+  if (globalThis.driver.gameSpeed === 1) globalThis.driver.gameSpeed = 20;
+  else globalThis.driver.gameSpeed = 1;
 }
 
 const defaultSaveName = 'idleLoops1';
 const challengeSaveName = 'idleLoopsChallenge';
 let saveName = defaultSaveName;
 
-const selfIsGame = typeof View !== 'undefined';
+const selfIsGame = typeof globalThis?.view?.View !== 'undefined';
 
 const timeNeededInitial = 5 * 50;
 // eslint-disable-next-line prefer-const
@@ -680,7 +680,7 @@ let timer = timeNeededInitial;
 // eslint-disable-next-line prefer-const
 let timeNeeded = timeNeededInitial;
 // eslint-disable-next-line prefer-const
-const view = selfIsGame ? new View() : null;
+const view = selfIsGame ? new globalThis.view.View() : null;
 const actions = new globalThis.actions.Actions();
 const actionLog = selfIsGame ? new ActionLog() : null;
 /**

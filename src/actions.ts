@@ -205,8 +205,9 @@ class Actions {
 
     curAction.ticks += manaToSpend;
     curAction.manaUsed += manaToSpend;
-    curAction.timeSpent += manaToSpend / baseManaPerSecond / globalThis.driver.getSpeedMult();
-    curAction.effectiveTimeElapsed += manaToSpend / baseManaPerSecond / globalThis.driver.getSpeedMult();
+    curAction.timeSpent += manaToSpend / globalThis.driver.baseManaPerSecond / globalThis.driver.getSpeedMult();
+    curAction.effectiveTimeElapsed += manaToSpend / globalThis.driver.baseManaPerSecond /
+      globalThis.driver.getSpeedMult();
 
     // exp gets added here, where it can factor in to adjustTicksNeeded
     addExpFromAction(curAction, manaToSpend);
@@ -284,7 +285,7 @@ class Actions {
     }
     if (curAction && this.currentAction !== curAction) {
       this.currentAction = curAction;
-      curAction.effectiveTimeElapsed = effectiveTime;
+      curAction.effectiveTimeElapsed = globalThis.driver.effectiveTime;
     }
     return curAction;
   }

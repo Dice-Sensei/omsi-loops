@@ -706,11 +706,13 @@ class View {
         return `<span id='bonusSeconds'>${formatTime(totalOfflineMs / 1000)}</span>`;
       },
       get lag_warning() {
-        return lagSpeed > 0 ? globalThis.Localization.txt('time_controls>bonus_seconds>lag_warning') : '';
+        return globalThis.driver.lagSpeed > 0
+          ? globalThis.Localization.txt('time_controls>bonus_seconds>lag_warning')
+          : '';
       },
       speed: fgSpeed,
       background_speed: bgSpeed,
-      lagSpeed,
+      lagSpeed: globalThis.driver.lagSpeed,
     };
     const lval = variables[lhs] ?? (parseFloat(lhs) || 0);
     const rval = variables[rhs] ?? (parseFloat(rhs) || 0);
@@ -720,9 +722,9 @@ class View {
   }
   updateTotalTicks() {
     document.getElementById('totalTicks').textContent = `${globalThis.helpers.formatNumber(actions.completedTicks)} | ${
-      formatTime(timeCounter)
+      formatTime(globalThis.driver.timeCounter)
     }`;
-    document.getElementById('effectiveTime').textContent = `${formatTime(effectiveTime)}`;
+    document.getElementById('effectiveTime').textContent = `${formatTime(globalThis.driver.effectiveTime)}`;
   }
   updateResource(resource) {
     const element = globalThis.helpers.htmlElement(`${resource}Div`, false, false);

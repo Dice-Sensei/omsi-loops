@@ -1,18 +1,10 @@
 'use strict';
 
-//globals!!!
-let gameSpeed = 1;
-const baseManaPerSecond = 50;
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
 let refund = false;
 let radarUpdateTime = 0;
-let timeCounter = 0;
-let effectiveTime = 0;
 let lastSave = Date.now();
-let lagSpeed = 0;
-//globals!!!
-
 function getSpeedMult(zone = curTown) {
   let speedMult = 1;
 
@@ -41,7 +33,7 @@ function getSpeedMult(zone = curTown) {
 }
 
 function getActualGameSpeed() {
-  return gameSpeed * getSpeedMult() * bonusSpeed;
+  return globalThis.driver.gameSpeed * getSpeedMult() * bonusSpeed;
 }
 
 function refreshDungeons(manaSpent) {
@@ -55,8 +47,8 @@ function refreshDungeons(manaSpent) {
 
 function singleTick() {
   timer++;
-  timeCounter += 1 / baseManaPerSecond;
-  effectiveTime += 1 / baseManaPerSecond;
+  globalThis.driver.timeCounter += 1 / globalThis.driver.baseManaPerSecond;
+  globalThis.driver.effectiveTime += 1 / globalThis.driver.baseManaPerSecond;
 
   actions.tick();
 
@@ -66,7 +58,7 @@ function singleTick() {
     loopEnd();
     prepareRestart();
   }
-  gameTicksLeft -= 1000 / baseManaPerSecond;
+  gameTicksLeft -= 1000 / globalThis.driver.baseManaPerSecond;
 }
 
 let lastAnimationTime = 0;
@@ -120,7 +112,9 @@ function executeGameTicks(deadline) {
   // convert "gameTicksLeft" (actually milliseconds) into equivalent base-mana count, aka actual game ticks
   // including the gameSpeed multiplier here because it is effectively constant over the course of a single
   // update, and it affects how many actual game ticks pass in a given span of realtime.
-  let baseManaToBurn = globalThis.helpers.Mana.floor(gameTicksLeft * baseManaPerSecond * gameSpeed / 1000);
+  let baseManaToBurn = globalThis.helpers.Mana.floor(
+    gameTicksLeft * globalThis.driver.baseManaPerSecond * globalThis.driver.gameSpeed / 1000,
+  );
   const originalManaToBurn = baseManaToBurn;
   let cleanExit = false;
 
@@ -144,7 +138,9 @@ function executeGameTicks(deadline) {
       // can't spend more mana than offline time available
       manaAvailable = Math.min(
         manaAvailable,
-        globalThis.helpers.Mana.ceil(totalOfflineMs * baseManaPerSecond * gameSpeed * bonusSpeed / 1000),
+        globalThis.helpers.Mana.ceil(
+          totalOfflineMs * globalThis.driver.baseManaPerSecond * globalThis.driver.gameSpeed * bonusSpeed / 1000,
+        ),
       );
     }
 
@@ -168,12 +164,12 @@ function executeGameTicks(deadline) {
     // okay, so the current action has used manaSpent effective ticks. figure out how much of our realtime
     // that accounts for, in base ticks and in seconds.
     const baseManaSpent = manaSpent / totalMultiplier;
-    const timeSpent = baseManaSpent / gameSpeed / baseManaPerSecond;
+    const timeSpent = baseManaSpent / globalThis.driver.gameSpeed / globalThis.driver.baseManaPerSecond;
 
     // update timers
     timer += manaSpent; // number of effective mana ticks
-    timeCounter += timeSpent; // realtime seconds
-    effectiveTime += timeSpent * gameSpeed * bonusSpeed; // "seconds" modified only by gameSpeed and offline bonus
+    globalThis.driver.timeCounter += timeSpent; // realtime seconds
+    globalThis.driver.effectiveTime += timeSpent * globalThis.driver.gameSpeed * bonusSpeed; // "seconds" modified only by gameSpeed and offline bonus
     baseManaToBurn -= baseManaSpent; // burn spent mana
     gameTicksLeft -= timeSpent * 1000;
 
@@ -198,7 +194,7 @@ function executeGameTicks(deadline) {
   }
 
   if (!gameIsStopped && baseManaToBurn * bonusSpeed >= 10) {
-    if (!cleanExit || lagSpeed > 0) {
+    if (!cleanExit || globalThis.driver.lagSpeed > 0) {
       // lagging. refund all backlog as bonus time to clear the queue
       addOffline(gameTicksLeft * offlineRatio);
       gameTicksLeft = 0;
@@ -272,9 +268,9 @@ function pauseGame(ping, message) {
 }
 
 function loopEnd() {
-  if (effectiveTime > 0) {
-    totals.time += timeCounter;
-    totals.effectiveTime += effectiveTime;
+  if (globalThis.driver.effectiveTime > 0) {
+    totals.time += globalThis.driver.timeCounter;
+    totals.effectiveTime += globalThis.driver.effectiveTime;
     totals.loops++;
     view.requestUpdate('updateTotals', null);
     const loopCompletedActions = actions.current.slice(0, actions.currentPos);
@@ -323,13 +319,13 @@ function prepareRestart() {
 function restart() {
   shouldRestart = false;
   timer = 0;
-  timeCounter = 0;
-  effectiveTime = 0;
+  globalThis.driver.timeCounter = 0;
+  globalThis.driver.effectiveTime = 0;
   timeNeeded = globalThis.saving.timeNeededInitial;
   document.title = 'Idle Loops';
   currentLoop = totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
   resetResources();
-  restartStats();
+  globalThis.stats.restartStats();
   for (let i = 0; i < towns.length; i++) {
     towns[i].restart();
   }
@@ -741,24 +737,24 @@ let lagStart = 0;
 let lagSpent = 0;
 function updateLag(manaSpent) {
   if (manaSpent === 0) { // cancel lag display
-    if (lagSpeed !== 0) {
-      lagSpeed = 0;
+    if (globalThis.driver.lagSpeed !== 0) {
+      globalThis.driver.lagSpeed = 0;
       view.requestUpdate('updateBonusText', null);
     }
     return;
   }
-  if (lagSpeed === 0) {
+  if (globalThis.driver.lagSpeed === 0) {
     // initial lag.
     lagStart = performance.now();
     lagSpent = 0;
-    lagSpeed = 1;
+    globalThis.driver.lagSpeed = 1;
     return;
   }
   // update lag
   lagSpent += manaSpent;
   const now = performance.now();
-  const measuredSpeed = lagSpent / (now - lagStart) * 1000 / baseManaPerSecond;
-  lagSpeed = measuredSpeed;
+  const measuredSpeed = lagSpent / (now - lagStart) * 1000 / globalThis.driver.baseManaPerSecond;
+  globalThis.driver.lagSpeed = measuredSpeed;
   view.requestUpdate('updateBonusText', null);
 }
 
@@ -883,6 +879,12 @@ const _driver = {
   toggleOffline,
   isBonusActive,
   checkExtraSpeed,
+
+  lagSpeed: 0,
+  effectiveTime: 0,
+  timeCounter: 0,
+  baseManaPerSecond: 50,
+  gameSpeed: 1,
 };
 
 declare global {

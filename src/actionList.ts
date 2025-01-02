@@ -6092,7 +6092,7 @@ Action.ManaWell = new Action('Mana Well', {
     return towns[5].getLevel('Meander') >= 2;
   },
   goldCost() { // in this case, "amount of mana in well"
-    return Math.max(5000 - Math.floor(10 * effectiveTime), 0);
+    return Math.max(5000 - Math.floor(10 * globalThis.driver.effectiveTime), 0);
   },
   finish() {
     towns[5].finishRegular(this.varName, 100, () => {
@@ -6802,7 +6802,7 @@ Action.Escape = new Action('Escape', {
   },
   canStart() {
     if (escapeStarted) return true;
-    else if (effectiveTime < 60) {
+    else if (globalThis.driver.effectiveTime < 60) {
       escapeStarted = true;
       return true;
     } else return false;
