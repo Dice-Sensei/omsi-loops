@@ -1250,7 +1250,7 @@ class View {
       const actionDiv = document.getElementById(`container${action.varName}`);
       const infoDiv = document.getElementById(`infoContainer${action.varName}`);
       const storyDiv = document.getElementById(`storyContainer${action.varName}`);
-      if (action.allowed && getNumOnList(action.name) >= action.allowed()) {
+      if (action.allowed && globalThis.actions.getNumOnList(action.name) >= action.allowed()) {
         globalThis.helpers.addClassToDiv(actionDiv, 'capped');
       } else if (action.unlocked()) {
         if (infoDiv) {

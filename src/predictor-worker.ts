@@ -4,7 +4,7 @@ importScripts('./helpers.ts');
 importScripts('./actionList.ts');
 importScripts('./driver.ts');
 importScripts('./stats.js');
-importScripts('./actions.js');
+importScripts('./actions.ts');
 importScripts('./town.ts');
 importScripts('./prestige.ts');
 importScripts('./saving.ts');

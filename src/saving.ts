@@ -604,7 +604,9 @@ class BuffEntry extends LeveledLogEntry {
   /** @param {string} key */
   getReplacement(key) {
     if (key === 'buff') {
-      return globalThis.Localization.txt(`buffs>${globalThis.actionList.getXMLName(globalThis.stats.Buff.fullNames[this.name])}>label`);
+      return globalThis.Localization.txt(
+        `buffs>${globalThis.actionList.getXMLName(globalThis.stats.Buff.fullNames[this.name])}>label`,
+      );
     }
     if (key === 'buff_cost') {
       return this.statSpendType
@@ -679,7 +681,7 @@ let timer = timeNeededInitial;
 let timeNeeded = timeNeededInitial;
 // eslint-disable-next-line prefer-const
 const view = selfIsGame ? new View() : null;
-const actions = new Actions();
+const actions = new globalThis.actions.Actions();
 const actionLog = selfIsGame ? new ActionLog() : null;
 /**
  * @template {number} Count Number of towns

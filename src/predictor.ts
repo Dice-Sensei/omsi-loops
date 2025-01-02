@@ -186,7 +186,7 @@ const Koviko = {
     }
 
     getTotalBonusXP(statName, t, ss) {
-      const soulstoneBonus = ss[statName] ? calcSoulstoneMult(ss[statName]) : 1;
+      const soulstoneBonus = ss[statName] ? globalThis.actions.calcSoulstoneMult(ss[statName]) : 1;
 
       var statBonus = 1;
       if (['Dex', 'Str', 'Con', 'Spd', 'Per'].includes(statName)) {
@@ -2631,7 +2631,9 @@ const Koviko = {
 
       this.totalDisplay.parentElement.classList.remove('expired');
 
-      if (getNumOnCurList('Open Portal') > 0 && (getNumOnList('Open Portal') == 0)) {
+      if (
+        globalThis.actions.getNumOnCurList('Open Portal') > 0 && (globalThis.actions.getNumOnList('Open Portal') == 0)
+      ) {
         this.totalDisplay.innerHTML += 'PORTAL MISSING';
         this.totalDisplay.style.color = 'var(--predictor-warning-color)';
       } else {

@@ -2965,7 +2965,7 @@ Action.ContinueOn = new Action('Continue On', {
     Spd: 0.4,
   },
   allowed() {
-    return getNumOnList('Open Portal') > 0 ? 2 : 1;
+    return globalThis.actions.getNumOnList('Open Portal') > 0 ? 2 : 1;
   },
   manaCost() {
     return Math.ceil(8000 - (60 * towns[1].getLevel('Shortcut')));
@@ -3957,7 +3957,7 @@ Action.StartTrek = new Action('Start Trek', {
     Spd: 0.1,
   },
   allowed() {
-    return getNumOnList('Open Portal') > 0 ? 2 : 1;
+    return globalThis.actions.getNumOnList('Open Portal') > 0 ? 2 : 1;
   },
   manaCost() {
     return Math.ceil(12000);
@@ -6422,7 +6422,7 @@ Action.JourneyForth = new Action('Journey Forth', {
     Spd: 0.3,
   },
   allowed() {
-    return getNumOnList('Open Portal') > 0 ? 2 : 1;
+    return globalThis.actions.getNumOnList('Open Portal') > 0 ? 2 : 1;
   },
   manaCost() {
     return 20000;

@@ -284,8 +284,8 @@ function loopEnd() {
     ) {
       loopCompletedActions.push(actions.current[actions.currentPos]);
     }
-    markActionsComplete(loopCompletedActions);
-    actionStory(loopCompletedActions);
+    globalThis.actions.markActionsComplete(loopCompletedActions);
+    globalThis.actions.actionStory(loopCompletedActions);
     if (options.highlightNew) {
       view.requestUpdate('removeAllHighlights', null);
       view.requestUpdate('highlightIncompleteActions', null);
@@ -351,11 +351,14 @@ function manualRestart() {
 function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
   for (const action of towns[townNum].totalActionList) {
     if (action.name === name) {
-      if (action.visible() && action.unlocked() && (!action.allowed || getNumOnList(action.name) < action.allowed())) {
+      if (
+        action.visible() && action.unlocked() &&
+        (!action.allowed || globalThis.actions.getNumOnList(action.name) < action.allowed())
+      ) {
         let addAmount = actions.addAmount;
         if (action.allowed) {
           const numMax = action.allowed();
-          const numHave = getNumOnList(action.name);
+          const numHave = globalThis.actions.getNumOnList(action.name);
           if (numMax - numHave < addAmount) {
             addAmount = numMax - numHave;
           }
@@ -547,9 +550,8 @@ function capAmount(index, townNum) {
   const action = actions.next[index];
   const varName = `good${globalThis.actionList.getActionPrototype(action.name)?.varName}`;
   let alreadyExisting;
-  //if (action.name.startsWith("Survey")) alreadyExisting = getOtherSurveysOnList("") + (action.disabled ? action.loops : 0);
-  //else
-  alreadyExisting = getNumOnList(action.name) + (action.disabled ? action.loops : 0);
+  alreadyExisting = globalThis.actions.globalThis.actions.getNumOnList(action.name) +
+    (action.disabled ? action.loops : 0);
   let newLoops;
   if (action.name.startsWith('Survey')) newLoops = 500 - alreadyExisting;
   if (action.name === 'Gather Team') {
@@ -562,7 +564,7 @@ function capAmount(index, townNum) {
 
 function capTraining(index) {
   const action = actions.next[index];
-  const alreadyExisting = getNumOnList(action.name) + (action.disabled ? action.loops : 0);
+  const alreadyExisting = globalThis.actions.getNumOnList(action.name) + (action.disabled ? action.loops : 0);
   const newLoops = trainingLimits - alreadyExisting;
   actions.updateAction(index, { loops: globalThis.helpers.clamp(action.loops + newLoops, 0, null) });
   view.updateNextActions();
@@ -585,7 +587,7 @@ function addLoop(actionId) {
   let addAmount = actions.addAmount;
   if (theClass.allowed) {
     const numMax = theClass.allowed();
-    const numHave = getNumOnList(theClass.name) + (action.disabled ? action.loops : 0);
+    const numHave = globalThis.actions.getNumOnList(theClass.name) + (action.disabled ? action.loops : 0);
     if ((numMax - numHave) < addAmount) {
       addAmount = numMax - numHave;
     }
@@ -703,7 +705,7 @@ function disableAction(actionId) {
   const action = actions.next[index];
   const translated = globalThis.actionList.getActionPrototype(action.name);
   if (action.disabled) {
-    if (!translated.allowed || getNumOnList(action.name) + action.loops <= translated.allowed()) {
+    if (!translated.allowed || globalThis.actions.getNumOnList(action.name) + action.loops <= translated.allowed()) {
       actions.updateAction(index, { disabled: false });
     }
   } else {

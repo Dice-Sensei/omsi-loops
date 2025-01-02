@@ -804,3 +804,22 @@ function getNumOnCurList(actionName) {
   }
   return count;
 }
+
+const _actions = {
+  isMultipartAction,
+  Actions,
+  ZoneSpan,
+  setAdjustedTicks,
+  calcSoulstoneMult,
+  calcTalentMult,
+  getMaxTicksForAction,
+  getMaxTicksForStat,
+  addExpFromAction,
+  markActionsComplete,
+  actionStory,
+  getNumOnList,
+  getOtherSurveysOnList,
+  getNumOnCurList,
+};
+
+globalThis.actions = _actions;
