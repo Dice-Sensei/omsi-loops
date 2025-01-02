@@ -368,7 +368,7 @@ class Buff extends Localizable2 {
   }
 
   constructor(name) {
-    super(`buffs>${globalThis.actionList.getXMLName(Buff.fullNames[name])}`);
+    super(`buffs>${globalThis.actionList.getXMLName(globalThis.stats.Buff.fullNames[name])}`);
 
     Object.defineProperty(this, 'name', { value: name });
   }
@@ -667,3 +667,53 @@ function restartStats() {
 function getTotalBonusXP(statName) {
   return stats[statName].totalBonusXP;
 }
+
+const _stats = {
+  LevelExp,
+  Stat,
+  Skill,
+  Buff,
+  initializeStats,
+  addNewStat,
+  initializeSkills,
+  addNewSkill,
+  initializeBuffs,
+  addNewBuff,
+  getLevel,
+  getTotalTalentLevel,
+  getTotalTalentPrc,
+  getLevelFromExp,
+  getExpOfLevel,
+  getExpOfSingleLevel,
+  getTalent,
+  getLevelFromTalent,
+  getExpOfTalent,
+  getExpOfSingleTalent,
+  getPrcToNextLevel,
+  getPrcToNextTalent,
+  getSkillLevelFromExp,
+  getExpOfSkillLevel,
+  getSkillLevel,
+  getSkillBonus,
+  setSkillBonusType,
+  getSkillMod,
+  getBuffLevel,
+  getBuffCap,
+  getRitualBonus,
+  getSurveyBonus,
+  getArmorLevel,
+  getSelfCombat,
+  getZombieStrength,
+  getTeamStrength,
+  getTeamCombat,
+  getPrcToNextSkillLevel,
+  addSkillExp,
+  handleSkillExp,
+  addBuffAmt,
+  getTalentMultiplier,
+  getExpToLevel,
+  addExp,
+  restartStats,
+  getTotalBonusXP,
+};
+globalThis.stats = _stats;

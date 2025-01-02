@@ -727,8 +727,9 @@ function getMaxTicksForAction(action, talentOnly = false) {
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
   for (const stat of statList) {
-    const expToNext = getExpToLevel(stat, talentOnly);
-    const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) * getTotalBonusXP(stat);
+    const expToNext = globalThis.stats.getExpToLevel(stat, talentOnly);
+    const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) *
+      globalThis.stats.getTotalBonusXP(stat);
     maxTicks = Math.min(maxTicks, globalThis.helpers.Mana.ceil(expToNext / statMultiplier));
   }
   return maxTicks;
@@ -738,8 +739,9 @@ function getMaxTicksForAction(action, talentOnly = false) {
 function getMaxTicksForStat(action, stat, talentOnly = false) {
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
-  const expToNext = getExpToLevel(stat, talentOnly);
-  const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) * getTotalBonusXP(stat);
+  const expToNext = globalThis.stats.getExpToLevel(stat, talentOnly);
+  const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) *
+    globalThis.stats.getTotalBonusXP(stat);
   return globalThis.helpers.Mana.ceil(expToNext / statMultiplier);
 }
 
@@ -747,7 +749,7 @@ function addExpFromAction(action, manaCount) {
   const adjustedExp = manaCount * action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
   for (const stat of statList) {
-    const expToAdd = ((action.stats[stat] ?? 0) + overFlow) * adjustedExp * getTotalBonusXP(stat);
+    const expToAdd = ((action.stats[stat] ?? 0) + overFlow) * adjustedExp * globalThis.stats.getTotalBonusXP(stat);
 
     // Used for updating the menus when hovering over a completed item in the actionList
     const statExp = `statExp${stat}`;
@@ -755,7 +757,7 @@ function addExpFromAction(action, manaCount) {
       action[statExp] = 0;
     }
     action[statExp] += expToAdd;
-    addExp(stat, expToAdd);
+    globalThis.stats.addExp(stat, expToAdd);
   }
 }
 

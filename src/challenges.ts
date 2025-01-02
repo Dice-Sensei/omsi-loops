@@ -35,10 +35,10 @@ const setupManaDrought = () => {
 
 const setupNoodleArms = () => {
   getSelfCombat = function () {
-    return Math.max(getZombieStrength(), getTeamStrength()) / 2;
+    return Math.max(globalThis.stats.getZombieStrength(), globalThis.stats.getTeamStrength()) / 2;
   };
   getTeamCombat = function () {
-    return getZombieStrength() + getTeamStrength();
+    return globalThis.stats.getZombieStrength() + globalThis.stats.getTeamStrength();
   };
 };
 

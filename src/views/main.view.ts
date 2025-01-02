@@ -401,12 +401,12 @@ class View {
 
   /** @param {StatName} stat */
   updateStat(stat) {
-    const level = getLevel(stat);
-    const talent = getTalent(stat);
+    const level = globalThis.stats.getLevel(stat);
+    const talent = globalThis.stats.getTalent(stat);
     const totalLevel = Object.values(stats).map((s) => s.statLevelExp.level).reduce((a, b) => a + b);
     const totalTalent = Object.values(stats).map((s) => s.talentLevelExp.level).reduce((a, b) => a + b);
-    const levelPrc = `${getPrcToNextLevel(stat)}%`;
-    const talentPrc = `${getPrcToNextTalent(stat)}%`;
+    const levelPrc = `${globalThis.stats.getPrcToNextLevel(stat)}%`;
+    const talentPrc = `${globalThis.stats.getPrcToNextTalent(stat)}%`;
 
     this.updateLevelLogBar('statsContainer', `stat${stat}LevelLogBar`, level, `stat${stat}LevelBar`, levelPrc);
     this.updateLevelLogBar('statsContainer', `stat${stat}TalentLogBar`, talent, `stat${stat}TalentBar`, talentPrc);
@@ -445,7 +445,7 @@ class View {
       );
       document.getElementById(`stat${stat}TalentProgress`).textContent = globalThis.helpers.intToString(talentPrc, 2);
       document.getElementById(`stat${stat}TotalMult`).textContent = globalThis.helpers.intToString(
-        getTotalBonusXP(stat),
+        globalThis.stats.getTotalBonusXP(stat),
         3,
       );
     }
@@ -481,7 +481,7 @@ class View {
   updateStats(skipAnimation) {
     let maxValue = 100; // I really need to stop writing this default explicitly everywhere
     for (const stat of statList) {
-      for (const value of [getLevel(stat), getTalent(stat), stats[stat].soulstone]) {
+      for (const value of [globalThis.stats.getLevel(stat), globalThis.stats.getTalent(stat), stats[stat].soulstone]) {
         maxValue = Math.max(value, maxValue);
       }
     }
@@ -518,10 +518,10 @@ class View {
       this.updateTeamCombat();
     }
 
-    const levelPrc = getPrcToNextSkillLevel(skill);
-    document.getElementById(`skill${skill}Level`).textContent = (getSkillLevel(skill) > 9999)
-      ? globalThis.helpers.toSuffix(getSkillLevel(skill))
-      : globalThis.helpers.formatNumber(getSkillLevel(skill));
+    const levelPrc = globalThis.stats.getPrcToNextSkillLevel(skill);
+    document.getElementById(`skill${skill}Level`).textContent = (globalThis.stats.getSkillLevel(skill) > 9999)
+      ? globalThis.helpers.toSuffix(globalThis.stats.getSkillLevel(skill))
+      : globalThis.helpers.formatNumber(globalThis.stats.getSkillLevel(skill));
     document.getElementById(`skill${skill}LevelBar`).style.width = `${levelPrc}%`;
 
     if (skillShowing === skill) {
@@ -537,62 +537,67 @@ class View {
 
       if (skill === 'Dark') {
         document.getElementById('skillBonusDark').textContent = globalThis.helpers.intToString(
-          getSkillBonus('Dark'),
+          globalThis.stats.getSkillBonus('Dark'),
           4,
         );
       } else if (skill === 'Chronomancy') {
         document.getElementById('skillBonusChronomancy').textContent = globalThis.helpers.intToString(
-          getSkillBonus('Chronomancy'),
+          globalThis.stats.getSkillBonus('Chronomancy'),
           4,
         );
       } else if (skill === 'Practical') {
-        document.getElementById('skillBonusPractical').textContent = getSkillBonus('Practical').toFixed(3).replace(
-          /(\.\d*?[1-9])0+$/gu,
-          '$1',
-        );
+        document.getElementById('skillBonusPractical').textContent = globalThis.stats.getSkillBonus('Practical')
+          .toFixed(3).replace(
+            /(\.\d*?[1-9])0+$/gu,
+            '$1',
+          );
       } else if (skill === 'Mercantilism') {
         document.getElementById('skillBonusMercantilism').textContent = globalThis.helpers.intToString(
-          getSkillBonus('Mercantilism'),
+          globalThis.stats.getSkillBonus('Mercantilism'),
           4,
         );
       } else if (skill === 'Spatiomancy') {
-        document.getElementById('skillBonusSpatiomancy').textContent = getSkillBonus('Spatiomancy').toFixed(3).replace(
-          /(\.\d*?[1-9])0+$/gu,
-          '$1',
-        );
+        document.getElementById('skillBonusSpatiomancy').textContent = globalThis.stats.getSkillBonus('Spatiomancy')
+          .toFixed(3).replace(
+            /(\.\d*?[1-9])0+$/gu,
+            '$1',
+          );
       } else if (skill === 'Divine') {
         document.getElementById('skillBonusDivine').textContent = globalThis.helpers.intToString(
-          getSkillBonus('Divine'),
+          globalThis.stats.getSkillBonus('Divine'),
           4,
         );
       } else if (skill === 'Commune') {
-        document.getElementById('skillBonusCommune').textContent = getSkillBonus('Commune').toFixed(3).replace(
-          /(\.\d*?[1-9])0+$/gu,
-          '$1',
-        );
+        document.getElementById('skillBonusCommune').textContent = globalThis.stats.getSkillBonus('Commune').toFixed(3)
+          .replace(
+            /(\.\d*?[1-9])0+$/gu,
+            '$1',
+          );
       } else if (skill === 'Wunderkind') {
         document.getElementById('skillBonusWunderkind').textContent = globalThis.helpers.intToString(
-          getSkillBonus('Wunderkind'),
+          globalThis.stats.getSkillBonus('Wunderkind'),
           4,
         );
       } else if (skill === 'Gluttony') {
-        document.getElementById('skillBonusGluttony').textContent = getSkillBonus('Gluttony').toFixed(3).replace(
+        document.getElementById('skillBonusGluttony').textContent = globalThis.stats.getSkillBonus('Gluttony').toFixed(
+          3,
+        ).replace(
           /(\.\d*?[1-9])0+$/gu,
           '$1',
         );
       } else if (skill === 'Thievery') {
         document.getElementById('skillBonusThievery').textContent = globalThis.helpers.intToString(
-          getSkillBonus('Thievery'),
+          globalThis.stats.getSkillBonus('Thievery'),
           4,
         );
       } else if (skill === 'Leadership') {
         document.getElementById('skillBonusLeadership').textContent = globalThis.helpers.intToString(
-          getSkillBonus('Leadership'),
+          globalThis.stats.getSkillBonus('Leadership'),
           4,
         );
       } else if (skill === 'Assassin') {
         document.getElementById('skillBonusAssassin').textContent = globalThis.helpers.intToString(
-          getSkillBonus('Assassin'),
+          globalThis.stats.getSkillBonus('Assassin'),
           4,
         );
       }
@@ -618,7 +623,7 @@ class View {
     }
     let container = document.getElementById(`buff${buff}Container`);
     container.style.display = 'flex';
-    document.getElementById(`buff${buff}Level`).textContent = `${getBuffLevel(buff)}/`;
+    document.getElementById(`buff${buff}Level`).textContent = `${globalThis.stats.getBuffLevel(buff)}/`;
     if (buff === 'Imbuement') {
       this.updateTrainingLimits();
     }
@@ -760,8 +765,14 @@ class View {
     if (towns[2].unlocked) {
       document.getElementById('skillSCombatContainer').style.display = 'inline-block';
       document.getElementById('skillTCombatContainer').style.display = 'inline-block';
-      document.getElementById('skillSCombatLevel').textContent = globalThis.helpers.intToString(getSelfCombat(), 1);
-      document.getElementById('skillTCombatLevel').textContent = globalThis.helpers.intToString(getTeamCombat(), 1);
+      document.getElementById('skillSCombatLevel').textContent = globalThis.helpers.intToString(
+        globalThis.stats.getSelfCombat(),
+        1,
+      );
+      document.getElementById('skillTCombatLevel').textContent = globalThis.helpers.intToString(
+        globalThis.stats.getTeamCombat(),
+        1,
+      );
     } else {
       document.getElementById('skillSCombatContainer').style.display = 'none';
       document.getElementById('skillTCombatContainer').style.display = 'none';
@@ -1626,7 +1637,7 @@ class View {
       }
     }
     if (isBuffName(action.grantsBuff)) {
-      const xmlName = globalThis.actionList.getXMLName(Buff.fullNames[action.grantsBuff]);
+      const xmlName = globalThis.actionList.getXMLName(globalThis.stats.Buff.fullNames[action.grantsBuff]);
       const grantsBuff = `<div class='bold'>${globalThis.Localization.txt('actions>tooltip>grants_buff')}:</div>`;
       lockedSkills += `${grantsBuff} <span>${globalThis.Localization.txt(`buffs>${xmlName}>label`)}</span><br>`;
       skillDetails += `<hr>
@@ -2033,7 +2044,7 @@ class View {
         trainingDiv.textContent = String(trainingLimits);
       }
     }
-    if (getBuffLevel('Imbuement') > 0 || getBuffLevel('Imbuement3') > 0) {
+    if (globalThis.stats.getBuffLevel('Imbuement') > 0 || globalThis.stats.getBuffLevel('Imbuement3') > 0) {
       document.getElementById('maxTraining').style.display = '';
     }
   }
@@ -2120,7 +2131,7 @@ class View {
     townsUnlocked.forEach((townNum) => {
       DRdesc.innerHTML += DarkRitualDescription[townNum];
     });
-    if (getBuffLevel('Ritual') > 200) DRdesc.innerHTML += DarkRitualDescription[9];
+    if (globalThis.stats.getBuffLevel('Ritual') > 200) DRdesc.innerHTML += DarkRitualDescription[9];
   }
 
   highlightIncompleteActions() {

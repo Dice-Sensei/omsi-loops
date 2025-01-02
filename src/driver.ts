@@ -17,22 +17,22 @@ function getSpeedMult(zone = curTown) {
   let speedMult = 1;
 
   // Dark Ritual
-  if (zone === 0) speedMult *= getRitualBonus(0, 20, 10);
-  else if (zone === 1) speedMult *= getRitualBonus(20, 40, 5);
-  else if (zone === 2) speedMult *= getRitualBonus(40, 60, 2.5);
-  else if (zone === 3) speedMult *= getRitualBonus(60, 80, 1.5);
-  else if (zone === 4) speedMult *= getRitualBonus(80, 100, 1);
-  else if (zone === 5) speedMult *= getRitualBonus(100, 150, .5);
-  else if (zone === 6) speedMult *= getRitualBonus(150, 200, .5);
-  else if (zone === 7) speedMult *= getRitualBonus(200, 250, .5);
-  else if (zone === 8) speedMult *= getRitualBonus(250, 300, .5);
-  speedMult *= getRitualBonus(300, 666, .1);
+  if (zone === 0) speedMult *= globalThis.stats.getRitualBonus(0, 20, 10);
+  else if (zone === 1) speedMult *= globalThis.stats.getRitualBonus(20, 40, 5);
+  else if (zone === 2) speedMult *= globalThis.stats.getRitualBonus(40, 60, 2.5);
+  else if (zone === 3) speedMult *= globalThis.stats.getRitualBonus(60, 80, 1.5);
+  else if (zone === 4) speedMult *= globalThis.stats.getRitualBonus(80, 100, 1);
+  else if (zone === 5) speedMult *= globalThis.stats.getRitualBonus(100, 150, .5);
+  else if (zone === 6) speedMult *= globalThis.stats.getRitualBonus(150, 200, .5);
+  else if (zone === 7) speedMult *= globalThis.stats.getRitualBonus(200, 250, .5);
+  else if (zone === 8) speedMult *= globalThis.stats.getRitualBonus(250, 300, .5);
+  speedMult *= globalThis.stats.getRitualBonus(300, 666, .1);
 
   // Chronomancy
-  speedMult *= getSkillBonus('Chronomancy');
+  speedMult *= globalThis.stats.getSkillBonus('Chronomancy');
 
   // Imbue Soul
-  speedMult *= 1 + 0.5 * getBuffLevel('Imbuement3');
+  speedMult *= 1 + 0.5 * globalThis.stats.getBuffLevel('Imbuement3');
 
   // Prestige Chronomancy
   speedMult *= globalThis.prestige.prestigeBonus('PrestigeChronomancy');
@@ -552,8 +552,9 @@ function capAmount(index, townNum) {
   alreadyExisting = getNumOnList(action.name) + (action.disabled ? action.loops : 0);
   let newLoops;
   if (action.name.startsWith('Survey')) newLoops = 500 - alreadyExisting;
-  if (action.name === 'Gather Team') newLoops = 5 + Math.floor(getSkillLevel('Leadership') / 100) - alreadyExisting;
-  else newLoops = towns[townNum][varName] - alreadyExisting;
+  if (action.name === 'Gather Team') {
+    newLoops = 5 + Math.floor(globalThis.stats.getSkillLevel('Leadership') / 100) - alreadyExisting;
+  } else newLoops = towns[townNum][varName] - alreadyExisting;
   actions.updateAction(index, { loops: globalThis.helpers.clamp(action.loops + newLoops, 0, null) });
   view.updateNextActions();
   view.updateLockedHidden();

@@ -26,21 +26,21 @@ function prestigeUpgrade(prestigeSelected: PrestigeBuffName) {
     return;
   }
 
-  addBuffAmt(prestigeSelected, 1);
+  globalThis.stats.addBuffAmt(prestigeSelected, 1);
   prestigeValues['prestigeCurrentPoints'] -= costOfPrestige;
 
   // Retain certain values between prestiges
   const nextPrestigeBuffs = {
-    PrestigePhysical: getBuffLevel('PrestigePhysical'),
-    PrestigeMental: getBuffLevel('PrestigeMental'),
-    PrestigeCombat: getBuffLevel('PrestigeCombat'),
-    PrestigeSpatiomancy: getBuffLevel('PrestigeSpatiomancy'),
-    PrestigeChronomancy: getBuffLevel('PrestigeChronomancy'),
-    PrestigeBartering: getBuffLevel('PrestigeBartering'),
-    PrestigeExpOverflow: getBuffLevel('PrestigeExpOverflow'),
+    PrestigePhysical: globalThis.stats.getBuffLevel('PrestigePhysical'),
+    PrestigeMental: globalThis.stats.getBuffLevel('PrestigeMental'),
+    PrestigeCombat: globalThis.stats.getBuffLevel('PrestigeCombat'),
+    PrestigeSpatiomancy: globalThis.stats.getBuffLevel('PrestigeSpatiomancy'),
+    PrestigeChronomancy: globalThis.stats.getBuffLevel('PrestigeChronomancy'),
+    PrestigeBartering: globalThis.stats.getBuffLevel('PrestigeBartering'),
+    PrestigeExpOverflow: globalThis.stats.getBuffLevel('PrestigeExpOverflow'),
 
     // Imbue Soul carry overs between prestiges, but only up to the number of prestiges you have.
-    Imbuement3: Math.min(prestigeValues['prestigeTotalCompletions'], getBuffLevel('Imbuement3')),
+    Imbuement3: Math.min(prestigeValues['prestigeTotalCompletions'], globalThis.stats.getBuffLevel('Imbuement3')),
   };
 
   const nextPrestigeValues = {
@@ -66,7 +66,7 @@ function resetAllPrestiges() {
     PrestigeExpOverflow: 0,
 
     // Imbue Soul carry overs between prestiges, but only up to the number of prestiges you have.
-    Imbuement3: Math.min(prestigeValues['prestigeTotalCompletions'], getBuffLevel('Imbuement3')),
+    Imbuement3: Math.min(prestigeValues['prestigeTotalCompletions'], globalThis.stats.getBuffLevel('Imbuement3')),
   };
 
   const nextPrestigeValues = {
@@ -95,8 +95,8 @@ function prestigeWithNewValues(
 
   // Regain prestige values and Totals
   for (const [key, value] of Object.entries(nextPrestigeBuffs)) {
-    addBuffAmt(key, 0); // Set them to 0
-    addBuffAmt(key, value); // Then set them to actual value
+    globalThis.stats.addBuffAmt(key, 0); // Set them to 0
+    globalThis.stats.addBuffAmt(key, value); // Then set them to actual value
     view.requestUpdate('updateBuff', key);
   }
 
@@ -131,7 +131,7 @@ function prestigeConfirmation() {
 function getPrestigeCost(prestigeSelected: PrestigeBuffName) {
   var currentCost = 30;
 
-  for (var i = 0; i < getBuffLevel(prestigeSelected); i++) {
+  for (var i = 0; i < globalThis.stats.getBuffLevel(prestigeSelected); i++) {
     currentCost += 10 + (5 * i);
   }
 
@@ -179,7 +179,7 @@ const prestigeBases: Record<PrestigeBuffName, number> = {
 function prestigeBonus(buff) {
   const cache = prestigeCache[buff];
 
-  const level = getBuffLevel(buff);
+  const level = globalThis.stats.getBuffLevel(buff);
 
   if (level !== cache.calc) {
     const base = prestigeBases[buff];
@@ -203,7 +203,6 @@ const _prestige = {
   prestigeCache,
   prestigeBases,
   prestigeValues,
-  getBuffLevel,
 } as const;
 
 globalThis.prestige = _prestige;

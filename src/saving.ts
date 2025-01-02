@@ -604,7 +604,7 @@ class BuffEntry extends LeveledLogEntry {
   /** @param {string} key */
   getReplacement(key) {
     if (key === 'buff') {
-      return globalThis.Localization.txt(`buffs>${globalThis.actionList.getXMLName(Buff.fullNames[this.name])}>label`);
+      return globalThis.Localization.txt(`buffs>${globalThis.actionList.getXMLName(globalThis.stats.Buff.fullNames[this.name])}>label`);
     }
     if (key === 'buff_cost') {
       return this.statSpendType
@@ -1572,9 +1572,9 @@ function loadDefaults() {
   if (defaultsRecorded) {
     globalThis.Data.resetToDefaults();
   }
-  initializeStats();
-  initializeSkills();
-  initializeBuffs();
+  globalThis.stats.initializeStats();
+  globalThis.stats.initializeSkills();
+  globalThis.stats.initializeBuffs();
   initializeActions();
   initializeTowns();
   globalThis.prestige.prestigeValues['prestigeCurrentPoints'] = 0;
@@ -1745,7 +1745,7 @@ function doLoad(toLoad) {
     });
   }
   completedActions.push('FoundGlasses');
-  trainingLimits = 10 + getBuffLevel('Imbuement');
+  trainingLimits = 10 + globalThis.stats.getBuffLevel('Imbuement');
   goldInvested = toLoad.goldInvested === undefined ? 0 : toLoad.goldInvested;
   stonesUsed = toLoad.stonesUsed === undefined ? { 1: 0, 3: 0, 5: 0, 6: 0 } : toLoad.stonesUsed;
 
