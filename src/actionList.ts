@@ -527,11 +527,11 @@ class TrialAction extends MultipartAction {
         : globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
   }
-  currentFloor(loopCounter = globalThis.saving.towns[this.townNum][`${this.varName}LoopCounter`]) {
+  currentFloor(loopCounter = globalThis.globals.towns[this.townNum][`${this.varName}LoopCounter`]) {
     return Math.floor(loopCounter / this.segments + 0.0000001);
   }
 
-  loopCost(segment, loopCounter = globalThis.saving.towns[this.townNum][`${this.varName}LoopCounter`]) {
+  loopCost(segment, loopCounter = globalThis.globals.towns[this.townNum][`${this.varName}LoopCounter`]) {
     return globalThis.helpers.precision3(
       Math.pow(this.baseScaling, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) *
         this.exponentScaling * globalThis.stats.getSkillBonus('Assassin'),
@@ -1762,7 +1762,7 @@ DungeonAction.prototype.finishDungeon = function finishDungeon(floorNum) {
     stats[statToAdd].soulstone = (stats[statToAdd].soulstone ?? 0) + countToAdd;
     floor.ssChance *= 0.98;
     globalThis.saving.view.requestUpdate('updateSoulstones', null);
-    globalThis.saving.actionLog.addSoulstones(this, statToAdd, countToAdd);
+    globalThis.globals.actionLog.addSoulstones(this, statToAdd, countToAdd);
     return true;
   }
   return false;
@@ -4352,7 +4352,7 @@ Action.MineSoulstones = new Action('Mine Soulstones', {
       const statToAdd = statList[Math.floor(Math.random() * statList.length)];
       const countToAdd = Math.floor(globalThis.stats.getSkillBonus('Divine'));
       stats[statToAdd].soulstone += countToAdd;
-      globalThis.saving.actionLog.addSoulstones(this, statToAdd, countToAdd);
+      globalThis.globals.actionLog.addSoulstones(this, statToAdd, countToAdd);
       globalThis.saving.view.requestUpdate('updateSoulstones', null);
     });
   },

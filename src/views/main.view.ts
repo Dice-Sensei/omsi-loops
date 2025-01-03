@@ -1169,8 +1169,8 @@ class View {
     if (index === 'clear') {
       log.innerHTML = this.actionLogClearHTML; // nuke it, dot it
     }
-    const entry = globalThis.saving.actionLog.getEntry(index);
-    if (globalThis.saving.actionLog.hasPrevious()) {
+    const entry = globalThis.globals.actionLog.getEntry(index);
+    if (globalThis.globals.actionLog.hasPrevious()) {
       log.classList.add('hasPrevious');
     } else {
       log.classList.remove('hasPrevious');
@@ -1188,7 +1188,7 @@ class View {
       const nextEntry = globalThis.helpers.htmlElement(`actionLogEntry${index + 1}`, false, false);
       log.insertBefore(element, nextEntry ?? globalThis.helpers.htmlElement('actionLogLatest'));
     }
-    if ((globalThis.saving.actionLog.firstNewOrUpdatedEntry ?? Infinity) <= index) {
+    if ((globalThis.globals.actionLog.firstNewOrUpdatedEntry ?? Infinity) <= index) {
       element.classList.add('highlight');
       // this is just causing problems right now. disable, it's not all that important if scroll anchors work properly
       // element.scrollIntoView({block: "nearest", inline: "nearest", behavior: "auto"});
@@ -1321,7 +1321,7 @@ class View {
   }
 
   updateGlobalStory(num) {
-    globalThis.saving.actionLog.addGlobalStory(num);
+    globalThis.globals.actionLog.addGlobalStory(num);
   }
 
   updateStories(init) {
@@ -1345,7 +1345,7 @@ class View {
                 action.visible() && action.unlocked() &&
                 globalThis.saving.vals.completedActions.includes(action.varName)
               ) {
-                globalThis.saving.actionLog.addActionStory(action, storyId, init);
+                globalThis.globals.actionLog.addActionStory(action, storyId, init);
               }
             } else {
               allStoriesForActionUnlocked = false;

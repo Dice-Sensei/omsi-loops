@@ -448,7 +448,7 @@ function closeTutorial() {
 
 function clearSave() {
   globalThis.localStorage[globalThis.saving.defaultSaveName] = '';
-  globalThis.localStorage[globalThis.saving.challengeSaveName] = '';
+  globalThis.localStorage[challengeSaveName] = '';
   location.reload();
 }
 
@@ -597,13 +597,13 @@ function doLoad(toLoad) {
   }
 
   if (toLoad.actionLog !== undefined) {
-    globalThis.saving.actionLog.load(toLoad.actionLog);
-    globalThis.saving.actionLog.loadRecent();
+    globalThis.globals.actionLog.load(toLoad.actionLog);
+    globalThis.globals.actionLog.loadRecent();
   } else {
-    globalThis.saving.actionLog.initialize();
+    globalThis.globals.actionLog.initialize();
   }
-  if (globalThis.saving.actionLog.entries.length === 0) {
-    globalThis.saving.actionLog.addGlobalStory(0);
+  if (globalThis.globals.actionLog.entries.length === 0) {
+    globalThis.globals.actionLog.addGlobalStory(0);
   }
 
   if (toLoad.totalTalent === undefined) {
@@ -971,7 +971,7 @@ function doSave() {
   toSave.storyReqs = storyFlags; // save uses the legacy name "storyReqs" for compatibility
   toSave.storyVars = storyVars;
   toSave.unreadActionStories = globalThis.saving.vals.unreadActionStories;
-  toSave.actionLog = globalThis.saving.actionLog;
+  toSave.actionLog = globalThis.globals.actionLog;
   toSave.buffCaps = buffCaps;
 
   toSave.date = new Date();
@@ -1166,7 +1166,6 @@ function resumeChallenge() {
 }
 
 const _saving = {
-  towns,
   save,
   exportSave,
   importSave,
@@ -1178,18 +1177,10 @@ const _saving = {
   beginChallenge,
   exitChallenge,
   resumeChallenge,
-  saveName,
-  challengeSaveName,
   trials,
   trialFloors,
-  stats,
-  skills,
-  buffs,
-  storyVars,
-  actionLog,
   actions,
   view,
-  buffCaps,
   loadDefaults,
   needsDataSnapshots,
   closeTutorial,

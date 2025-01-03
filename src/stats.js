@@ -555,7 +555,7 @@ function addSkillExp(name, amount) {
   skills[name].levelExp.addExp(amount);
   const newLevel = getSkillLevel(name);
   if (oldLevel !== newLevel) {
-    globalThis.saving.actionLog.addSkillLevel(globalThis.saving.actions.currentAction, name, newLevel, oldLevel);
+    globalThis.globals.actionLog.addSkillLevel(globalThis.saving.actions.currentAction, name, newLevel, oldLevel);
   }
   globalThis.saving.view.requestUpdate('updateSkill', name);
 }
@@ -590,7 +590,7 @@ function addBuffAmt(name, amount, action, spendType, statsSpent) {
   buffs[name].amt += amount;
   if (amount === 0) buffs[name].amt = 0; // for presetige, reset to 0 when passed in.
   if (action) {
-    globalThis.saving.actionLog.addBuff(action, name, buffs[name].amt, oldBuffLevel, spendType, statsSpent);
+    globalThis.globals.actionLog.addBuff(action, name, buffs[name].amt, oldBuffLevel, spendType, statsSpent);
   }
   globalThis.saving.view.requestUpdate('updateBuff', name);
 }

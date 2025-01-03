@@ -974,3 +974,15 @@ const storyVars = {
   maxWizardGuildSegmentCleared: -1,
   maxZombiesRaised: -1,
 };
+
+globalThis.globals = {
+  storyFlags,
+  storyVars,
+  actionLog,
+  buffCaps,
+  actions,
+  skills,
+  towns,
+  buffs,
+  stats,
+};
