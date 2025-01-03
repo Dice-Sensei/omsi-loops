@@ -7,6 +7,7 @@ importScripts('./stats.js');
 importScripts('./actions.ts');
 importScripts('./town.ts');
 importScripts('./prestige.ts');
+importScripts('./globals.ts');
 importScripts('./saving.ts');
 importScripts('./predictor.ts');
 
