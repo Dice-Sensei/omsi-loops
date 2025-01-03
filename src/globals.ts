@@ -975,7 +975,7 @@ const storyVars = {
   maxZombiesRaised: -1,
 };
 
-globalThis.globals = {
+const _globals = {
   storyFlags,
   storyVars,
   actionLog,
@@ -986,3 +986,9 @@ globalThis.globals = {
   buffs,
   stats,
 };
+
+declare global {
+  var globals: typeof _globals;
+}
+
+globalThis.globals = _globals;
