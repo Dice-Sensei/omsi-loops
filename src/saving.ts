@@ -1028,14 +1028,6 @@ const storyInitializers = {
   },
 };
 
-let totals = {
-  time: 0,
-  effectiveTime: 0,
-  borrowedTime: 0,
-  loops: 0,
-  actions: 0,
-};
-
 const options = {
   theme: 'normal',
   themeVariant: '',
@@ -1074,6 +1066,14 @@ const options = {
 };
 // Globals!!!!!
 
+vals.totals = {
+  time: 0,
+  effectiveTime: 0,
+  borrowedTime: 0,
+  loops: 0,
+  actions: 0,
+};
+
 vals.challengeSave = {
   challengeMode: 0,
   inChallenge: false,
@@ -1107,7 +1107,7 @@ globalThis.Data.registerAll({
   completedActions: vals.completedActions,
   storyFlags,
   storyVars,
-  totals,
+  totals: vals.totals,
 });
 
 let pauseNotification = null;
@@ -1826,13 +1826,15 @@ function doLoad(toLoad) {
   }
 
   if (toLoad.totals != undefined) {
-    totals.time = toLoad.totals.time === undefined ? 0 : toLoad.totals.time;
-    totals.effectiveTime = toLoad.totals.effectiveTime === undefined ? 0 : toLoad.totals.effectiveTime;
-    totals.borrowedTime = toLoad.totals.borrowedTime ?? 0;
-    totals.loops = toLoad.totals.loops === undefined ? 0 : toLoad.totals.loops;
-    totals.actions = toLoad.totals.actions === undefined ? 0 : toLoad.totals.actions;
-  } else totals = { time: 0, effectiveTime: 0, borrowedTime: 0, loops: 0, actions: 0 };
-  globalThis.saving.vals.currentLoop = totals.loops;
+    globalThis.saving.vals.totals.time = toLoad.totals.time === undefined ? 0 : toLoad.totals.time;
+    globalThis.saving.vals.totals.effectiveTime = toLoad.totals.effectiveTime === undefined
+      ? 0
+      : toLoad.totals.effectiveTime;
+    globalThis.saving.vals.totals.borrowedTime = toLoad.totals.borrowedTime ?? 0;
+    globalThis.saving.vals.totals.loops = toLoad.totals.loops === undefined ? 0 : toLoad.totals.loops;
+    globalThis.saving.vals.totals.actions = toLoad.totals.actions === undefined ? 0 : toLoad.totals.actions;
+  } else globalThis.saving.vals.totals = { time: 0, effectiveTime: 0, borrowedTime: 0, loops: 0, actions: 0 };
+  globalThis.saving.vals.currentLoop = globalThis.saving.vals.totals.loops;
   view.updateTotals();
   console.log('Updating prestige values from load');
   view.updatePrestigeValues();
@@ -1944,7 +1946,7 @@ function doSave() {
 
   toSave.date = new Date();
   toSave.totalOfflineMs = globalThis.saving.vals.totalOfflineMs;
-  toSave.totals = totals;
+  toSave.totals = globalThis.saving.vals.totals;
 
   toSave.challengeSave = globalThis.saving.vals.challengeSave;
   for (const challengeProgress in globalThis.saving.vals.challengeSave) {
@@ -2020,7 +2022,7 @@ function storeSaveJson(saveJson) {
 function saveFileName() {
   const gameName = document.title.replace('*PAUSED* ', '');
   const version = document.querySelector('#changelog > li[data-verNum]').firstChild.textContent.trim();
-  return `${gameName} ${version} - Loop ${totals.loops}.txt`;
+  return `${gameName} ${version} - Loop ${globalThis.saving.vals.totals.loops}.txt`;
 }
 
 function exportSaveFile() {
@@ -2160,7 +2162,6 @@ const _saving = {
   actions,
   view,
   buffCaps,
-  totals,
   loadDefaults,
   needsDataSnapshots,
   closeTutorial,

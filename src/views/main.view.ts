@@ -1315,7 +1315,7 @@ class View {
     }
     if (
       globalThis.saving.vals.totalActionList.filter((action) => action.finish.toString().includes('updateBuff')).filter(
-          (action) => action.unlocked()
+          (action) => action.unlocked(),
         ).length > 0 ||
       globalThis.prestige.prestigeValues['completedAnyPrestige']
     ) {
@@ -2173,15 +2173,21 @@ class View {
   }
 
   updateTotals() {
-    document.getElementById('totalPlaytime').textContent = `${formatTime(totals.time)}`;
-    document.getElementById('totalEffectiveTime').textContent = `${formatTime(totals.effectiveTime)}`;
-    document.getElementById('borrowedTimeBalance').textContent = formatTime(totals.borrowedTime);
+    document.getElementById('totalPlaytime').textContent = `${formatTime(globalThis.saving.vals.totals.time)}`;
+    document.getElementById('totalEffectiveTime').textContent = `${
+      formatTime(globalThis.saving.vals.totals.effectiveTime)
+    }`;
+    document.getElementById('borrowedTimeBalance').textContent = formatTime(globalThis.saving.vals.totals.borrowedTime);
     document.getElementById('borrowedTimeDays').textContent = `${
-      globalThis.helpers.formatNumber(Math.floor(totals.borrowedTime / 86400))
+      globalThis.helpers.formatNumber(Math.floor(globalThis.saving.vals.totals.borrowedTime / 86400))
     }${globalThis.Localization.txt('time_controls>days')}`;
-    document.getElementById('totalLoops').textContent = `${globalThis.helpers.formatNumber(totals.loops)}`;
-    document.getElementById('totalActions').textContent = `${globalThis.helpers.formatNumber(totals.actions)}`;
-    if (totals.borrowedTime > 0) document.documentElement.classList.add('time-borrowed');
+    document.getElementById('totalLoops').textContent = `${
+      globalThis.helpers.formatNumber(globalThis.saving.vals.totals.loops)
+    }`;
+    document.getElementById('totalActions').textContent = `${
+      globalThis.helpers.formatNumber(globalThis.saving.vals.totals.actions)
+    }`;
+    if (globalThis.saving.vals.totals.borrowedTime > 0) document.documentElement.classList.add('time-borrowed');
     else document.documentElement.classList.remove('time-borrowed');
   }
 

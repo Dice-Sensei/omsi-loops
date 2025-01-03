@@ -48,11 +48,11 @@ const setupManaBurn = () => {
     globalThis.saving.timer = 0;
     globalThis.driver.timeCounter = 0;
     globalThis.driver.effectiveTime = 0;
-    globalThis.saving.timeNeeded = 4320000 - totals.effectiveTime * 50;
+    globalThis.saving.timeNeeded = 4320000 - globalThis.saving.vals.totals.effectiveTime * 50;
     document.title = 'Idle Loops';
     globalThis.driver.resetResources();
     globalThis.stats.restartStats();
-    for (let i = 0; i < towns.length; i++) {
+    for (let i = 0; i < globalThis.saving.vals.towns.length; i++) {
       globalThis.saving.vals.towns[i].restart();
     }
     globalThis.saving.view.requestUpdate('updateSkills');

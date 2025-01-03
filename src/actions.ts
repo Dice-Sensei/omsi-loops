@@ -152,22 +152,29 @@ class Actions {
         manaLeft -= manaUsed;
         manaToSpend += manaUsed;
         // console.log("using: "+curAction.loopStats[(towns[curAction.townNum][curAction.varName + "LoopCounter"]+segment) % curAction.loopStats.length]+" to add: " + toAdd + " to segment: " + segment + " and part " +towns[curAction.townNum][curAction.varName + "LoopCounter"]+" of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
-        towns[curAction.townNum][curAction.varName] += toAdd;
+        globalThis.saving.vals.towns[curAction.townNum][curAction.varName] += toAdd;
         curProgress += toAdd;
         while (curProgress >= loopCost(segment)) {
           curProgress -= loopCost(segment);
           // segment finished
           if (segment === curAction.segments - 1) {
             // part finished
-            if (curAction.name === 'Dark Ritual' && towns[curAction.townNum][curAction.varName] >= 4000000) {
+            if (
+              curAction.name === 'Dark Ritual' &&
+              globalThis.saving.vals.towns[curAction.townNum][curAction.varName] >= 4000000
+            ) {
               globalThis.view.setStoryFlag('darkRitualThirdSegmentReached');
             }
-            if (curAction.name === 'Imbue Mind' && towns[curAction.townNum][curAction.varName] >= 700000000) {
+            if (
+              curAction.name === 'Imbue Mind' &&
+              globalThis.saving.vals.towns[curAction.townNum][curAction.varName] >= 700000000
+            ) {
               globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
             }
-            towns[curAction.townNum][curAction.varName] = 0;
-            loopCounter = towns[curAction.townNum][`${curAction.varName}LoopCounter`] += curAction.segments;
-            towns[curAction.townNum][`total${curAction.varName}`]++;
+            globalThis.saving.vals.towns[curAction.townNum][curAction.varName] = 0;
+            loopCounter = globalThis.saving.vals.towns[curAction.townNum][`${curAction.varName}LoopCounter`] +=
+              curAction.segments;
+            globalThis.saving.vals.towns[curAction.townNum][`total${curAction.varName}`]++;
             segment -= curAction.segments;
             loopCosts = {};
             curAction.loopsFinished();
@@ -180,10 +187,10 @@ class Actions {
               curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
               curAction.goldRemaining = resources.gold;
               curAction.finish();
-              totals.actions++;
+              globalThis.saving.vals.totals.actions++;
               break manaLoop;
             }
-            towns[curAction.townNum][curAction.varName] = curProgress;
+            globalThis.saving.vals.towns[curAction.townNum][curAction.varName] = curProgress;
           }
           if (curAction.segmentFinished) {
             curAction.segmentFinished();
@@ -227,7 +234,7 @@ class Actions {
       curAction.lastMana = curAction.rawTicks;
       this.completedTicks += curAction.adjustedTicks;
       curAction.finish();
-      totals.actions++;
+      globalThis.saving.vals.totals.actions++;
       curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
 
       if (curAction.cost) {

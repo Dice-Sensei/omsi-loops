@@ -275,9 +275,9 @@ function pauseGame(ping, message) {
 
 function loopEnd() {
   if (globalThis.driver.effectiveTime > 0) {
-    totals.time += globalThis.driver.timeCounter;
-    totals.effectiveTime += globalThis.driver.effectiveTime;
-    totals.loops++;
+    globalThis.saving.vals.totals.time += globalThis.driver.timeCounter;
+    globalThis.saving.vals.totals.effectiveTime += globalThis.driver.effectiveTime;
+    globalThis.saving.vals.totals.loops++;
     globalThis.saving.view.requestUpdate('updateTotals', null);
     const loopCompletedActions = actions.current.slice(0, actions.currentPos);
     if (
@@ -329,7 +329,7 @@ function restart() {
   globalThis.driver.effectiveTime = 0;
   globalThis.saving.timeNeeded = globalThis.saving.timeNeededInitial;
   document.title = 'Idle Loops';
-  globalThis.saving.vals.currentLoop = totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
+  globalThis.saving.vals.currentLoop = globalThis.saving.vals.totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
   resetResources();
   globalThis.stats.restartStats();
   for (let i = 0; i < globalThis.saving.towns.length; i++) {
@@ -733,7 +733,7 @@ function removeAction(actionId) {
 
 function borrowTime() {
   addOffline(86400_000);
-  totals.borrowedTime += 86400;
+  globalThis.saving.vals.totals.borrowedTime += 86400;
   globalThis.saving.view.requestUpdate('updateOffline', null);
   globalThis.saving.view.requestUpdate('updateTotals', null);
 }
@@ -741,7 +741,7 @@ function borrowTime() {
 function returnTime() {
   if (globalThis.saving.vals.totalOfflineMs >= 86400_000) {
     addOffline(-86400_000);
-    totals.borrowedTime -= 86400;
+    globalThis.saving.vals.totals.borrowedTime -= 86400;
     globalThis.saving.view.requestUpdate('updateOffline', null);
     globalThis.saving.view.requestUpdate('updateTotals', null);
   }
