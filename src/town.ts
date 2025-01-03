@@ -29,7 +29,7 @@
  * @template {number} TN
  * @typedef {keyof TownVars<TN>} TownVarNames
  */
-/** @template {Town<number>} T @typedef {T extends Town<infer TN> ? TN : never} NumOfTown */
+
 /**
  * @template {number} TN Town number
  */
@@ -162,7 +162,6 @@ class Town<TN extends number> {
     }
   }
 
-  /** @param {ProgressScalingType} [progressScaling] */
   createProgressVars(varName, progressScaling = 'default') {
     if (this[`exp${varName}`] === undefined) {
       this[`exp${varName}`] = 0;

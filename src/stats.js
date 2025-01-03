@@ -19,13 +19,11 @@ class LevelExp {
     return this.expRequiredForNextLevel - this.exp;
   }
 
-  /** @type {number} */
   #expRequiredForNextLevel;
   get expRequiredForNextLevel() {
     return this.#expRequiredForNextLevel ??= LevelExp.expRequiredForLevel(this.level + 1);
   }
 
-  /** @type {number} */
   #totalExpForThisLevel;
   get totalExpForThisLevel() {
     return this.#totalExpForThisLevel ??= LevelExp.totalExpForLevel(this.level);
@@ -41,7 +39,6 @@ class LevelExp {
     this.exp = totalExp - this.totalExp;
   }
 
-  /** @param {number} [levelOrTotalExp] @param {number} [exp]  */
   constructor(levelOrTotalExp, exp) {
     if (typeof levelOrTotalExp === 'number') {
       if (typeof exp === 'number') {
@@ -126,16 +123,14 @@ class Localizable2 {
 }
 
 class Stat extends Localizable2 {
-  /** @type {StatName} */
   name;
   statLevelExp = new LevelExp();
   talentLevelExp = new LevelExp();
   soullessLevelExp = new LevelExp();
   soulstone = 0;
-  /** @type {PrestigeBuffName} */
+
   prestigeBuff;
 
-  /** @param {StatName} name */
   constructor(name) {
     super(`stats>${name}`);
     Object.defineProperty(this, 'name', { value: name });
@@ -248,27 +243,26 @@ class Stat extends Localizable2 {
     return true;
   }
 
-  /** @type {(a:Stat, b:Stat) => number} */
   static compareLevelAscending(a, b) {
     return a.exp - b.exp;
   }
-  /** @type {(a:Stat, b:Stat) => number} */
+
   static compareLevelDescending(a, b) {
     return b.exp - a.exp;
   }
-  /** @type {(a:Stat, b:Stat) => number} */
+
   static compareTalentAscending(a, b) {
     return a.talent - b.talent;
   }
-  /** @type {(a:Stat, b:Stat) => number} */
+
   static compareTalentDescending(a, b) {
     return b.talent - a.talent;
   }
-  /** @type {(a:Stat, b:Stat) => number} */
+
   static compareSoulstoneAscending(a, b) {
     return a.soulstone - b.soulstone;
   }
-  /** @type {(a:Stat, b:Stat) => number} */
+
   static compareSoulstoneDescending(a, b) {
     return b.soulstone - a.soulstone;
   }
@@ -279,13 +273,11 @@ const Skill_decrease = 2;
 const Skill_custom = 3;
 
 class Skill extends Localizable2 {
-  /** @type {SkillName} */
   name;
   levelExp = new LevelExp();
-  /** @type {Skill_increase | Skill_decrease | Skill_custom | 0} */
+
   change = 0;
 
-  /** @param {SkillName} name */
   constructor(name) {
     super(`skills>${name}`);
     Object.defineProperty(this, 'name', { value: name });
@@ -320,9 +312,8 @@ class Skill extends Localizable2 {
     this.levelExp.load(toLoad.statLevelExp, toLoad.exp);
   }
 
-  /** @type {number} */
   #bonusCalc;
-  /** @type {number} */
+
   #bonus;
   getBonus() {
     if (this.#bonusCalc !== this.levelExp.level) {
@@ -340,7 +331,7 @@ class Skill extends Localizable2 {
 }
 
 class Buff extends Localizable2 {
-  static fullNames = /** @type {const} */ ({
+  static fullNames = ({
     Ritual: 'Dark Ritual',
     Imbuement: 'Imbue Mind',
     Imbuement2: 'Imbue Body',
@@ -380,7 +371,6 @@ function initializeStats() {
   }
 }
 
-/** @param {StatName} name */
 function addNewStat(name) {
   stats[name] = new Stat(name);
 }
@@ -391,7 +381,6 @@ function initializeSkills() {
   }
 }
 
-/** @param {SkillName} name */
 function addNewSkill(name) {
   skills[name] = new Skill(name);
   setSkillBonusType(name);
@@ -403,12 +392,10 @@ function initializeBuffs() {
   }
 }
 
-/** @param {BuffName} name */
 function addNewBuff(name) {
   buffs[name] = new Buff(name);
 }
 
-/** @param {StatName} stat */
 function getLevel(stat) {
   return stats[stat].statLevelExp.level;
 }
@@ -434,7 +421,6 @@ function getExpOfSingleLevel(level) {
   return level * 100;
 }
 
-/** @param {StatName} stat  */
 function getTalent(stat) {
   return stats[stat].talentLevelExp.level;
 }
@@ -451,14 +437,12 @@ function getExpOfSingleTalent(level) {
   return level * 100;
 }
 
-/** @param {StatName} stat */
 function getPrcToNextLevel(stat) {
   const curLevelProgress = stats[stat].statLevelExp.exp;
   const nextLevelNeeds = stats[stat].statLevelExp.expRequiredForNextLevel;
   return Math.floor(curLevelProgress / nextLevelNeeds * 100 * 10) / 10;
 }
 
-/** @param {StatName} stat */
 function getPrcToNextTalent(stat) {
   const curLevelProgress = stats[stat].talentLevelExp.exp;
   const nextLevelNeeds = stats[stat].talentLevelExp.expRequiredForNextLevel;
@@ -473,12 +457,10 @@ function getExpOfSkillLevel(level) {
   return level * (level + 1) * 50;
 }
 
-/** @param {SkillName} skill */
 function getSkillLevel(skill) {
   return skills[skill].levelExp.level;
 }
 
-/** @param {SkillName} skill */
 function getSkillBonus(skill) {
   const bonus = skills[skill].getBonus();
   if (bonus === 0) {
@@ -486,7 +468,7 @@ function getSkillBonus(skill) {
   }
   return bonus;
 }
-/** @param {SkillName} skill */
+
 function setSkillBonusType(skill) {
   let change;
   if (
@@ -503,18 +485,15 @@ function setSkillBonusType(skill) {
   else return skills[skill].change = 0;
 }
 
-/** @param {SkillName} name */
 function getSkillMod(name, min, max, percentChange) {
   if (getSkillLevel(name) < min) return 1;
   else return 1 + Math.min(getSkillLevel(name) - min, max - min) * percentChange / 100;
 }
 
-/** @param {BuffName} buff */
 function getBuffLevel(buff) {
   return buffs[buff].amt;
 }
 
-/** @param {BuffName} buff */
 function getBuffCap(buff) {
   // Fixme please! I need to have a storage in data space
   const input = document.getElementById(`buff${buff}Cap`);
@@ -564,14 +543,12 @@ function getTeamCombat() {
   return getSelfCombat() + getZombieStrength() + getTeamStrength();
 }
 
-/** @param {SkillName} skill */
 function getPrcToNextSkillLevel(skill) {
   const curLevelProgress = skills[skill].levelExp.exp;
   const nextLevelNeeds = skills[skill].levelExp.expRequiredForNextLevel;
   return Math.floor(curLevelProgress / nextLevelNeeds * 100 * 10) / 10;
 }
 
-/** @param {SkillName} name */
 function addSkillExp(name, amount) {
   if (name === 'Combat' || name === 'Pyromancy' || name === 'Restoration') amount *= 1 + getBuffLevel('Heroism') * 0.02;
   const oldLevel = getSkillLevel(name);
@@ -583,7 +560,6 @@ function addSkillExp(name, amount) {
   globalThis.saving.view.requestUpdate('updateSkill', name);
 }
 
-/** @param {Partial<Record<SkillName, number | (() => number)>>} list  */
 function handleSkillExp(list) {
   for (const skill in list) {
     if (!isSkillName(skill)) {
@@ -638,7 +614,7 @@ function getTalentMultiplier() {
 }
 
 // how much "addExp" would you have to do to get this stat to the next exp or talent level
-/** @param {StatName} name */
+
 function getExpToLevel(name, talentOnly = false) {
   const expToNext = stats[name].statLevelExp.expToNextLevel;
   const talentToNext = stats[name].talentLevelExp.expToNextLevel;
@@ -646,7 +622,6 @@ function getExpToLevel(name, talentOnly = false) {
   return Math.ceil(Math.min(talentOnly ? Infinity : expToNext, talentToNext / talentMultiplier));
 }
 
-/** @param {StatName} name */
 function addExp(name, amount) {
   stats[name].statLevelExp.addExp(amount);
   stats[name].soullessLevelExp.addExp(amount / stats[name].soulstoneMult);
@@ -664,7 +639,6 @@ function restartStats() {
   globalThis.saving.view.requestUpdate('updateStats', true);
 }
 
-/** @param {typeof statList[number]} statName */
 function getTotalBonusXP(statName) {
   return stats[statName].totalBonusXP;
 }

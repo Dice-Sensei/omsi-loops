@@ -644,6 +644,7 @@ const actionLogEntryTypeMap = {
 };
 
 // Globals!!!!!
+
 const actions = new globalThis.actions.Actions();
 
 const selfIsGame = typeof globalThis?.view?.View !== 'undefined';
@@ -977,20 +978,4 @@ const storyVars = {
   maxZombiesRaised: -1,
 };
 
-const storyInitializers = {
-  storyFlags: {},
-  storyVars: {
-    maxWizardGuildSegmentCleared(loadingFlags, loadingVars) {
-      if (loadingFlags['wizardGuildRankSSSReached']) return 48;
-      if (loadingFlags['wizardGuildRankSSReached']) return 42;
-      if (loadingFlags['wizardGuildRankSReached']) return 36;
-      if (loadingFlags['wizardGuildRankAReached']) return 30;
-      if (loadingFlags['wizardGuildRankBReached']) return 24;
-      if (loadingFlags['wizardGuildRankCReached']) return 18;
-      if (loadingFlags['wizardGuildRankDReached']) return 12;
-      if (loadingFlags['wizardGuildRankEReached']) return 6;
-      if (loadingFlags['wizardGuildTestTaken']) return 0;
-    },
-  },
-};
 // Globals!!!!!

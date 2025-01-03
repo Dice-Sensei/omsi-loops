@@ -40,19 +40,16 @@
  */
 
 class SnapshotMissingError extends ReferenceError {
-  /** @type {number} */
   id;
 
-  /** @param {number} id  */
   constructor(id) {
     super();
     this.id = id;
   }
 }
 class Data {
-  /** @type {Record<string, object>} */
   static rootObjects = { __proto__: null };
-  /** @type {DataSnapshot[]} */
+
   static snapshotStack = [];
   static get defaultSnapshot() {
     return this.snapshotStack[0];
@@ -60,7 +57,7 @@ class Data {
   static get baseSnapshot() {
     return this.snapshotStack[1];
   }
-  /** @type {WeakMap<object, number>} */
+
   static objectIdMap = new WeakMap();
   // these language invariants need a way to have their identities transmitted across thread boundaries
   static get wellKnownObjects() {
@@ -85,7 +82,7 @@ class Data {
     }
     return wellKnownObjects;
   }
-  /** @satisfies {{[K in keyof typeof Data.wellKnownObjects]: (record: typeof Data.wellKnownObjects[K]) => typeof Data.wellKnownObjects[K]}} */
+
   static wellKnownConstructors = {
     __proto__: null,
     [-1]: () => ({}),
@@ -132,14 +129,12 @@ class Data {
     this.setObjectId(this.rootObjects, 1);
   }
 
-  /** @type {<T>(key: string, object: T) => T} */
   static register(key, object) {
     globalThis.Data.rootObjects[key] = object;
     this.getObjectId(object);
     return object;
   }
 
-  /** @type {(objects: {[key: string]: {}}) => void} */
   static registerAll(objects) {
     for (const key in objects) {
       this.register(key, objects[key]);
@@ -166,7 +161,6 @@ class Data {
     return this.recordSnapshot('base');
   }
 
-  /** @param {SnapshotIdentifier} identifier */
   static getSnapshotIndex(identifier) {
     return identifier instanceof DataSnapshot
       ? this.snapshotStack.lastIndexOf(identifier)
@@ -181,12 +175,10 @@ class Data {
       : -1;
   }
 
-  /** @param {SnapshotIdentifier} identifier */
   static getSnapshot(identifier) {
     return identifier instanceof DataSnapshot ? identifier : this.snapshotStack[this.getSnapshotIndex(identifier)];
   }
 
-  /** @param {(snapshot: DataSnapshot) => boolean} predicate  */
   static findSnapshotIndex(predicate) {
     for (let i = this.snapshotStack.length - 1; i >= 0; i--) {
       if (predicate(this.snapshotStack[i])) {
@@ -195,17 +187,15 @@ class Data {
     }
     return -1;
   }
-  /** @param {(snapshot: DataSnapshot) => boolean} predicate  */
+
   static findSnapshot(predicate) {
     return this.snapshotStack[this.findSnapshotIndex(predicate)];
   }
 
-  /** @param {SnapshotIdentifier} identifier */
   static exportSnapshot(identifier) {
     return this.getSnapshot(identifier)?.export();
   }
 
-  /** @param {SnapshotExport} data @param {DataSnapshot} [baseSnapshot] */
   static importSnapshot(data, baseSnapshot) {
     baseSnapshot ??= data.type !== 'delta'
       ? null
@@ -231,7 +221,6 @@ class Data {
     return this.defaultSnapshot.exportIds();
   }
 
-  /** @param {SnapshotIdMap} ids */
   static verifyDefaultIds(ids) {
     return this.defaultSnapshot.verifyIds(ids);
   }
@@ -276,7 +265,6 @@ class Data {
     }
   }
 
-  /** @param {SnapshotIdentifier} identifier */
   static revertToSnapshot(identifier, keepOnStack) {
     const startMark = performance.mark('start-revertToSnapshot');
     const targetSnapshot = this.getSnapshot(identifier);
@@ -293,7 +281,6 @@ class Data {
     performance.measure('revertToSnapshot', startMark.name, endMark.name);
   }
 
-  /** @param {SnapshotIdentifier} identifier */
   static rewindToSnapshot(identifier, keepOnStack) {
     const startMark = performance.mark('start-rewindToSnapshot');
     const targetSnapshot = this.getSnapshot(identifier);
@@ -364,8 +351,7 @@ class Data {
    * @param {(keyof O)[]} props
    */
   static omitProperties(object, props) {
-    const omitRecords =
-      /** @type {Partial<Record<keyof O, boolean>>} */ (DataSnapshot_OMIT in object ? object[DataSnapshot_OMIT] : {});
+    const omitRecords = DataSnapshot_OMIT in object ? object[DataSnapshot_OMIT] : {};
     Object.defineProperty(object, DataSnapshot_OMIT, { value: omitRecords, configurable: true });
     for (const prop of props) {
       omitRecords[prop] = true;
@@ -391,18 +377,17 @@ const DataSnapshot_NAME = Symbol('DataSnapshot_NAME');
 const DataSnapshot_OWNER = Symbol('DataSnapshot_OWNER');
 const DataSnapshot_DELETED = Symbol('DataSnapshot_DELETED');
 const DataSnapshot_OMIT = Symbol('DataSnapshot_OMIT');
-/** @typedef {{readonly [DataSnapshot_NAME]: string, readonly [DataSnapshot_OWNER]: symbol, readonly [prop: string]: any}} DataRecord */
+
 /**
  * Creates and holds a DataRecord as it is being recorded
  */
 class DataRecorder {
-  /** @type {string} */
   name;
-  /** @type {symbol} */
+
   owner;
-  /** @type {DataRecord | null} */
+
   base;
-  /** @type {DataRecord & Record<string, any>} */
+
   #record;
 
   /**
@@ -420,22 +405,18 @@ class DataRecorder {
     });
   }
 
-  /** @type {(prop: string) => boolean} */
   has(prop) {
     return Object.hasOwn(this.#record, prop);
   }
 
-  /** @param {string} prop  */
   set(prop, value) {
     this.#record[prop] = value;
   }
 
-  /** @param {string} prop  */
   delete(prop) {
     this.#record[prop] = DataSnapshot_DELETED;
   }
 
-  /** @returns {DataRecord | null} */
   finalize() {
     Object.setPrototypeOf(this.#record, this.base);
     return Object.freeze(this.#record);
@@ -444,7 +425,7 @@ class DataRecorder {
 
 class DeltaRecorder extends DataRecorder {
   hasChanges = false;
-  /** @type {Record<string, true>} */
+
   foundProps = {};
 
   /**
@@ -456,7 +437,6 @@ class DeltaRecorder extends DataRecorder {
     super(name, owner, base);
   }
 
-  /** @param {string} prop  */
   set(prop, value) {
     this.foundProps[prop] = true;
     if (!(prop in this.base) || this.base[prop] !== value) {
@@ -470,7 +450,6 @@ class DeltaRecorder extends DataRecorder {
     super.delete(prop);
   }
 
-  /** @returns {DataRecord | null} */
   finalize() {
     for (const prop in this.base) {
       if (!this.foundProps[prop]) {
@@ -497,13 +476,12 @@ class DeltaRecorder extends DataRecorder {
  * @implements {ReadonlyMap<O, DataRecord>}
  */
 class DataSnapshot {
-  /** @type {string} */
   name;
-  /** @type {symbol} */
+
   tag;
-  /** @type {number} */
+
   id;
-  /** @type {Map<O, DataRecord>} */
+
   objects = new Map();
   /**
    * Map of object ids for objects contained in this snapshot
@@ -511,10 +489,8 @@ class DataSnapshot {
    */
   idMap = {};
 
-  /** About how much storage space does this take up? */
   sizeEstimate = 0;
 
-  /** How many snapshots in total are required to compose this snapshot? */
   heritageLength = 1;
 
   #root;
@@ -555,12 +531,10 @@ class DataSnapshot {
     return [this];
   }
 
-  /** @param {O} object  */
   get(object) {
     return this.objects.get(object);
   }
 
-  /** @param {O} object  */
   has(object) {
     return this.objects.has(object);
   }
@@ -573,7 +547,6 @@ class DataSnapshot {
     yield* this.objects.entries();
   }
 
-  /** @type {(callbackfn: (record: DataRecord, object: O, snapshot: DataSnapshot) => void, thisArg?: any) => void}   */
   forEach(callbackfn, thisArg) {
     for (const [object, record] of this.entries()) {
       callbackfn.call(thisArg, record, object, this);
@@ -592,7 +565,6 @@ class DataSnapshot {
     }
   }
 
-  /** @param {O} object @param {string} prop */
   getValue(object, prop) {
     const copy = this.get(object);
     const value = copy[prop];
@@ -600,7 +572,6 @@ class DataSnapshot {
     return value;
   }
 
-  /** @param {O} object @returns {Generator<[string, any]>} */
   *getEntries(object) {
     const record = this.get(object);
     if (!record) return;
@@ -608,7 +579,6 @@ class DataSnapshot {
     yield* this.getEntriesFromRecord(record);
   }
 
-  /** @param {DataRecord} record @returns {Generator<[string, any]>} */
   *getEntriesFromRecord(record) {
     for (const prop in record) {
       const value = record[prop];
@@ -617,7 +587,6 @@ class DataSnapshot {
     }
   }
 
-  /** @param {O} object */
   *getProps(object) {
     for (const [prop, _value] of this.getEntries(object)) {
       yield prop;
@@ -625,7 +594,6 @@ class DataSnapshot {
   }
 
   exportIds() {
-    /** @type {SnapshotIdMap} */
     const idRefs = {
       [globalThis.Data.getObjectId(this)]: {
         root: globalThis.Data.getObjectId(this.root),
@@ -633,7 +601,7 @@ class DataSnapshot {
     };
     for (const [object, record] of this.objects) {
       const id = globalThis.Data.getObjectId(object);
-      /** @type {Record<string, number>} */
+
       const refs = {};
       for (const prop of Object.getOwnPropertyNames(record)) {
         const value = record[prop];
@@ -646,7 +614,6 @@ class DataSnapshot {
     return idRefs;
   }
 
-  /** @param {SnapshotIdMap} idRefs */
   verifyIds(idRefs) {
     const rootId = idRefs[globalThis.Data.getObjectId(this)]?.root;
     if (rootId !== globalThis.Data.getObjectId(this.root)) {
@@ -687,7 +654,6 @@ class DataSnapshot {
   }
 
   export() {
-    /** @type {SnapshotExport} */
     const data = {
       type: this instanceof StaticSnapshot ? 'static' : this instanceof DeltaSnapshot ? 'delta' : (() => {
         throw new TypeError('Snapshot not expected type');
@@ -705,7 +671,7 @@ class DataSnapshot {
       const name = record[DataSnapshot_NAME];
       data.idList.push(id);
       const values = {};
-      /** @type {Record<string,number>} */
+
       const refs = {};
       const deleted = [];
       const prototypeId = globalThis.Data.getObjectId(Object.getPrototypeOf(object));
@@ -735,7 +701,6 @@ class DataSnapshot {
     return data;
   }
 
-  /** @param {SnapshotExport} data  */
   import(data, root, finalize = true) {
     this.#root = root;
     const idMap = {
@@ -804,7 +769,6 @@ class DataSnapshot {
     return count;
   }
 
-  /** @protected @type {(object: O, name: string) => DataRecorder} */
   createRecorderForImport(object, name) {
     // delta objects may have a base, but they get recorded like standard objects using the DataRecorder
     return new DataRecorder(name, this.tag, this.get(object));
@@ -836,7 +800,6 @@ class DataSnapshot {
     performance.measure('applyState', 'applyState-start', 'applyState-end');
   }
 
-  /** @protected @param {O} object @param {DataRecord} record */
   applyObject(object, record) {
     for (const prop of Object.getOwnPropertyNames(record)) { // we only want modifications on our layer of the object
       const value = record[prop];
@@ -848,7 +811,6 @@ class DataSnapshot {
     }
   }
 
-  /** @returns {this | null} */
   finalize() {
     for (const [object, record] of this.objects) {
       this.idMap[globalThis.Data.getObjectId(object)] = object;
@@ -858,7 +820,6 @@ class DataSnapshot {
     return this;
   }
 
-  /** @protected @param {DataRecord} record */
   estimateSize(record) {
     // as a rough estimate, each property of each record will need a reference to its key and a reference to its value, each 64 bits
     // the idMap will need another key + value for this record at 64 bits apiece (16 bytes total)
@@ -867,7 +828,6 @@ class DataSnapshot {
     return Object.getOwnPropertyNames(record).length * 16 + 16 + 40;
   }
 
-  /** @returns {this | null} */
   recordData(root, finalize = true) {
     this.#root = root;
     this.recordHierarchy(root, '', DataSnapshot.#getEntriesForRecord);
@@ -875,7 +835,6 @@ class DataSnapshot {
     return finalize ? this.finalize() : this;
   }
 
-  /** @param {DataSnapshot} snapshot @returns {this | null} */
   recordFromSnapshot(snapshot, finalize = true) {
     this.#root = snapshot.#root;
     this.recordHierarchy(this.#root, '', snapshot.getEntries.bind(snapshot));
@@ -884,7 +843,7 @@ class DataSnapshot {
   }
 
   // When recording from live data we get all the writable string-named own properties, enumerable or not
-  /** @returns {Generator<[string, any, boolean]>} */
+
   static *#getEntriesForRecord(object) {
     const omitRecords = object[DataSnapshot_OMIT];
     for (const prop of Object.getOwnPropertyNames(object)) {
@@ -919,7 +878,6 @@ class DataSnapshot {
     return count;
   }
 
-  /** @type {(object: O, name: string, getEntries: (object: O) => Iterable<[string, any, boolean]>, seen?: Set<O>) => Generator<[O, DataRecord | null]>} */
   *walkHierarchy(object, name, getEntries, seen) {
     if (!object) {
       throw new Error(`Called walkHierarchy for ${name} with falsy object ${object}`);
@@ -942,7 +900,6 @@ class DataSnapshot {
     yield [object, recorder.finalize()];
   }
 
-  /** @type {(object: O, recorder: DataRecorder, getEntries: (object: O) => Iterable<[string, any, boolean]>) => Generator<[string, any]>} */
   *processRecord(object, recorder, getEntries) {
     for (const [prop, value, writable] of getEntries(object)) {
       if (writable !== false) {
@@ -955,19 +912,16 @@ class DataSnapshot {
     }
   }
 
-  /** @type {(base: DataSnapshot) => DeltaSnapshot} */
   createDeltaFrom(base) {
     const delta = new DeltaSnapshot(this.tag.description, base);
     return delta.recordFromSnapshot(this);
   }
 
-  /** @returns {StaticSnapshot} */
   toStatic() {
     const snapshot = new StaticSnapshot(this.tag.description);
     return snapshot.recordFromSnapshot(this);
   }
 
-  /** @protected @type {(object: O, name: string) => DataRecorder} */
   createRecorder(_object, name) {
     return new DataRecorder(name, this.tag, null);
   }
@@ -979,12 +933,10 @@ class DataSnapshot {
  * @extends {DataSnapshot<O>}
  */
 class StaticSnapshot extends DataSnapshot {
-  /** @param {string} name @param {number} [id] */
   constructor(name, id) {
     super(name, id);
   }
 
-  /**  @protected @param {O} object @param {DataRecord} copy */
   applyObject(object, copy) {
     super.applyObject(object, copy);
 
@@ -1012,9 +964,8 @@ class StaticSnapshot extends DataSnapshot {
  * @extends {DataSnapshot<O>}
  */
 class DeltaSnapshot extends DataSnapshot {
-  /** @type {DataSnapshot<O>} */
   deltaBase;
-  /** @type {DataSnapshot<O>} */
+
   nominalBase;
 
   get size() {
@@ -1055,7 +1006,6 @@ class DeltaSnapshot extends DataSnapshot {
     }
   }
 
-  /** @returns {this | null} */
   finalize() {
     const count = this.objects.size;
     if (!count) return null;
@@ -1073,7 +1023,6 @@ class DeltaSnapshot extends DataSnapshot {
   }
 
   optimizeDeltaBase() {
-    /** @type {Set<symbol>} */
     const parents = new Set();
     // get a list of all names of snapshots that parent our records
     for (const record of this.objects.values()) {
@@ -1098,7 +1047,6 @@ class DeltaSnapshot extends DataSnapshot {
     this.heritageLength = this.deltaBase.heritageLength + 1;
   }
 
-  /** @override @type {(object: O, name: string) => DataRecorder} */
   createRecorder(object, name) {
     const base = this.deltaBase.get(object) || null;
     return new (base ? DeltaRecorder : DataRecorder)(name, this.tag, base);
@@ -1110,7 +1058,6 @@ class DeltaSnapshot extends DataSnapshot {
     return finalize ? inverse.finalize() : inverse;
   }
 
-  /** @type {(object: O, record: DataRecord, baseRecord: DataRecord) => void} */
   #invertRecord(object, record, baseRecord) {
     if (baseRecord === null) {
       // this object was introduced in this delta, which means it needs no changes. Skip.
@@ -1132,7 +1079,6 @@ class DeltaSnapshot extends DataSnapshot {
     this.objects.set(object, inverse.finalize());
   }
 
-  /** @type {(next: DeltaSnapshot, finalize?: boolean) => DeltaSnapshot} */
   composeWith(next, finalize = true) {
     const composition = new DeltaSnapshot(
       `${this.tag.description}${next.tag.description.startsWith('-') ? '' : '+'}${next.tag.description}`,
@@ -1154,7 +1100,6 @@ class DeltaSnapshot extends DataSnapshot {
     return finalize ? composition.finalize() : composition;
   }
 
-  /** @param {DataRecord} record @param {DataRecord} nextRecord */
   #composeObject(object, record, nextRecord) {
     const baseRecord = this.nominalBase.get(object) ?? null;
     const composition = new DataRecorder(nextRecord[DataSnapshot_NAME], this.tag, baseRecord);

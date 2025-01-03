@@ -17,13 +17,7 @@ function withoutSpaces(name) {
   return name.replace(/ /gu, '');
 }
 
-/** @template {Action<any, any>} A @typedef {A extends Action<any, infer E> ? E : never} ExtrasOf */
-/** @template {Action<any, any>} A @typedef {A extends Action<infer N, any> ? N : never} NameOf */
-/** @template {Action<any, any>} A @typedef {A["varName"]} VarNameOf */
-/** @template {Action<any, any>} A @typedef {A extends Action<any, infer E> ? number extends E["townNum"] ? never : E["townNum"] : never} TownNumOf */
-/** @template {Action<any, any>} A @typedef {A extends Action<any, infer E> ? number extends E["type"] ? never : E["type"] : never} ActionTypeOf */
 // reverse lookup
-/** @template {AnyAction} A @typedef {A extends ActionConstructor[infer I extends ActionId] ? I : never} ActionIdOf */
 
 // selection
 /**
@@ -36,8 +30,6 @@ function withoutSpaces(name) {
  * @template {ActionType} T type
  * @typedef {Extract<AnyAction, {townNum: TN, type: T}>} ActionOfTownAndType
  */
-/** @template {number} TN @typedef {ActionOfTownAndType<TN,any>} ActionOfTown */
-/** @template {ActionType} T @typedef {ActionOfTownAndType<any,T>} ActionOfType */
 
 /**
  * @typedef {Action<any>|MultipartAction<any>} AnyActionType
@@ -92,8 +84,7 @@ function getActionPrototype(name) {
   console.warn(`error trying to create ${name}`);
   return undefined;
 }
-/** @template T @typedef {{-readonly [K in keyof T]: T[K]}} Mutable */
-/** @template {ActionId|ActionName} N @param {N} name @returns {Mutable<LookupAction<N>>} */
+
 function translateClassNames(name) {
   // construct a new action object with appropriate prototype
   const nameWithoutSpaces = withoutSpaces(name);
@@ -103,8 +94,6 @@ function translateClassNames(name) {
   throw new ClassNameNotFoundError(`error trying to create ${name}`);
 }
 
-/** @typedef {typeof limitedActions[number]} LimitedActionName */
-/** @satisfies {ActionName[]} */
 const limitedActions = [
   'Smash Pots',
   'Pick Locks',
@@ -122,8 +111,7 @@ const limitedActions = [
   'Mana Well',
   'Destroy Pylons',
 ];
-/** @typedef {typeof trainingActions[number]} TrainingActionName */
-/** @satisfies {ActionName[]} */
+
 const trainingActions = [
   'Train Speed',
   'Train Strength',
@@ -134,22 +122,22 @@ const trainingActions = [
   'Oracle',
   'Charm School',
 ];
-/** @param {ActionName} name @returns {name is LimitedActionName}  */
+
 function hasLimit(name) {
   // @ts-ignore
   return limitedActions.includes(name);
 }
-/** @param {ActionName} name  */
+
 function isTravel(name) {
   return getTravelNum(name) !== 0;
 }
-/** @param {ActionName} name  */
+
 function getPossibleTravel(name) {
   if (name === 'Face Judgement') return [1, 2];
   const travelNum = getTravelNum(name);
   return travelNum ? [travelNum] : [];
 }
-/** @param {ActionName} name  */
+
 function getTravelNum(name) {
   if (name === 'Face Judgement' && resources.reputation <= 50) return 2;
   if (name === 'Face Judgement' && resources.reputation >= 50) return 1;
@@ -162,13 +150,12 @@ function getTravelNum(name) {
   if (name === 'Open Portal') return -5;
   return 0;
 }
-/** @param {ActionName} name @returns {name is TrainingActionName} */
+
 function isTraining(name) {
   // @ts-ignore
   return trainingActions.includes(name);
 }
 
-/** @template {ActionType} T @param {AnyAction} action @param {T} type @returns {action is ActionOfType<T>} */
 function isActionOfType(action, type) {
   return action.type === type;
 }
@@ -197,9 +184,7 @@ const townNames = [
 
 // type names are "normal", "progress", "limited", and "multipart".
 // define one of these in the action, and they will create any additional UI elements that are needed
-/** @typedef {"normal"|"progress"|"limited"|"multipart"} ActionType */
-/** @typedef {"default"|"linear"} ProgressScalingType */
-/** @satisfies {ActionType[]} */
+
 const actionTypes = ['normal', 'progress', 'limited', 'multipart'];
 /**
  * @typedef {{
@@ -266,9 +251,8 @@ class Localizable1 {
 }
 
 class Action extends Localizable1 {
-  /** @type {N} */
   name;
-  /** @type {E extends {varName: infer VN extends string} ? VN : WithoutSpaces<N>} */
+
   varName;
 
   /**
@@ -281,7 +265,7 @@ class Action extends Localizable1 {
     this.name = name;
     // many actions have to override this (in extras) for save compatibility, because the
     // varName is often used in parts of the game state
-    this.varName = /** @type {any} */ (withoutSpaces(name));
+    this.varName = withoutSpaces(name);
     Object.assign(this, extras);
   }
 
@@ -335,7 +319,6 @@ class Action extends Localizable1 {
     }: `}</span><div id='checked${this.varName}'></div>`;
   }
 
-  /** @param {SkillName} skill */
   teachesSkill(skill) {
     // if we don't give exp in the skill we don't teach it
     if (this.skills?.[skill] === undefined) return false;
@@ -350,7 +333,6 @@ class Action extends Localizable1 {
   }
 
   getStoryTexts(rawStoriesDataForAction = this.txtsObj[0].children) {
-    /** @type {{num: number, condition: string, conditionHTML: string, text: string}[]} */
     const storyTexts = [];
 
     for (const rawStoryData of rawStoriesDataForAction) {
@@ -392,7 +374,6 @@ class Action extends Localizable1 {
  * @extends {Action<N,E>}
  */
 class MultipartAction extends Action {
-  /** @type {number} */
   segments;
 
   /**
@@ -406,21 +387,18 @@ class MultipartAction extends Action {
   // lazily calculate segment names when explicitly requested (to give chance for localization
   // code to be loaded first)
 
-  /** @returns {string[]} */
   get segmentNames() {
     this._segmentNames ??= Array.from(this.txtsObj.find('>segment_names>name')).map((e) => e.textContent);
 
     return this._segmentNames;
   }
 
-  /** @returns {string[]} */
   get altSegmentNames() {
     this._altSegmentNames ??= Array.from(this.txtsObj.find('>segment_alt_names>name')).map((e) => e.textContent);
 
     return this._altSegmentNames;
   }
 
-  /** @returns {string[]} */
   get segmentModifiers() {
     this._segmentModifiers ??= Array.from(this.txtsObj.find('>segment_modifiers>segment_modifier')).map((e) =>
       e.textContent
@@ -463,7 +441,6 @@ class MultipartAction extends Action {
  * @extends {MultipartAction<N,E&DungeonActionImpl>}
  */
 class DungeonAction extends MultipartAction {
-  /** @type {number} */
   dungeonNum;
 
   /**
@@ -527,7 +504,6 @@ class DungeonAction extends MultipartAction {
  * @implements {TrialActionImpl}
  */
 class TrialAction extends MultipartAction {
-  /** @type {number} */
   trialNum;
   /**
    * @param {N} name @param {number} trialNum, @param {E & ThisType<E & TrialAction<N>>} extras
@@ -554,14 +530,14 @@ class TrialAction extends MultipartAction {
   currentFloor(loopCounter = globalThis.saving.towns[this.townNum][`${this.varName}LoopCounter`]) {
     return Math.floor(loopCounter / this.segments + 0.0000001);
   }
-  /** @param {number} segment  */
+
   loopCost(segment, loopCounter = globalThis.saving.towns[this.townNum][`${this.varName}LoopCounter`]) {
     return globalThis.helpers.precision3(
       Math.pow(this.baseScaling, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) *
         this.exponentScaling * globalThis.stats.getSkillBonus('Assassin'),
     );
   }
-  /** @param {number} offset  */
+
   tickProgress(offset, loopCounter) {
     return this.baseProgress() *
       Math.sqrt(1 + globalThis.saving.trials[this.trialNum][this.currentFloor(loopCounter)].completed / 200);
@@ -629,7 +605,7 @@ class AssassinAction extends MultipartAction {
     return super.getStoryTexts(rawStoriesDataForAction);
   }
 
-  static $defaults = /** @type {const} */ ({
+  static $defaults = ({
     type: 'multipart',
     expMult: 1,
     stats: { Per: 0.2, Int: 0.1, Dex: 0.3, Luck: 0.2, Spd: 0.2 },
@@ -688,9 +664,9 @@ class AssassinAction extends MultipartAction {
 //====================================================================================================
 //Survery Actions (All Zones)
 //====================================================================================================
-/** @template {number} N @param {N} townNum */
+
 function SurveyAction(townNum) {
-  return /** @type {const} */ ({
+  return ({
     type: 'progress',
     expMult: 1,
     townNum,
@@ -735,9 +711,8 @@ Action.SurveyZ6 = new Action('SurveyZ6', SurveyAction(6));
 Action.SurveyZ7 = new Action('SurveyZ7', SurveyAction(7));
 Action.SurveyZ8 = new Action('SurveyZ8', SurveyAction(8));
 
-/** @template {number} N @param {N} townNum */
 function RuinsAction(townNum) {
-  return /** @type {const} */ ({
+  return ({
     type: 'progress',
     expMult: 1,
     townNum,
@@ -796,9 +771,8 @@ function adjustAllRocks() {
   adjustRocks(6);
 }
 
-/** @template {number} N @param {N} townNum */
 function HaulAction(townNum) {
-  return /** @type {const} */ ({
+  return ({
     type: 'limited',
     expMult: 1,
     townNum,
@@ -877,7 +851,6 @@ Action.AssassinZ7 = new AssassinAction('AssassinZ7', {
   townNum: 7,
 });
 
-/** @type {string[]} */
 const lateGameActions = Object.values(Action).filter((a) => a instanceof Action).map((a) => a.name);
 
 //====================================================================================================
@@ -2852,10 +2825,8 @@ function checkSoulstoneSac(amount) {
   return sum >= amount ? true : false;
 }
 
-/** @type {(amount: number, parameter?: number, stonesSpent?: Partial<Record<StatName, number>>, sortedStats?: Stat[]) => Partial<Record<StatName, number>>} */
 let sacrificeSoulstones = sacrificeSoulstonesBySegments;
 
-/** @param {Partial<Record<StatName, number>>} [stonesSpent] */
 function sacrificeSoulstonesBySegments(
   amount,
   segments = 9,
@@ -2889,7 +2860,6 @@ function sacrificeSoulstonesBySegments(
   return stonesSpent;
 }
 
-/** @param {Partial<Record<StatName, number>>} [stonesSpent] @param {Stat[]} [sortedStats] */
 function sacrificeSoulstonesProportional(amount, power = 1, stonesSpent = {}, sortedStats = Object.values(stats)) { //initializer does not sort because we do every loop anyway
   // extremely unlikely that we have to use more than one iteration for typical cases, but some powers can cause degenerate behavior
   while (amount > 0) {
@@ -2918,7 +2888,6 @@ function sacrificeSoulstonesProportional(amount, power = 1, stonesSpent = {}, so
   return stonesSpent;
 }
 
-/** @param {Partial<Record<StatName, number>>} [stonesSpent] @param {Stat[]} [sortedStats]  */
 function sacrificeSoulstonesToEquality(
   amount,
   allowedDifference = 0,
@@ -4669,7 +4638,6 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
   },
   grantsBuff: 'Imbuement2',
   loopsFinished() {
-    /** @type {SoulstoneEntry["stones"]} */
     const spent = {};
     for (const stat of statList) {
       const currentTalentLevel = globalThis.stats.getTalent(stat);
@@ -7081,9 +7049,9 @@ function getExploreExpSinceLastProgress() {
     : totalExploreProgress < towns.length * 2
     ? totalExploreProgress - 1
     : totalExploreProgress % towns.length + 1;
-  /** @type {{[I in TownNum]?: number}} */
+
   const levelsPerTown = {};
-  /** @param {Town} town  */
+
   function expSinceLast(town) {
     const varName = `SurveyZ${town.index}`;
     const level = town.getLevel(varName) - (levelsPerTown[town.index] ?? 0);
@@ -7114,9 +7082,9 @@ function getExploreExpToNextProgress() {
     : totalExploreProgress < towns.length * 2
     ? towns.length * 2 - totalExploreProgress
     : towns.length - (totalExploreProgress % towns.length);
-  /** @type {{[I in TownNum]?: number}} */
+
   const levelsPerTown = {};
-  /** @param {Town} town  */
+
   function expToNext(town) {
     const varName = `SurveyZ${town.index}`;
     const level = town.getLevel(varName) + (levelsPerTown[town.index] ?? 0);

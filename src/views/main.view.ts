@@ -97,7 +97,7 @@ class View {
     document.body.removeEventListener('focusin', this.mouseoverHandler);
     document.body.addEventListener('focusin', this.mouseoverHandler, { passive: true });
     globalThis.addEventListener('modifierkeychange', this.modifierkeychangeHandler);
-    /** @type {WeakMap<HTMLElement, Element | false>} */
+
     this.tooltipTriggerMap = new WeakMap();
     this.mouseoverCount = 0;
   }
@@ -107,7 +107,6 @@ class View {
     this.modifierkeychangeHandler = this.modifierkeychangeHandler.bind(this);
   }
 
-  /** @param {UIEvent} event */
   mouseoverHandler(event) {
     if (!(event.target instanceof HTMLElement)) return;
     const trigger = this.getClosestTrigger(event.target);
@@ -138,7 +137,6 @@ class View {
       : globalThis.Localization.txt('actions>tooltip>clear_list');
   }
 
-  /** @param {HTMLElement} element */
   getClosestTrigger(element) {
     let trigger = this.tooltipTriggerMap.get(element);
     if (trigger == null) {
@@ -225,7 +223,7 @@ class View {
 
   // requests are properties, where the key is the function name,
   // and the array items in the value are the target of the function
-  /** @satisfies {Partial<Record<keyof View, any[]>>} */
+
   requests = {
     updateStats: [],
     updateStat: [],
@@ -294,7 +292,7 @@ class View {
     // if the delegation in mouseoverHandler ends up being too costly, though, this is where
     // we'll bind discrete mouseenter handlers, like so:
 
-    // const trigger = /** @type {HTMLElement} */(tooltipDiv.closest(".showthat,.showthatO,.showthat2,.showthatH,.showthatloadout"));
+    // const trigger = (tooltipDiv.closest(".showthat,.showthatO,.showthat2,.showthatH,.showthatloadout"));
     // trigger.onmouseenter = e => this.fixTooltipPosition(tooltipDiv, trigger, e);
   }
 
@@ -399,7 +397,6 @@ class View {
 
   updateStatGraphNeeded = false;
 
-  /** @param {StatName} stat */
   updateStat(stat) {
     const level = globalThis.stats.getLevel(stat);
     const talent = globalThis.stats.getTalent(stat);
@@ -452,7 +449,7 @@ class View {
   }
 
   logBarScaleBase = 1.25;
-  /** @param {number} maxValue  */
+
   getMaxLogBarScale(maxValue) {
     return this.logBarScaleBase ** Math.ceil(Math.log(maxValue) / Math.log(this.logBarScaleBase));
   }
@@ -506,7 +503,6 @@ class View {
     if (skill !== undefined) this.updateSkill(skill);
   }
 
-  /** @param {SkillName} skill */
   updateSkill(skill) {
     if (skills[skill].levelExp.level === 0) {
       document.getElementById(`skill${skill}Container`).style.display = 'none';
@@ -672,7 +668,7 @@ class View {
     }
     return text;
   }
-  /** @type {(lhs: string, op?: string, rhs?: string) => string} */
+
   getBonusReplacement(lhs, op, rhs) {
     // this is the second time I've manually implemented this text-replacement pattern (first was for Action Log entries). Next time I need to make it a
     // generic operation on Localization; I think I'm beginning to figure out what will be needed for it
@@ -1137,13 +1133,11 @@ class View {
     }
   }
 
-  /** @typedef {{lastScroll:Pick<HTMLElement,'scrollTop'|'scrollHeight'|'clientHeight'>}} LastScrollRecord */
-  /** @type {string} */
   actionLogClearHTML;
-  /** @type {ResizeObserver} */
+
   actionLogObserver;
   initActionLog() {
-    const log = /** @type {HTMLElement & LastScrollRecord} */ (document.getElementById('actionLog'));
+    const log = document.getElementById('actionLog');
     this.actionLogClearHTML ??= log.innerHTML;
     this.actionLogObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -1164,7 +1158,7 @@ class View {
     log.addEventListener('scroll', this.recordScrollPosition, { passive: true });
     log.addEventListener('scrollend', this.recordScrollPosition, { passive: true });
   }
-  /** @this {HTMLElement & LastScrollRecord} */
+
   recordScrollPosition() {
     const { scrollTop, scrollHeight, clientHeight } = this;
     this.lastScroll = { scrollTop, scrollHeight, clientHeight };
@@ -1227,7 +1221,6 @@ class View {
     }
   }
 
-  /** @param {{name: string, town: Town}} updateInfo */
   updateProgressAction(
     { name: varName, town },
     level = town.getLevel(varName),
@@ -1513,12 +1506,10 @@ class View {
     if (globalThis.saving.vals.options.highlightNew) this.highlightIncompleteActions();
   }
 
-  /** @param {ActionOfType<"progress">} action  */
   createGlobalSurveyProgress(action) {
     this.createActionProgress(action, 'Global', action.labelGlobal, true);
   }
 
-  /** @param {ActionOfType<"progress">} action @param {string} [label] */
   createActionProgress(action, varSuffix = '', label, includeExpBar = true) {
     const totalDivText = `<div class='townStatContainer showthat'>
             <div class='bold townLabel'>${label ?? action.labelDone}</div>
@@ -1551,7 +1542,6 @@ class View {
     }
   }
 
-  /** @param {AnyAction} action  */
   createTownAction(action) {
     let actionStats = '';
     let actionSkills = '';
@@ -1607,11 +1597,11 @@ class View {
       lockedStats = `(${
         statEntries.map((
           [stat, ratio],
-        ) => /** @type {const} */ ([
+        ) => [
           ratio === highestRatio,
           stat,
           globalThis.Localization.txt(`stats>${stat}>short_form`),
-        ]))
+        ])
           .map(([isHighestStat, stat, label]) =>
             `<span class='${isHighestStat ? 'bold' : ''} stat-${stat} stat-color'>${label}</span>`
           )
@@ -1829,7 +1819,6 @@ class View {
     }
   }
 
-  /** @param {ActionOfType<"limited">} action  */
   createTownInfo(action) {
     const totalInfoText =
       // important that there be 8 element children of townInfoContainer (excluding the showthis popup and hideVarButton)
@@ -1856,7 +1845,6 @@ class View {
     }
   }
 
-  /** @param {ActionOfType<"multipart">} action  */
   createMultiPartPBar(action) {
     let pbars = '';
     const width = `style='width:calc(${91 / action.segments}% - 4px)'`;
@@ -2264,7 +2252,6 @@ function unlockGlobalStory(num) {
   }
 }
 
-/** @param {StoryFlagName} name  */
 function setStoryFlag(name) {
   if (!storyFlags[name]) {
     storyFlags[name] = true;
@@ -2273,7 +2260,6 @@ function setStoryFlag(name) {
 }
 const unlockStory = setStoryFlag; // compatibility alias
 
-/** @param {StoryVarName} name @param {number} value */
 function increaseStoryVarTo(name, value) {
   if (storyVars[name] < value) {
     storyVars[name] = value;
@@ -2325,7 +2311,6 @@ for (let i = 0; i <= 8; i++) {
   townInfos[i] = document.getElementById(`townInfo${i}`);
 }
 
-/** @param {Element} theDiv @param {StatName} stat  */
 function addStatColors(theDiv, stat, forceColors = false) {
   for (const className of Array.from(theDiv.classList)) {
     if (className.startsWith('stat-') && className.slice(5) in stats) {

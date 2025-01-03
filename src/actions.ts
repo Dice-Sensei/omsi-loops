@@ -51,29 +51,27 @@
  * @prop {number}     [actionId]
  */
 
-/** @param {AnyActionEntry} action @returns {action is MultipartAction} */
 function isMultipartAction(action) {
   return 'loopStats' in action;
 }
 
 class Actions {
-  /** @type {AnyActionEntry[]} */
   current = [];
-  /** @readonly @type {readonly Readonly<NextActionEntry>[]} */
+
   next = [];
-  /** @type {readonly Readonly<NextActionEntry>[]} */
+
   #nextLast;
   addAmount = 1;
 
   get #writableNext() {
-    return /** @type {NextActionEntry[]} */ (this.next);
+    return (this.next);
   }
 
   totalNeeded = 0;
   completedTicks = 0;
   currentPos = 0;
   timeSinceLastUpdate = 0;
-  /** @type {AnyActionEntry} */
+
   currentAction;
 
   static {
@@ -262,7 +260,6 @@ class Actions {
     return manaToSpend;
   }
 
-  /** @returns {CurrentActionEntry & Action | CurrentActionEntry & MultipartAction} */
   getNextValidAction() {
     let curAction = this.current[this.currentPos];
     if (!curAction) {
@@ -297,7 +294,6 @@ class Actions {
     return curAction;
   }
 
-  /** @param {AnyActionEntry} action  */
   getErrorMessage(action) {
     if (action.townNum !== globalThis.saving.vals.curTown) {
       return `You were in zone ${
@@ -365,7 +361,7 @@ class Actions {
         if (action.loops === 0 || action.disabled) {
           continue;
         }
-        const toAdd = /** @type {AnyActionEntry} */ (globalThis.actionList.translateClassNames(action.name));
+        const toAdd = globalThis.actionList.translateClassNames(action.name);
 
         toAdd.loopsType = action.loopsType ?? (isMultipartAction(toAdd) ? 'maxEffort' : 'actions');
         if (isMultipartAction(toAdd) && action.loopsType === 'actions') action.loopsType = 'maxEffort';
@@ -404,7 +400,6 @@ class Actions {
     globalThis.saving.view.requestUpdate('updateTotalTicks', null);
   }
 
-  /** @type {ZoneSpan[]} */
   #zoneSpans;
   get zoneSpans() {
     if (!this.#zoneSpans) {
@@ -435,10 +430,8 @@ class Actions {
     return this.zoneSpans.find((zs) => index >= zs.start && index <= zs.end);
   }
 
-  /** @type {number} */
   #lastModifiedIndex;
 
-  /** @param {number} actionId  */
   findActionWithId(actionId) {
     const index = this.findIndexOfActionWithId(actionId);
     if (index < 0) return undefined;
@@ -446,7 +439,6 @@ class Actions {
     return { ...action, index };
   }
 
-  /** @param {number} actionId  */
   findIndexOfActionWithId(actionId) {
     return this.next.findIndex((a) => a.actionId === Number(actionId));
   }
@@ -455,13 +447,11 @@ class Actions {
     return Math.max(0, ...this.next.map((a) => a.actionId).filter((a) => a));
   }
 
-  /** @param {NextActionEntry} action @param {(action: Readonly<NextActionEntry>, actionProto: Readonly<AnyAction>) => boolean} [additionalTest]  */
   isValidAndEnabled(action, additionalTest) {
     return action && (!action.actionId || this.next.some((a) => a.actionId === action.actionId)) &&
       Actions.isValidAndEnabled(action, additionalTest);
   }
 
-  /** @param {NextActionEntry} action @param {(action: Readonly<NextActionEntry>, actionProto: Readonly<AnyAction>) => boolean} [additionalTest]  */
   static isValidAndEnabled(action, additionalTest) {
     const actionProto = globalThis.actionList.getActionPrototype(action?.name);
     return actionProto && !action.disabled && action.loops > 0 &&
@@ -496,7 +486,6 @@ class Actions {
     );
   }
 
-  /** @param {NextActionEntry} toAdd  */
   addActionRecord(
     toAdd,
     initialOrder = globalThis.saving.vals.options.addActionsToTop ? 0 : -1,
@@ -523,14 +512,12 @@ class Actions {
     return initialOrder;
   }
 
-  /** @param {NextActionEntry[]} records */
   appendActionRecords(records) {
     for (const record of records) {
       this.addActionRecord(record, -1, false);
     }
   }
 
-  /** @param {number|NextActionEntry} initialIndexOrAction @param {number} resultingIndex */
   moveAction(initialIndexOrAction, resultingIndex, moveToClosestValidIndex = false) {
     let initialIndex = typeof initialIndexOrAction === 'number'
       ? initialIndexOrAction
@@ -559,7 +546,6 @@ class Actions {
     return resultingIndex;
   }
 
-  /** @param {number|NextActionEntry} indexOrAction */
   removeAction(indexOrAction) {
     let index = typeof indexOrAction === 'number' ? indexOrAction : this.next.indexOf(indexOrAction);
     if (index < 0) index += this.next.length;
@@ -569,7 +555,6 @@ class Actions {
     return this.#writableNext.splice(index, 1)[0];
   }
 
-  /** @param {number|NextActionEntry} indexOrAction @param {Partial<NextActionEntry>} [update] */
   updateAction(indexOrAction, update) {
     let index = typeof indexOrAction === 'number' ? indexOrAction : this.next.indexOf(indexOrAction);
     if (index < 0) index += this.next.length;
@@ -579,7 +564,6 @@ class Actions {
     return Object.assign(this.#writableNext[index], update);
   }
 
-  /** @param {number|NextActionEntry} indexOrAction @param {number} [amountToSplit] @param {number} [targetIndex] */
   splitAction(indexOrAction, amountToSplit, targetIndex, splitToClosestValidIndex = false) {
     let index = typeof indexOrAction === 'number' ? indexOrAction : this.next.indexOf(indexOrAction);
     if (index < 0) index += this.next.length;
@@ -600,7 +584,6 @@ class Actions {
     this.updateAction(this.#lastModifiedIndex, { loops: action.loops - amountToSplit });
   }
 
-  /** @param {(action: Readonly<NextActionEntry>) => boolean} [predicate] */
   clearActions(predicate) {
     if (this.next.length === 0) return;
     this.recordLast();
@@ -611,7 +594,6 @@ class Actions {
     }
   }
 
-  /** @param {number} [unlessIndex] */
   recordLast(unlessIndex, saveLastModified = false) {
     if (typeof unlessIndex === 'undefined' || this.#lastModifiedIndex !== unlessIndex) {
       this.#nextLast = structuredClone(this.next);
@@ -631,12 +613,10 @@ class Actions {
     this.#zoneSpans = null;
   }
 
-  /** @param {number} townNum @param {number} index  */
   isValidIndexForAction(townNum, index) {
     return this.zoneSpanAtIndex(index)?.zones.includes(townNum) ?? false;
   }
 
-  /** @param {number} townNum @param {number} desiredIndex @param {number} [ignoreIndex]  */
   closestValidIndexForAction(townNum, desiredIndex, ignoreIndex) {
     if (desiredIndex < 0) desiredIndex += this.next.length + 1;
     desiredIndex = globalThis.helpers.clamp(desiredIndex, 0, this.next.length);
@@ -693,7 +673,6 @@ class ZoneSpan {
       !!endAction.collapsed;
   }
 
-  /** @param {number} start @param {number} end @param {number[]} zones @param {number} spanIndex @param {readonly NextActionEntry[]} actionList */
   constructor(start, end, zones, spanIndex, actionList) {
     this.start = start;
     this.end = end;
@@ -702,13 +681,11 @@ class ZoneSpan {
     this.actionList = actionList;
   }
 
-  /** @param {number} [ignoringIndex] */
   ignoringStart(ignoringIndex) {
     if (ignoringIndex == null) return this.start;
     return this.start - (this.start > ignoringIndex ? 1 : 0);
   }
 
-  /** @param {number} [ignoringIndex] */
   ignoringEnd(ignoringIndex) {
     if (ignoringIndex == null) return this.end;
     if (this.end === ignoringIndex) return Infinity; // the final travel action can move as far as it wants
@@ -750,7 +727,6 @@ function getMaxTicksForAction(action, talentOnly = false) {
   return maxTicks;
 }
 
-/** @param {StatName} stat  */
 function getMaxTicksForStat(action, stat, talentOnly = false) {
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;

@@ -176,7 +176,7 @@ const optionIndicatorClasses = {
 
 const optionValueHandlers = {
   notifyOnPause(value, init, getInput) {
-    const input = /** @type {HTMLInputElement} */ (getInput());
+    const input = getInput();
     if (value && !init) {
       if (Notification && Notification.permission === 'default') {
         input.checked = false;
@@ -262,6 +262,22 @@ const optionValueHandlers = {
   },
 };
 
+const storyInitializers = {
+  storyFlags: {},
+  storyVars: {
+    maxWizardGuildSegmentCleared(loadingFlags, loadingVars) {
+      if (loadingFlags['wizardGuildRankSSSReached']) return 48;
+      if (loadingFlags['wizardGuildRankSSReached']) return 42;
+      if (loadingFlags['wizardGuildRankSReached']) return 36;
+      if (loadingFlags['wizardGuildRankAReached']) return 30;
+      if (loadingFlags['wizardGuildRankBReached']) return 24;
+      if (loadingFlags['wizardGuildRankCReached']) return 18;
+      if (loadingFlags['wizardGuildRankDReached']) return 12;
+      if (loadingFlags['wizardGuildTestTaken']) return 0;
+    },
+  },
+};
+
 if (selfIsGame) {
   Object.assign(vals.options, importPredictorSettings()); // override hardcoded defaults if not in worker
 }
@@ -320,8 +336,8 @@ function initializeActions() {
 function virtualizeGlobalVariables(variables) {
   const globals = Data.rootObjects.globals ?? {};
   for (const name in variables) {
-    const get = /** @type {() => any} */ (new Function(`return ${name};`));
-    const set = /** @type {(any) => void} */ (new Function('v__', `${name} = v__`));
+    const get = new Function(`return ${name};`);
+    const set = new Function('v__', `${name} = v__`);
     Object.defineProperty(globals, name, {
       get,
       set,
@@ -333,21 +349,20 @@ function virtualizeGlobalVariables(variables) {
 }
 
 function isNumericOption(option) {
-  return numericOptions.includes(/** @type {NumericOptionName} */ (option));
+  return numericOptions.includes(option);
 }
 
 function isStringOption(option) {
-  return stringOptions.includes(/** @type {StringOptionName} */ (option));
+  return stringOptions.includes(option);
 }
 
 function isBooleanOption(option) {
   // I'm explicitly deciding to leave this open-ended, so unknown options are treated as booleans
-  return !numericOptions.includes(/** @type {NumericOptionName} */ (option)) &&
-    !stringOptions.includes(/** @type {StringOptionName} */ (option));
+  return !numericOptions.includes(option) &&
+    !stringOptions.includes(option);
 }
 
 function importPredictorSettings() {
-  /** @type {Record<string, OptionName>} */
   const settingsMap = {
     __proto__: null,
     timePrecision: 'predictorTimePrecision',
@@ -357,7 +372,7 @@ function importPredictorSettings() {
     slowMode: 'predictorSlowMode',
     slowTimer: 'predictorSlowTimer',
   };
-  /** @type {Partial<typeof options>} */
+
   const newOptions = {};
   for (const [originalSetting, newOption] of Object.entries(settingsMap)) {
     const value = localStorage.getItem(originalSetting);
@@ -767,7 +782,6 @@ function doLoad(toLoad) {
     }
   }
 
-  /** @type {string[]} */
   const hiddenVarNames = toLoad.hiddenVars?.slice() ?? [];
 
   for (const town of globalThis.saving.vals.towns) {
@@ -918,7 +932,6 @@ function doSave() {
   toSave.stonesUsed = globalThis.saving.vals.stonesUsed;
   toSave.version75 = true;
 
-  /** @type {string[][]} */
   const hiddenVars = [];
 
   for (const town of towns) {
@@ -1087,7 +1100,7 @@ function importCurrentList() {
     if (!toImport[i]) {
       continue;
     }
-    const name = /** @type {ActionName} */ (toImport[i].substr(toImport[i].indexOf('x') + 1).trim());
+    const name = toImport[i].substr(toImport[i].indexOf('x') + 1).trim();
     const loops = toImport[i].substr(0, toImport[i].indexOf('x'));
     try {
       const action = globalThis.actionList.getActionPrototype(name);

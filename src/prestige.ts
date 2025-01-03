@@ -178,7 +178,6 @@ const prestigeBases: Record<PrestigeBuffName, number> = {
   PrestigeSpatiomancy: 1.1,
 };
 
-/** @param {PrestigeBuffName} buff  */
 function prestigeBonus(buff) {
   const cache = prestigeCache[buff];
 

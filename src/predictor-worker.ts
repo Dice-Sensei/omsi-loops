@@ -57,18 +57,16 @@ console.log('starting predictor worker');
 globalThis.saving.loadDefaults();
 
 const predictor = globalThis.Koviko.initWorkerPredictor();
-/** @type {MessageToPredictor} */
+
 let queuedUpdate;
 
-/** @param {MessageEvent<MessageToPredictor>} e */
 onmessage = (e) => {
   const { data } = e;
   // console.log("Got message:", data);
   handleMessage(data);
 };
-/** @param {MessageToPredictor} data */
+
 function handleMessage(data) {
-  /** @type {(message: MessageFromPredictor) => void} */
   const postMessage = self.postMessage;
 
   if (!data?.type) {

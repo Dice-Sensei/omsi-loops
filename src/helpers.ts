@@ -10,7 +10,6 @@ function copyArray(arr) {
   return JSON.parse(JSON.stringify(arr));
 }
 
-/** @type {<T>(obj: T) => T} */
 function copyObject(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -76,7 +75,6 @@ function toSuffix(value) {
 }
 
 const Mana = {
-  /** @param {number} value @param {number} [minNonZero] */
   ceil(value, minNonZero) {
     return value === 0
       ? 0
@@ -89,7 +87,6 @@ const Mana = {
       : Math.min(value, -minNonZero);
   },
 
-  /** @param {number} value @param {number} [minNonZero] */
   floor(value, minNonZero) {
     return value === 0
       ? 0
@@ -102,7 +99,6 @@ const Mana = {
       : Math.min(value, -minNonZero);
   },
 
-  /** @param {number} value @param {number} [minNonZero] */
   round(value, minNonZero) {
     return value === 0
       ? 0
@@ -116,7 +112,6 @@ const Mana = {
   },
 };
 
-/** @param {number} value @param {number} min @param {number} max */
 function clamp(value, min, max) {
   value = Math.max(value, min ?? -Infinity);
   value = Math.min(value, max ?? Infinity);
@@ -192,7 +187,7 @@ const wrappedElementSymbol = Symbol('wrappedElement');
 
 function getElement(
   elementOrId,
-  expectedClass = /** @type {new()=>T} */ (Element),
+  expectedClass = Element,
   throwIfMissing = true,
   warnIfMissing = true,
 ) {
@@ -204,12 +199,12 @@ function getElement(
   if (element && wrappedElementSymbol in element) {
     // last try before bailing
     const wrappedResult = getElement(
-      /** @type {Element}*/ (element[wrappedElementSymbol]),
+      element[wrappedElementSymbol],
       expectedClasses,
       false,
       false,
     );
-    if (wrappedResult) return /** @type {T} */ (element); // returning the wrapper so it can intercept IDL behaviors
+    if (wrappedResult) return element; // returning the wrapper so it can intercept IDL behaviors
   }
   if (warnIfMissing) {
     console.warn('Expected element missing or wrong type!', elementOrId, expectedClass, element);
@@ -243,7 +238,7 @@ function selectElement(elementOrId, throwIfMissing = true, warnIfMissing = true)
 function valueElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(
     elementOrId,
-    [/** @type {new() => HTMLValueElement} */ (HTMLInputElement), HTMLTextAreaElement, HTMLSelectElement],
+    [HTMLInputElement, HTMLTextAreaElement, HTMLSelectElement],
     throwIfMissing,
     warnIfMissing,
   );
@@ -271,7 +266,6 @@ function numberToWords(n) {
   return capitalizeFirst(number2Words(n));
 }
 
-/** @type {(object: any, strings?: (string|number)[], map?: Record<string, number>) => any} */
 function extractStrings(object, strings, map) {
   const isToplevel = strings == undefined;
   strings ??= [];
@@ -305,7 +299,6 @@ function extractStrings(object, strings, map) {
   return object;
 }
 
-/** @type {(object: any, strings?: (string|number)[]) => any} */
 function restoreStrings(object, strings) {
   const isTopLevel = strings == undefined;
   if (isTopLevel) {

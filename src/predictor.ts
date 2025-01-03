@@ -1,6 +1,5 @@
 // prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
 
-/** @namespace `*/
 const Koviko = {
   /**
    * IdleLoops view
@@ -47,7 +46,6 @@ const Koviko = {
    * @prop {number} exp Experience
    */
 
-  /** A prediction, capable of calculating and estimating ticks and rewards of an action. */
   Prediction: class {
     /**
      * Loop attributes for a prediction
@@ -113,10 +111,8 @@ const Koviko = {
        */
       this.loop = params.loop || null;
 
-      /** @type {Koviko_Prediction_Parameters["canStart"]|true} */
       this.canStart = params.canStart || true;
 
-      /** @type {Koviko_Prediction_Parameters["manaCost"]|false} */
       this.manaCost = params.manaCost || false;
     }
 
@@ -214,7 +210,7 @@ const Koviko = {
       amount -= Math.ceil(amount / 9);
     }
   },
-  /** A collection of attributes and a comparison of those attributes from one snapshot to the next. */
+
   Snapshot: class {
     /**
      * Attributes to consider from one snapshot to the next.
@@ -296,8 +292,6 @@ const Koviko = {
     }
   },
 
-  /** A cache so the predictor can skip expensivly calculating each action */
-
   Cache:
     /**
      * @template {*} K type for keys
@@ -325,7 +319,7 @@ const Koviko = {
       miss(current = false) {
         this.cache = this.cache.slice(0, this.index + (current ? 0 : 1));
       }
-      /** @param {R} data @returns {boolean} */
+
       reset(data) {
         this.index = 0;
         if (!this.equals(data, this.cache[0]?.data)) {
@@ -334,7 +328,7 @@ const Koviko = {
         }
         return true;
       }
-      /** @param {K} key @param {T} data */
+
       add(key, data) {
         this.cache.push({ 'key': key, 'data': structuredClone(data) });
       }
@@ -344,7 +338,6 @@ const Koviko = {
       }
     },
 
-  /** A predictor which uses Predictions to calculate and estimate an entire action list. */
   Predictor: class {
     /**
      * Progression
@@ -391,11 +384,10 @@ const Koviko = {
 
     #nextUpdateId = 1;
 
-    /** @type {Omit<Worker, 'postMessage'> & {postMessage(message: MessageToPredictor): void}} */
     #worker;
-    /** @type {Record<number, {resolve: (data: MessageFromPredictor) => void, reject: (error: any) => void}>} */
+
     #channelAwaiters = {};
-    /** @type {Record<number, MessageFromPredictor[]>} */
+
     #channelQueues = {};
     #workerDisabled = false;
     get worker() {
@@ -419,7 +411,6 @@ const Koviko = {
       }
     }
 
-    /** @param {number} channel @returns {Promise<MessageFromPredictor>} */
     nextWorkerMessage(channel) {
       return new Promise((resolve, reject) => {
         const message = this.#channelQueues[channel]?.shift();
@@ -435,7 +426,6 @@ const Koviko = {
       });
     }
 
-    /** @param {MessageEvent<MessageFromPredictor>} e  */
     handleWorkerMessage(e) {
       const { data } = e;
       if (data.type === 'error') {
@@ -501,7 +491,6 @@ const Koviko = {
      * @memberof Koviko.Predictor
      */
     test() {
-      /** @type {Partial<NextActionEntry>[]} */
       const actions = [];
 
       for (const name of Object.keys(this.predictions)) {
@@ -575,7 +564,7 @@ const Koviko = {
     }
 
     updateTrackedList() {
-      let statisticList = /** @type {JQuery<HTMLOptionElement>} */ ($('#predictorTrackedStatInput').children());
+      let statisticList = $('#predictorTrackedStatInput').children();
       for (const statistic of statisticList) {
         let trackedStat = Koviko.trackedStats[statistic.value];
         if (trackedStat && trackedStat.hidden) {
@@ -689,7 +678,6 @@ const Koviko = {
 
       // Initialise cache
 
-      /** @type {PredictorCache<[ActionName, number, boolean]|any, [PredictorRunState, string[]]|any, [PredictorRunState, number, boolean]|any>} */
       this.cache = new Koviko.Cache();
       if (typeof structuredClone !== 'function') {
         console.log('Predictor: This browser does not support structuredClone, disabling the cache');
@@ -2028,7 +2016,7 @@ const Koviko = {
       if (!state) {
         state = {
           // @ts-ignore
-          resources: { mana: 250, town: /** @type {TownNum} */ (0), guild: '', totalTicks: 0 },
+          resources: { mana: 250, town: (0), guild: '', totalTicks: 0 },
           stats: statList.reduce(
             (
               stats,
@@ -2247,7 +2235,6 @@ const Koviko = {
       return runData;
     }
 
-    /** @param {PredictorRunData} runData @returns {AsyncGenerator<[number, PredictorRunState, boolean]>}  */
     async *doBackgroundUpdate(runData) {
       const {
         id: updateId,
@@ -2278,7 +2265,6 @@ const Koviko = {
       }
     }
 
-    /** @param {PredictorRunData} runData */
     async workerUpdate(runData) {
       const { id, snapshots } = runData;
       for await (const [i, state, isValid] of this.doUpdate(runData)) {
@@ -2395,7 +2381,6 @@ const Koviko = {
           cacheIsValid = false;
         }
 
-        /** @type {Koviko_Prediction} */
         let prediction = this.predictions[listedAction.name];
 
         if (prediction) {
@@ -2406,12 +2391,10 @@ const Koviko = {
             // Reinitialise variables on cache miss
             isValid = prediction.action.townNum == state.resources.town;
 
-            /** @type {number} */
             let currentMana;
 
             // Make sure that the loop is properly represented in `state.progress`
             if (prediction.loop && !(prediction.name in state.progress)) {
-              /** @type {Koviko_Predictor_Progression} */
               state.progress[prediction.name] = {
                 progress: 0,
                 completed: 0,
@@ -2552,7 +2535,7 @@ const Koviko = {
         loop,
       });
     }
-    /** @param {HTMLElement} container  @param {PredictorRunData} runData  */
+
     async finishUpdate(container, runData) {
       const {
         state,
@@ -2878,13 +2861,10 @@ const Koviko = {
 
       // Handle the loop if it exists
       if (prediction.loop) {
-        /** @type {Koviko_Predictor_Progression} */
         const progression = state.progress[prediction.name];
 
-        /** @type {function} */
         const loopCost = prediction.loop.cost(progression, prediction.action);
 
-        /** @type {function} */
         const tickProgress = prediction.loop.tick(
           progression,
           prediction.action,
@@ -2893,10 +2873,8 @@ const Koviko = {
           state.resources,
         );
 
-        /** @type {number} */
         const totalSegments = prediction.action.segments;
 
-        /** @type {number} */
         const maxSegments = prediction.loop.max ? prediction.loop.max(prediction.action) * totalSegments : Infinity;
 
         // Helper for caching cost Calculations
@@ -2999,7 +2977,6 @@ const Koviko = {
 
   predictor: null,
 
-  /** @return {Predictor} */
   get instance() {
     if (!this.predictor) {
       this.predictor = new Koviko.Predictor();
@@ -3021,15 +2998,9 @@ const Koviko = {
 };
 globalThis.Koviko = Koviko;
 
-/** @typedef {InstanceType<(typeof Koviko)["Snapshot"]>} Koviko_Snapshot */
-/** @typedef {InstanceType<(typeof Koviko)["Prediction"]>} Koviko_Prediction */
-/** @typedef {InstanceType<(typeof Koviko)["Predictor"]>} Predictor */
 /**
  * @template {*} K
  * @template {*} R
  * @template {*} T
  * @typedef {InstanceType<typeof Koviko.Cache<K,R,T>>} PredictorCache
  */
-
-/** @typedef {Awaited<ReturnType<Predictor["update"]>>} PredictorRunData */
-/** @typedef {Predictor["initState"]} PredictorRunState */
