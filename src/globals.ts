@@ -718,15 +718,6 @@ const buffList = /** @type {const} */ ([
 const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
 let hearts = [];
 
-//globals!!!!!
-const actionLog = selfIsGame ? new ActionLog() : null;
-
-const actions = new globalThis.actions.Actions();
-
-const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
-
-const stats = /** @type {{[K in StatName]: Stat}} */ ({});
-
 let resources = {
   gold: 0,
   reputation: 0,
@@ -757,8 +748,13 @@ let resources = {
   wizardCollege: false,
 };
 const resourcesTemplate = globalThis.helpers.copyObject(resources);
-
+const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 const skills = /** @type {{[K in SkillName]: Skill}} */ ({});
+const stats = /** @type {{[K in StatName]: Stat}} */ ({});
+
+//globals!!!!!
+const actionLog = selfIsGame ? new ActionLog() : null;
+const actions = new globalThis.actions.Actions();
 
 const storyFlags = {
   maxSQuestsInALoop: false,

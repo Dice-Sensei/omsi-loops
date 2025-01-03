@@ -818,14 +818,18 @@ const Koviko = {
           affected: ['mana'],
           effect: (r) => {
             r.temp1 = (r.temp1 || 0) + 1;
-            r.mana += r.temp1 <= towns[0].goodPots ? globalThis.actionList.Action.SmashPots.goldCost() : 0;
+            r.mana += r.temp1 <= globalThis.globals.towns[0].goodPots
+              ? globalThis.actionList.Action.SmashPots.goldCost()
+              : 0;
           },
         },
         'Pick Locks': {
           affected: ['gold'],
           effect: (r) => {
             r.temp2 = (r.temp2 || 0) + 1;
-            r.gold += r.temp2 <= towns[0].goodLocks ? globalThis.actionList.Action.PickLocks.goldCost() : 0;
+            r.gold += r.temp2 <= globalThis.globals.towns[0].goodLocks
+              ? globalThis.actionList.Action.PickLocks.goldCost()
+              : 0;
           },
         },
         'Buy Glasses': {
@@ -855,7 +859,9 @@ const Koviko = {
           affected: ['gold'],
           effect: (r) => {
             r.temp3 = (r.temp3 || 0) + 1;
-            r.gold += r.temp3 <= towns[0].goodSQuests ? globalThis.actionList.Action.ShortQuest.goldCost() : 0;
+            r.gold += r.temp3 <= globalThis.globals.towns[0].goodSQuests
+              ? globalThis.actionList.Action.ShortQuest.goldCost()
+              : 0;
           },
         },
         'Investigate': { affected: [''] },
@@ -863,8 +869,10 @@ const Koviko = {
           affected: ['gold', 'rep'],
           effect: (r) => {
             r.temp4 = (r.temp4 || 0) + 1;
-            r.gold += r.temp4 <= towns[0].goodLQuests ? globalThis.actionList.Action.LongQuest.goldCost() : 0;
-            r.rep += r.temp4 <= towns[0].goodLQuests ? 1 : 0;
+            r.gold += r.temp4 <= globalThis.globals.towns[0].goodLQuests
+              ? globalThis.actionList.Action.LongQuest.goldCost()
+              : 0;
+            r.rep += r.temp4 <= globalThis.globals.towns[0].goodLQuests ? 1 : 0;
           },
         },
         'Throw Party': { affected: ['rep'], canStart: (input) => (input.rep >= 2), effect: (r, k) => r.rep -= 2 },
@@ -959,21 +967,23 @@ const Koviko = {
           affected: ['mana'],
           effect: (r) => {
             r.temp5 = (r.temp5 || 0) + 1;
-            r.mana += r.temp5 <= towns[1].goodWildMana ? globalThis.actionList.Action.WildMana.goldCost() : 0;
+            r.mana += r.temp5 <= globalThis.globals.towns[1].goodWildMana
+              ? globalThis.actionList.Action.WildMana.goldCost()
+              : 0;
           },
         },
         'Gather Herbs': {
           affected: ['herbs'],
           effect: (r) => {
             r.temp6 = (r.temp6 || 0) + 1;
-            r.herbs += r.temp6 <= towns[1].goodHerbs ? 1 : 0;
+            r.herbs += r.temp6 <= globalThis.globals.towns[1].goodHerbs ? 1 : 0;
           },
         },
         'Hunt': {
           affected: ['hide'],
           effect: (r) => {
             r.temp7 = (r.temp7 || 0) + 1;
-            r.hide += r.temp7 <= towns[1].goodHunt ? 1 : 0;
+            r.hide += r.temp7 <= globalThis.globals.towns[1].goodHunt ? 1 : 0;
           },
         },
         'Sit By Waterfall': { affected: [''] },
@@ -1012,7 +1022,7 @@ const Koviko = {
 
               return attempt < 1
                 ? (globalThis.stats.getSkillLevelFromExp(k.dark) * h.getStatProgress(p, a, s, offset)) /
-                  (1 - towns[1].getLevel('Witch') * .005)
+                  (1 - globalThis.globals.towns[1].getLevel('Witch') * .005)
                 : 0;
             },
             effect: {
@@ -1050,7 +1060,7 @@ const Koviko = {
           effect: (r) => {
             r.temp8 = (r.temp8 || 0) + 1;
             r.gold +=
-              (r.temp8 <= towns[2].goodGamble
+              (r.temp8 <= globalThis.globals.towns[2].goodGamble
                 ? Math.floor(60 * Math.pow(1 + globalThis.stats.getSkillLevel('Thievery') / 60, 0.25))
                 : 0) - 20;
             r.rep--;
@@ -1135,7 +1145,8 @@ const Koviko = {
           canStart: (input) => (input.guild == 'crafting'),
           effect: (r, k) =>
             Math.min(
-              (r.apprentice = (r.apprentice || towns[2].expApprentice) + 30 * h.getGuildRankBonus(r.crafts || 0),
+              (r.apprentice = (r.apprentice || globalThis.globals.towns[2].expApprentice) +
+                30 * h.getGuildRankBonus(r.crafts || 0),
                 505000),
               k.crafting += 10 * (1 + h.getTownLevelFromExp(r.apprentice) / 100),
             ),
@@ -1146,7 +1157,10 @@ const Koviko = {
           effect: (
             r,
             k,
-          ) => (r.mason = Math.min((r.mason || towns[2].expMason) + 20 * h.getGuildRankBonus(r.crafts || 0), 505000),
+          ) => (r.mason = Math.min(
+            (r.mason || globalThis.globals.towns[2].expMason) + 20 * h.getGuildRankBonus(r.crafts || 0),
+            505000,
+          ),
             k.crafting += 20 * (1 + h.getTownLevelFromExp(r.mason) / 100)),
         },
         'Architect': {
@@ -1154,7 +1168,9 @@ const Koviko = {
           canStart: (input) => (input.guild == 'crafting'),
           effect: (r, k) =>
             Math.min(
-              (r.architect = (r.architect || towns[2].expArchitect) + 10 * h.getGuildRankBonus(r.crafts || 0), 505000),
+              (r.architect = (r.architect || globalThis.globals.towns[2].expArchitect) +
+                10 * h.getGuildRankBonus(r.crafts || 0),
+                505000),
               k.crafting += 40 * (1 + h.getTownLevelFromExp(r.architect) / 100),
             ),
         },
@@ -1204,7 +1220,7 @@ const Koviko = {
           canStart: (input) => input.pickaxe,
           effect: (r) => {
             r.temp9 = (r.temp9 || 0) + 1;
-            r.mana += r.temp9 <= towns[3].goodGeysers ? 5000 : 0;
+            r.mana += r.temp9 <= globalThis.globals.towns[3].goodGeysers ? 5000 : 0;
           },
         },
         'Decipher Runes': { affected: [''] },
@@ -1224,7 +1240,7 @@ const Koviko = {
           canStart: (input) => input.pickaxe,
           effect: (r) => {
             r.temp10 = (r.temp10 || 0) + 1;
-            let ssGained = r.temp10 <= towns[3].goodMineSoulstones ? h.getRewardSS(0) : 0;
+            let ssGained = r.temp10 <= globalThis.globals.towns[3].goodMineSoulstones ? h.getRewardSS(0) : 0;
             r.nonDungeonSS += ssGained;
             r.soul += ssGained;
           },
@@ -1249,7 +1265,7 @@ const Koviko = {
           affected: ['artifacts'],
           effect: (r) => {
             r.temp11 = (r.temp11 || 0) + 1;
-            r.artifacts += r.temp11 <= towns[3].goodArtifacts ? 1 : 0;
+            r.artifacts += r.temp11 <= globalThis.globals.towns[3].goodArtifacts ? 1 : 0;
           },
         },
         'Imbue Mind': {
@@ -1350,7 +1366,7 @@ const Koviko = {
           },
           effect: (r) => {
             r.donateLoot = (r.donateLoot || 0) + 1;
-            if (r.donateLoot <= towns[4].goodDonations) {
+            if (r.donateLoot <= globalThis.globals.towns[4].goodDonations) {
               r.gold += 20;
             }
             r.rep -= 1;
@@ -1460,7 +1476,9 @@ const Koviko = {
               ((input.houses || 0) <
                 Math.floor(
                   h.getGuildRankBonus(input.crafts || 0) *
-                    (1 + Math.min(globalThis.stats.getSkillLevelFromExp(skills.Spatiomancy.exp), 500) * .01),
+                    (1 +
+                      Math.min(globalThis.stats.getSkillLevelFromExp(globalThis.globals.skills.Spatiomancy.exp), 500) *
+                        .01),
                 )));
           },
           effect: (r) => (r.houses = r.houses ? r.houses + 1 : 1),
@@ -1560,14 +1578,16 @@ const Koviko = {
           canStart: true,
           effect: (r, k) => {
             r.wellLoot = (r.wellLoot || 0) + 1;
-            r.mana += r.wellLoot <= towns[5].goodWells ? Math.max(5000 - Math.floor(r.totalTicks / 5), 0) : 0;
+            r.mana += r.wellLoot <= globalThis.globals.towns[5].goodWells
+              ? Math.max(5000 - Math.floor(r.totalTicks / 5), 0)
+              : 0;
           },
         },
         'Destroy Pylons': {
           affected: ['pylons'],
           effect: (r) => {
             r.pylonLoot = (r.pylonLoot || 0) + 1;
-            if (r.pylonLoot <= towns[5].goodPylons) {
+            if (r.pylonLoot <= globalThis.globals.towns[5].goodPylons) {
               r.pylons += 1;
             }
           },
@@ -1748,7 +1768,7 @@ const Koviko = {
           canStart: (input) => (input.guild === 'thieves'),
           effect: (r, k) => {
             r.gold += Math.floor(Math.floor(2 * h.getSkillBonusInc(k.thievery)) * h.getGuildRankBonus(r.thieves));
-            k.thievery += 10 * (1 + towns[7].getLevel('PickPockets') / 100);
+            k.thievery += 10 * (1 + globalThis.globals.towns[7].getLevel('PickPockets') / 100);
           },
         },
         'Rob Warehouse': {
@@ -1756,7 +1776,7 @@ const Koviko = {
           canStart: (input) => (input.guild === 'thieves'),
           effect: (r, k) => {
             r.gold += Math.floor(Math.floor(20 * h.getSkillBonusInc(k.thievery)) * h.getGuildRankBonus(r.thieves));
-            k.thievery += 20 * (1 + towns[7].getLevel('RobWarehouse') / 100);
+            k.thievery += 20 * (1 + globalThis.globals.towns[7].getLevel('RobWarehouse') / 100);
           },
         },
         'Insurance Fraud': {
@@ -1764,7 +1784,7 @@ const Koviko = {
           canStart: (input) => (input.guild === 'thieves'),
           effect: (r, k) => {
             r.gold += Math.floor(Math.floor(200 * h.getSkillBonusInc(k.thievery)) * h.getGuildRankBonus(r.thieves));
-            k.thievery += 40 * (1 + towns[7].getLevel('InsuranceFraud') / 100);
+            k.thievery += 40 * (1 + globalThis.globals.towns[7].getLevel('InsuranceFraud') / 100);
           },
         },
         'Guild Assassin': {
@@ -2022,7 +2042,7 @@ const Koviko = {
               stats,
               name,
             ) => (stats[name] = globalThis.stats.getExpOfLevel(
-              buffs.Imbuement2.amt * (skills.Wunderkind.exp >= 100 ? 2 : 1),
+              buffs.Imbuement2.amt * (globalThis.globals.skills.Wunderkind.exp >= 100 ? 2 : 1),
             ),
               stats),
             {},
@@ -2407,7 +2427,7 @@ const Koviko = {
               state.progress[prediction.name] = {
                 progress: 0,
                 completed: 0,
-                total: towns[prediction.action.townNum]['total' + prediction.action.varName],
+                total: globalThis.globals.towns[prediction.action.townNum]['total' + prediction.action.varName],
               };
             }
 

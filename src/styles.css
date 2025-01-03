@@ -2482,7 +2482,7 @@ li#actionLogLatest {
     flex: 0 0 100%;
   }
 
-  /* This has to do with keeping towns the same height, but not doing that for now
+  /* This has to do with keeping globalThis.globals.towns the same height, but not doing that for now
   & #townInfos > *[style*="none"], & #townActions > *[style*="none"] {
       display:block !important;
       visibility: hidden;

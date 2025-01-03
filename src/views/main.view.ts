@@ -774,7 +774,7 @@ class View {
     Array.from(document.getElementsByClassName('surveySkill')).forEach((div) => {
       div.textContent = `${globalThis.actionList.getExploreSkill()}`;
     });
-    for (const town of towns) {
+    for (const town of globalThis.globals.towns) {
       const varName = town.progressVars.find((v) => v.startsWith('Survey'));
       this.updateGlobalSurvey(varName, town);
     }
@@ -935,7 +935,7 @@ class View {
       })
       .property('data-index', (_a, i) => i)
       .call((container) => {
-        for (const { index } of towns) {
+        for (const { index } of globalThis.globals.towns) {
           container.classed(`zone-${index + 1}`, (a) => a.action.townNum === index);
         }
         for (const type of globalThis.actionList.actionTypes) {
@@ -1509,7 +1509,7 @@ class View {
     for (const action of globalThis.saving.vals.towns.flatMap((t) => t.totalActionList)) {
       this.createTownAction(action);
     }
-    for (const varName of towns.flatMap((t) => t.allVarNames)) {
+    for (const varName of globalThis.globals.towns.flatMap((t) => t.allVarNames)) {
       const action = globalThis.saving.vals.totalActionList.find((a) => a.varName === varName);
       if (globalThis.actionList.isActionOfType(action, 'limited')) this.createTownInfo(action);
       if (globalThis.actionList.isActionOfType(action, 'progress')) {
@@ -1928,7 +1928,7 @@ class View {
 
   updateMultiPartSegments(action) {
     let segment = 0;
-    let curProgress = towns[action.townNum][action.varName];
+    let curProgress = globalThis.globals.towns[action.townNum][action.varName];
     // update previous segments
     let loopCost = action.loopCost(segment);
     while (curProgress >= loopCost && segment < action.segments) {

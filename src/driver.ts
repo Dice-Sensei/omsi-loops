@@ -354,7 +354,7 @@ function manualRestart() {
 }
 
 function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
-  for (const action of towns[townNum].totalActionList) {
+  for (const action of globalThis.globals.towns[townNum].totalActionList) {
     if (action.name === name) {
       if (
         action.visible() && action.unlocked() &&
@@ -567,7 +567,7 @@ function capAmount(index, townNum) {
   if (action.name.startsWith('Survey')) newLoops = 500 - alreadyExisting;
   if (action.name === 'Gather Team') {
     newLoops = 5 + Math.floor(globalThis.stats.getSkillLevel('Leadership') / 100) - alreadyExisting;
-  } else newLoops = towns[townNum][varName] - alreadyExisting;
+  } else newLoops = globalThis.globals.towns[townNum][varName] - alreadyExisting;
   actions.updateAction(index, { loops: globalThis.helpers.clamp(action.loops + newLoops, 0, null) });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();

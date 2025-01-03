@@ -109,7 +109,7 @@ class Actions {
     // only for multi-part progress bars
     if (isMultipartAction(curAction)) {
       let loopCosts = {};
-      let loopCounter = towns[curAction.townNum][`${curAction.varName}LoopCounter`];
+      let loopCounter = globalThis.globals.towns[curAction.townNum][`${curAction.varName}LoopCounter`];
       const loopStats = curAction.loopStats;
 
       function loopCost(segment) {
@@ -118,7 +118,7 @@ class Actions {
       }
 
       let segment = 0;
-      let curProgress = towns[curAction.townNum][curAction.varName];
+      let curProgress = globalThis.globals.towns[curAction.townNum][curAction.varName];
       while (curProgress >= loopCost(segment)) {
         curProgress -= loopCost(segment);
         segment++;
@@ -315,7 +315,7 @@ class Actions {
     this.completedTicks = 0;
     this.currentAction = null;
     globalThis.saving.vals.curTown = 0;
-    towns[0].suppliesCost = 300;
+    globalThis.globals.towns[0].suppliesCost = 300;
     globalThis.saving.view.requestUpdate('updateResource', 'supplies');
     globalThis.saving.vals.curAdvGuildSegment = 0;
     globalThis.saving.vals.curCraftGuildSegment = 0;
@@ -324,7 +324,7 @@ class Actions {
     globalThis.saving.vals.curFightJungleMonstersSegment = 0;
     globalThis.saving.vals.curThievesGuildSegment = 0;
     globalThis.saving.vals.curGodsSegment = 0;
-    for (const town of towns) {
+    for (const town of globalThis.globals.towns) {
       for (const action of town.totalActionList) {
         if (action.type === 'multipart') {
           town[action.varName] = 0;

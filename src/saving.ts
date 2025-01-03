@@ -532,14 +532,14 @@ function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
 
 function doLoad(toLoad) {
   for (const property of Object.getOwnPropertyNames(toLoad.stats ?? {})) {
-    if (property in stats) {
-      stats[property].load(toLoad.stats[property]);
+    if (property in globalThis.globals.stats) {
+      globalThis.globals.stats[property].load(toLoad.stats[property]);
     }
   }
 
   for (const property of Object.getOwnPropertyNames(toLoad.skills ?? {})) {
-    if (property in skills) {
-      skills[property].load(toLoad.skills[property]);
+    if (property in globalThis.globals.skills) {
+      globalThis.globals.skills[property].load(toLoad.skills[property]);
     }
   }
 
@@ -926,10 +926,10 @@ function doSave() {
   toSave.townsUnlocked = globalThis.saving.vals.townsUnlocked;
   toSave.completedActions = globalThis.saving.vals.completedActions;
 
-  toSave.stats = stats;
+  toSave.stats = globalThis.globals.stats;
   toSave.totalTalent = globalThis.saving.vals.totalTalent;
-  toSave.skills = skills;
-  toSave.buffs = buffs;
+  toSave.skills = globalThis.globals.skills;
+  toSave.buffs = globalThis.globals.buffs;
   toSave.prestigeValues = globalThis.prestige.prestigeValues;
   toSave.goldInvested = globalThis.saving.vals.goldInvested;
   toSave.stonesUsed = globalThis.saving.vals.stonesUsed;
@@ -937,7 +937,7 @@ function doSave() {
 
   const hiddenVars = [];
 
-  for (const town of towns) {
+  for (const town of globalThis.globals.towns) {
     hiddenVars.push(Array.from(town.hiddenVars));
     for (const action of town.totalActionList) {
       if (action.type === 'progress') {
