@@ -216,7 +216,7 @@ Keyboard
   }, {
     onDown: {
       fn: () => {
-        actions.undoLast();
+        globalThis.globals.actions.undoLast();
         globalThis.saving.view.updateNextActions();
         globalThis.saving.view.updateLockedHidden();
       },

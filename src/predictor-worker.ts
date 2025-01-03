@@ -11,11 +11,6 @@ importScripts('./globals.ts');
 importScripts('./saving.ts');
 importScripts('./predictor.ts');
 
-// to moduleify
-// - stats.js
-// - actions.js
-// - saving.js
-
 /**
  * @typedef {{
  *  type: "setOptions",

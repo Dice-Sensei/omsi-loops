@@ -640,7 +640,7 @@ function doLoad(toLoad) {
   globalThis.saving.vals.goldInvested = toLoad.goldInvested === undefined ? 0 : toLoad.goldInvested;
   globalThis.saving.vals.stonesUsed = toLoad.stonesUsed === undefined ? { 1: 0, 3: 0, 5: 0, 6: 0 } : toLoad.stonesUsed;
 
-  actions.clearActions();
+  globalThis.globals.actions.clearActions();
   if (toLoad.nextList) {
     for (const action of toLoad.nextList) {
       if (action.name === 'Sell Gold') {
@@ -662,7 +662,7 @@ function doLoad(toLoad) {
         action.name = 'Buy Mana Z3';
       }
       if (globalThis.saving.vals.totalActionList.some((x) => x.name === action.name)) {
-        actions.addActionRecord(action, -1, false);
+        globalThis.globals.actions.addActionRecord(action, -1, false);
       }
     }
   }
@@ -957,7 +957,7 @@ function doSave() {
     }
   }
   toSave.hiddenVars = hiddenVars;
-  toSave.nextList = actions.next;
+  toSave.nextList = globalThis.globals.actions.next;
   toSave.loadouts = globalThis.saving.vals.loadouts;
   toSave.loadoutnames = globalThis.saving.vals.loadoutnames;
   toSave.options = {};
@@ -1027,8 +1027,8 @@ function processSave(saveData) {
   if (saveJson) {
     storeSaveJson(saveJson);
   }
-  actions.clearActions();
-  actions.current = [];
+  globalThis.globals.actions.clearActions();
+  globalThis.globals.actions.current = [];
   load(null, saveJson);
   globalThis.driver.pauseGame();
   globalThis.driver.restart();
@@ -1087,7 +1087,7 @@ function importSaveFile(e) {
 
 function exportCurrentList() {
   let toReturn = '';
-  for (const action of actions.next) {
+  for (const action of globalThis.globals.actions.next) {
     toReturn += `${action.loops}x ${action.name}`;
     toReturn += '\n';
   }
@@ -1098,7 +1098,7 @@ function exportCurrentList() {
 
 function importCurrentList() {
   const toImport = globalThis.helpers.textAreaElement('exportImportList').value.split('\n');
-  actions.clearActions();
+  globalThis.globals.actions.clearActions();
   for (let i = 0; i < toImport.length; i++) {
     if (!toImport[i]) {
       continue;
@@ -1108,7 +1108,7 @@ function importCurrentList() {
     try {
       const action = globalThis.actionList.getActionPrototype(name);
       if (action.unlocked()) {
-        actions.addActionRecord({ name, loops: Number(loops), disabled: false }, -1, false);
+        globalThis.globals.actions.addActionRecord({ name, loops: Number(loops), disabled: false }, -1, false);
       }
     } catch (e) {
       if (e instanceof globalThis.actionList.ClassNameNotFoundError) {

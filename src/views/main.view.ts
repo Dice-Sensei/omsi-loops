@@ -825,7 +825,7 @@ class View {
     globalThis.trash.d3.select(nextActionsDiv)
       .selectAll('.nextActionContainer')
       .data(
-        actions.next.map((a, index) => ({
+        globalThis.globals.actions.next.map((a, index) => ({
           ...a,
           actionId: a.actionId,
           index,
@@ -946,12 +946,12 @@ class View {
       .classed('action-is-training', (a) => globalThis.actionList.isTraining(a.name))
       .classed('action-is-singular', (a) => a.action.allowed?.() === 1)
       .classed('action-is-travel', (a) => globalThis.actionList.getPossibleTravel(a.name).length > 0)
-      .classed('action-disabled', (a) => !actions.isValidAndEnabled(a))
+      .classed('action-disabled', (a) => !globalThis.globals.actions.isValidAndEnabled(a))
       .classed('user-disabled', (a) => !!a.disabled)
       .classed('user-collapsed', (a) => !!a.collapsed)
-      .classed('zone-collapsed', (a) => actions.zoneSpanAtIndex(a.index).isCollapsed)
+      .classed('zone-collapsed', (a) => globalThis.globals.actions.zoneSpanAtIndex(a.index).isCollapsed)
       .classed('action-is-collapsing-zone', (a) => {
-        const zoneSpan = actions.zoneSpanAtIndex(a.index);
+        const zoneSpan = globalThis.globals.actions.zoneSpanAtIndex(a.index);
         return zoneSpan.end === a.index && zoneSpan.isCollapsed;
       })
       .style('background', ({ action }) => {
@@ -987,7 +987,7 @@ class View {
       );
 
     if (globalThis.saving.vals.options.predictor) {
-      Koviko.postUpdateHandler(actions.next, nextActionsDiv);
+      Koviko.postUpdateHandler(globalThis.globals.actions.next, nextActionsDiv);
     }
     nextActionsDiv.scrollTop = Math.max(nextActionsDiv.scrollTop, scrollTop); // scrolling down to see the new thing added is okay, scrolling up when you click an action button is not
   }
@@ -996,8 +996,8 @@ class View {
     let totalDivText = '';
 
     // definite leak - need to remove listeners and image
-    for (let i = 0; i < actions.current.length; i++) {
-      const action = actions.current[i];
+    for (let i = 0; i < globalThis.globals.actions.current.length; i++) {
+      const action = globalThis.globals.actions.current[i];
       const actionLoops = action.loops > 99999
         ? globalThis.helpers.toSuffix(action.loops)
         : globalThis.helpers.formatNumber(action.loops);
@@ -1019,8 +1019,8 @@ class View {
 
     totalDivText = '';
 
-    for (let i = 0; i < actions.current.length; i++) {
-      const action = actions.current[i];
+    for (let i = 0; i < globalThis.globals.actions.current.length; i++) {
+      const action = globalThis.globals.actions.current[i];
       totalDivText += `<div id='actionTooltip${i}' style='display:none;padding-left:10px;width:90%'>` +
         `<div style='text-align:center;width:100%'>${action.label}</div><br><br>` +
         `<b>${
@@ -1064,7 +1064,7 @@ class View {
     if (!div) {
       return;
     }
-    const action = actions.current[index];
+    const action = globalThis.globals.actions.current[index];
     if (!action) {
       return;
     }
@@ -1225,7 +1225,7 @@ class View {
   }
 
   updateCurrentActionLoops(index) {
-    const action = actions.current[index];
+    const action = globalThis.globals.actions.current[index];
     if (action !== undefined) {
       document.getElementById(`action${index}LoopsDone`).textContent = (action.loops - action.loopsLeft) > 99999
         ? globalThis.helpers.toSuffix(action.loops - action.loopsLeft)
@@ -1395,7 +1395,7 @@ class View {
   }
 
   showTown(townNum) {
-    if (!towns[townNum].unlocked()) return;
+    if (!globalThis.globals.towns[townNum].unlocked()) return;
 
     if (townNum === 0) {
       document.getElementById('townViewLeft').style.visibility = 'hidden';

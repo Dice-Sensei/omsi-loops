@@ -751,9 +751,9 @@ const resourcesTemplate = globalThis.helpers.copyObject(resources);
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 const skills = /** @type {{[K in SkillName]: Skill}} */ ({});
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
+const actionLog = selfIsGame ? new ActionLog() : null;
 
 //globals!!!!!
-const actionLog = selfIsGame ? new ActionLog() : null;
 const actions = new globalThis.actions.Actions();
 
 const storyFlags = {
