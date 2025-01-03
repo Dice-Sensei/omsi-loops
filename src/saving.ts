@@ -663,7 +663,7 @@ const actionLog = selfIsGame ? new ActionLog() : null;
 
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 
-let curTown = 0;
+vals.curTown = 0;
 const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
 

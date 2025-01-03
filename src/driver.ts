@@ -5,7 +5,7 @@ let gameTicksLeft = 0; // actually milliseconds, not ticks
 let refund = false;
 let radarUpdateTime = 0;
 let lastSave = Date.now();
-function getSpeedMult(zone = curTown) {
+function getSpeedMult(zone = globalThis.saving.vals.curTown) {
   let speedMult = 1;
 
   // Dark Ritual
@@ -510,7 +510,7 @@ function unlockTown(townNum) {
     if (challengeSave['c' + cNum] < townNum) challengeSave['c' + cNum] = townNum;
     else if (challengeSave['c' + cNum] === undefined) challengeSave['c' + cNum] = townNum;
   }
-  curTown = townNum;
+  globalThis.saving.vals.curTown = townNum;
 }
 
 function adjustAll() {

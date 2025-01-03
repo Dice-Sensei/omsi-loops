@@ -242,7 +242,7 @@ class Actions {
     if (curAction.loopsLeft === 0) {
       if (
         !this.current[this.currentPos + 1] && options.repeatLastAction &&
-        (!curAction.canStart || curAction.canStart()) && curAction.townNum === curTown
+        (!curAction.canStart || curAction.canStart()) && curAction.townNum === globalThis.saving.vals.curTown
       ) {
         curAction.loopsLeft++;
         curAction.loops++;
@@ -269,7 +269,7 @@ class Actions {
       return undefined;
     }
     while (
-      curAction.townNum !== curTown ||
+      curAction.townNum !== globalThis.saving.vals.curTown ||
       (curAction.canStart && !curAction.canStart()) ||
       (isMultipartAction(curAction) && !curAction.canMakeProgress(0))
     ) {
@@ -292,10 +292,10 @@ class Actions {
 
   /** @param {AnyActionEntry} action  */
   getErrorMessage(action) {
-    if (action.townNum !== curTown) {
-      return `You were in zone ${curTown + 1} when you tried this action, and needed to be in zone ${
-        action.townNum + 1
-      }`;
+    if (action.townNum !== globalThis.saving.vals.curTown) {
+      return `You were in zone ${
+        globalThis.saving.vals.curTown + 1
+      } when you tried this action, and needed to be in zone ${action.townNum + 1}`;
     }
     if (action.canStart && !action.canStart()) {
       return 'You could not make the cost for this action.';
@@ -311,7 +311,7 @@ class Actions {
     this.currentPos = 0;
     this.completedTicks = 0;
     this.currentAction = null;
-    curTown = 0;
+    globalThis.saving.vals.curTown = 0;
     towns[0].suppliesCost = 300;
     globalThis.saving.view.requestUpdate('updateResource', 'supplies');
     globalThis.saving.vals.curAdvGuildSegment = 0;
