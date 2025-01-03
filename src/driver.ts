@@ -54,7 +54,7 @@ function singleTick() {
 
   refreshDungeons(1);
 
-  if (shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
+  if (globalThis.saving.vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
     loopEnd();
     prepareRestart();
   }
@@ -154,7 +154,7 @@ function executeGameTicks(deadline) {
     manaAvailable = Math.min(manaAvailable, globalThis.saving.timeNeeded - globalThis.saving.timer);
 
     // don't run more than 1 tick
-    if (shouldRestart) {
+    if (globalThis.saving.vals.shouldRestart) {
       manaAvailable = Math.min(manaAvailable, 1);
     }
 
@@ -184,7 +184,7 @@ function executeGameTicks(deadline) {
 
     refreshDungeons(manaSpent);
 
-    if (shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
+    if (globalThis.saving.vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
       cleanExit = true;
       loopEnd();
       prepareRestart();
@@ -258,7 +258,9 @@ function pauseGame(ping, message) {
   document.getElementById('pausePlay').textContent = globalThis.Localization.txt(
     `time_controls>${gameIsStopped ? 'play_button' : 'pause_button'}`,
   );
-  if (!gameIsStopped && (shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded)) {
+  if (
+    !gameIsStopped && (globalThis.saving.vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded)
+  ) {
     restart();
   } else if (ping) {
     if (options.pingOnPause) {
@@ -321,7 +323,7 @@ function prepareRestart() {
 }
 
 function restart() {
-  shouldRestart = false;
+  globalThis.saving.vals.shouldRestart = false;
   globalThis.saving.timer = 0;
   globalThis.driver.timeCounter = 0;
   globalThis.driver.effectiveTime = 0;

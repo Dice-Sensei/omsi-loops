@@ -655,6 +655,8 @@ const view = selfIsGame ? new globalThis.view.View() : null;
 const vals = {
   trainingLimits: 10,
 };
+vals.curTown = 0;
+vals.shouldRestart = true;
 
 // Globals!!!!!
 const actions = new globalThis.actions.Actions();
@@ -663,12 +665,10 @@ const actionLog = selfIsGame ? new ActionLog() : null;
 
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 
-vals.curTown = 0;
 const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
 
 let totalTalent = 0;
-let shouldRestart = true;
 
 let resources = {
   gold: 0,

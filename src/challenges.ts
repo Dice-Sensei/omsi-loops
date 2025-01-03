@@ -44,7 +44,7 @@ const setupNoodleArms = () => {
 
 const setupManaBurn = () => {
   restart = function () {
-    shouldRestart = false;
+    globalThis.saving.vals.shouldRestart = false;
     globalThis.saving.timer = 0;
     globalThis.driver.timeCounter = 0;
     globalThis.driver.effectiveTime = 0;

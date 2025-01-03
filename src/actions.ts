@@ -87,7 +87,7 @@ class Actions {
     const curAction = this.getNextValidAction();
     // out of actions
     if (!curAction) {
-      shouldRestart = true;
+      globalThis.saving.vals.shouldRestart = true;
       return 0;
     }
     this.currentAction = curAction;
