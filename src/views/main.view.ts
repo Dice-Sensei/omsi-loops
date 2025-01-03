@@ -1979,7 +1979,7 @@ class View {
   updateTrialInfo(updateInfo) {
     const curFloor = updateInfo.curFloor;
     const trialNum = updateInfo.trialNum;
-    const trial = trials[trialNum];
+    const trial = globalThis.saving.trials[trialNum];
     document.getElementById(`trial${trialNum}HighestFloor`).textContent = String(trial.highestFloor + 1);
     if (curFloor >= trial.length) {
       document.getElementById(`trial${trialNum}CurFloor`).textContent = '';

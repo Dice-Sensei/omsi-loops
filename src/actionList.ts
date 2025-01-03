@@ -546,16 +546,16 @@ class TrialAction extends MultipartAction {
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
     const floor = Math.floor((loopCounter + 0.0001) / this.segments + 1);
     return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
-      floor <= trials[this.trialNum].length
+      floor <= globalThis.saving.trials[this.trialNum].length
         ? globalThis.helpers.numberToWords(floor)
         : globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
   }
-  currentFloor(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
+  currentFloor(loopCounter = globalThis.saving.towns[this.townNum][`${this.varName}LoopCounter`]) {
     return Math.floor(loopCounter / this.segments + 0.0000001);
   }
   /** @param {number} segment  */
-  loopCost(segment, loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
+  loopCost(segment, loopCounter = globalThis.saving.towns[this.townNum][`${this.varName}LoopCounter`]) {
     return globalThis.helpers.precision3(
       Math.pow(this.baseScaling, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) *
         this.exponentScaling * globalThis.stats.getSkillBonus('Assassin'),
@@ -564,14 +564,14 @@ class TrialAction extends MultipartAction {
   /** @param {number} offset  */
   tickProgress(offset, loopCounter) {
     return this.baseProgress() *
-      Math.sqrt(1 + trials[this.trialNum][this.currentFloor(loopCounter)].completed / 200);
+      Math.sqrt(1 + globalThis.saving.trials[this.trialNum][this.currentFloor(loopCounter)].completed / 200);
   }
   loopsFinished(loopCounter) {
     const finishedFloor = this.currentFloor(loopCounter) - 1;
     //console.log("Finished floor: " + finishedFloor + " Current Floor: " + this.currentFloor());
-    trials[this.trialNum][finishedFloor].completed++;
-    if (finishedFloor > trials[this.trialNum].highestFloor || trials[this.trialNum].highestFloor === undefined) {
-      trials[this.trialNum].highestFloor = finishedFloor;
+    globalThis.saving.trials[this.trialNum][finishedFloor].completed++;
+    if (finishedFloor > globalThis.saving.trials[this.trialNum].highestFloor || globalThis.saving.trials[this.trialNum].highestFloor === undefined) {
+      globalThis.saving.trials[this.trialNum].highestFloor = finishedFloor;
     }
     globalThis.saving.view.requestUpdate('updateTrialInfo', {
       trialNum: this.trialNum,
@@ -3918,7 +3918,7 @@ Action.HeroesTrial = new TrialAction('Heroes Trial', 0, {
     return 100000;
   },
   canStart() {
-    return this.currentFloor() < trialFloors[this.trialNum];
+    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
   },
   baseProgress() {
     return globalThis.stats.getTeamCombat();
@@ -6407,7 +6407,7 @@ Action.DeadTrial = new TrialAction('Dead Trial', 4, {
     globalThis.driver.addResource('zombie', 1);
   },
   canStart() {
-    return this.currentFloor() < trialFloors[this.trialNum];
+    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
   },
   visible() {
     return towns[this.townNum].getLevel('Survey') >= 100;
@@ -7770,7 +7770,7 @@ Action.SecretTrial = new TrialAction('Secret Trial', 3, {
     return 100000;
   },
   canStart() {
-    return this.currentFloor() < trialFloors[this.trialNum];
+    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
   },
   baseProgress() {
     return globalThis.stats.getTeamCombat();
@@ -8027,7 +8027,7 @@ Action.GodsTrial = new TrialAction('Gods Trial', 1, {
     return 50000;
   },
   canStart() {
-    return this.currentFloor() < trialFloors[this.trialNum] && resources.power < 7;
+    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum] && resources.power < 7;
   },
   baseProgress() {
     return globalThis.stats.getTeamCombat();
@@ -8044,7 +8044,7 @@ Action.GodsTrial = new TrialAction('Gods Trial', 1, {
     if (this.currentFloor() >= 80) globalThis.view.setStoryFlag('trailGods80Done');
     if (this.currentFloor() >= 90) globalThis.view.setStoryFlag('trailGods90Done');
 
-    if (this.currentFloor() === trialFloors[this.trialNum]) { //warning: the predictor assumes the old behavior, but this is clearly the intended
+    if (this.currentFloor() === globalThis.saving.trialFloors[this.trialNum]) { //warning: the predictor assumes the old behavior, but this is clearly the intended
       globalThis.view.setStoryFlag('trailGodsAllDone');
       globalThis.driver.addResource('power', 1);
     }
@@ -8127,7 +8127,7 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
     return 50000;
   },
   canStart() {
-    return this.currentFloor() < trialFloors[this.trialNum] && resources.power > 0 && resources.power < 8;
+    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum] && resources.power > 0 && resources.power < 8;
   },
   baseProgress() {
     return globalThis.stats.getSelfCombat();

@@ -663,7 +663,6 @@ const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 
 let curTown = 0;
 const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
-
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
 
 let totalTalent = 0;
@@ -747,7 +746,6 @@ const buffList = /** @type {const} */ ([
 ]);
 
 const dungeonFloors = [6, 9, 20];
-const trialFloors = [50, 100, 7, 1000, 25];
 const buffHardCaps = {
   Ritual: 666,
   Imbuement: 500,
@@ -1041,10 +1039,8 @@ let challengeSave = {
   inChallenge: false,
 };
 
-
 let totalActionList = [];
 let dungeons = [[], [], []];
-let trials = [[], [], [], [], []];
 
 const options = {
   theme: 'normal',
@@ -1083,6 +1079,9 @@ const options = {
   predictorBackgroundThread: true,
 };
 // Globals!!!!!
+
+let trials = [[], [], [], [], []];
+const trialFloors = [50, 100, 7, 1000, 25];
 
 Object.assign(vals, {
   currentLoop: 0,
@@ -1714,7 +1713,7 @@ function doLoad(toLoad) {
   trials = [[], [], [], [], []];
   const trialLevel = { completed: 0 };
   if (toLoad.trials === undefined) toLoad.trials = globalThis.helpers.copyArray(trials);
-  for (let i = 0; i < trials.length; i++) {
+  for (let i = 0; i < globalThis.saving.trials.length; i++) {
     floors = trialFloors[i];
     trials[i].highestFloor = 0;
     for (let j = 0; j < floors; j++) {
@@ -2149,6 +2148,7 @@ const _saving = {
   challengeSave,
   dungeons,
   trials,
+  trialFloors,
   stats,
   totalTalent,
   skills,

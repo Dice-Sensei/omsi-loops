@@ -1169,7 +1169,7 @@ const Koviko = {
           affected: ['heroism'],
           canStart: true,
           loop: {
-            max: (a) => trialFloors[a.trialNum],
+            max: (a) => globalThis.saving.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               globalThis.helpers.precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1177,9 +1177,9 @@ const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in trials[a.trialNum]
+              return floor in globalThis.saving.trials[a.trialNum]
                 ? h.getTeamCombat(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1630,7 +1630,7 @@ const Koviko = {
           affected: ['zombie'],
           canStart: true,
           loop: {
-            max: (a) => trialFloors[a.trialNum],
+            max: (a) => globalThis.saving.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               globalThis.helpers.precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1638,9 +1638,9 @@ const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in trials[a.trialNum]
+              return floor in globalThis.saving.trials[a.trialNum]
                 ? h.getZombieStrength(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: { loop: (r) => (r.zombie++) },
@@ -1814,7 +1814,7 @@ const Koviko = {
           affected: ['zombie'],
           canStart: true,
           loop: {
-            max: (a) => trialFloors[a.trialNum],
+            max: (a) => globalThis.saving.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               globalThis.helpers.precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1823,9 +1823,9 @@ const Koviko = {
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
               if (!p.progress) p.teamCombat = h.getTeamCombat(r, k);
-              return floor in trials[a.trialNum]
+              return floor in globalThis.saving.trials[a.trialNum]
                 ? p.teamCombat * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {},
@@ -1864,7 +1864,7 @@ const Koviko = {
           affected: ['power'],
           canStart: true,
           loop: {
-            max: (a) => trialFloors[a.trialNum],
+            max: (a) => globalThis.saving.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               globalThis.helpers.precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1872,9 +1872,9 @@ const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in trials[a.trialNum]
+              return floor in globalThis.saving.trials[a.trialNum]
                 ? h.getTeamCombat(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1897,7 +1897,7 @@ const Koviko = {
           affected: ['power'],
           canStart: (input) => (input.power > 0),
           loop: {
-            max: (a) => trialFloors[a.trialNum],
+            max: (a) => globalThis.saving.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               globalThis.helpers.precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1905,9 +1905,9 @@ const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in trials[a.trialNum]
+              return floor in globalThis.saving.trials[a.trialNum]
                 ? h.getSelfCombat(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {

@@ -330,8 +330,8 @@ function restart() {
   globalThis.saving.vals.currentLoop = totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
   resetResources();
   globalThis.stats.restartStats();
-  for (let i = 0; i < towns.length; i++) {
-    towns[i].restart();
+  for (let i = 0; i < globalThis.saving.towns.length; i++) {
+    globalThis.saving.towns[i].restart();
   }
   globalThis.saving.view.requestUpdate('updateSkills');
   actions.restart();
