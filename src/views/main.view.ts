@@ -643,7 +643,7 @@ class View {
     document.getElementById('timer').textContent = `${
       globalThis.helpers.intToString(
         globalThis.saving.timeNeeded - globalThis.saving.timer,
-        options.fractionalMana ? 2 : 1,
+        globalThis.saving.vals.options.fractionalMana ? 2 : 1,
         true,
       )
     } | ${
@@ -678,11 +678,11 @@ class View {
     // generic operation on Localization; I think I'm beginning to figure out what will be needed for it
     const fgSpeed = Math.max(
       5,
-      options.speedIncrease10x ? 10 : 0,
-      options.speedIncrease20x ? 20 : 0,
-      options.speedIncreaseCustom,
+      globalThis.saving.vals.options.speedIncrease10x ? 10 : 0,
+      globalThis.saving.vals.options.speedIncrease20x ? 20 : 0,
+      globalThis.saving.vals.options.speedIncreaseCustom,
     );
-    const bgSpeed = !isFinite(options.speedIncreaseBackground) ? -1 : options.speedIncreaseBackground ?? -1;
+    const bgSpeed = !isFinite(globalThis.saving.vals.options.speedIncreaseBackground) ? -1 : globalThis.saving.vals.options.speedIncreaseBackground ?? -1;
     const variables = {
       __proto__: null, // toString is not a valid replacement name
       get background_info() {
@@ -814,7 +814,7 @@ class View {
   }
   updateNextActions() {
     const { scrollTop } = nextActionsDiv; // save the current scroll position
-    if (options.predictor) {
+    if (globalThis.saving.vals.options.predictor) {
       globalThis.Koviko.preUpdateHandler(nextActionsDiv);
     }
 
@@ -982,7 +982,7 @@ class View {
           )
       );
 
-    if (options.predictor) {
+    if (globalThis.saving.vals.options.predictor) {
       Koviko.postUpdateHandler(actions.next, nextActionsDiv);
     }
     nextActionsDiv.scrollTop = Math.max(nextActionsDiv.scrollTop, scrollTop); // scrolling down to see the new thing added is okay, scrolling up when you click an action button is not
@@ -1099,11 +1099,11 @@ class View {
     if (curActionShowing === index) {
       document.getElementById(`action${index}ManaOrig`).textContent = globalThis.helpers.intToString(
         action.manaCost() * action.loops,
-        options.fractionalMana ? 3 : 1,
+        globalThis.saving.vals.options.fractionalMana ? 3 : 1,
       );
       document.getElementById(`action${index}ManaUsed`).textContent = globalThis.helpers.intToString(
         action.manaUsed,
-        options.fractionalMana ? 3 : 1,
+        globalThis.saving.vals.options.fractionalMana ? 3 : 1,
       );
       document.getElementById(`action${index}LastMana`).textContent = globalThis.helpers.intToString(
         action.lastMana,
@@ -1111,7 +1111,7 @@ class View {
       );
       document.getElementById(`action${index}Remaining`).textContent = globalThis.helpers.intToString(
         action.manaRemaining,
-        options.fractionalMana ? 3 : 1,
+        globalThis.saving.vals.options.fractionalMana ? 3 : 1,
       );
       document.getElementById(`action${index}GoldRemaining`).textContent = globalThis.helpers.formatNumber(
         action.goldRemaining,
@@ -1508,7 +1508,7 @@ class View {
       }
       if (globalThis.actionList.isActionOfType(action, 'multipart')) this.createMultiPartPBar(action);
     }
-    if (options.highlightNew) this.highlightIncompleteActions();
+    if (globalThis.saving.vals.options.highlightNew) this.highlightIncompleteActions();
   }
 
   /** @param {ActionOfType<"progress">} action  */
@@ -2111,11 +2111,11 @@ class View {
   changeTheme(init) {
     const themeInput = globalThis.helpers.selectElement('themeInput');
     const themeVariantInput = globalThis.helpers.selectElement('themeVariantInput');
-    if (init) themeInput.value = options.theme;
-    if (init) themeVariantInput.value = options.themeVariant;
-    options.theme = themeInput.value;
-    options.themeVariant = themeVariantInput.value;
-    const variants = $(themeVariantInput).find(`.variant-${options.theme.replaceAll(' ', '_')}`);
+    if (init) themeInput.value = globalThis.saving.vals.options.theme;
+    if (init) themeVariantInput.value = globalThis.saving.vals.options.themeVariant;
+    globalThis.saving.vals.options.theme = themeInput.value;
+    globalThis.saving.vals.options.themeVariant = themeVariantInput.value;
+    const variants = $(themeVariantInput).find(`.variant-${globalThis.saving.vals.options.theme.replaceAll(' ', '_')}`);
     if (variants.length) {
       document.getElementById('themeVariantSection').style.display = '';
       $(themeVariantInput).find('option').css('display', 'none');
@@ -2123,8 +2123,8 @@ class View {
     } else {
       document.getElementById('themeVariantSection').style.display = 'none';
     }
-    document.getElementById('theBody').className = `t-${options.theme} ${options.themeVariant}`;
-    localStorage['latestTheme'] = `${options.theme} ${options.themeVariant}`;
+    document.getElementById('theBody').className = `t-${globalThis.saving.vals.options.theme} ${globalThis.saving.vals.options.themeVariant}`;
+    localStorage['latestTheme'] = `${globalThis.saving.vals.options.theme} ${globalThis.saving.vals.options.themeVariant}`;
   }
 
   createTravelMenu() {
@@ -2264,7 +2264,7 @@ function unlockGlobalStory(num) {
 function setStoryFlag(name) {
   if (!storyFlags[name]) {
     storyFlags[name] = true;
-    if (options.actionLog) view.requestUpdate('updateStories', false);
+    if (globalThis.saving.vals.options.actionLog) view.requestUpdate('updateStories', false);
   }
 }
 const unlockStory = setStoryFlag; // compatibility alias
@@ -2273,7 +2273,7 @@ const unlockStory = setStoryFlag; // compatibility alias
 function increaseStoryVarTo(name, value) {
   if (storyVars[name] < value) {
     storyVars[name] = value;
-    if (options.actionLog) view.requestUpdate('updateStories', false);
+    if (globalThis.saving.vals.options.actionLog) view.requestUpdate('updateStories', false);
   }
 }
 

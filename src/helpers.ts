@@ -80,7 +80,7 @@ const Mana = {
   ceil(value, minNonZero) {
     return value === 0
       ? 0
-      : !options.fractionalMana
+      : !globalThis.saving.vals.options.fractionalMana
       ? Math.ceil(value)
       : !minNonZero
       ? value
@@ -93,7 +93,7 @@ const Mana = {
   floor(value, minNonZero) {
     return value === 0
       ? 0
-      : !options.fractionalMana
+      : !globalThis.saving.vals.options.fractionalMana
       ? Math.floor(value)
       : !minNonZero
       ? value
@@ -106,7 +106,7 @@ const Mana = {
   round(value, minNonZero) {
     return value === 0
       ? 0
-      : !options.fractionalMana
+      : !globalThis.saving.vals.options.fractionalMana
       ? Math.round(value)
       : !minNonZero
       ? value

@@ -402,11 +402,11 @@ const Koviko = {
       if (this.isWorker) {
         throw new Error("Can't get worker from inside worker!");
       }
-      if (!this.#worker && options.predictorBackgroundThread && !this.#workerDisabled) {
+      if (!this.#worker && globalThis.saving.vals.options.predictorBackgroundThread && !this.#workerDisabled) {
         this.#worker = new Worker('./src/predictor-worker.ts', { name: 'predictor' });
 
         this.#worker.onmessage = this.handleWorkerMessage.bind(this);
-        this.#worker.postMessage({ type: 'setOptions', options });
+        this.#worker.postMessage({ type: 'setOptions', options: globalThis.saving.vals.options });
         this.#worker.postMessage({ type: 'verifyDefaultIds', idRefs: globalThis.Data.exportDefaultIds() });
       }
       return this.#worker;
@@ -486,7 +486,7 @@ const Koviko = {
       this.isWorker = isWorker;
       if (!isWorker) {
         this.initElements();
-        this.setOptions(options);
+        this.setOptions(globalThis.saving.vals.options);
       }
       this.initPredictions();
       this.state;
@@ -584,7 +584,8 @@ const Koviko = {
           statistic.hidden = false;
         }
       }
-      globalThis.helpers.selectElement('predictorTrackedStatInput').value = options.predictorTrackedStat;
+      globalThis.helpers.selectElement('predictorTrackedStatInput').value =
+        globalThis.saving.vals.options.predictorTrackedStat;
     }
 
     /**
@@ -2014,12 +2015,12 @@ const Koviko = {
       let state;
 
       //"Slowmode means only update the initial state every X Minutes
-      if (options.predictorSlowMode) {
+      if (globalThis.saving.vals.options.predictorSlowMode) {
         if (this.initState && (new Date() < this.nextUpdate)) {
           state = structuredClone(this.initState);
           //console.log("Slowmode - Redraw");
         } else {
-          this.nextUpdate = new Date(Date.now() + options.predictorSlowTimer * 1000 * 60);
+          this.nextUpdate = new Date(Date.now() + globalThis.saving.vals.options.predictorSlowTimer * 1000 * 60);
           //console.log("Slowmode - Update Data");
         }
       }
@@ -2045,7 +2046,7 @@ const Koviko = {
           toNextLoop: {},
           soulstones: statList.reduce((soulstones, name) => (soulstones[name] = stats[name].soulstone, soulstones), {}),
         };
-        if (options.predictorSlowMode) {
+        if (globalThis.saving.vals.options.predictorSlowMode) {
           this.initState = structuredClone(state);
         }
       }
@@ -2057,7 +2058,10 @@ const Koviko = {
       }
 
       //Challenge Mode
-      if ((typeof globalThis.saving.vals.challengeSave != 'undefined') && (globalThis.saving.vals.challengeSave.challengeMode == 1)) {
+      if (
+        (typeof globalThis.saving.vals.challengeSave != 'undefined') &&
+        (globalThis.saving.vals.challengeSave.challengeMode == 1)
+      ) {
         state.resources.isManaDrought = true;
         state.resources.manaBought = 7500;
       }
@@ -2137,7 +2141,7 @@ const Koviko = {
       //Statistik parammeters
       let statisticStart = 0;
       let newStatisticValue = 0;
-      const trackedStat = Koviko.trackedStats[options.predictorTrackedStat];
+      const trackedStat = Koviko.trackedStats[globalThis.saving.vals.options.predictorTrackedStat];
       switch (trackedStat.type) {
         case 'R':
           break;
@@ -2176,7 +2180,7 @@ const Koviko = {
       this.update.id = id;
       const runData = {
         id,
-        options,
+        options: globalThis.saving.vals.options,
         actions,
         isDebug,
         snapshots,
@@ -2191,7 +2195,7 @@ const Koviko = {
         finalIndex,
       };
       for await (
-        const [i, state, isValid] of options.predictorBackgroundThread && this.worker
+        const [i, state, isValid] of globalThis.saving.vals.options.predictorBackgroundThread && this.worker
           ? this.doBackgroundUpdate(runData)
           : this.doUpdate(runData)
       ) {
@@ -2253,7 +2257,7 @@ const Koviko = {
       globalThis.Data.recordSnapshot('predictor-worker');
       this.backgroundSnapshot = globalThis.Data.getSnapshot(-1);
       const snapshotHeritage = this.backgroundSnapshot.getHeritage().map((s) => s.id);
-      this.worker.postMessage({ type: 'setOptions', options });
+      this.worker.postMessage({ type: 'setOptions', options: globalThis.saving.vals.options });
       this.worker.postMessage({
         type: 'startUpdate',
         runData,
@@ -2564,7 +2568,7 @@ const Koviko = {
         newStatisticValue,
       } = runData;
 
-      const trackedStat = Koviko.trackedStats[options.predictorTrackedStat];
+      const trackedStat = Koviko.trackedStats[globalThis.saving.vals.options.predictorTrackedStat];
 
       let totalMinutes = state.resources.totalTicks / 50 / 60;
 
@@ -2672,8 +2676,8 @@ const Koviko = {
       let h = Math.floor(seconds / 3600);
       let m = Math.floor(seconds % 3600 / 60);
       let s = Math.floor(seconds % 3600 % 60);
-      let ms = Math.floor(seconds % 1 * Math.pow(10, options.predictorTimePrecision)).toString();
-      while (ms.length < options.predictorTimePrecision) ms = '0' + ms;
+      let ms = Math.floor(seconds % 1 * Math.pow(10, globalThis.saving.vals.options.predictorTimePrecision)).toString();
+      while (ms.length < globalThis.saving.vals.options.predictorTimePrecision) ms = '0' + ms;
 
       return ('0' + h).slice(-2) + ':' + ('0' + m).slice(-2) + ':' + ('0' + s).slice(-2) + '.' + ms;
     }
@@ -2835,8 +2839,10 @@ const Koviko = {
       }
       if (toNextLoop[currname] && toNextLoop[currname].value > 0) {
         tooltip += '<tr><td><b>NEXT</b><td>' +
-          Math.floor(toNextLoop[currname].value * 100 * Math.pow(10, options.predictorNextPrecision)) /
-            Math.pow(10, options.predictorNextPrecision) +
+          Math.floor(
+              toNextLoop[currname].value * 100 * Math.pow(10, globalThis.saving.vals.options.predictorNextPrecision),
+            ) /
+            Math.pow(10, globalThis.saving.vals.options.predictorNextPrecision) +
           '%</td><td></td></tr>';
       }
       //Timer

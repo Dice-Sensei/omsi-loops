@@ -23,7 +23,7 @@ class ActionLog {
       entry.entryIndex = this.entries.length;
       this.entries.push(entry);
     }
-    if (!init && options.actionLog) {
+    if (!init && globalThis.saving.vals.options.actionLog) {
       this.firstNewOrUpdatedEntry = Math.min(this.firstNewOrUpdatedEntry ?? Infinity, entry.entryIndex);
       this.earliestShownEntry ??= entry.entryIndex;
       if (this.earliestShownEntry > entry.entryIndex + 1) {
@@ -1027,8 +1027,9 @@ const storyInitializers = {
     },
   },
 };
+// Globals!!!!!
 
-const options = {
+vals.options = {
   theme: 'normal',
   themeVariant: '',
   responsiveUI: true,
@@ -1064,7 +1065,6 @@ const options = {
   predictorTrackedStat: 'Rsoul',
   predictorBackgroundThread: true,
 };
-// Globals!!!!!
 
 vals.totals = {
   time: 0,
@@ -1193,7 +1193,7 @@ const optionValueHandlers = {
         input.indeterminate = false;
       }
     } else if (!value) {
-      options.notifyOnPause = false;
+      globalThis.saving.vals.options.notifyOnPause = false;
       input.checked = false;
       input.indeterminate = false;
     }
@@ -1225,7 +1225,7 @@ const optionValueHandlers = {
     }
   },
   repeatLastAction() {
-    if (options.predictor) {
+    if (globalThis.saving.vals.options.predictor) {
       view.requestUpdate('updateNextActions');
     }
   },
@@ -1261,7 +1261,7 @@ const optionValueHandlers = {
 };
 
 if (selfIsGame) {
-  Object.assign(options, importPredictorSettings()); // override hardcoded defaults if not in worker
+  Object.assign(vals.options, importPredictorSettings()); // override hardcoded defaults if not in worker
 }
 
 function decompressFromBase64(item) {
@@ -1380,19 +1380,22 @@ function handleOption(option, value, init, getInput) {
   optionValueHandlers[option]?.(value, init, getInput);
   // The handler can change the value of the option. Recheck when setting or clearing the indicator class.
   if (option in optionIndicatorClasses) {
-    document.documentElement.classList.toggle(optionIndicatorClasses[option], !!options[option]);
+    document.documentElement.classList.toggle(optionIndicatorClasses[option], !!globalThis.saving.vals.options[option]);
   }
 }
 
 function setOption(option, value, updateUI = false) {
-  const oldValue = options[option];
+  const oldValue = globalThis.saving.vals.options[option];
   options[option] = value;
   handleOption(option, value, false, () => globalThis.helpers.valueElement(`${option}Input`));
-  if (options[option] !== oldValue) {
+  if (globalThis.saving.vals.options[option] !== oldValue) {
     save();
   }
-  if (updateUI && (options[option] !== oldValue || options[option] !== value)) {
-    loadOption(option, options[option], false);
+  if (
+    updateUI &&
+    (globalThis.saving.vals.options[option] !== oldValue || globalThis.saving.vals.options[option] !== value)
+  ) {
+    loadOption(option, globalThis.saving.vals.options[option], false);
   }
 }
 
@@ -1462,7 +1465,7 @@ function saveUISettings() {
 }
 
 function needsDataSnapshots() {
-  return options.predictor && options.predictorBackgroundThread;
+  return globalThis.saving.vals.options.predictor && globalThis.saving.vals.options.predictorBackgroundThread;
 }
 
 function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
@@ -1728,25 +1731,37 @@ function doLoad(toLoad) {
   }
 
   if (toLoad.options === undefined) {
-    options.theme = toLoad.currentTheme === undefined ? options.theme : toLoad.currentTheme;
-    options.repeatLastAction = toLoad.repeatLast;
-    options.pingOnPause = toLoad.pingOnPause === undefined ? options.pingOnPause : toLoad.pingOnPause;
-    options.notifyOnPause = toLoad.notifyOnPause === undefined ? options.notifyOnPause : toLoad.notifyOnPause;
-    options.autoMaxTraining = toLoad.autoMaxTraining === undefined ? options.autoMaxTraining : toLoad.autoMaxTraining;
-    options.highlightNew = toLoad.highlightNew === undefined ? options.highlightNew : toLoad.highlightNew;
-    options.hotkeys = toLoad.hotkeys === undefined ? options.hotkeys : toLoad.hotkeys;
-    options.updateRate = toLoad.updateRate === undefined
-      ? options.updateRate
+    globalThis.saving.vals.options.theme = toLoad.currentTheme === undefined
+      ? globalThis.saving.vals.options.theme
+      : toLoad.currentTheme;
+    globalThis.saving.vals.options.repeatLastAction = toLoad.repeatLast;
+    globalThis.saving.vals.options.pingOnPause = toLoad.pingOnPause === undefined
+      ? globalThis.saving.vals.options.pingOnPause
+      : toLoad.pingOnPause;
+    globalThis.saving.vals.options.notifyOnPause = toLoad.notifyOnPause === undefined
+      ? globalThis.saving.vals.options.notifyOnPause
+      : toLoad.notifyOnPause;
+    globalThis.saving.vals.options.autoMaxTraining = toLoad.autoMaxTraining === undefined
+      ? globalThis.saving.vals.options.autoMaxTraining
+      : toLoad.autoMaxTraining;
+    globalThis.saving.vals.options.highlightNew = toLoad.highlightNew === undefined
+      ? globalThis.saving.vals.options.highlightNew
+      : toLoad.highlightNew;
+    globalThis.saving.vals.options.hotkeys = toLoad.hotkeys === undefined
+      ? globalThis.saving.vals.options.hotkeys
+      : toLoad.hotkeys;
+    globalThis.saving.vals.options.updateRate = toLoad.updateRate === undefined
+      ? globalThis.saving.vals.options.updateRate
       : globalThis.localStorage['updateRate'] ?? toLoad.updateRate;
   } else {
     const optionsToLoad = { ...toLoad.options, ...toLoad.extraOptions };
     for (const option in optionsToLoad) {
-      if (option in options) {
-        options[option] = optionsToLoad[option];
+      if (option in globalThis.saving.vals.options) {
+        globalThis.saving.vals.options[option] = optionsToLoad[option];
       }
     }
     if ('updateRate' in optionsToLoad && globalThis.localStorage['updateRate']) {
-      options.updateRate = globalThis.localStorage['updateRate'];
+      globalThis.saving.vals.options.updateRate = globalThis.localStorage['updateRate'];
     }
   }
 
@@ -1808,8 +1823,8 @@ function doLoad(toLoad) {
 
   globalThis.saving.vals.totalOfflineMs = toLoad.totalOfflineMs === undefined ? 0 : toLoad.totalOfflineMs; // must load before options
 
-  for (const option of Object.keys(options)) {
-    loadOption(option, options[option]);
+  for (const option of Object.keys(globalThis.saving.vals.options)) {
+    loadOption(option, globalThis.saving.vals.options[option]);
   }
   globalThis.saving.vals.storyShowing = toLoad.storyShowing === undefined ? 0 : toLoad.storyShowing;
   globalThis.saving.vals.storyMax = toLoad.storyMax === undefined ? 0 : toLoad.storyMax;
@@ -1880,7 +1895,7 @@ function doLoad(toLoad) {
   view.updateMultiPartActions();
   view.updateStories(true);
   view.update();
-  globalThis.driver.recalcInterval(options.updateRate);
+  globalThis.driver.recalcInterval(globalThis.saving.vals.options.updateRate);
   globalThis.driver.pauseGame();
 }
 
@@ -1929,11 +1944,11 @@ function doSave() {
   toSave.loadoutnames = globalThis.saving.vals.loadoutnames;
   toSave.options = {};
   toSave.extraOptions = {}; // to avoid crashing when exporting to lloyd, etc
-  for (const option in options) {
+  for (const option in globalThis.saving.vals.options) {
     if (isStandardOption[option]) {
-      toSave.options[option] = options[option];
+      toSave.options[option] = globalThis.saving.vals.options[option];
     } else {
-      toSave.extraOptions[option] = options[option];
+      toSave.extraOptions[option] = globalThis.saving.vals.options[option];
     }
   }
   toSave.storyShowing = globalThis.saving.vals.storyShowing;
@@ -1960,7 +1975,7 @@ function save() {
   const toSave = doSave();
   const saveJson = JSON.stringify(toSave);
   storeSaveJson(saveJson);
-  globalThis.localStorage['updateRate'] = options.updateRate;
+  globalThis.localStorage['updateRate'] = globalThis.saving.vals.options.updateRate;
   return saveJson;
 }
 
@@ -2155,7 +2170,6 @@ const _saving = {
   stats,
   skills,
   buffs,
-  options,
   storyReqs,
   storyVars,
   actionLog,

@@ -713,12 +713,12 @@ function SurveyAction(townNum) {
       return getExploreProgress() > 0;
     },
     finish() {
-      if (towns[this.townNum].getLevel('Survey') != 100) {
+      if (globalThis.saving.vals.towns[this.townNum].getLevel('Survey') != 100) {
         globalThis.saving.viewalThis.driver.addResource('map', -1);
         globalThis.driver.addResource('completedMap', 1);
-        towns[this.townNum].finishProgress(this.varName, getExploreSkill());
+        globalThis.saving.vals.towns[this.townNum].finishProgress(this.varName, getExploreSkill());
         view.requestUpdate('updateActionTooltips', null);
-      } else if (options.pauseOnComplete) {
+      } else if (globalThis.saving.vals.options.pauseOnComplete) {
         globalThis.driver.pauseGame(true, 'Survey complete! (Game paused)');
       }
     },
@@ -4609,8 +4609,8 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
   },
   finish() {
     globalThis.saving.view.requestUpdate('updateBuff', 'Imbuement');
-    if (options.autoMaxTraining) globalThis.driver.capAllTraining();
-    if (towns[3].ImbueMindLoopCounter >= 0) globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
+    if (globalThis.saving.vals.options.autoMaxTraining) globalThis.driver.capAllTraining();
+    if (globalThis.saving.vals.towns[3].ImbueMindLoopCounter >= 0) globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
   },
 });
 

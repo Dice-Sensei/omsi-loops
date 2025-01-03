@@ -73,8 +73,9 @@ class Town<TN extends number> {
   finishProgress(varName, expGain) {
     // return if capped, for performance
     if (this[`exp${varName}`] === 505000) {
-      if (options.pauseOnComplete) globalThis.driver.pauseGame(true, 'Progress complete! (Game paused)');
-      else return;
+      if (globalThis.saving.vals.options.pauseOnComplete) {
+        globalThis.driver.pauseGame(true, 'Progress complete! (Game paused)');
+      } else return;
     }
 
     const prevLevel = this.getLevel(varName);

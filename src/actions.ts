@@ -220,7 +220,7 @@ class Actions {
     addExpFromAction(curAction, manaToSpend);
 
     if (
-      this.currentPos === this.current.length - 1 && options.fractionalMana &&
+      this.currentPos === this.current.length - 1 && globalThis.saving.vals.options.fractionalMana &&
       curAction.ticks < curAction.adjustedTicks && curAction.ticks >= curAction.adjustedTicks - 0.005
     ) {
       // this is close enough to finished that it shows as e.g. 250.00/250.00 mana used for action
@@ -248,7 +248,7 @@ class Actions {
     globalThis.saving.view.requestUpdate('updateCurrentActionBar', this.currentPos);
     if (curAction.loopsLeft === 0) {
       if (
-        !this.current[this.currentPos + 1] && options.repeatLastAction &&
+        !this.current[this.currentPos + 1] && globalThis.saving.vals.options.repeatLastAction &&
         (!curAction.canStart || curAction.canStart()) && curAction.townNum === globalThis.saving.vals.curTown
       ) {
         curAction.loopsLeft++;
@@ -342,7 +342,7 @@ class Actions {
     globalThis.saving.vals.portalUsed = false;
     globalThis.saving.vals.stoneLoc = 0;
     globalThis.saving.vals.totalMerchantMana = 7500;
-    if (options.keepCurrentList && this.current?.length > 0) {
+    if (globalThis.saving.vals.options.keepCurrentList && this.current?.length > 0) {
       this.currentPos = 0;
       this.completedTicks = 0;
 
@@ -479,7 +479,7 @@ class Actions {
   addAction(
     action,
     loops = this.addAmount,
-    initialOrder = options.addActionsToTop ? 0 : -1,
+    initialOrder = globalThis.saving.vals.options.addActionsToTop ? 0 : -1,
     disabled = false,
     loopsType = 'actions',
     addAtClosestValidIndex = true,
@@ -497,7 +497,11 @@ class Actions {
   }
 
   /** @param {NextActionEntry} toAdd  */
-  addActionRecord(toAdd, initialOrder = options.addActionsToTop ? 0 : -1, addAtClosestValidIndex = true) {
+  addActionRecord(
+    toAdd,
+    initialOrder = globalThis.saving.vals.options.addActionsToTop ? 0 : -1,
+    addAtClosestValidIndex = true,
+  ) {
     if (initialOrder < 0) initialOrder += this.next.length + 1;
     initialOrder = globalThis.helpers.clamp(initialOrder, 0, this.next.length);
     if (addAtClosestValidIndex) {
@@ -717,8 +721,11 @@ function setAdjustedTicks(action) {
   for (const actionStatName in action.stats) {
     newCost += action.stats[actionStatName] * stats[actionStatName].manaMultiplier;
   }
-  action.rawTicks = action.manaCost() * newCost - (options.fractionalMana ? 0 : 0.000001);
-  action.adjustedTicks = Math.max(options.fractionalMana ? 0 : 1, globalThis.helpers.Mana.ceil(action.rawTicks));
+  action.rawTicks = action.manaCost() * newCost - (globalThis.saving.vals.options.fractionalMana ? 0 : 0.000001);
+  action.adjustedTicks = Math.max(
+    globalThis.saving.vals.options.fractionalMana ? 0 : 1,
+    globalThis.helpers.Mana.ceil(action.rawTicks),
+  );
 }
 
 function calcSoulstoneMult(soulstones) {

@@ -85,7 +85,7 @@ function tick() {
   curTime = newTime;
 
   // save even when paused
-  if (curTime - lastSave > options.autosaveRate * 1000) {
+  if (curTime - lastSave > globalThis.saving.vals.options.autosaveRate * 1000) {
     lastSave = curTime;
     globalThis.saving.save();
   }
@@ -118,7 +118,10 @@ function executeGameTicks(deadline) {
   const originalManaToBurn = baseManaToBurn;
   let cleanExit = false;
 
-  while (baseManaToBurn * bonusSpeed >= (options.fractionalMana ? 0.01 : 1) && performance.now() < deadline) {
+  while (
+    baseManaToBurn * bonusSpeed >= (globalThis.saving.vals.options.fractionalMana ? 0.01 : 1) &&
+    performance.now() < deadline
+  ) {
     if (gameIsStopped) {
       cleanExit = true;
       break;
@@ -237,7 +240,7 @@ function stopGame() {
   if (globalThis.saving.needsDataSnapshots()) {
     globalThis.Data.updateSnapshot('stop', 'base');
   }
-  if (options.predictor) {
+  if (globalThis.saving.vals.options.predictor) {
     globalThis.saving.view.requestUpdate('updateNextActions');
   }
 }
@@ -251,7 +254,7 @@ function pauseGame(ping, message) {
   globalThis.saving.view.requestUpdate('updateTime', null);
   globalThis.saving.view.requestUpdate('updateCurrentActionBar', actions.currentPos);
   globalThis.saving.view.update();
-  if (!gameIsStopped && options.notifyOnPause) {
+  if (!gameIsStopped && globalThis.saving.vals.options.notifyOnPause) {
     globalThis.saving.clearPauseNotification();
   }
   document.title = gameIsStopped ? '*PAUSED* Idle Loops' : 'Idle Loops';
@@ -263,11 +266,11 @@ function pauseGame(ping, message) {
   ) {
     restart();
   } else if (ping) {
-    if (options.pingOnPause) {
+    if (globalThis.saving.vals.options.pingOnPause) {
       globalThis.helpers.beep(250);
       setTimeout(() => globalThis.helpers.beep(250), 500);
     }
-    if (options.notifyOnPause) {
+    if (globalThis.saving.vals.options.notifyOnPause) {
       globalThis.saving.showPauseNotification(message || 'Game paused!');
     }
   }
@@ -288,7 +291,7 @@ function loopEnd() {
     }
     globalThis.actions.markActionsComplete(loopCompletedActions);
     globalThis.actions.actionStory(loopCompletedActions);
-    if (options.highlightNew) {
+    if (globalThis.saving.vals.options.highlightNew) {
       globalThis.saving.view.requestUpdate('removeAllHighlights', null);
       globalThis.saving.view.requestUpdate('highlightIncompleteActions', null);
     }
@@ -298,15 +301,15 @@ function loopEnd() {
 function prepareRestart() {
   const curAction = actions.getNextValidAction();
   if (
-    options.pauseBeforeRestart ||
-    (options.pauseOnFailedLoop &&
+    globalThis.saving.vals.options.pauseBeforeRestart ||
+    (globalThis.saving.vals.options.pauseOnFailedLoop &&
       (actions.current.filter((action) => action.loopsLeft - action.extraLoops > 0).length > 0))
   ) {
-    if (options.pingOnPause) {
+    if (globalThis.saving.vals.options.pingOnPause) {
       globalThis.helpers.beep(250);
       setTimeout(() => globalThis.helpers.beep(250), 500);
     }
-    if (options.notifyOnPause) {
+    if (globalThis.saving.vals.options.notifyOnPause) {
       globalThis.saving.showPauseNotification('Game paused!');
     }
     if (curAction) {
@@ -814,16 +817,17 @@ function isBonusActive() {
 function checkExtraSpeed() {
   globalThis.saving.view.requestUpdate('updateBonusText', null);
   if (
-    typeof options.speedIncreaseBackground === 'number' && !isNaN(options.speedIncreaseBackground) &&
-    options.speedIncreaseBackground >= 0 && !document.hasFocus() &&
-    (options.speedIncreaseBackground < 1 || isBonusActive())
+    typeof globalThis.saving.vals.options.speedIncreaseBackground === 'number' &&
+    !isNaN(globalThis.saving.vals.options.speedIncreaseBackground) &&
+    globalThis.saving.vals.options.speedIncreaseBackground >= 0 && !document.hasFocus() &&
+    (globalThis.saving.vals.options.speedIncreaseBackground < 1 || isBonusActive())
   ) {
-    if (options.speedIncreaseBackground === 1) {
+    if (globalThis.saving.vals.options.speedIncreaseBackground === 1) {
       bonusSpeed = 1.00001;
-    } else if (options.speedIncreaseBackground === 0) {
+    } else if (globalThis.saving.vals.options.speedIncreaseBackground === 0) {
       bonusSpeed = 0.0000001; // let's avoid any divide by zero errors shall we
     } else {
-      bonusSpeed = options.speedIncreaseBackground;
+      bonusSpeed = globalThis.saving.vals.options.speedIncreaseBackground;
     }
     return;
   }
@@ -831,9 +835,11 @@ function checkExtraSpeed() {
     bonusSpeed = 1;
     return;
   }
-  if (options.speedIncrease10x === true) bonusSpeed = 10;
-  if (options.speedIncrease20x === true) bonusSpeed = 20;
-  if (bonusSpeed < options.speedIncreaseCustom) bonusSpeed = options.speedIncreaseCustom;
+  if (globalThis.saving.vals.options.speedIncrease10x === true) bonusSpeed = 10;
+  if (globalThis.saving.vals.options.speedIncrease20x === true) bonusSpeed = 20;
+  if (bonusSpeed < globalThis.saving.vals.options.speedIncreaseCustom) {
+    bonusSpeed = globalThis.saving.vals.options.speedIncreaseCustom;
+  }
 }
 
 const _driver = {
