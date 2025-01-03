@@ -1185,7 +1185,6 @@ const _saving = {
   stats,
   skills,
   buffs,
-  storyReqs,
   storyVars,
   actionLog,
   actions,

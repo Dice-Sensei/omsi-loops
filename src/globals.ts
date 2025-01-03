@@ -643,8 +643,6 @@ const actionLogEntryTypeMap = {
   'buff': BuffEntry,
 };
 
-// Globals!!!!!
-
 const actions = new globalThis.actions.Actions();
 
 const selfIsGame = typeof globalThis?.view?.View !== 'undefined';
@@ -971,11 +969,8 @@ const storyFlags = {
   fightGods17: false,
   fightGods18: false,
 };
-const storyReqs = storyFlags;
 
 const storyVars = {
   maxWizardGuildSegmentCleared: -1,
   maxZombiesRaised: -1,
 };
-
-// Globals!!!!!

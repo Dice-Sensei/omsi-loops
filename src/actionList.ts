@@ -5541,7 +5541,6 @@ Action.SeekCitizenship = new Action('Seek Citizenship', {
         return towns[4].getLevel(this.varName) >= 80;
       case 6:
         return towns[4].getLevel(this.varName) >= 100;
-        //case 7: return storyReqs.repeatedCitizenExam;
     }
   },
   stats: {
