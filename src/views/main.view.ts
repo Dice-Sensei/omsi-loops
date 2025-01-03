@@ -2279,16 +2279,16 @@ function unlockGlobalStory(num) {
 }
 
 function setStoryFlag(name) {
-  if (!storyFlags[name]) {
-    storyFlags[name] = true;
+  if (!globalThis.globals.storyFlags[name]) {
+    globalThis.globals.storyFlags[name] = true;
     if (globalThis.saving.vals.options.actionLog) globalThis.saving.view.requestUpdate('updateStories', false);
   }
 }
 const unlockStory = setStoryFlag; // compatibility alias
 
 function increaseStoryVarTo(name, value) {
-  if (storyVars[name] < value) {
-    storyVars[name] = value;
+  if (globalThis.globals.storyVars[name] < value) {
+    globalThis.globals.storyVars[name] = value;
     if (globalThis.saving.vals.options.actionLog) globalThis.saving.view.requestUpdate('updateStories', false);
   }
 }

@@ -581,21 +581,23 @@ function doLoad(toLoad) {
         : toLoad.prestigeValues['completedAnyPrestige'];
   }
 
-  for (const property in storyFlags) {
+  for (const property in globalThis.globals.storyFlags) {
     if (toLoad.storyReqs?.hasOwnProperty(property)) {
-      storyFlags[property] = toLoad.storyReqs[property];
+      globalThis.globals.storyFlags[property] = toLoad.storyReqs[property];
     } else {
-      storyFlags[property] = storyInitializers.storyFlags[property]?.(toLoad.storyReqs ?? {}, toLoad.storyVars ?? {}) ??
-        false;
+      globalThis.globals.storyFlags[property] =
+        storyInitializers.storyFlags[property]?.(toLoad.storyReqs ?? {}, toLoad.storyVars ?? {}) ??
+          false;
     }
   }
 
-  for (const property in storyVars) {
+  for (const property in globalThis.globals.storyVars) {
     if (toLoad.storyVars?.hasOwnProperty(property)) {
-      storyVars[property] = toLoad.storyVars[property];
+      globalThis.globals.storyVars[property] = toLoad.storyVars[property];
     } else {
-      storyVars[property] = storyInitializers.storyVars[property]?.(toLoad.storyReqs ?? {}, toLoad.storyVars ?? {}) ??
-        -1;
+      globalThis.globals.storyVars[property] =
+        storyInitializers.storyVars[property]?.(toLoad.storyReqs ?? {}, toLoad.storyVars ?? {}) ??
+          -1;
     }
   }
 
@@ -970,8 +972,8 @@ function doSave() {
     }
   }
   toSave.storyShowing = globalThis.saving.vals.storyShowing;
-  toSave.storyMax = globalThis.saving.vals.storyMax;
-  toSave.storyReqs = storyFlags; // save uses the legacy name "storyReqs" for compatibility
+  toSave.storyMax = gglobalThis.globals.storyFlagssaving.vals.storyMax;
+  toSave.storyReqs = globalThis.globals.storyVarss; // save uses the legacy name "storyReqs" for compatibility
   toSave.storyVars = storyVars;
   toSave.unreadActionStories = globalThis.saving.vals.unreadActionStories;
   toSave.actionLog = globalThis.globals.actionLog;

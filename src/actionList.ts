@@ -1050,7 +1050,7 @@ Action.BuyGlasses = new Action('Buy Glasses', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.glassesBought;
+        return globalThis.globals.storyFlags.glassesBought;
       case 2:
         return getExploreProgress() >= 100;
     }
@@ -1206,15 +1206,15 @@ Action.TrainStrength = new Action('Train Strength', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.strengthTrained;
+        return globalThis.globals.storyFlags.strengthTrained;
       case 2:
-        return storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 100;
+        return globalThis.globals.storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 100;
       case 3:
-        return storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 1000;
+        return globalThis.globals.storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 1000;
       case 4:
-        return storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 10000;
+        return globalThis.globals.storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 10000;
       case 5:
-        return storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 100000;
+        return globalThis.globals.storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 100000;
     }
     return false;
   },
@@ -1252,10 +1252,10 @@ Action.ShortQuest = new Action('Short Quest', {
         return globalThis.globals.towns[0][`checked${this.varName}`] >= 1;
       case 2:
         // 20 short quests in a loop
-        return storyFlags.maxSQuestsInALoop;
+        return globalThis.globals.storyFlags.maxSQuestsInALoop;
       case 3:
         // 50 short quests in a loop
-        return storyFlags.realMaxSQuestsInALoop;
+        return globalThis.globals.storyFlags.realMaxSQuestsInALoop;
     }
     return false;
   },
@@ -1358,10 +1358,10 @@ Action.LongQuest = new Action('Long Quest', {
         return globalThis.globals.towns[0][`checked${this.varName}`] >= 1;
       case 2:
         // 10 long quests in a loop
-        return storyFlags.maxLQuestsInALoop;
+        return globalThis.globals.storyFlags.maxLQuestsInALoop;
       case 3:
         // 25 long quests in a loop
-        return storyFlags.realMaxLQuestsInALoop;
+        return globalThis.globals.storyFlags.realMaxLQuestsInALoop;
     }
     return false;
   },
@@ -1411,9 +1411,9 @@ Action.ThrowParty = new Action('Throw Party', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.partyThrown;
+        return globalThis.globals.storyFlags.partyThrown;
       case 2:
-        return storyFlags.partyThrown2;
+        return globalThis.globals.storyFlags.partyThrown2;
     }
     return false;
   },
@@ -1552,14 +1552,14 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
         return globalThis.globals.towns[0].totalHeal >= 1;
       case 2:
         // 10 patients healed in a loop
-        return storyFlags.heal10PatientsInALoop;
+        return globalThis.globals.storyFlags.heal10PatientsInALoop;
       case 3:
         return globalThis.globals.towns[0].totalHeal >= 100;
       case 4:
         return globalThis.globals.towns[0].totalHeal >= 1000;
       case 5:
         // fail reputation req
-        return storyFlags.failedHeal;
+        return globalThis.globals.storyFlags.failedHeal;
       case 6:
         return globalThis.stats.getSkillLevel('Restoration') >= 50;
     }
@@ -1689,7 +1689,7 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.smallDungeonAttempted;
+        return globalThis.globals.storyFlags.smallDungeonAttempted;
       case 2:
         return globalThis.globals.towns[0][`total${this.varName}`] >= 1000;
       case 3:
@@ -1697,7 +1697,7 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
       case 4:
         return globalThis.globals.towns[0][`total${this.varName}`] >= 10000;
       case 5:
-        return storyFlags.clearSDungeon;
+        return globalThis.globals.storyFlags.clearSDungeon;
     }
     return false;
   },
@@ -1782,9 +1782,9 @@ Action.BuySupplies = new Action('Buy Supplies', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.suppliesBought;
+        return globalThis.globals.storyFlags.suppliesBought;
       case 2:
-        return storyFlags.suppliesBoughtWithoutHaggling;
+        return globalThis.globals.storyFlags.suppliesBoughtWithoutHaggling;
     }
     return false;
   },
@@ -1828,11 +1828,11 @@ Action.Haggle = new Action('Haggle', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.haggle;
+        return globalThis.globals.storyFlags.haggle;
       case 2:
-        return storyFlags.haggle15TimesInALoop;
+        return globalThis.globals.storyFlags.haggle15TimesInALoop;
       case 3:
-        return storyFlags.haggle16TimesInALoop;
+        return globalThis.globals.storyFlags.haggle16TimesInALoop;
     }
     return false;
   },
@@ -2187,15 +2187,15 @@ Action.SitByWaterfall = new Action('Sit By Waterfall', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.satByWaterfall;
+        return globalThis.globals.storyFlags.satByWaterfall;
       case 2:
-        return storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 100;
+        return globalThis.globals.storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 100;
       case 3:
-        return storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 1000;
+        return globalThis.globals.storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 1000;
       case 4:
-        return storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 10000;
+        return globalThis.globals.storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 10000;
       case 5:
-        return storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 100000;
+        return globalThis.globals.storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 100000;
     }
     return false;
   },
@@ -2408,13 +2408,13 @@ Action.BrewPotions = new Action('Brew Potions', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.potionBrewed;
+        return globalThis.globals.storyFlags.potionBrewed;
       case 2:
-        return storyFlags.brewed50PotionsInALoop;
+        return globalThis.globals.storyFlags.brewed50PotionsInALoop;
       case 3:
-        return storyFlags.failedBrewPotions;
+        return globalThis.globals.storyFlags.failedBrewPotions;
       case 4:
-        return storyFlags.failedBrewPotionsNegativeRep;
+        return globalThis.globals.storyFlags.failedBrewPotionsNegativeRep;
     }
     return false;
   },
@@ -2459,15 +2459,15 @@ Action.TrainDexterity = new Action('Train Dexterity', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.dexterityTrained;
+        return globalThis.globals.storyFlags.dexterityTrained;
       case 2:
-        return storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 100;
+        return globalThis.globals.storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 100;
       case 3:
-        return storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 1000;
+        return globalThis.globals.storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 1000;
       case 4:
-        return storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 10000;
+        return globalThis.globals.storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 10000;
       case 5:
-        return storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 100000;
+        return globalThis.globals.storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 100000;
     }
     return false;
   },
@@ -2499,15 +2499,15 @@ Action.TrainSpeed = new Action('Train Speed', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.speedTrained;
+        return globalThis.globals.storyFlags.speedTrained;
       case 2:
-        return storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 100;
+        return globalThis.globals.storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 100;
       case 3:
-        return storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 1000;
+        return globalThis.globals.storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 1000;
       case 4:
-        return storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 10000;
+        return globalThis.globals.storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 10000;
       case 5:
-        return storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 100000;
+        return globalThis.globals.storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 100000;
     }
     return false;
   },
@@ -2583,15 +2583,15 @@ Action.BirdWatching = new Action('Bird Watching', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.birdsWatched;
+        return globalThis.globals.storyFlags.birdsWatched;
       case 2:
-        return storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 100;
+        return globalThis.globals.storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 100;
       case 3:
-        return storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 1000;
+        return globalThis.globals.storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 1000;
       case 4:
-        return storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 10000;
+        return globalThis.globals.storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 10000;
       case 5:
-        return storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 100000;
+        return globalThis.globals.storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 100000;
     }
     return false;
   },
@@ -2768,7 +2768,7 @@ Action.DarkRitual = new MultipartAction('Dark Ritual', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.darkRitualThirdSegmentReached;
+        return globalThis.globals.storyFlags.darkRitualThirdSegmentReached;
       case 2:
         return globalThis.stats.getBuffLevel('Ritual') >= 1;
       case 3:
@@ -3049,9 +3049,9 @@ Action.Gamble = new Action('Gamble', {
       case 4:
         return globalThis.globals.towns[2][`good${this.varName}`] >= 75;
       case 5:
-        return storyFlags.failedGamble;
+        return globalThis.globals.storyFlags.failedGamble;
       case 6:
-        return storyFlags.failedGambleLowMoney;
+        return globalThis.globals.storyFlags.failedGambleLowMoney;
     }
     return false;
   },
@@ -3143,7 +3143,7 @@ Action.BuyManaZ3 = new Action('Buy Mana Z3', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.manaZ3Bought;
+        return globalThis.globals.storyFlags.manaZ3Bought;
     }
   },
   stats: {
@@ -3182,13 +3182,13 @@ Action.SellPotions = new Action('Sell Potions', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.potionSold;
+        return globalThis.globals.storyFlags.potionSold;
       case 2:
-        return storyFlags.sell20PotionsInALoop;
+        return globalThis.globals.storyFlags.sell20PotionsInALoop;
       case 3:
-        return storyFlags.sellPotionFor100Gold;
+        return globalThis.globals.storyFlags.sellPotionFor100Gold;
       case 4:
-        return storyFlags.sellPotionFor1kGold;
+        return globalThis.globals.storyFlags.sellPotionFor1kGold;
     }
     return false;
   },
@@ -3230,23 +3230,23 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.advGuildTestsTaken;
+        return globalThis.globals.storyFlags.advGuildTestsTaken;
       case 2:
-        return storyFlags.advGuildRankEReached;
+        return globalThis.globals.storyFlags.advGuildRankEReached;
       case 3:
-        return storyFlags.advGuildRankDReached;
+        return globalThis.globals.storyFlags.advGuildRankDReached;
       case 4:
-        return storyFlags.advGuildRankCReached;
+        return globalThis.globals.storyFlags.advGuildRankCReached;
       case 5:
-        return storyFlags.advGuildRankBReached;
+        return globalThis.globals.storyFlags.advGuildRankBReached;
       case 6:
-        return storyFlags.advGuildRankAReached;
+        return globalThis.globals.storyFlags.advGuildRankAReached;
       case 7:
-        return storyFlags.advGuildRankSReached;
+        return globalThis.globals.storyFlags.advGuildRankSReached;
       case 8:
-        return storyFlags.advGuildRankUReached;
+        return globalThis.globals.storyFlags.advGuildRankUReached;
       case 9:
-        return storyFlags.advGuildRankGodlikeReached;
+        return globalThis.globals.storyFlags.advGuildRankGodlikeReached;
     }
     return false;
   },
@@ -3346,11 +3346,11 @@ Action.GatherTeam = new Action('Gather Team', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.teammateGathered;
+        return globalThis.globals.storyFlags.teammateGathered;
       case 2:
-        return storyFlags.fullParty;
+        return globalThis.globals.storyFlags.fullParty;
       case 3:
-        return storyFlags.failedGatherTeam;
+        return globalThis.globals.storyFlags.failedGatherTeam;
     }
     return false;
   },
@@ -3396,7 +3396,7 @@ Action.LargeDungeon = new DungeonAction('Large Dungeon', 1, {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.largeDungeonAttempted;
+        return globalThis.globals.storyFlags.largeDungeonAttempted;
       case 2:
         return globalThis.globals.towns[2][`total${this.varName}`] >= 2000;
       case 3:
@@ -3404,7 +3404,7 @@ Action.LargeDungeon = new DungeonAction('Large Dungeon', 1, {
       case 4:
         return globalThis.globals.towns[2][`total${this.varName}`] >= 20000;
       case 5:
-        return storyFlags.clearLDungeon;
+        return globalThis.globals.storyFlags.clearLDungeon;
     }
     return false;
   },
@@ -3464,23 +3464,23 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.craftGuildTestsTaken;
+        return globalThis.globals.storyFlags.craftGuildTestsTaken;
       case 2:
-        return storyFlags.craftGuildRankEReached;
+        return globalThis.globals.storyFlags.craftGuildRankEReached;
       case 3:
-        return storyFlags.craftGuildRankDReached;
+        return globalThis.globals.storyFlags.craftGuildRankDReached;
       case 4:
-        return storyFlags.craftGuildRankCReached;
+        return globalThis.globals.storyFlags.craftGuildRankCReached;
       case 5:
-        return storyFlags.craftGuildRankBReached;
+        return globalThis.globals.storyFlags.craftGuildRankBReached;
       case 6:
-        return storyFlags.craftGuildRankAReached;
+        return globalThis.globals.storyFlags.craftGuildRankAReached;
       case 7:
-        return storyFlags.craftGuildRankSReached;
+        return globalThis.globals.storyFlags.craftGuildRankSReached;
       case 8:
-        return storyFlags.craftGuildRankUReached;
+        return globalThis.globals.storyFlags.craftGuildRankUReached;
       case 9:
-        return storyFlags.craftGuildRankGodlikeReached;
+        return globalThis.globals.storyFlags.craftGuildRankGodlikeReached;
     }
     return false;
   },
@@ -3584,13 +3584,13 @@ Action.CraftArmor = new Action('Craft Armor', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.armorCrafted;
+        return globalThis.globals.storyFlags.armorCrafted;
       case 2:
-        return storyFlags.craft10Armor;
+        return globalThis.globals.storyFlags.craft10Armor;
       case 3:
-        return storyFlags.craft20Armor;
+        return globalThis.globals.storyFlags.craft20Armor;
       case 4:
-        return storyFlags.failedCraftArmor;
+        return globalThis.globals.storyFlags.failedCraftArmor;
     }
     return false;
   },
@@ -3791,15 +3791,15 @@ Action.ReadBooks = new Action('Read Books', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.booksRead;
+        return globalThis.globals.storyFlags.booksRead;
       case 2:
-        return storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 100;
+        return globalThis.globals.storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 100;
       case 3:
-        return storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 1000;
+        return globalThis.globals.storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 1000;
       case 4:
-        return storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 10000;
+        return globalThis.globals.storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 10000;
       case 5:
-        return storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 100000;
+        return globalThis.globals.storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 100000;
     }
     return false;
   },
@@ -3835,7 +3835,7 @@ Action.BuyPickaxe = new Action('Buy Pickaxe', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.pickaxeBought;
+        return globalThis.globals.storyFlags.pickaxeBought;
     }
     return false;
   },
@@ -3876,13 +3876,13 @@ Action.HeroesTrial = new TrialAction('Heroes Trial', 0, {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.heroTrial1Done;
+        return globalThis.globals.storyFlags.heroTrial1Done;
       case 2:
-        return storyFlags.heroTrial10Done;
+        return globalThis.globals.storyFlags.heroTrial10Done;
       case 3:
-        return storyFlags.heroTrial25Done;
+        return globalThis.globals.storyFlags.heroTrial25Done;
       case 4:
-        return storyFlags.heroTrial50Done;
+        return globalThis.globals.storyFlags.heroTrial50Done;
     }
   },
   varName: 'HTrial',
@@ -3980,7 +3980,7 @@ Action.Underworld = new Action('Underworld', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.charonPaid;
+        return globalThis.globals.storyFlags.charonPaid;
     }
   },
   stats: {
@@ -4204,7 +4204,7 @@ Action.LoopingPotion = new Action('Looping Potion', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.loopingPotionMade;
+        return globalThis.globals.storyFlags.loopingPotionMade;
     }
     return false;
   },
@@ -4393,9 +4393,9 @@ Action.HuntTrolls = new MultipartAction('Hunt Trolls', {
       case 1:
         return globalThis.globals.towns[3].totalHuntTrolls >= 1;
       case 2:
-        return storyFlags.slay6TrollsInALoop;
+        return globalThis.globals.storyFlags.slay6TrollsInALoop;
       case 3:
-        return storyFlags.slay20TrollsInALoop;
+        return globalThis.globals.storyFlags.slay20TrollsInALoop;
     }
     return false;
   },
@@ -4541,7 +4541,8 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.imbueMindThirdSegmentReached || globalThis.stats.getBuffLevel('Imbuement') >= 1;
+        return globalThis.globals.storyFlags.imbueMindThirdSegmentReached ||
+          globalThis.stats.getBuffLevel('Imbuement') >= 1;
       case 2:
         return globalThis.stats.getBuffLevel('Imbuement') >= 1;
       case 3:
@@ -4609,7 +4610,8 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.imbueBodyThirdSegmentReached || globalThis.stats.getBuffLevel('Imbuement2') >= 1;
+        return globalThis.globals.storyFlags.imbueBodyThirdSegmentReached ||
+          globalThis.stats.getBuffLevel('Imbuement2') >= 1;
       case 2:
         return globalThis.stats.getBuffLevel('Imbuement2') >= 1;
       case 3:
@@ -4619,7 +4621,7 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
       case 5:
         //Since the action cannot be performed once you hit level 500, give the
         //action story here so you don't end up unable to 100% the action stories.
-        return storyFlags.failedImbueBody || globalThis.stats.getBuffLevel('Imbuement2') >= 500;
+        return globalThis.globals.storyFlags.failedImbueBody || globalThis.stats.getBuffLevel('Imbuement2') >= 500;
     }
     return false;
   },
@@ -4693,13 +4695,13 @@ Action.FaceJudgement = new Action('Face Judgement', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.judgementFaced;
+        return globalThis.globals.storyFlags.judgementFaced;
       case 2:
-        return storyFlags.acceptedIntoValhalla;
+        return globalThis.globals.storyFlags.acceptedIntoValhalla;
       case 3:
-        return storyFlags.castIntoShadowRealm;
+        return globalThis.globals.storyFlags.castIntoShadowRealm;
       case 4:
-        return storyFlags.ignoredByGods;
+        return globalThis.globals.storyFlags.ignoredByGods;
     }
     return false;
   },
@@ -4743,7 +4745,7 @@ Action.Guru = new Action('Guru', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.spokeToGuru;
+        return globalThis.globals.storyFlags.spokeToGuru;
     }
   },
   stats: {
@@ -4882,7 +4884,7 @@ Action.Donate = new Action('Donate', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.donatedToCharity;
+        return globalThis.globals.storyFlags.donatedToCharity;
     }
     return false;
   },
@@ -4919,7 +4921,7 @@ Action.AcceptDonations = new Action('Accept Donations', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.receivedDonation;
+        return globalThis.globals.storyFlags.receivedDonation;
       case 2:
         return globalThis.globals.towns[4][`good${this.varName}`] >= 1;
       case 3:
@@ -4927,7 +4929,7 @@ Action.AcceptDonations = new Action('Accept Donations', {
       case 4:
         return globalThis.globals.towns[4][`good${this.varName}`] >= 250;
       case 5:
-        return storyFlags.failedReceivedDonation;
+        return globalThis.globals.storyFlags.failedReceivedDonation;
     }
   },
   stats: {
@@ -4976,7 +4978,7 @@ Action.TidyUp = new MultipartAction('Tidy Up', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.tidiedUp;
+        return globalThis.globals.storyFlags.tidiedUp;
       case 5:
         return globalThis.globals.towns[4].totalTidy >= 100;
       case 6:
@@ -5032,7 +5034,7 @@ Action.BuyManaZ5 = new Action('Buy Mana Z5', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.manaZ5Bought;
+        return globalThis.globals.storyFlags.manaZ5Bought;
     }
   },
   stats: {
@@ -5071,7 +5073,7 @@ Action.SellArtifact = new Action('Sell Artifact', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.artifactSold;
+        return globalThis.globals.storyFlags.artifactSold;
     }
   },
   stats: {
@@ -5108,11 +5110,11 @@ Action.GiftArtifact = new Action('Gift Artifact', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.artifactDonated;
+        return globalThis.globals.storyFlags.artifactDonated;
       case 2:
-        return storyFlags.donated20Artifacts;
+        return globalThis.globals.storyFlags.donated20Artifacts;
       case 3:
-        return storyFlags.donated40Artifacts;
+        return globalThis.globals.storyFlags.donated40Artifacts;
     }
   },
   stats: {
@@ -5197,15 +5199,15 @@ Action.CharmSchool = new Action('Charm School', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.charmSchoolVisited;
+        return globalThis.globals.storyFlags.charmSchoolVisited;
       case 2:
-        return storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 100;
+        return globalThis.globals.storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 100;
       case 3:
-        return storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 1000;
+        return globalThis.globals.storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 1000;
       case 4:
-        return storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 10000;
+        return globalThis.globals.storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 10000;
       case 5:
-        return storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 100000;
+        return globalThis.globals.storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 100000;
     }
   },
   stats: {
@@ -5236,15 +5238,15 @@ Action.Oracle = new Action('Oracle', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.oracleVisited;
+        return globalThis.globals.storyFlags.oracleVisited;
       case 2:
-        return storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 100;
+        return globalThis.globals.storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 100;
       case 3:
-        return storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 1000;
+        return globalThis.globals.storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 1000;
       case 4:
-        return storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 10000;
+        return globalThis.globals.storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 10000;
       case 5:
-        return storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 100000;
+        return globalThis.globals.storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 100000;
     }
   },
   stats: {
@@ -5275,11 +5277,11 @@ Action.EnchantArmor = new Action('Enchant Armor', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.armorEnchanted;
+        return globalThis.globals.storyFlags.armorEnchanted;
       case 2:
-        return storyFlags.enchanted10Armor;
+        return globalThis.globals.storyFlags.enchanted10Armor;
       case 3:
-        return storyFlags.enchanted20Armor;
+        return globalThis.globals.storyFlags.enchanted20Armor;
     }
   },
   stats: {
@@ -5323,23 +5325,23 @@ Action.WizardCollege = new MultipartAction('Wizard College', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyVars.maxWizardGuildSegmentCleared >= 0;
+        return globalThis.globals.storyVars.maxWizardGuildSegmentCleared >= 0;
       case 12:
-        return storyVars.maxWizardGuildSegmentCleared >= 3;
+        return globalThis.globals.storyVars.maxWizardGuildSegmentCleared >= 3;
       case 2:
-        return storyVars.maxWizardGuildSegmentCleared >= 6;
+        return globalThis.globals.storyVars.maxWizardGuildSegmentCleared >= 6;
       case 3:
-        return storyVars.maxWizardGuildSegmentCleared >= 12;
+        return globalThis.globals.storyVars.maxWizardGuildSegmentCleared >= 12;
       case 4:
-        return storyVars.maxWizardGuildSegmentCleared >= 18;
+        return globalThis.globals.storyVars.maxWizardGuildSegmentCleared >= 18;
       case 6:
-        return storyVars.maxWizardGuildSegmentCleared >= 30;
+        return globalThis.globals.storyVars.maxWizardGuildSegmentCleared >= 30;
       case 8:
-        return storyVars.maxWizardGuildSegmentCleared >= 42;
+        return globalThis.globals.storyVars.maxWizardGuildSegmentCleared >= 42;
       case 10:
-        return storyVars.maxWizardGuildSegmentCleared >= 54;
+        return globalThis.globals.storyVars.maxWizardGuildSegmentCleared >= 54;
       case 13:
-        return storyVars.maxWizardGuildSegmentCleared >= 57;
+        return globalThis.globals.storyVars.maxWizardGuildSegmentCleared >= 57;
     }
   },
   stats: {
@@ -5590,11 +5592,11 @@ Action.BuildHousing = new Action('Build Housing', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.houseBuilt;
+        return globalThis.globals.storyFlags.houseBuilt;
       case 2:
-        return storyFlags.housesBuiltGodlike;
+        return globalThis.globals.storyFlags.housesBuiltGodlike;
       case 3:
-        return storyFlags.built50Houses;
+        return globalThis.globals.storyFlags.built50Houses;
     }
   },
   stats: {
@@ -5642,9 +5644,9 @@ Action.CollectTaxes = new Action('Collect Taxes', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.collectedTaxes;
+        return globalThis.globals.storyFlags.collectedTaxes;
       case 2:
-        return storyFlags.collected50Taxes;
+        return globalThis.globals.storyFlags.collected50Taxes;
     }
   },
   stats: {
@@ -5691,9 +5693,9 @@ Action.Pegasus = new Action('Pegasus', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.acquiredPegasus;
+        return globalThis.globals.storyFlags.acquiredPegasus;
       case 2:
-        return storyFlags.acquiredPegasusWithTeam;
+        return globalThis.globals.storyFlags.acquiredPegasusWithTeam;
     }
   },
   stats: {
@@ -5738,27 +5740,27 @@ Action.FightFrostGiants = new MultipartAction('Fight Frost Giants', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.giantGuildTestTaken;
+        return globalThis.globals.storyFlags.giantGuildTestTaken;
       case 2:
-        return storyFlags.giantGuildRankEReached;
+        return globalThis.globals.storyFlags.giantGuildRankEReached;
       case 3:
-        return storyFlags.giantGuildRankDReached;
+        return globalThis.globals.storyFlags.giantGuildRankDReached;
       case 4:
-        return storyFlags.giantGuildRankCReached;
+        return globalThis.globals.storyFlags.giantGuildRankCReached;
       case 5:
-        return storyFlags.giantGuildRankBReached;
+        return globalThis.globals.storyFlags.giantGuildRankBReached;
       case 6:
-        return storyFlags.giantGuildRankAReached;
+        return globalThis.globals.storyFlags.giantGuildRankAReached;
       case 7:
-        return storyFlags.giantGuildRankSReached;
+        return globalThis.globals.storyFlags.giantGuildRankSReached;
       case 8:
-        return storyFlags.giantGuildRankSSReached;
+        return globalThis.globals.storyFlags.giantGuildRankSSReached;
       case 9:
-        return storyFlags.giantGuildRankSSSReached;
+        return globalThis.globals.storyFlags.giantGuildRankSSSReached;
       case 10:
-        return storyFlags.giantGuildRankUReached;
+        return globalThis.globals.storyFlags.giantGuildRankUReached;
       case 11:
-        return storyFlags.giantGuildRankGodlikeReached;
+        return globalThis.globals.storyFlags.giantGuildRankGodlikeReached;
     }
   },
   stats: {
@@ -5816,7 +5818,7 @@ Action.FightFrostGiants = new MultipartAction('Fight Frost Giants', {
     return `${getFrostGiantsRank(segment % 3).name}`;
   },
   visible() {
-    return globalThis.globals.towns[4].getLevel('Citizen') >= 80 || storyFlags.acquiredPegasus;
+    return globalThis.globals.towns[4].getLevel('Citizen') >= 80 || globalThis.globals.storyFlags.acquiredPegasus;
   },
   unlocked() {
     return globalThis.globals.towns[4].getLevel('Citizen') >= 100;
@@ -5872,11 +5874,11 @@ Action.SeekBlessing = new Action('Seek Blessing', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.blessingSought;
+        return globalThis.globals.storyFlags.blessingSought;
       case 2:
         return globalThis.stats.getSkillLevel('Divine') >= 1;
       case 3:
-        return storyFlags.greatBlessingSought;
+        return globalThis.globals.storyFlags.greatBlessingSought;
     }
   },
   stats: {
@@ -5897,7 +5899,7 @@ Action.SeekBlessing = new Action('Seek Blessing', {
     return 1000000;
   },
   visible() {
-    return globalThis.globals.towns[4].getLevel('Citizen') >= 80 || storyFlags.acquiredPegasus;
+    return globalThis.globals.towns[4].getLevel('Citizen') >= 80 || globalThis.globals.storyFlags.acquiredPegasus;
   },
   unlocked() {
     return globalThis.globals.towns[4].getLevel('Citizen') >= 100;
@@ -5918,7 +5920,7 @@ Action.GreatFeast = new MultipartAction('Great Feast', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.feastAttempted;
+        return globalThis.globals.storyFlags.feastAttempted;
       case 2:
         return globalThis.stats.getBuffLevel('Feast') >= 1;
     }
@@ -5976,7 +5978,7 @@ Action.FallFromGrace = new Action('Fall From Grace', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.fellFromGrace;
+        return globalThis.globals.storyFlags.fellFromGrace;
     }
     return false;
   },
@@ -6032,7 +6034,7 @@ Action.Meander = new Action('Meander', {
       case 8:
         return globalThis.globals.towns[5].getLevel('Meander') >= 100;
       case 9:
-        return storyFlags.meanderIM100;
+        return globalThis.globals.storyFlags.meanderIM100;
     }
   },
   stats: {
@@ -6073,13 +6075,13 @@ Action.ManaWell = new Action('Mana Well', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.wellDrawn;
+        return globalThis.globals.storyFlags.wellDrawn;
       case 2:
-        return storyFlags.drew10Wells;
+        return globalThis.globals.storyFlags.drew10Wells;
       case 3:
-        return storyFlags.drew15Wells;
+        return globalThis.globals.storyFlags.drew15Wells;
       case 4:
-        return storyFlags.drewDryWell;
+        return globalThis.globals.storyFlags.drewDryWell;
     }
   },
   stats: {
@@ -6168,11 +6170,11 @@ Action.RaiseZombie = new Action('Raise Zombie', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.attemptedRaiseZombie;
+        return globalThis.globals.storyFlags.attemptedRaiseZombie;
       case 3:
-        return storyVars.maxZombiesRaised >= 10;
+        return globalThis.globals.storyVars.maxZombiesRaised >= 10;
       case 4:
-        return storyVars.maxZombiesRaised >= 25;
+        return globalThis.globals.storyVars.maxZombiesRaised >= 25;
     }
   },
   stats: {
@@ -6260,17 +6262,17 @@ Action.TheSpire = new DungeonAction('The Spire', 2, {
     switch (storyNum) {
       //TODO: decide on some reasonable/better floor requirements for progress stories.
       case 1:
-        return storyFlags.spireAttempted;
+        return globalThis.globals.storyFlags.spireAttempted;
       case 2:
         return globalThis.globals.towns[5].totalTheSpire >= 1000;
       case 3:
         return globalThis.globals.towns[5].totalTheSpire >= 5000;
       case 4:
-        return storyFlags.clearedSpire;
+        return globalThis.globals.storyFlags.clearedSpire;
       case 5:
-        return storyFlags.spire10Pylons;
+        return globalThis.globals.storyFlags.spire10Pylons;
       case 6:
-        return storyFlags.spire20Pylons;
+        return globalThis.globals.storyFlags.spire20Pylons;
     }
   },
   stats: {
@@ -6333,7 +6335,7 @@ Action.PurchaseSupplies = new Action('Purchase Supplies', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.suppliesPurchased;
+        return globalThis.globals.storyFlags.suppliesPurchased;
     }
   },
   stats: {
@@ -6373,11 +6375,11 @@ Action.DeadTrial = new TrialAction('Dead Trial', 4, {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.deadTrial1Done;
+        return globalThis.globals.storyFlags.deadTrial1Done;
       case 2:
-        return storyFlags.deadTrial10Done;
+        return globalThis.globals.storyFlags.deadTrial10Done;
       case 3:
-        return storyFlags.deadTrial25Done;
+        return globalThis.globals.storyFlags.deadTrial25Done;
     }
   },
   stats: {
@@ -6517,25 +6519,25 @@ Action.FightJungleMonsters = new MultipartAction('Fight Jungle Monsters', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.monsterGuildTestTaken;
+        return globalThis.globals.storyFlags.monsterGuildTestTaken;
       case 2:
-        return storyFlags.monsterGuildRankDReached;
+        return globalThis.globals.storyFlags.monsterGuildRankDReached;
       case 3:
-        return storyFlags.monsterGuildRankCReached;
+        return globalThis.globals.storyFlags.monsterGuildRankCReached;
       case 4:
-        return storyFlags.monsterGuildRankBReached;
+        return globalThis.globals.storyFlags.monsterGuildRankBReached;
       case 5:
-        return storyFlags.monsterGuildRankAReached;
+        return globalThis.globals.storyFlags.monsterGuildRankAReached;
       case 6:
-        return storyFlags.monsterGuildRankSReached;
+        return globalThis.globals.storyFlags.monsterGuildRankSReached;
       case 7:
-        return storyFlags.monsterGuildRankSSReached;
+        return globalThis.globals.storyFlags.monsterGuildRankSSReached;
       case 8:
-        return storyFlags.monsterGuildRankSSSReached;
+        return globalThis.globals.storyFlags.monsterGuildRankSSSReached;
       case 9:
-        return storyFlags.monsterGuildRankUReached;
+        return globalThis.globals.storyFlags.monsterGuildRankUReached;
       case 10:
-        return storyFlags.monsterGuildRankGodlikeReached;
+        return globalThis.globals.storyFlags.monsterGuildRankGodlikeReached;
     }
   },
   stats: {
@@ -6663,11 +6665,11 @@ Action.RescueSurvivors = new MultipartAction('Rescue Survivors', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.survivorRescued;
+        return globalThis.globals.storyFlags.survivorRescued;
       case 2:
-        return storyFlags.rescued6Survivors;
+        return globalThis.globals.storyFlags.rescued6Survivors;
       case 3:
-        return storyFlags.rescued20Survivors;
+        return globalThis.globals.storyFlags.rescued20Survivors;
     }
   },
   stats: {
@@ -6722,11 +6724,11 @@ Action.PrepareBuffet = new Action('Prepare Buffet', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.buffetHeld;
+        return globalThis.globals.storyFlags.buffetHeld;
       case 2:
-        return storyFlags.buffetFor1;
+        return globalThis.globals.storyFlags.buffetFor1;
       case 3:
-        return storyFlags.buffetFor6;
+        return globalThis.globals.storyFlags.buffetFor6;
       case 4:
         return globalThis.stats.getSkillLevel('Gluttony') >= 10;
       case 5:
@@ -6860,7 +6862,7 @@ Action.OpenPortal = new Action('Open Portal', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.portalOpened;
+        return globalThis.globals.storyFlags.portalOpened;
     }
   },
   stats: {
@@ -6918,7 +6920,7 @@ Action.Excursion = new Action('Excursion', {
       case 7:
         return globalThis.globals.towns[7].getLevel('Excursion') >= 100;
       case 8:
-        return storyFlags.excursionAsGuildmember;
+        return globalThis.globals.storyFlags.excursionAsGuildmember;
     }
   },
   stats: {
@@ -6986,9 +6988,9 @@ Action.ExplorersGuild = new Action('Explorers Guild', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.explorerGuildTestTaken;
+        return globalThis.globals.storyFlags.explorerGuildTestTaken;
       case 2:
-        return storyFlags.mapTurnedIn;
+        return globalThis.globals.storyFlags.mapTurnedIn;
       case 3:
         return fullyExploredZones() >= 1;
       case 4:
@@ -7163,23 +7165,23 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.thiefGuildTestsTaken;
+        return globalThis.globals.storyFlags.thiefGuildTestsTaken;
       case 2:
-        return storyFlags.thiefGuildRankEReached;
+        return globalThis.globals.storyFlags.thiefGuildRankEReached;
       case 3:
-        return storyFlags.thiefGuildRankDReached;
+        return globalThis.globals.storyFlags.thiefGuildRankDReached;
       case 4:
-        return storyFlags.thiefGuildRankCReached;
+        return globalThis.globals.storyFlags.thiefGuildRankCReached;
       case 5:
-        return storyFlags.thiefGuildRankBReached;
+        return globalThis.globals.storyFlags.thiefGuildRankBReached;
       case 6:
-        return storyFlags.thiefGuildRankAReached;
+        return globalThis.globals.storyFlags.thiefGuildRankAReached;
       case 7:
-        return storyFlags.thiefGuildRankSReached;
+        return globalThis.globals.storyFlags.thiefGuildRankSReached;
       case 8:
-        return storyFlags.thiefGuildRankUReached;
+        return globalThis.globals.storyFlags.thiefGuildRankUReached;
       case 9:
-        return storyFlags.thiefGuildRankGodlikeReached;
+        return globalThis.globals.storyFlags.thiefGuildRankGodlikeReached;
     }
   },
   stats: {
@@ -7474,15 +7476,15 @@ Action.GuildAssassin = new Action('Guild Assassin', {
       case 1:
         return globalThis.stats.getSkillLevel('Assassin') > 0;
       case 2:
-        return storyFlags.assassinHeartDelivered;
+        return globalThis.globals.storyFlags.assassinHeartDelivered;
       case 3:
         return totalAssassinations() >= 4;
       case 4:
-        return storyFlags.assassin4HeartsDelivered;
+        return globalThis.globals.storyFlags.assassin4HeartsDelivered;
       case 5:
         return totalAssassinations() >= 8;
       case 6:
-        return storyFlags.assassin8HeartsDelivered;
+        return globalThis.globals.storyFlags.assassin8HeartsDelivered;
     }
   },
   stats: {
@@ -7539,9 +7541,9 @@ Action.Invest = new Action('Invest', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.investedOne;
+        return globalThis.globals.storyFlags.investedOne;
       case 2:
-        return storyFlags.investedTwo;
+        return globalThis.globals.storyFlags.investedTwo;
       case 3:
         return globalThis.saving.vals.goldInvested >= 1000000;
       case 4:
@@ -7578,7 +7580,7 @@ Action.Invest = new Action('Invest', {
     globalThis.saving.vals.goldInvested += globalThis.globals.resources.gold;
     if (globalThis.saving.vals.goldInvested > 999999999999) globalThis.saving.vals.goldInvested = 999999999999;
     globalThis.driver.resetResource('gold');
-    if (storyFlags.investedOne) globalThis.view.setStoryFlag('investedTwo');
+    if (globalThis.globals.storyFlags.investedOne) globalThis.view.setStoryFlag('investedTwo');
     globalThis.view.setStoryFlag('investedOne');
     globalThis.saving.view.requestUpdate('updateActionTooltips', null);
   },
@@ -7591,13 +7593,13 @@ Action.CollectInterest = new Action('Collect Interest', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.interestCollected;
+        return globalThis.globals.storyFlags.interestCollected;
       case 2:
-        return storyFlags.collected1KInterest;
+        return globalThis.globals.storyFlags.collected1KInterest;
       case 3:
-        return storyFlags.collected1MInterest;
+        return globalThis.globals.storyFlags.collected1MInterest;
       case 4:
-        return storyFlags.collectedMaxInterest;
+        return globalThis.globals.storyFlags.collectedMaxInterest;
     }
   },
   stats: {
@@ -7642,13 +7644,13 @@ Action.Seminar = new Action('Seminar', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.seminarAttended;
+        return globalThis.globals.storyFlags.seminarAttended;
       case 2:
-        return storyFlags.leadership10;
+        return globalThis.globals.storyFlags.leadership10;
       case 3:
-        return storyFlags.leadership100;
+        return globalThis.globals.storyFlags.leadership100;
       case 4:
-        return storyFlags.leadership1k;
+        return globalThis.globals.storyFlags.leadership1k;
     }
   },
   stats: {
@@ -7694,7 +7696,7 @@ Action.PurchaseKey = new Action('Purchase Key', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.keyBought;
+        return globalThis.globals.storyFlags.keyBought;
     }
   },
   stats: {
@@ -7738,17 +7740,17 @@ Action.SecretTrial = new TrialAction('Secret Trial', 3, {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.trailSecretFaced;
+        return globalThis.globals.storyFlags.trailSecretFaced;
       case 2:
-        return storyFlags.trailSecret1Done;
+        return globalThis.globals.storyFlags.trailSecret1Done;
       case 3:
-        return storyFlags.trailSecret10Done;
+        return globalThis.globals.storyFlags.trailSecret10Done;
       case 4:
-        return storyFlags.trailSecret100Done;
+        return globalThis.globals.storyFlags.trailSecret100Done;
       case 5:
-        return storyFlags.trailSecret500Done;
+        return globalThis.globals.storyFlags.trailSecret500Done;
       case 6:
-        return storyFlags.trailSecretAllDone;
+        return globalThis.globals.storyFlags.trailSecretAllDone;
     }
   },
   stats: {
@@ -7846,7 +7848,7 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.soulInfusionAttempted;
+        return globalThis.globals.storyFlags.soulInfusionAttempted;
       case 2:
         return globalThis.globals.buffs['Imbuement3'].amt > 0;
       case 3:
@@ -7982,27 +7984,27 @@ Action.GodsTrial = new TrialAction('Gods Trial', 1, {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.trailGodsFaced;
+        return globalThis.globals.storyFlags.trailGodsFaced;
       case 2:
-        return storyFlags.trailGods10Done;
+        return globalThis.globals.storyFlags.trailGods10Done;
       case 3:
-        return storyFlags.trailGods20Done;
+        return globalThis.globals.storyFlags.trailGods20Done;
       case 4:
-        return storyFlags.trailGods30Done;
+        return globalThis.globals.storyFlags.trailGods30Done;
       case 5:
-        return storyFlags.trailGods40Done;
+        return globalThis.globals.storyFlags.trailGods40Done;
       case 6:
-        return storyFlags.trailGods50Done;
+        return globalThis.globals.storyFlags.trailGods50Done;
       case 7:
-        return storyFlags.trailGods60Done;
+        return globalThis.globals.storyFlags.trailGods60Done;
       case 8:
-        return storyFlags.trailGods70Done;
+        return globalThis.globals.storyFlags.trailGods70Done;
       case 9:
-        return storyFlags.trailGods80Done;
+        return globalThis.globals.storyFlags.trailGods80Done;
       case 10:
-        return storyFlags.trailGods90Done;
+        return globalThis.globals.storyFlags.trailGods90Done;
       case 11:
-        return storyFlags.trailGodsAllDone;
+        return globalThis.globals.storyFlags.trailGodsAllDone;
     }
   },
   stats: {
@@ -8071,41 +8073,41 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyFlags.fightGods01;
+        return globalThis.globals.storyFlags.fightGods01;
       case 2:
-        return storyFlags.fightGods02;
+        return globalThis.globals.storyFlags.fightGods02;
       case 3:
-        return storyFlags.fightGods03;
+        return globalThis.globals.storyFlags.fightGods03;
       case 4:
-        return storyFlags.fightGods04;
+        return globalThis.globals.storyFlags.fightGods04;
       case 5:
-        return storyFlags.fightGods05;
+        return globalThis.globals.storyFlags.fightGods05;
       case 6:
-        return storyFlags.fightGods06;
+        return globalThis.globals.storyFlags.fightGods06;
       case 7:
-        return storyFlags.fightGods07;
+        return globalThis.globals.storyFlags.fightGods07;
       case 8:
-        return storyFlags.fightGods08;
+        return globalThis.globals.storyFlags.fightGods08;
       case 9:
-        return storyFlags.fightGods09;
+        return globalThis.globals.storyFlags.fightGods09;
       case 10:
-        return storyFlags.fightGods10;
+        return globalThis.globals.storyFlags.fightGods10;
       case 11:
-        return storyFlags.fightGods11;
+        return globalThis.globals.storyFlags.fightGods11;
       case 12:
-        return storyFlags.fightGods12;
+        return globalThis.globals.storyFlags.fightGods12;
       case 13:
-        return storyFlags.fightGods13;
+        return globalThis.globals.storyFlags.fightGods13;
       case 14:
-        return storyFlags.fightGods14;
+        return globalThis.globals.storyFlags.fightGods14;
       case 15:
-        return storyFlags.fightGods15;
+        return globalThis.globals.storyFlags.fightGods15;
       case 16:
-        return storyFlags.fightGods16;
+        return globalThis.globals.storyFlags.fightGods16;
       case 17:
-        return storyFlags.fightGods17;
+        return globalThis.globals.storyFlags.fightGods17;
       case 18:
-        return storyFlags.fightGods18;
+        return globalThis.globals.storyFlags.fightGods18;
     }
   },
   stats: {
