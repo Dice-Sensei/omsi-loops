@@ -53,7 +53,7 @@ const setupManaBurn = () => {
     globalThis.driver.resetResources();
     globalThis.stats.restartStats();
     for (let i = 0; i < towns.length; i++) {
-      towns[i].restart();
+      globalThis.saving.vals.towns[i].restart();
     }
     globalThis.saving.view.requestUpdate('updateSkills');
     globalThis.saving.actions.restart();
@@ -63,7 +63,7 @@ const setupManaBurn = () => {
 };
 
 function loadChallenge() {
-  switch (challengeSave.challengeMode) {
+  switch (globalThis.saving.vals.challengeSave.challengeMode) {
     case ChallengeMode.ManaDrought:
       return setupManaDrought();
     case ChallengeMode.NoodleArms:

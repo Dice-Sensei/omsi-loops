@@ -87,15 +87,15 @@ class Town<TN extends number> {
     if (level !== prevLevel) {
       globalThis.saving.view.requestUpdate('updateLockedHidden', null);
       globalThis.driver.adjustAll();
-      for (const action of totalActionList) {
-        if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
+      for (const action of globalThis.saving.vals.totalActionList) {
+        if (globalThis.saving.vals.towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
           globalThis.saving.view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
         }
       }
     }
     globalThis.saving.view.requestUpdate('updateProgressAction', {
       name: varName,
-      town: towns[globalThis.saving.vals.curTown],
+      town: globalThis.saving.vals.towns[globalThis.saving.vals.curTown],
     });
   }
 
@@ -186,7 +186,7 @@ class Town<TN extends number> {
     this.index = index;
     let lateGameActionCount = 0;
     let inLateGameActions = true;
-    for (const action of totalActionList) {
+    for (const action of globalThis.saving.vals.totalActionList) {
       if (this.index === action.townNum) {
         if (inLateGameActions) {
           if (globalThis.actionList.lateGameActions.includes(action.name)) {

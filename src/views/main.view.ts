@@ -1251,7 +1251,7 @@ class View {
   }
 
   updateProgressActions() {
-    for (const town of towns) {
+    for (const town of globalThis.saving.vals.towns) {
       for (let i = 0; i < town.progressVars.length; i++) {
         const varName = town.progressVars[i];
         this.updateProgressAction({ name: varName, town: town });
@@ -1260,7 +1260,7 @@ class View {
   }
 
   updateLockedHidden() {
-    for (const action of totalActionList) {
+    for (const action of globalThis.saving.vals.totalActionList) {
       const actionDiv = document.getElementById(`container${action.varName}`);
       const infoDiv = document.getElementById(`infoContainer${action.varName}`);
       const storyDiv = document.getElementById(`storyContainer${action.varName}`);
@@ -1306,17 +1306,16 @@ class View {
       }
     }
     if (
-      totalActionList.filter((action) => action.finish.toString().includes('handleSkillExp')).filter((action) =>
-        action.unlocked()
-      ).length > 0
+      globalThis.saving.vals.totalActionList.filter((action) => action.finish.toString().includes('handleSkillExp'))
+        .filter((action) => action.unlocked()).length > 0
     ) {
       document.getElementById('skillList').style.display = '';
     } else {
       document.getElementById('skillList').style.display = 'none';
     }
     if (
-      totalActionList.filter((action) => action.finish.toString().includes('updateBuff')).filter((action) =>
-          action.unlocked()
+      globalThis.saving.vals.totalActionList.filter((action) => action.finish.toString().includes('updateBuff')).filter(
+          (action) => action.unlocked()
         ).length > 0 ||
       globalThis.prestige.prestigeValues['completedAnyPrestige']
     ) {
@@ -1332,7 +1331,7 @@ class View {
 
   updateStories(init) {
     // several ms cost per run. run once every 2000ms on an interval
-    for (const action of totalActionList) {
+    for (const action of globalThis.saving.vals.totalActionList) {
       if (action.storyReqs !== undefined) {
         // greatly reduces/nullifies the cost of checking actions with all stories unlocked, which is nice,
         // since you're likely to have more stories unlocked at end game, which is when performance is worse
@@ -1501,7 +1500,7 @@ class View {
       this.createTownAction(action);
     }
     for (const varName of towns.flatMap((t) => t.allVarNames)) {
-      const action = totalActionList.find((a) => a.varName === varName);
+      const action = globalThis.saving.vals.totalActionList.find((a) => a.varName === varName);
       if (globalThis.actionList.isActionOfType(action, 'limited')) this.createTownInfo(action);
       if (globalThis.actionList.isActionOfType(action, 'progress')) {
         if (action.name.startsWith('Survey')) this.createGlobalSurveyProgress(action);
@@ -1823,7 +1822,7 @@ class View {
     }
   }
   adjustExpGains() {
-    for (const action of totalActionList) {
+    for (const action of globalThis.saving.vals.totalActionList) {
       if (action.skills) this.adjustExpGain(action);
     }
   }
@@ -1912,7 +1911,7 @@ class View {
   }
 
   updateMultiPartActions() {
-    for (const action of totalActionList) {
+    for (const action of globalThis.saving.vals.totalActionList) {
       if (action.type === 'multipart') {
         this.updateMultiPart(action);
         this.updateMultiPartSegments(action);
@@ -1968,7 +1967,7 @@ class View {
   }
 
   updateSoulstoneChance(index) {
-    const dungeon = globalThis.saving.dungeons[index];
+    const dungeon = globalThis.saving.vals.dungeons[index];
     for (let i = 0; i < dungeon.length; i++) {
       const level = dungeon[i];
       document.getElementById(`soulstoneChance${index}_${i}`).textContent = globalThis.helpers.intToString(

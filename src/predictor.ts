@@ -921,7 +921,7 @@ const Koviko = {
           affected: ['soul'],
           canStart: (input) => input.rep >= 2,
           loop: {
-            max: (a) => globalThis.saving.dungeons[a.dungeonNum].length,
+            max: (a) => globalThis.saving.vals.dungeons[a.dungeonNum].length,
             cost: (p, a) => (segment) =>
               globalThis.helpers.precision3(
                 Math.pow(2, Math.floor((p.completed + segment) / a.segments + .0000001)) * 15000,
@@ -929,10 +929,10 @@ const Koviko = {
             tick: (p, a, s, k, r) => (offset) => {
               let floor = Math.floor(p.completed / a.segments + .0000001);
 
-              return floor in globalThis.saving.dungeons[a.dungeonNum]
+              return floor in globalThis.saving.vals.dungeons[a.dungeonNum]
                 ? (h.getSelfCombat(r, k) + globalThis.stats.getSkillLevelFromExp(k.magic)) *
                   h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.dungeons[a.dungeonNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.vals.dungeons[a.dungeonNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -941,7 +941,7 @@ const Koviko = {
                 let ssGained = h.getRewardSS(0);
                 r.completionsSmallDungeon = (r.completionsSmallDungeon || 0) + 1;
                 r.soul += ssGained;
-                r.expectedSS += ssGained * globalThis.saving.dungeons[0][r.completionsSmallDungeon - 1].ssChance;
+                r.expectedSS += ssGained * globalThis.saving.vals.dungeons[0][r.completionsSmallDungeon - 1].ssChance;
               },
             },
           },
@@ -1098,17 +1098,17 @@ const Koviko = {
           affected: ['team', 'soul'],
           canStart: (input) => (input.team > 0),
           loop: {
-            max: (a) => globalThis.saving.dungeons[a.dungeonNum].length,
+            max: (a) => globalThis.saving.vals.dungeons[a.dungeonNum].length,
             cost: (p, a) => (segment) =>
               globalThis.helpers.precision3(
                 Math.pow(3, Math.floor((p.completed + segment) / a.segments + .0000001)) * 5e5,
               ),
             tick: (p, a, s, k, r) => (offset) => {
               let floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in globalThis.saving.dungeons[a.dungeonNum]
+              return floor in globalThis.saving.vals.dungeons[a.dungeonNum]
                 ? (h.getTeamCombat(r, k) + globalThis.stats.getSkillLevelFromExp(k.magic)) *
                   h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.dungeons[a.dungeonNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.vals.dungeons[a.dungeonNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1117,7 +1117,7 @@ const Koviko = {
                 let ssGained = h.getRewardSS(1);
                 r.completionsLargeDungeon = (r.completionsLargeDungeon || 0) + 1;
                 r.soul += ssGained;
-                r.expectedSS += ssGained * globalThis.saving.dungeons[1][r.completionsLargeDungeon - 1].ssChance;
+                r.expectedSS += ssGained * globalThis.saving.vals.dungeons[1][r.completionsLargeDungeon - 1].ssChance;
               },
             },
           },
@@ -1600,7 +1600,7 @@ const Koviko = {
           affected: ['soul'],
           canStart: true,
           loop: {
-            max: (a) => globalThis.saving.dungeons[a.dungeonNum].length,
+            max: (a) => globalThis.saving.vals.dungeons[a.dungeonNum].length,
             cost: (p, a) => (segment) =>
               globalThis.helpers.precision3(
                 Math.pow(2, Math.floor((p.completed + segment) / a.segments + .0000001)) * 10000000,
@@ -1608,11 +1608,11 @@ const Koviko = {
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
 
-              return floor in globalThis.saving.dungeons[a.dungeonNum]
+              return floor in globalThis.saving.vals.dungeons[a.dungeonNum]
                 ? h.getTeamCombat(r, k) *
                   (1 + 0.1 * (r.pylons || 0)) *
                   h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.dungeons[a.dungeonNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.vals.dungeons[a.dungeonNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1623,7 +1623,7 @@ const Koviko = {
                 let ssGained = h.getRewardSS(2);
                 r.completionsTheSpire = (r.completionsTheSpire || 0) + 1;
                 r.soul += ssGained;
-                r.expectedSS += ssGained * globalThis.saving.dungeons[2][r.completionsTheSpire - 1].ssChance;
+                r.expectedSS += ssGained * globalThis.saving.vals.dungeons[2][r.completionsTheSpire - 1].ssChance;
               },
             },
           },
@@ -2057,7 +2057,7 @@ const Koviko = {
       }
 
       //Challenge Mode
-      if ((typeof challengeSave != 'undefined') && (challengeSave.challengeMode == 1)) {
+      if ((typeof globalThis.saving.vals.challengeSave != 'undefined') && (globalThis.saving.vals.challengeSave.challengeMode == 1)) {
         state.resources.isManaDrought = true;
         state.resources.manaBought = 7500;
       }
@@ -2600,11 +2600,10 @@ const Koviko = {
             // This is a re-arranged 'compound interest with contributions' formula solving for the number of iterations
             // required to reach `goldTillKey / i_rate`, when you can collect enough gold from interest.
             // The actual implementation rounds your interest each loop, so this is slightly innacurate.
-            let loopsNeeded =
-              Math.log(
-                (goldTillKey + state.resources.invested) /
-                  (globalThis.saving.vals.goldInvested * i_rate + state.resources.invested),
-              ) /
+            let loopsNeeded = Math.log(
+              (goldTillKey + state.resources.invested) /
+                (globalThis.saving.vals.goldInvested * i_rate + state.resources.invested),
+            ) /
               Math.log(i_rate + 1);
             newStatisticValue = loopsNeeded * state.resources.totalTicks; // Estimate of total ticks until we can buy the key
             legend = 'till key';

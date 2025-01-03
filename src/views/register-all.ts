@@ -414,7 +414,7 @@ const menu = {
             Please export and save your data locally before starting.<br>
             <b>Beginning a challenge will permanently delete your current save.</b><br>
             `;
-    if (challengeSave.challengeMode !== 0 || 1 === 1) {
+    if (globalThis.saving.vals.challengeSave.challengeMode !== 0 || 1 === 1) {
       html +=
         `<button class='button showthat control' style='margin-top: 2px;' onclick='globalThis.saving.exitChallenge()'>Exit Challenge 
                 </button>

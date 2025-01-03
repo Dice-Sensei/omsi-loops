@@ -674,6 +674,8 @@ vals.townShowing = 0;
 vals.actionStoriesShowing = false;
 vals.townsUnlocked = [];
 vals.completedActions = [];
+vals.totalActionList = [];
+vals.dungeons = [[], [], []];
 
 // Globals!!!!!
 const actions = new globalThis.actions.Actions();
@@ -1034,15 +1036,6 @@ let totals = {
   actions: 0,
 };
 
-let challengeSave = {
-  challengeMode: 0,
-  inChallenge: false,
-};
-
-// cursed variable
-let totalActionList = [];
-let dungeons = [[], [], []];
-
 const options = {
   theme: 'normal',
   themeVariant: '',
@@ -1081,6 +1074,10 @@ const options = {
 };
 // Globals!!!!!
 
+vals.challengeSave = {
+  challengeMode: 0,
+  inChallenge: false,
+};
 let trials = [[], [], [], [], []];
 const trialFloors = [50, 100, 7, 1000, 25];
 
@@ -1311,10 +1308,10 @@ function isBuffName(name) {
 }
 
 function initializeActions() {
-  totalActionList.length = 0;
+  globalThis.saving.vals.totalActionList.length = 0;
   for (const prop in globalThis.actionList.Action) {
     const action = globalThis.actionList.Action[prop];
-    totalActionList.push(action);
+    globalThis.saving.vals.totalActionList.push(action);
   }
 }
 
@@ -1489,21 +1486,24 @@ function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
 
   if (toLoad.challengeSave !== undefined) {
     for (let challengeProgress in toLoad.challengeSave) {
-      challengeSave[challengeProgress] = toLoad.challengeSave[challengeProgress];
+      globalThis.saving.vals.challengeSave[challengeProgress] = toLoad.challengeSave[challengeProgress];
     }
   }
-  if (inChallenge !== undefined) challengeSave.inChallenge = inChallenge;
+  if (inChallenge !== undefined) globalThis.saving.vals.challengeSave.inChallenge = inChallenge;
 
-  console.log('Challenge Mode: ' + challengeSave.challengeMode + ' In Challenge: ' + challengeSave.inChallenge);
+  console.log(
+    'Challenge Mode: ' + globalThis.saving.vals.challengeSave.challengeMode + ' In Challenge: ' +
+      globalThis.saving.vals.challengeSave.inChallenge,
+  );
 
-  if (saveName === defaultSaveName && challengeSave.inChallenge === true) {
+  if (saveName === defaultSaveName && globalThis.saving.vals.challengeSave.inChallenge === true) {
     console.log('Switching to challenge save');
     saveName = challengeSaveName;
     load(true);
     return;
   }
 
-  if (challengeSave.challengeMode !== 0) {
+  if (globalThis.saving.vals.challengeSave.challengeMode !== 0) {
     saveName = challengeSaveName;
   }
 
@@ -1638,7 +1638,7 @@ function doLoad(toLoad) {
       if (action.name === 'Purchase Mana') {
         action.name = 'Buy Mana Z3';
       }
-      if (totalActionList.some((x) => x.name === action.name)) {
+      if (globalThis.saving.vals.totalActionList.some((x) => x.name === action.name)) {
         actions.addActionRecord(action, -1, false);
       }
     }
@@ -1666,7 +1666,7 @@ function doLoad(toLoad) {
         if (action.name === 'Purchase Mana') {
           action.name = 'Buy Mana Z3';
         }
-        if (totalActionList.some((x) => x.name === action.name)) {
+        if (globalThis.saving.vals.totalActionList.some((x) => x.name === action.name)) {
           globalThis.saving.vals.loadouts[i].push(action);
         }
       }
@@ -1695,30 +1695,25 @@ function doLoad(toLoad) {
     );
   }
 
-  /*if (toLoad.dungeons) {
-        if (toLoad.dungeons.length < dungeons.length) {
-            toLoad.dungeons.push([]);
-        }
-    }*/
-  dungeons = [[], [], []];
+  globalThis.saving.vals.dungeons = [[], [], []];
   const level = { ssChance: 1, completed: 0 };
   let floors = 0;
-  if (toLoad.dungeons === undefined) toLoad.dungeons = globalThis.helpers.copyArray(dungeons);
-  for (let i = 0; i < dungeons.length; i++) {
+  if (toLoad.dungeons === undefined) toLoad.dungeons = globalThis.helpers.copyArray(globalThis.saving.vals.dungeons);
+  for (let i = 0; i < globalThis.saving.vals.dungeons.length; i++) {
     floors = dungeonFloors[i];
     for (let j = 0; j < floors; j++) {
       if (toLoad.dungeons[i] != undefined && toLoad.dungeons && toLoad.dungeons[i][j]) {
-        dungeons[i][j] = toLoad.dungeons[i][j];
+        globalThis.saving.vals.dungeons[i][j] = toLoad.dungeons[i][j];
       } else {
-        dungeons[i][j] = globalThis.helpers.copyArray(level);
+        globalThis.saving.vals.dungeons[i][j] = globalThis.helpers.copyArray(level);
       }
-      dungeons[i][j].lastStat = 'NA';
+      globalThis.saving.vals.dungeons[i][j].lastStat = 'NA';
     }
   }
 
-  trials = [[], [], [], [], []];
+  globalThis.saving.vals.trials = [[], [], [], [], []];
   const trialLevel = { completed: 0 };
-  if (toLoad.trials === undefined) toLoad.trials = globalThis.helpers.copyArray(trials);
+  if (toLoad.trials === undefined) toLoad.trials = globalThis.helpers.copyArray(globalThis.saving.vals.trials);
   for (let i = 0; i < globalThis.saving.trials.length; i++) {
     floors = trialFloors[i];
     trials[i].highestFloor = 0;
@@ -1758,7 +1753,7 @@ function doLoad(toLoad) {
   /** @type {string[]} */
   const hiddenVarNames = toLoad.hiddenVars?.slice() ?? [];
 
-  for (const town of towns) {
+  for (const town of globalThis.saving.vals.towns) {
     const hiddenVars = hiddenVarNames.shift() ?? [];
     town.hiddenVars.clear();
     for (const action of town.totalActionList) {
@@ -1799,7 +1794,7 @@ function doLoad(toLoad) {
   globalThis.trash.loadChallenge();
   view.initalize();
 
-  for (const town of towns) {
+  for (const town of globalThis.saving.vals.towns) {
     for (const action of town.totalActionList) {
       if (action.type === 'limited') {
         const varName = action.varName;
@@ -1847,23 +1842,25 @@ function doLoad(toLoad) {
 
   if (toLoad.version75 === undefined) {
     const total = towns[0].totalSDungeon;
-    dungeons[0][0].completed = Math.floor(total / 2);
-    dungeons[0][1].completed = Math.floor(total / 4);
-    dungeons[0][2].completed = Math.floor(total / 8);
-    dungeons[0][3].completed = Math.floor(total / 16);
-    dungeons[0][4].completed = Math.floor(total / 32);
-    dungeons[0][5].completed = Math.floor(total / 64);
-    towns[0].totalSDungeon = dungeons[0][0].completed + dungeons[0][1].completed + dungeons[0][2].completed +
-      dungeons[0][3].completed + dungeons[0][4].completed + dungeons[0][5].completed;
+    globalThis.saving.vals.dungeons[0][0].completed = Math.floor(total / 2);
+    globalThis.saving.vals.dungeons[0][1].completed = Math.floor(total / 4);
+    globalThis.saving.vals.dungeons[0][2].completed = Math.floor(total / 8);
+    globalThis.saving.vals.dungeons[0][3].completed = Math.floor(total / 16);
+    globalThis.saving.vals.dungeons[0][4].completed = Math.floor(total / 32);
+    globalThis.saving.vals.dungeons[0][5].completed = Math.floor(total / 64);
+    globalThis.saving.vals.towns[0].totalSDungeon = globalThis.saving.vals.dungeons[0][0].completed +
+      globalThis.saving.vals.dungeons[0][1].completed + globalThis.saving.vals.dungeons[0][2].completed +
+      globalThis.saving.vals.dungeons[0][3].completed + globalThis.saving.vals.dungeons[0][4].completed +
+      globalThis.saving.vals.dungeons[0][5].completed;
   }
 
   //Handle players on previous challenge system
   if (toLoad.challenge !== undefined && toLoad.challenge !== 0) {
-    challengeSave.challengeMode = 0;
-    challengeSave.inChallenge = true;
+    globalThis.saving.vals.challengeSave.challengeMode = 0;
+    globalThis.saving.vals.challengeSave.inChallenge = true;
     save();
 
-    challengeSave.challengeMode = toLoad.challenge;
+    globalThis.saving.vals.challengeSave.challengeMode = toLoad.challenge;
     saveName = challengeSaveName;
     save();
     location.reload();
@@ -1949,9 +1946,9 @@ function doSave() {
   toSave.totalOfflineMs = globalThis.saving.vals.totalOfflineMs;
   toSave.totals = totals;
 
-  toSave.challengeSave = challengeSave;
-  for (const challengeProgress in challengeSave) {
-    toSave.challengeSave[challengeProgress] = challengeSave[challengeProgress];
+  toSave.challengeSave = globalThis.saving.vals.challengeSave;
+  for (const challengeProgress in globalThis.saving.vals.challengeSave) {
+    toSave.challengeSave[challengeProgress] = globalThis.saving.vals.challengeSave[challengeProgress];
   }
 
   return toSave;
@@ -1983,7 +1980,7 @@ function importSave() {
 function processSave(saveData) {
   if (saveData === '') {
     if (confirm('Importing nothing will delete your save. Are you sure you want to delete your save?')) {
-      challengeSave = {};
+      globalThis.saving.vals.challengeSave = {};
       clearSave();
     } else {
       return;
@@ -2098,12 +2095,12 @@ function beginChallenge(challengeNum) {
       return false;
     }
   }
-  if (challengeSave.challengeMode === 0) {
-    challengeSave.inChallenge = true;
+  if (globalThis.saving.vals.challengeSave.challengeMode === 0) {
+    globalThis.saving.vals.challengeSave.inChallenge = true;
     save();
     console.log('Saving to: ' + saveName);
   }
-  challengeSave.challengeMode = challengeNum;
+  globalThis.saving.vals.challengeSave.challengeMode = challengeNum;
   saveName = challengeSaveName;
   load(true);
   globalThis.saving.vals.totalOfflineMs = 1000000;
@@ -2113,7 +2110,7 @@ function beginChallenge(challengeNum) {
 }
 
 function exitChallenge() {
-  if (challengeSave.challengeMode !== 0) {
+  if (globalThis.saving.vals.challengeSave.challengeMode !== 0) {
     saveName = defaultSaveName;
     load(false);
     save();
@@ -2123,10 +2120,10 @@ function exitChallenge() {
 
 function resumeChallenge() {
   if (
-    challengeSave.challengeMode === 0 && globalThis.localStorage[challengeSaveName] &&
+    globalThis.saving.vals.challengeSave.challengeMode === 0 && globalThis.localStorage[challengeSaveName] &&
     globalThis.localStorage[challengeSaveName] !== ''
   ) {
-    challengeSave.inChallenge = true;
+    globalThis.saving.vals.challengeSave.inChallenge = true;
     save();
     saveName = challengeSaveName;
     load(true);
@@ -2151,8 +2148,6 @@ const _saving = {
   resumeChallenge,
   saveName,
   challengeSaveName,
-  challengeSave,
-  dungeons,
   trials,
   trialFloors,
   stats,

@@ -37,7 +37,7 @@ function getActualGameSpeed() {
 }
 
 function refreshDungeons(manaSpent) {
-  for (const dungeon of globalThis.saving.dungeons) {
+  for (const dungeon of globalThis.saving.vals.dungeons) {
     for (const level of dungeon) {
       const chance = level.ssChance;
       if (chance < 1) level.ssChance = Math.min(chance + 0.0000001 * manaSpent, 1);
@@ -510,10 +510,13 @@ function unlockTown(townNum) {
     globalThis.saving.view.showTown(townNum);
     globalThis.saving.view.requestUpdate('updateTravelMenu', null);
   }
-  let cNum = challengeSave.challengeMode;
+  let cNum = globalThis.saving.vals.challengeSave.challengeMode;
   if (cNum !== 0) {
-    if (globalThis.saving.vals.challengeSave['c' + cNum] < townNum) globalThis.saving.vals.challengeSave['c' + cNum] = townNum;
-    else if (globalThis.saving.vals.challengeSave['c' + cNum] === undefined) globalThis.saving.vals.challengeSave['c' + cNum] = townNum;
+    if (globalThis.saving.vals.challengeSave['c' + cNum] < townNum) {
+      globalThis.saving.vals.challengeSave['c' + cNum] = townNum;
+    } else if (globalThis.saving.vals.challengeSave['c' + cNum] === undefined) {
+      globalThis.saving.vals.challengeSave['c' + cNum] = townNum;
+    }
   }
   globalThis.saving.vals.curTown = townNum;
 }
