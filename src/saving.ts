@@ -8,7 +8,7 @@ const view = globalThis.globals.selfIsGame ? new globalThis.view.View() : null;
 const vals = {
   trainingLimits: 10,
 };
-vals.towns = towns;
+vals.towns = globalThis.globals.towns;
 vals.curTown = 0;
 vals.shouldRestart = true;
 vals.totalTalent = 0;
@@ -94,22 +94,6 @@ Object.assign(vals, {
   curThievesGuildSegment: 0,
   curGodsSegment: 0,
   totalOfflineMs: 0,
-});
-
-globalThis.Data.registerAll({
-  actions,
-  towns,
-  stats,
-  resources,
-  hearts,
-  skills,
-  buffs,
-  prestigeValues: globalThis.prestige.prestigeValues,
-  townsUnlocked: vals.townsUnlocked,
-  completedActions: vals.completedActions,
-  storyFlags,
-  storyVars,
-  totals: vals.totals,
 });
 
 let pauseNotification = null;
@@ -278,7 +262,7 @@ const storyInitializers = {
   },
 };
 
-if (selfIsGame) {
+if (globalThis.globals.selfIsGame) {
   Object.assign(vals.options, importPredictorSettings()); // override hardcoded defaults if not in worker
 }
 
@@ -302,14 +286,12 @@ function cheat() {
 }
 
 function _town(townNum) {
-  // @ts-ignore
-  return towns[townNum];
+  return globalThis.globals.towns[townNum];
 }
 
 function initializeTowns() {
   for (let i = 0; i <= 8; i++) {
-    // @ts-ignore
-    towns[i] = new globalThis.trash.Town(i);
+    globalThis.globals.towns[i] = new globalThis.trash.Town(i);
   }
 }
 
@@ -879,7 +861,7 @@ function doLoad(toLoad) {
   globalThis.driver.addOffline(Math.min(Math.floor(Date.now() - Date.parse(toLoad.date)), 2678400000));
 
   if (toLoad.version75 === undefined) {
-    const total = towns[0].totalSDungeon;
+    const total = globalThis.globals.towns[0].totalSDungeon;
     globalThis.saving.vals.dungeons[0][0].completed = Math.floor(total / 2);
     globalThis.saving.vals.dungeons[0][1].completed = Math.floor(total / 4);
     globalThis.saving.vals.dungeons[0][2].completed = Math.floor(total / 8);
@@ -972,9 +954,9 @@ function doSave() {
     }
   }
   toSave.storyShowing = globalThis.saving.vals.storyShowing;
-  toSave.storyMax = gglobalThis.globals.storyFlagssaving.vals.storyMax;
-  toSave.storyReqs = globalThis.globals.storyVarss; // save uses the legacy name "storyReqs" for compatibility
-  toSave.storyVars = storyVars;
+  toSave.storyMax = globalThis.saving.vals.storyMax;
+  toSave.storyReqs = globalThis.globals.storyFlags; // save uses the legacy name "storyReqs" for compatibility
+  toSave.storyVars = globalThis.saving.vals.storyVars;
   toSave.unreadActionStories = globalThis.saving.vals.unreadActionStories;
   toSave.actionLog = globalThis.globals.actionLog;
   toSave.buffCaps = globalThis.globals.buffCaps;
@@ -1184,7 +1166,7 @@ const _saving = {
   resumeChallenge,
   trials,
   trialFloors,
-  actions,
+  actions: globalThis.globals.actions,
   view,
   loadDefaults,
   needsDataSnapshots,

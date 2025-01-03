@@ -754,7 +754,6 @@ const stats = /** @type {{[K in StatName]: Stat}} */ ({});
 const actionLog = selfIsGame ? new ActionLog() : null;
 const actions = new globalThis.actions.Actions();
 
-//globals!!!!!
 const storyFlags = {
   maxSQuestsInALoop: false,
   realMaxSQuestsInALoop: false,

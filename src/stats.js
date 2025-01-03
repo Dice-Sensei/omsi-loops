@@ -422,7 +422,7 @@ function getExpOfSingleLevel(level) {
 }
 
 function getTalent(stat) {
-  return stats[stat].talentLevelExp.level;
+  return globalThis.globals.stats[stat].talentLevelExp.level;
 }
 
 function getLevelFromTalent(exp) {
@@ -438,14 +438,14 @@ function getExpOfSingleTalent(level) {
 }
 
 function getPrcToNextLevel(stat) {
-  const curLevelProgress = stats[stat].statLevelExp.exp;
-  const nextLevelNeeds = stats[stat].statLevelExp.expRequiredForNextLevel;
+  const curLevelProgress = globalThis.globals.stats[stat].statLevelExp.exp;
+  const nextLevelNeeds = globalThis.globals.stats[stat].statLevelExp.expRequiredForNextLevel;
   return Math.floor(curLevelProgress / nextLevelNeeds * 100 * 10) / 10;
 }
 
 function getPrcToNextTalent(stat) {
-  const curLevelProgress = stats[stat].talentLevelExp.exp;
-  const nextLevelNeeds = stats[stat].talentLevelExp.expRequiredForNextLevel;
+  const curLevelProgress = globalThis.globals.stats[stat].talentLevelExp.exp;
+  const nextLevelNeeds = globalThis.globals.stats[stat].talentLevelExp.expRequiredForNextLevel;
   return Math.floor(curLevelProgress / nextLevelNeeds * 100 * 10) / 10;
 }
 
@@ -458,11 +458,11 @@ function getExpOfSkillLevel(level) {
 }
 
 function getSkillLevel(skill) {
-  return skills[skill].levelExp.level;
+  return globalThis.globals.skills[skill].levelExp.level;
 }
 
 function getSkillBonus(skill) {
-  const bonus = skills[skill].getBonus();
+  const bonus = globalThis.globals.skills[skill].getBonus();
   if (bonus === 0) {
     console.warn('Skill does not have curve set:', skill);
   }
@@ -479,10 +479,10 @@ function setSkillBonusType(skill) {
     change = 'decrease';
   } else if (skill === 'Assassin') change = 'custom';
 
-  if (change == 'increase') skills[skill].change = Skill_increase;
-  else if (change == 'decrease') skills[skill].change = Skill_decrease;
-  else if (change == 'custom') skills[skill].change = Skill_custom;
-  else return skills[skill].change = 0;
+  if (change == 'increase') globalThis.globals.skills[skill].change = Skill_increase;
+  else if (change == 'decrease') globalThis.globals.skills[skill].change = Skill_decrease;
+  else if (change == 'custom') globalThis.globals.skills[skill].change = Skill_custom;
+  else return globalThis.globals.skills[skill].change = 0;
 }
 
 function getSkillMod(name, min, max, percentChange) {
@@ -513,7 +513,9 @@ function getSurveyBonus(town) {
 }
 
 function getArmorLevel() {
-  return 1 + ((resources.armor + 3 * resources.enchantments) * globalThis.actionList.getCraftGuildRank().bonus) / 5;
+  return 1 +
+    ((globalThis.globals.resources.armor + 3 * globalThis.globals.resources.enchantments) *
+        globalThis.actionList.getCraftGuildRank().bonus) / 5;
 }
 
 function getSelfCombat() {
@@ -525,7 +527,7 @@ function getSelfCombat() {
 
 function getZombieStrength() {
   return getSkillLevel('Dark') *
-    resources.zombie / 2 *
+    globalThis.globals.resources.zombie / 2 *
     Math.max(getBuffLevel('Ritual') / 100, 1) *
     (1 + getBuffLevel('Feast') * .05) *
     globalThis.prestige.prestigeBonus('PrestigeCombat');
@@ -533,7 +535,7 @@ function getZombieStrength() {
 
 function getTeamStrength() {
   return ((getSkillLevel('Combat') + getSkillLevel('Restoration') * 4) *
-    (resources.teamMembers / 2) *
+    (globalThis.globals.resources.teamMembers / 2) *
     globalThis.actionList.getAdvGuildRank().bonus * getSkillBonus('Leadership') *
     (1 + getBuffLevel('Feast') * .05)) *
     globalThis.prestige.prestigeBonus('PrestigeCombat');
@@ -544,15 +546,15 @@ function getTeamCombat() {
 }
 
 function getPrcToNextSkillLevel(skill) {
-  const curLevelProgress = skills[skill].levelExp.exp;
-  const nextLevelNeeds = skills[skill].levelExp.expRequiredForNextLevel;
+  const curLevelProgress = globalThis.globals.skills[skill].levelExp.exp;
+  const nextLevelNeeds = globalThis.globals.skills[skill].levelExp.expRequiredForNextLevel;
   return Math.floor(curLevelProgress / nextLevelNeeds * 100 * 10) / 10;
 }
 
 function addSkillExp(name, amount) {
   if (name === 'Combat' || name === 'Pyromancy' || name === 'Restoration') amount *= 1 + getBuffLevel('Heroism') * 0.02;
   const oldLevel = getSkillLevel(name);
-  skills[name].levelExp.addExp(amount);
+  globalThis.globals.skills[name].levelExp.addExp(amount);
   const newLevel = getSkillLevel(name);
   if (oldLevel !== newLevel) {
     globalThis.globals.actionLog.addSkillLevel(globalThis.saving.actions.currentAction, name, newLevel, oldLevel);

@@ -1606,7 +1606,9 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
     globalThis.stats.handleSkillExp(this.skills);
   },
   story(completed) {
-    if (towns[0].HealLoopCounter / 3 + 1 >= 10) globalThis.view.setStoryFlag('heal10PatientsInALoop');
+    if (globalThis.globals.towns[0].HealLoopCounter / 3 + 1 >= 10) {
+      globalThis.view.setStoryFlag('heal10PatientsInALoop');
+    }
   },
 });
 
@@ -1732,7 +1734,9 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
       Math.sqrt(1 + globalThis.saving.vals.dungeons[this.dungeonNum][floor].completed / 200);
   },
   loopsFinished() {
-    const curFloor = Math.floor((towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001 - 1);
+    const curFloor = Math.floor(
+      (globalThis.globals.towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001 - 1,
+    );
     const success = this.finishDungeon(curFloor);
     if (success === true && globalThis.saving.vals.storyMax <= 1) {
       globalThis.view.unlockGlobalStory(1);
@@ -1751,7 +1755,9 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
   },
   story(completed) {
     globalThis.view.setStoryFlag('smallDungeonAttempted');
-    if (towns[this.townNum][this.varName + 'LoopCounter'] >= 42) globalThis.view.setStoryFlag('clearSDungeon');
+    if (globalThis.globals.towns[this.townNum][this.varName + 'LoopCounter'] >= 42) {
+      globalThis.view.setStoryFlag('clearSDungeon');
+    }
   },
 });
 DungeonAction.prototype.finishDungeon = function finishDungeon(floorNum) {
@@ -1766,7 +1772,7 @@ DungeonAction.prototype.finishDungeon = function finishDungeon(floorNum) {
     const statToAdd = globalThis.globals.statList[Math.floor(Math.random() * globalThis.globals.statList.length)];
     floor.lastStat = statToAdd;
     const countToAdd = Math.floor(Math.pow(10, dungeonNum) * globalThis.stats.getSkillBonus('Divine'));
-    stats[statToAdd].soulstone = (globalThis.globals.stats[statToAdd].soulstone ?? 0) + countToAdd;
+    globalThis.globals.stats[statToAdd].soulstone = (globalThis.globals.stats[statToAdd].soulstone ?? 0) + countToAdd;
     floor.ssChance *= 0.98;
     globalThis.saving.view.requestUpdate('updateSoulstones', null);
     globalThis.globals.actionLog.addSoulstones(this, statToAdd, countToAdd);
@@ -1817,7 +1823,7 @@ Action.BuySupplies = new Action('Buy Supplies', {
   },
   story(completed) {
     globalThis.view.setStoryFlag('suppliesBought');
-    if (towns[0].suppliesCost === 300) globalThis.view.setStoryFlag('suppliesBoughtWithoutHaggling');
+    if (globalThis.globals.towns[0].suppliesCost === 300) globalThis.view.setStoryFlag('suppliesBoughtWithoutHaggling');
   },
 });
 
@@ -1858,7 +1864,7 @@ Action.Haggle = new Action('Haggle', {
   },
   finish() {
     globalThis.globals.towns[0].suppliesCost -= 20;
-    if (towns[0].suppliesCost < 0) {
+    if (globalThis.globals.towns[0].suppliesCost < 0) {
       globalThis.globals.towns[0].suppliesCost = 0;
     }
     globalThis.saving.view.requestUpdate('updateResource', 'supplies');
@@ -2361,7 +2367,7 @@ Action.LearnAlchemy = new Action('Learn Alchemy', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return skills.Alchemy.exp >= 50;
+        return globalThis.globals.skills.Alchemy.exp >= 50;
       case 2:
         return globalThis.stats.getSkillLevel('Alchemy') >= 25;
       case 3:
@@ -2824,14 +2830,16 @@ Action.DarkRitual = new MultipartAction('Dark Ritual', {
   finish() {
     globalThis.saving.view.requestUpdate('updateBuff', 'Ritual');
     globalThis.saving.view.requestUpdate('adjustExpGain', Action.DarkMagic);
-    if (towns[1].DarkRitualLoopCounter >= 0) globalThis.view.setStoryFlag('darkRitualThirdSegmentReached');
+    if (globalThis.globals.towns[1].DarkRitualLoopCounter >= 0) {
+      globalThis.view.setStoryFlag('darkRitualThirdSegmentReached');
+    }
   },
 });
 
 function checkSoulstoneSac(amount) {
   let sum = 0;
-  for (const stat in stats) {
-    sum += stats[stat].soulstone;
+  for (const stat in globalThis.globals.stats) {
+    sum += globalThis.globals.stats[stat].soulstone;
   }
   return sum >= amount ? true : false;
 }
@@ -3452,7 +3460,7 @@ Action.LargeDungeon = new DungeonAction('Large Dungeon', 1, {
   finish() {
     globalThis.stats.handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('largeDungeonAttempted');
-    if (towns[2].LDungeonLoopCounter >= 63) globalThis.view.setStoryFlag('clearLDungeon');
+    if (globalThis.globals.towns[2].LDungeonLoopCounter >= 63) globalThis.view.setStoryFlag('clearLDungeon');
   },
 });
 
@@ -4368,7 +4376,7 @@ Action.MineSoulstones = new Action('Mine Soulstones', {
     globalThis.globals.towns[3].finishRegular(this.varName, 10, () => {
       const statToAdd = globalThis.globals.statList[Math.floor(Math.random() * globalThis.globals.statList.length)];
       const countToAdd = Math.floor(globalThis.stats.getSkillBonus('Divine'));
-      stats[statToAdd].soulstone += countToAdd;
+      globalThis.globals.stats[statToAdd].soulstone += countToAdd;
       globalThis.globals.actionLog.addSoulstones(this, statToAdd, countToAdd);
       globalThis.saving.view.requestUpdate('updateSoulstones', null);
     });
@@ -4664,7 +4672,7 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
         currentTalentLevel - globalThis.stats.getBuffLevel('Imbuement2') - 1,
         0,
       );
-      stats[stat].talentLevelExp.setLevel(targetTalentLevel);
+      globalThis.globals.stats[stat].talentLevelExp.setLevel(targetTalentLevel);
       spent[stat] = currentTalentLevel - targetTalentLevel;
     }
     globalThis.saving.view.updateStats();
@@ -5533,7 +5541,7 @@ Action.Spatiomancy = new Action('Spatiomancy', {
       globalThis.saving.view.requestUpdate('adjustManaCost', 'Mana Well');
       globalThis.driver.adjustAll();
       for (const action of globalThis.saving.vals.totalActionList) {
-        if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
+        if (globalThis.globals.towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
           globalThis.saving.view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
         }
       }
@@ -6115,8 +6123,8 @@ Action.ManaWell = new Action('Mana Well', {
       }
       return wellMana;
     });
-    if (towns[5].goodWells >= 10) globalThis.view.setStoryFlag('drew10Wells');
-    if (towns[5].goodWells >= 15) globalThis.view.setStoryFlag('drew15Wells');
+    if (globalThis.globals.towns[5].goodWells >= 10) globalThis.view.setStoryFlag('drew10Wells');
+    if (globalThis.globals.towns[5].goodWells >= 15) globalThis.view.setStoryFlag('drew15Wells');
   },
 });
 function adjustWells() {
@@ -6762,11 +6770,11 @@ Action.PrepareBuffet = new Action('Prepare Buffet', {
   },
   finish() {
     // @ts-ignore
-    this.skills.Gluttony = Math.floor(towns[6].RescueLoopCounter * 5);
+    this.skills.Gluttony = Math.floor(globalThis.globals.towns[6].RescueLoopCounter * 5);
     globalThis.stats.handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('buffetHeld');
-    if (towns[6].RescueLoopCounter >= 1) globalThis.view.setStoryFlag('buffetFor1');
-    if (towns[6].RescueLoopCounter >= 6) globalThis.view.setStoryFlag('buffetFor6');
+    if (globalThis.globals.towns[6].RescueLoopCounter >= 1) globalThis.view.setStoryFlag('buffetFor1');
+    if (globalThis.globals.towns[6].RescueLoopCounter >= 6) globalThis.view.setStoryFlag('buffetFor6');
   },
 });
 
@@ -7083,7 +7091,7 @@ function getExploreExpSinceLastProgress() {
       return curExp - globalThis.stats.getExpOfLevel(level) + 1;
     }
   }
-  const townsByExpOrder = [...towns].sort((a, b) => expSinceLast(a) - expSinceLast(b));
+  const townsByExpOrder = [...globalThis.globals.towns].sort((a, b) => expSinceLast(a) - expSinceLast(b));
   let totalExpGained = 0;
   while (levelsSinceLastProgress--) {
     totalExpGained += expSinceLast(townsByExpOrder[0]);
@@ -7116,7 +7124,7 @@ function getExploreExpToNextProgress() {
       return globalThis.stats.getExpOfLevel(level + 1) - town[`exp${varName}`];
     }
   }
-  const townsByExpOrder = [...towns].sort((a, b) => expToNext(a) - expToNext(b));
+  const townsByExpOrder = [...globalThis.globals.towns].sort((a, b) => expToNext(a) - expToNext(b));
   let totalExpNeeded = 0;
   while (levelsToNextProgress--) {
     totalExpNeeded += expToNext(townsByExpOrder[0]);
@@ -7141,7 +7149,7 @@ function exchangeMap() {
     let rand = unfinishedSurveyZones[Math.floor(Math.random() * unfinishedSurveyZones.length)];
     let name = 'expSurveyZ' + rand;
     globalThis.globals.towns[rand][name] += getExploreSkill() * 2;
-    if (towns[rand][name] >= 505000) {
+    if (globalThis.globals.towns[rand][name] >= 505000) {
       globalThis.globals.towns[rand][name] = 505000;
       for (var i = 0; i < unfinishedSurveyZones.length; i++) {
         if (unfinishedSurveyZones[i] === rand) {
@@ -7529,7 +7537,7 @@ function totalAssassinations() {
   //Counts all zones with at least one successful assassination.
   let total = 0;
   for (var i = 0; i < globalThis.globals.towns.length; i++) {
-    if (towns[i][`totalAssassinZ${i}`] > 0) total++;
+    if (globalThis.globals.towns[i][`totalAssassinZ${i}`] > 0) total++;
   }
   return total;
 }
@@ -7883,8 +7891,8 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
   grantsBuff: 'Imbuement3',
   loopsFinished() {
     for (const stat of globalThis.globals.statList) {
-      stats[stat].talentLevelExp.setLevel(0);
-      stats[stat].soulstone = 0;
+      globalThis.globals.stats[stat].talentLevelExp.setLevel(0);
+      globalThis.globals.stats[stat].soulstone = 0;
       globalThis.saving.view.requestUpdate('updateStat', stat);
     }
     globalThis.globals.buffs['Imbuement'].amt = 0;

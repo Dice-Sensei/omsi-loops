@@ -545,7 +545,7 @@ const Koviko = {
           type: 'S',
           name: skill.toLowerCase(),
           display_name: skill,
-          hidden: () => (skills[skill].exp <= 0),
+          hidden: () => (globalThis.globals.skills[skill].exp <= 0),
         };
       }
       for (const stat of globalThis.globals.statList) {
@@ -2042,7 +2042,7 @@ const Koviko = {
               stats,
               name,
             ) => (stats[name] = globalThis.stats.getExpOfLevel(
-              buffs.Imbuement2.amt * (globalThis.globals.skills.Wunderkind.exp >= 100 ? 2 : 1),
+              globalThis.globals.buffs.Imbuement2.amt * (globalThis.globals.skills.Wunderkind.exp >= 100 ? 2 : 1),
             ),
               stats),
             {},

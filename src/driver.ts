@@ -391,12 +391,12 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
 // mana and resources
 
 function addMana(amount) {
-  timeNeeded += amount;
+  globalThis.saving.timeNeeded += amount;
 }
 
 function addResource(resource, amount) {
-  if (Number.isFinite(amount)) resources[resource] += amount;
-  else resources[resource] = amount;
+  if (Number.isFinite(amount)) globalThis.globals.resources[resource] += amount;
+  else globalThis.globals.resources[resource] = amount;
   globalThis.saving.view.requestUpdate('updateResource', resource);
 
   if (resource === 'teamMembers' || resource === 'armor' || resource === 'zombie') {
@@ -405,12 +405,12 @@ function addResource(resource, amount) {
 }
 
 function resetResource(resource) {
-  resources[resource] = resourcesTemplate[resource];
+  globalThis.globals.resources[resource] = globalThis.globals.resourcesTemplate[resource];
   globalThis.saving.view.requestUpdate('updateResource', resource);
 }
 
 function resetResources() {
-  resources = globalThis.helpers.copyObject(resourcesTemplate);
+  globalThis.globals.resources = globalThis.helpers.copyObject(globalThis.globals.resourcesTemplate);
   if (globalThis.actionList.getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
     addResource('glasses', true);
   }

@@ -157,7 +157,7 @@ class View {
         'beforebegin',
         `<div class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${
           axisTip[1] + 3
-        }%;' onmouseover='view.showStat("${stat}")' onmouseout='globalThis.saving.view.showStat(undefined)'>
+        }%;' onmouseover='globalThis.saving.view.showStat("${stat}")' onmouseout='globalThis.saving.view.showStat(undefined)'>
                 <div class='statLabelContainer'>
                     <div class='medium bold stat-name long-form' style='margin-left:18px;margin-top:5px;'>${
           globalThis.Localization.txt(`stats>${stat}>long_form`)
@@ -400,8 +400,10 @@ class View {
   updateStat(stat) {
     const level = globalThis.stats.getLevel(stat);
     const talent = globalThis.stats.getTalent(stat);
-    const totalLevel = Object.values(stats).map((s) => s.statLevelExp.level).reduce((a, b) => a + b);
-    const totalTalent = Object.values(stats).map((s) => s.talentLevelExp.level).reduce((a, b) => a + b);
+    const totalLevel = Object.values(globalThis.globals.stats).map((s) => s.statLevelExp.level).reduce((a, b) => a + b);
+    const totalTalent = Object.values(globalThis.globals.stats).map((s) => s.talentLevelExp.level).reduce((a, b) =>
+      a + b
+    );
     const levelPrc = `${globalThis.stats.getPrcToNextLevel(stat)}%`;
     const talentPrc = `${globalThis.stats.getPrcToNextTalent(stat)}%`;
 
@@ -418,26 +420,26 @@ class View {
     if (statShowing === stat || document.getElementById(`stat${stat}LevelExp`).innerHTML === '') {
       document.getElementById(`stat${stat}Level2`).textContent = globalThis.helpers.formatNumber(level);
       document.getElementById(`stat${stat}LevelExp`).textContent = globalThis.helpers.intToString(
-        stats[stat].statLevelExp.exp,
+        globalThis.globals.stats[stat].statLevelExp.exp,
         1,
       );
       document.getElementById(`stat${stat}LevelExpNeeded`).textContent = globalThis.helpers.intToString(
-        stats[stat].statLevelExp.expRequiredForNextLevel,
+        globalThis.globals.stats[stat].statLevelExp.expRequiredForNextLevel,
         1,
       );
       document.getElementById(`stat${stat}LevelProgress`).textContent = globalThis.helpers.intToString(levelPrc, 2);
 
       document.getElementById(`stat${stat}Talent2`).textContent = globalThis.helpers.formatNumber(talent);
       document.getElementById(`stat${stat}TalentExp`).textContent = globalThis.helpers.intToString(
-        stats[stat].talentLevelExp.exp,
+        globalThis.globals.stats[stat].talentLevelExp.exp,
         1,
       );
       document.getElementById(`stat${stat}TalentExpNeeded`).textContent = globalThis.helpers.intToString(
-        stats[stat].talentLevelExp.expRequiredForNextLevel,
+        globalThis.globals.stats[stat].talentLevelExp.expRequiredForNextLevel,
         1,
       );
       document.getElementById(`stat${stat}TalentMult`).textContent = globalThis.helpers.intToString(
-        stats[stat].talentMult,
+        globalThis.globals.stats[stat].talentMult,
         3,
       );
       document.getElementById(`stat${stat}TalentProgress`).textContent = globalThis.helpers.intToString(talentPrc, 2);
@@ -742,7 +744,9 @@ class View {
     const element = globalThis.helpers.htmlElement(`${resource}Div`, false, false);
     if (element) element.style.display = globalThis.globals.resources[resource] ? 'inline-block' : 'none';
 
-    if (resource === 'supplies') document.getElementById('suppliesCost').textContent = String(towns[0].suppliesCost);
+    if (resource === 'supplies') {
+      document.getElementById('suppliesCost').textContent = String(globalThis.globals.towns[0].suppliesCost);
+    }
     if (resource === 'teamMembers') {
       document.getElementById('teamCost').textContent = `${(globalThis.globals.resources.teamMembers + 1) * 100}`;
     }
@@ -780,7 +784,7 @@ class View {
     }
   }
   updateTeamCombat() {
-    if (towns[2].unlocked) {
+    if (globalThis.globals.towns[2].unlocked) {
       document.getElementById('skillSCombatContainer').style.display = 'inline-block';
       document.getElementById('skillTCombatContainer').style.display = 'inline-block';
       document.getElementById('skillSCombatLevel').textContent = globalThis.helpers.intToString(
@@ -1552,7 +1556,7 @@ class View {
     progressDiv.style.display = '';
     progressDiv.innerHTML = totalDivText;
     townInfos[action.townNum].appendChild(progressDiv);
-    if (towns[action.townNum].hiddenVars.has(`${action.varName}${varSuffix}`)) {
+    if (globalThis.globals.towns[action.townNum].hiddenVars.has(`${action.varName}${varSuffix}`)) {
       progressDiv.classList.add('user-hidden');
     }
   }
@@ -1857,7 +1861,7 @@ class View {
     infoDiv.style.display = '';
     infoDiv.innerHTML = totalInfoText;
     townInfos[action.townNum].appendChild(infoDiv);
-    if (towns[action.townNum].hiddenVars.has(action.varName)) {
+    if (globalThis.globals.towns[action.townNum].hiddenVars.has(action.varName)) {
       infoDiv.classList.add('user-hidden');
     }
   }
@@ -1912,7 +1916,7 @@ class View {
     progressDiv.style.display = '';
     progressDiv.innerHTML = totalDivText;
     townInfos[action.townNum].appendChild(progressDiv);
-    if (towns[action.townNum].hiddenVars.has(action.varName)) {
+    if (globalThis.globals.towns[action.townNum].hiddenVars.has(action.varName)) {
       progressDiv.firstElementChild.classList.add('user-hidden');
     }
   }

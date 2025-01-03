@@ -139,7 +139,7 @@ class Actions {
       manaLoop:
       while (manaLeftForCurrentSegment > 0 && curAction.canMakeProgress(segment)) {
         //const toAdd = curAction.tickProgress(segment) * (curAction.manaCost() / curAction.adjustedTicks);
-        const loopStat = stats[loopStats[(loopCounter + segment) % loopStats.length]];
+        const loopStat = globalThis.globals.stats[loopStats[(loopCounter + segment) % loopStats.length]];
         const progressMultiplier = curAction.tickProgress(segment) * tickMultiplier * loopStat.effortMultiplier;
         const toAdd = Math.min(
           manaLeftForCurrentSegment * progressMultiplier, // how much progress would we make if we spend all available mana?
@@ -183,7 +183,7 @@ class Actions {
               curAction.loopsLeft = 0;
               curAction.ticks = 0;
               curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
-              curAction.goldRemaining = resources.gold;
+              curAction.goldRemaining = globalThis.globals.resources.gold;
               curAction.finish();
               globalThis.saving.vals.totals.actions++;
               break manaLoop;
@@ -238,7 +238,7 @@ class Actions {
       if (curAction.cost) {
         curAction.cost();
       }
-      curAction.goldRemaining = resources.gold;
+      curAction.goldRemaining = globalThis.globals.resources.gold;
 
       this.adjustTicksNeeded();
       globalThis.saving.view.requestUpdate('updateCurrentActionLoops', this.currentPos);
@@ -696,7 +696,7 @@ class ZoneSpan {
 function setAdjustedTicks(action) {
   let newCost = 0;
   for (const actionStatName in action.stats) {
-    newCost += action.stats[actionStatName] * stats[actionStatName].manaMultiplier;
+    newCost += action.stats[actionStatName] * globalThis.globals.stats[actionStatName].manaMultiplier;
   }
   action.rawTicks = action.manaCost() * newCost - (globalThis.saving.vals.options.fractionalMana ? 0 : 0.000001);
   action.adjustedTicks = Math.max(
