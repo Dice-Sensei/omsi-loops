@@ -624,7 +624,9 @@ function showNotification(name) {
 }
 
 function hideNotification(name) {
-  unreadActionStories = unreadActionStories.filter((toRead) => toRead !== name);
+  globalThis.saving.vals.unreadActionStories = globalThis.saving.vals.unreadActionStories.filter((toRead) =>
+    toRead !== name
+  );
   document.getElementById(`${name}Notification`).style.display = 'none';
 }
 

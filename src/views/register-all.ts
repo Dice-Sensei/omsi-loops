@@ -594,15 +594,15 @@ const timeControls = {
           </div>
         </button>
         <div class='control'>
-          <div tabindex='0' id='story_control' class='showthatH' onmouseover='globalThis.saving.view.updateStory(storyShowing)' onfocus='globalThis.saving.view.updateStory(storyShowing)' style='height:30px;'>
+          <div tabindex='0' id='story_control' class='showthatH' onmouseover='globalThis.saving.view.updateStory(globalThis.saving.vals.storyShowing)' onfocus='globalThis.sglobalThis.saving.vals.storyShowingpdateStory(storyShowing)' style='height:30px;'>
             <div class='large bold'>
               ${globalThis.Localization.txt('time_controls>story_title')}
             </div>
             <div id='newStory' style='color:var(--alert-color);display:none;'>(!)</div>
             <div id='story_tooltip' class='showthisH' style='width:400px;'>
-              <button style='margin-left:175px;' class='actionIcon fa fa-arrow-left control' id='storyLeft' onclick='globalThis.saving.view.updateStory(storyShowing-1)'></button>
+              <button style='margin-left:175px;' class='actionIcon fa fa-arrow-left control' id='storyLeft' onclick='globalThis.saving.view.updateStory(globalThis.saving.vals.storyShowing-1)'></button>
               <div style='' id='storyPage' class='bold control'></div>
-              <button style='' class='actionIcon fa fa-arrow-right control' id='storyRight' onclick='globalThis.saving.view.updateStory(storyShowing+1)'></button>
+              <button style='' class='actionIcon fa fa-arrow-right control' id='storyRight' onclick='globalThis.saving.view.updateStory(globalThis.saving.vals.storyShowing+1)'></button>
               ${stories()}
             </div>
           </div>

@@ -78,7 +78,7 @@ class View {
     this.updateLoadoutNames();
     this.updateResources();
     this.updateTrials();
-    if (storyMax >= 12) {
+    if (globalThis.saving.vals.storyMax >= 12) {
       setInterval(() => {
         globalThis.saving.view.updateStories();
         globalThis.saving.view.updateLockedHidden();
@@ -1363,7 +1363,9 @@ class View {
             document.getElementById(divName).children[2].innerHTML = storyTooltipText;
             if (!init) {
               globalThis.driver.showNotification(divName);
-              if (!unreadActionStories.includes(divName)) unreadActionStories.push(divName);
+              if (!globalThis.saving.vals.unreadActionStories.includes(divName)) {
+                globalThis.saving.vals.unreadActionStories.push(divName);
+              }
             }
             if (allStoriesForActionUnlocked) {
               document.getElementById(divName).classList.add('storyContainerCompleted');
@@ -2070,8 +2072,8 @@ class View {
       document.getElementById('storyLeft').style.visibility = '';
     }
 
-    if (num >= storyMax) {
-      num = storyMax;
+    if (num >= globalThis.saving.vals.storyMax) {
+      num = globalThis.saving.vals.storyMax;
       document.getElementById('storyRight').style.visibility = 'hidden';
     } else {
       document.getElementById('storyRight').style.visibility = '';
@@ -2083,8 +2085,8 @@ class View {
         storyDiv.style.display = 'none';
       }
     }
-    storyShowing = num;
-    document.getElementById('storyPage').textContent = String(storyShowing + 1);
+    globalThis.saving.vals.storyShowing = num;
+    document.getElementById('storyPage').textContent = String(globalThis.saving.vals.storyShowing + 1);
     document.getElementById(`story${num}`).style.display = 'inline-block';
   }
 
@@ -2237,9 +2239,9 @@ class View {
 }
 
 function unlockGlobalStory(num) {
-  if (num > storyMax) {
+  if (num > globalThis.saving.vals.storyMax) {
     document.getElementById('newStory').style.display = 'inline-block';
-    storyMax = num;
+    globalThis.saving.vals.storyMax = num;
     view.requestUpdate('updateGlobalStory', num);
   }
 }

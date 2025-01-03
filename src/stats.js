@@ -414,11 +414,12 @@ function getLevel(stat) {
 }
 
 function getTotalTalentLevel() {
-  return Math.floor(Math.pow(totalTalent, 0.2));
+  return Math.floor(Math.pow(globalThis.saving.vals.totalTalent, 0.2));
 }
 
 function getTotalTalentPrc() {
-  return (Math.pow(totalTalent, 0.2) - Math.floor(Math.pow(totalTalent, 0.2))) * 100;
+  return (Math.pow(globalThis.saving.vals.totalTalent, 0.2) -
+    Math.floor(Math.pow(globalThis.saving.vals.totalTalent, 0.2))) * 100;
 }
 
 function getLevelFromExp(exp) {
@@ -651,7 +652,7 @@ function addExp(name, amount) {
   stats[name].soullessLevelExp.addExp(amount / stats[name].soulstoneMult);
   let talentGain = amount * getTalentMultiplier();
   stats[name].talentLevelExp.addExp(talentGain);
-  totalTalent += talentGain;
+  globalThis.saving.vals.totalTalent += talentGain;
   view.requestUpdate('updateStat', name);
 }
 

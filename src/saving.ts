@@ -657,6 +657,17 @@ const vals = {
 };
 vals.curTown = 0;
 vals.shouldRestart = true;
+vals.totalTalent = 0;
+vals.stoneLoc = 0;
+vals.guild = '';
+vals.escapeStarted = false;
+vals.portalUsed = false;
+vals.curLoadout = 0;
+vals.loadouts = undefined;
+vals.loadoutnames = undefined;
+vals.storyShowing = 0;
+vals.storyMax = 0;
+vals.unreadActionStories = undefined;
 
 // Globals!!!!!
 const actions = new globalThis.actions.Actions();
@@ -699,18 +710,6 @@ let resources = {
 };
 const resourcesTemplate = globalThis.helpers.copyObject(resources);
 let hearts = [];
-
-let totalTalent = 0;
-let guild = '';
-
-vals.totalTalent = 0;
-vals.stoneLoc = 0;
-vals.guild = '';
-vals.escapeStarted = false;
-vals.portalUsed = false;
-vals.curLoadout = 0;
-vals.loadouts = undefined;
-vals.loadoutnames = undefined;
 
 const skillList = /** @type {const} */ ([
   'Combat',
@@ -790,10 +789,6 @@ let townShowing = 0;
 let actionStoriesShowing = false;
 let townsUnlocked = [];
 let completedActions = [];
-
-let storyShowing = 0;
-let storyMax = 0;
-let unreadActionStories;
 
 const storyFlags = {
   maxSQuestsInALoop: false,
@@ -1597,9 +1592,9 @@ function doLoad(toLoad) {
         temptotalTalent += toLoad.stats[property].talent * 100;
       }
     }
-    totalTalent = temptotalTalent;
+    globalThis.saving.vals.totalTalent = temptotalTalent;
   } else {
-    totalTalent = toLoad.totalTalent;
+    globalThis.saving.vals.totalTalent = toLoad.totalTalent;
   }
 
   if (toLoad.maxTown) {
@@ -1820,16 +1815,16 @@ function doLoad(toLoad) {
   for (const option of Object.keys(options)) {
     loadOption(option, options[option]);
   }
-  storyShowing = toLoad.storyShowing === undefined ? 0 : toLoad.storyShowing;
-  storyMax = toLoad.storyMax === undefined ? 0 : toLoad.storyMax;
+  globalThis.saving.vals.storyShowing = toLoad.storyShowing === undefined ? 0 : toLoad.storyShowing;
+  globalThis.saving.vals.storyMax = toLoad.storyMax === undefined ? 0 : toLoad.storyMax;
   if (
     toLoad.unreadActionStories === undefined ||
     toLoad.unreadActionStories.find((s) => !s.includes('storyContainer'))
   ) {
-    unreadActionStories = [];
+    globalThis.saving.vals.unreadActionStories = [];
   } else {
-    unreadActionStories = toLoad.unreadActionStories;
-    for (const name of unreadActionStories) {
+    globalThis.saving.vals.unreadActionStories = toLoad.unreadActionStories;
+    for (const name of globalThis.saving.vals.unreadActionStories) {
       globalThis.driver.showNotification(name);
     }
   }
@@ -1898,7 +1893,7 @@ function doSave() {
   toSave.completedActions = completedActions;
 
   toSave.stats = stats;
-  toSave.totalTalent = totalTalent;
+  toSave.totalTalent = globalThis.saving.vals.totalTalent;
   toSave.skills = skills;
   toSave.buffs = buffs;
   toSave.prestigeValues = globalThis.prestige.prestigeValues;
@@ -1941,11 +1936,11 @@ function doSave() {
       toSave.extraOptions[option] = options[option];
     }
   }
-  toSave.storyShowing = storyShowing;
-  toSave.storyMax = storyMax;
+  toSave.storyShowing = globalThis.saving.vals.storyShowing;
+  toSave.storyMax = globalThis.saving.vals.storyMax;
   toSave.storyReqs = storyFlags; // save uses the legacy name "storyReqs" for compatibility
   toSave.storyVars = storyVars;
-  toSave.unreadActionStories = unreadActionStories;
+  toSave.unreadActionStories = globalThis.saving.vals.unreadActionStories;
   toSave.actionLog = globalThis.saving.actionLog;
   toSave.buffCaps = buffCaps;
 
@@ -2160,16 +2155,13 @@ const _saving = {
   trials,
   trialFloors,
   stats,
-  totalTalent,
   skills,
   buffs,
   goldInvested,
   stonesUsed,
   options,
-  storyMax,
   storyReqs,
   storyVars,
-  unreadActionStories,
   actionLog,
   actions,
   view,

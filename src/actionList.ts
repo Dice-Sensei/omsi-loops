@@ -1751,9 +1751,9 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
   loopsFinished() {
     const curFloor = Math.floor((towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001 - 1);
     const success = this.finishDungeon(curFloor);
-    if (success === true && storyMax <= 1) {
+    if (success === true && globalThis.saving.vals.storyMax <= 1) {
       globalThis.view.unlockGlobalStory(1);
-    } else if (success === false && storyMax <= 2) {
+    } else if (success === false && globalThis.saving.vals.storyMax <= 2) {
       globalThis.view.unlockGlobalStory(2);
     }
   },
@@ -3277,7 +3277,7 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
     return 1;
   },
   canStart() {
-    return guild === '';
+    return globalThis.saving.vals.guild === '';
   },
   loopCost(segment, loopCounter = towns[2][`${this.varName}LoopCounter`]) {
     return globalThis.helpers.precision3(Math.pow(1.2, loopCounter + segment)) * 5e6;
@@ -3314,7 +3314,7 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
     return towns[2].getLevel('Drunk') >= 20;
   },
   finish() {
-    guild = 'Adventure';
+    globalThis.saving.vals.guild = 'Adventure';
     globalThis.view.setStoryFlag('advGuildTestsTaken');
   },
 });
@@ -3379,7 +3379,7 @@ Action.GatherTeam = new Action('Gather Team', {
     return 5 + Math.floor(globalThis.stats.getSkillLevel('Leadership') / 100);
   },
   canStart() {
-    return guild === 'Adventure' && resources.gold >= (resources.teamMembers + 1) * 100;
+    return globalThis.saving.vals.guild === 'Adventure' && resources.gold >= (resources.teamMembers + 1) * 100;
   },
   cost() {
     // cost comes after finish
@@ -3512,7 +3512,7 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
     return 1;
   },
   canStart() {
-    return guild === '';
+    return globalThis.saving.vals.guild === '';
   },
   loopCost(segment, loopCounter = towns[2][`${this.varName}LoopCounter`]) {
     return globalThis.helpers.precision3(Math.pow(1.2, loopCounter + segment)) * 2e6;
@@ -3550,7 +3550,7 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
     return towns[2].getLevel('Drunk') >= 30;
   },
   finish() {
-    guild = 'Crafting';
+    globalThis.saving.vals.guild = 'Crafting';
     globalThis.view.setStoryFlag('craftGuildTestsTaken');
   },
 });
@@ -3671,7 +3671,7 @@ Action.Apprentice = new Action('Apprentice', {
   },
   affectedBy: ['Crafting Guild'],
   canStart() {
-    return guild === 'Crafting';
+    return globalThis.saving.vals.guild === 'Crafting';
   },
   manaCost() {
     return 2000;
@@ -3724,7 +3724,7 @@ Action.Mason = new Action('Mason', {
   },
   affectedBy: ['Crafting Guild'],
   canStart() {
-    return guild === 'Crafting';
+    return globalThis.saving.vals.guild === 'Crafting';
   },
   manaCost() {
     return 2000;
@@ -3777,7 +3777,7 @@ Action.Architect = new Action('Architect', {
   },
   affectedBy: ['Crafting Guild'],
   canStart() {
-    return guild === 'Crafting';
+    return globalThis.saving.vals.guild === 'Crafting';
   },
   manaCost() {
     return 2000;
@@ -5621,7 +5621,8 @@ Action.BuildHousing = new Action('Build Housing', {
   canStart() {
     //Maximum crafting guild bonus is 10, maximum spatiomancy mult is 5.
     let maxHouses = Math.floor(getCraftGuildRank().bonus * globalThis.stats.getSkillMod('Spatiomancy', 0, 500, 1));
-    return guild === 'Crafting' && towns[4].getLevel('Citizen') >= 100 && resources.houses < maxHouses;
+    return globalThis.saving.vals.guild === 'Crafting' && towns[4].getLevel('Citizen') >= 100 &&
+      resources.houses < maxHouses;
   },
   manaCost() {
     return 2000;
@@ -6950,10 +6951,12 @@ Action.Excursion = new Action('Excursion', {
     return true;
   },
   goldCost() {
-    return (guild === 'Thieves' || guild === 'Explorer') ? 2 : 10;
+    return (globalThis.saving.vals.guild === 'Thieves' || globalThis.saving.vals.guild === 'Explorer') ? 2 : 10;
   },
   finish() {
-    if (guild === 'Thieves' || guild === 'Explorer') globalThis.view.setStoryFlag('excursionAsGuildmember');
+    if (globalThis.saving.vals.guild === 'Thieves' || globalThis.saving.vals.guild === 'Explorer') {
+      globalThis.view.setStoryFlag('excursionAsGuildmember');
+    }
     towns[7].finishProgress(this.varName, 50 * (resources.glasses ? 2 : 1));
     globalThis.driver.addResource('gold', -1 * this.goldCost());
   },
@@ -7016,7 +7019,7 @@ Action.ExplorersGuild = new Action('Explorers Guild', {
     return 1;
   },
   canStart() {
-    return guild === '';
+    return globalThis.saving.vals.guild === '';
   },
   visible() {
     return towns[7].getLevel('Excursion') >= 5;
@@ -7032,7 +7035,7 @@ Action.ExplorersGuild = new Action('Explorers Guild', {
       exchangeMap();
       globalThis.view.setStoryFlag('mapTurnedIn');
     }
-    guild = 'Explorer';
+    globalThis.saving.vals.guild = 'Explorer';
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
   },
 });
@@ -7202,7 +7205,7 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
     return 1;
   },
   canStart() {
-    return guild === '' && resources.reputation < 0;
+    return globalThis.saving.vals.guild === '' && resources.reputation < 0;
   },
   loopCost(segment, loopCounter = towns[7][`${this.varName}LoopCounter`]) {
     return globalThis.helpers.precision3(Math.pow(1.2, loopCounter + segment)) * 5e8;
@@ -7232,7 +7235,7 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
     return towns[7].getLevel('Excursion') >= 25;
   },
   finish() {
-    guild = 'Thieves';
+    globalThis.saving.vals.guild = 'Thieves';
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
     globalThis.stats.handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('thiefGuildTestsTaken');
@@ -7320,7 +7323,7 @@ Action.PickPockets = new Action('Pick Pockets', {
     return towns[7].totalPockets;
   },
   canStart() {
-    return guild === 'Thieves';
+    return globalThis.saving.vals.guild === 'Thieves';
   },
   manaCost() {
     return 20000;
@@ -7382,7 +7385,7 @@ Action.RobWarehouse = new Action('Rob Warehouse', {
     return towns[7].totalWarehouses;
   },
   canStart() {
-    return guild === 'Thieves';
+    return globalThis.saving.vals.guild === 'Thieves';
   },
   manaCost() {
     return 50000;
@@ -7444,7 +7447,7 @@ Action.InsuranceFraud = new Action('Insurance Fraud', {
     return towns[7].totalInsurance;
   },
   canStart() {
-    return guild === 'Thieves';
+    return globalThis.saving.vals.guild === 'Thieves';
   },
   manaCost() {
     return 100000;
@@ -7504,7 +7507,7 @@ Action.GuildAssassin = new Action('Guild Assassin', {
     return 1;
   },
   canStart() {
-    return guild === '';
+    return globalThis.saving.vals.guild === '';
   },
   visible() {
     return towns[this.townNum].getLevel('InsuranceFraud') >= 75;
@@ -7522,7 +7525,7 @@ Action.GuildAssassin = new Action('Guild Assassin', {
     this.skills.Assassin = assassinExp;
     globalThis.stats.handleSkillExp(this.skills);
     resources.heart = 0;
-    guild = 'Assassin';
+    globalThis.saving.vals.guild = 'Assassin';
   },
 });
 
@@ -7782,10 +7785,10 @@ Action.SecretTrial = new TrialAction('Secret Trial', 3, {
     //None
   },
   visible() {
-    return storyMax >= 12 && globalThis.stats.getBuffLevel('Imbuement3') >= 7;
+    return globalThis.saving.vals.storyMax >= 12 && globalThis.stats.getBuffLevel('Imbuement3') >= 7;
   },
   unlocked() {
-    return storyMax >= 12 && globalThis.stats.getBuffLevel('Imbuement3') >= 7;
+    return globalThis.saving.vals.storyMax >= 12 && globalThis.stats.getBuffLevel('Imbuement3') >= 7;
   },
   finish() {
     globalThis.view.setStoryFlag('trailSecretFaced');
@@ -8219,7 +8222,7 @@ Action.RestoreTime = new Action('Restore Time', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyMax >= 12;
+        return globalThis.saving.vals.storyMax >= 12;
     }
   },
   stats: {
