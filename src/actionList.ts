@@ -4349,7 +4349,7 @@ Action.MineSoulstones = new Action('Mine Soulstones', {
   },
   finish() {
     towns[3].finishRegular(this.varName, 10, () => {
-      const statToAdd = statList[Math.floor(Math.random() * statList.length)];
+      const statToAdd = globalThis.globals.statList[Math.floor(Math.random() * globalThis.globals.statList.length)];
       const countToAdd = Math.floor(globalThis.stats.getSkillBonus('Divine'));
       stats[statToAdd].soulstone += countToAdd;
       globalThis.globals.actionLog.addSoulstones(this, statToAdd, countToAdd);
@@ -4620,7 +4620,7 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
   },
   canStart(loopCounter = towns[3].ImbueBodyLoopCounter) {
     let tempCanStart = true;
-    for (const stat of statList) {
+    for (const stat of globalThis.globals.statList) {
       if (globalThis.stats.getTalent(stat) < globalThis.stats.getBuffLevel('Imbuement2') + 1) {
         tempCanStart = false;
       }
@@ -4639,7 +4639,7 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
   grantsBuff: 'Imbuement2',
   loopsFinished() {
     const spent = {};
-    for (const stat of statList) {
+    for (const stat of globalThis.globals.statList) {
       const currentTalentLevel = globalThis.stats.getTalent(stat);
       const targetTalentLevel = Math.max(
         currentTalentLevel - globalThis.stats.getBuffLevel('Imbuement2') - 1,
@@ -7858,7 +7858,7 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
   },
   grantsBuff: 'Imbuement3',
   loopsFinished() {
-    for (const stat of statList) {
+    for (const stat of globalThis.globals.statList) {
       stats[stat].talentLevelExp.setLevel(0);
       stats[stat].soulstone = 0;
       globalThis.saving.view.requestUpdate('updateStat', stat);

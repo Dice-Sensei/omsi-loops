@@ -718,7 +718,7 @@ function getMaxTicksForAction(action, talentOnly = false) {
   let maxTicks = Number.MAX_SAFE_INTEGER;
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
-  for (const stat of statList) {
+  for (const stat of globalThis.globals.statList) {
     const expToNext = globalThis.stats.getExpToLevel(stat, talentOnly);
     const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) *
       globalThis.stats.getTotalBonusXP(stat);
@@ -739,7 +739,7 @@ function getMaxTicksForStat(action, stat, talentOnly = false) {
 function addExpFromAction(action, manaCount) {
   const adjustedExp = manaCount * action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
-  for (const stat of statList) {
+  for (const stat of globalThis.globals.statList) {
     const expToAdd = ((action.stats[stat] ?? 0) + overFlow) * adjustedExp * globalThis.stats.getTotalBonusXP(stat);
 
     // Used for updating the menus when hovering over a completed item in the actionList

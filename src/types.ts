@@ -18,8 +18,3 @@ export type Stat = {
 
 export type StatName = 'Dex' | 'Str' | 'Con' | 'Spd' | 'Per' | 'Cha' | 'Int' | 'Luck' | 'Soul';
 export type StatRecord = Record<StatName, Stat>;
-
-declare global {
-  var statList: StatName[];
-  var stats: StatRecord;
-}

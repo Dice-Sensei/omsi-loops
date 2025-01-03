@@ -715,6 +715,8 @@ const buffList = /** @type {const} */ ([
   'PrestigeBartering',
   'PrestigeExpOverflow',
 ]);
+const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
+
 //globals!!!!!
 const actionLog = selfIsGame ? new ActionLog() : null;
 
@@ -722,7 +724,6 @@ const actions = new globalThis.actions.Actions();
 
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 
-const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
 
 let resources = {

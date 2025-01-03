@@ -125,7 +125,7 @@ const Koviko = {
      */
     updateTicks(a, s, state) {
       let baseMana = this.baseManaCost(a, state);
-      let cost = statList.reduce(
+      let cost = globalThis.globals.statList.reduce(
         (cost, i) =>
           cost + (i in a.stats && i in s ? a.stats[i] / (1 + globalThis.stats.getLevelFromExp(s[i]) / 100) : 0),
         0,
@@ -165,7 +165,7 @@ const Koviko = {
      * @memberof Koviko.Prediction
      */
     exp(a, s, t, ss) {
-      statList.forEach((i) => {
+      globalThis.globals.statList.forEach((i) => {
         if (i in s) {
           var expToAdd = 0;
           const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
@@ -548,7 +548,7 @@ const Koviko = {
           hidden: () => (skills[skill].exp <= 0),
         };
       }
-      for (const stat of statList) {
+      for (const stat of globalThis.globals.statList) {
         Koviko.trackedStats['T' + stat] = {
           type: 'T',
           name: stat,
@@ -2017,7 +2017,7 @@ const Koviko = {
         state = {
           // @ts-ignore
           resources: { mana: 250, town: (0), guild: '', totalTicks: 0 },
-          stats: statList.reduce(
+          stats: globalThis.globals.statList.reduce(
             (
               stats,
               name,
@@ -2027,12 +2027,21 @@ const Koviko = {
               stats),
             {},
           ),
-          talents: statList.reduce((talents, name) => (talents[name] = stats[name].talent, talents), {}),
-          skills: Object.entries(skills).reduce((skills, x) => (skills[x[0].toLowerCase()] = x[1].exp, skills), {}),
+          talents: globalThis.globals.statList.reduce(
+            (talents, name) => (talents[name] = globalThis.globals.stats[name].talent, talents),
+            {},
+          ),
+          skills: Object.entries(globalThis.globals.skills).reduce(
+            (skills, x) => (skills[x[0].toLowerCase()] = x[1].exp, skills),
+            {},
+          ),
           progress: {},
           currProgress: {},
           toNextLoop: {},
-          soulstones: statList.reduce((soulstones, name) => (soulstones[name] = stats[name].soulstone, soulstones), {}),
+          soulstones: globalThis.globals.statList.reduce(
+            (soulstones, name) => (soulstones[name] = globalThis.globals.stats[name].soulstone, soulstones),
+            {},
+          ),
         };
         if (globalThis.saving.vals.options.predictorSlowMode) {
           this.initState = structuredClone(state);

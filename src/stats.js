@@ -366,8 +366,8 @@ class Buff extends Localizable2 {
 }
 
 function initializeStats() {
-  for (let i = 0; i < statList.length; i++) {
-    addNewStat(statList[i]);
+  for (let i = 0; i < globalThis.globals.statList.length; i++) {
+    addNewStat(globalThis.globals.statList[i]);
   }
 }
 
@@ -623,31 +623,32 @@ function getTalentMultiplier() {
 // how much "addExp" would you have to do to get this stat to the next exp or talent level
 
 function getExpToLevel(name, talentOnly = false) {
-  const expToNext = stats[name].statLevelExp.expToNextLevel;
-  const talentToNext = stats[name].talentLevelExp.expToNextLevel;
+  const expToNext = globalThis.globals.stats[name].statLevelExp.expToNextLevel;
+  const talentToNext = globalThis.globals.stats[name].talentLevelExp.expToNextLevel;
   const talentMultiplier = getTalentMultiplier();
   return Math.ceil(Math.min(talentOnly ? Infinity : expToNext, talentToNext / talentMultiplier));
 }
 
 function addExp(name, amount) {
-  stats[name].statLevelExp.addExp(amount);
-  stats[name].soullessLevelExp.addExp(amount / stats[name].soulstoneMult);
+  globalThis.globals.stats[name].statLevelExp.addExp(amount);
+  globalThis.globals.stats[name].soullessLevelExp.addExp(amount / globalThis.globals.stats[name].soulstoneMult);
   let talentGain = amount * getTalentMultiplier();
-  stats[name].talentLevelExp.addExp(talentGain);
+  globalThis.globals.stats[name].talentLevelExp.addExp(talentGain);
   globalThis.saving.vals.totalTalent += talentGain;
   globalThis.saving.view.requestUpdate('updateStat', name);
 }
 
 function restartStats() {
-  for (let i = 0; i < statList.length; i++) {
-    if (getSkillLevel('Wunderkind') > 0) stats[statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2') * 2);
-    else stats[statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2'));
+  for (let i = 0; i < globalThis.globals.statList.length; i++) {
+    if (getSkillLevel('Wunderkind') > 0) {
+      globalThis.globals.stats[globalThis.globals.statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2') * 2);
+    } else globalThis.globals.stats[globalThis.globals.statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2'));
   }
   globalThis.saving.view.requestUpdate('updateStats', true);
 }
 
 function getTotalBonusXP(statName) {
-  return stats[statName].totalBonusXP;
+  return globalThis.globals.stats[statName].totalBonusXP;
 }
 
 const _stats = {

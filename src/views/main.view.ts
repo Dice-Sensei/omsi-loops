@@ -151,7 +151,7 @@ class View {
 
     this.statGraph.init(document.getElementById('statsContainer'));
     const totalContainer = globalThis.helpers.htmlElement('totalStatContainer');
-    for (const stat of statList) {
+    for (const stat of globalThis.globals.statList) {
       const axisTip = this.statGraph.getAxisTip(stat);
       totalContainer.insertAdjacentHTML(
         'beforebegin',
@@ -477,8 +477,14 @@ class View {
 
   updateStats(skipAnimation) {
     let maxValue = 100; // I really need to stop writing this default explicitly everywhere
-    for (const stat of statList) {
-      for (const value of [globalThis.stats.getLevel(stat), globalThis.stats.getTalent(stat), stats[stat].soulstone]) {
+    for (const stat of globalThis.globals.statList) {
+      for (
+        const value of [
+          globalThis.stats.getLevel(stat),
+          globalThis.stats.getTalent(stat),
+          globalThis.globals.stats[stat].soulstone,
+        ]
+      ) {
         maxValue = Math.max(value, maxValue);
       }
     }
@@ -493,7 +499,7 @@ class View {
       requestAnimationFrame(() => statsContainer.classList.add('animate-logBars'));
     }
 
-    for (const stat of statList) {
+    for (const stat of globalThis.globals.statList) {
       this.updateStat(stat);
     }
   }
@@ -504,7 +510,7 @@ class View {
   }
 
   updateSkill(skill) {
-    if (skills[skill].levelExp.level === 0) {
+    if (globalThis.globals.skills[skill].levelExp.level === 0) {
       document.getElementById(`skill${skill}Container`).style.display = 'none';
       return;
     }
@@ -522,11 +528,11 @@ class View {
 
     if (skillShowing === skill) {
       document.getElementById(`skill${skill}LevelExp`).textContent = globalThis.helpers.intToString(
-        skills[skill].levelExp.exp,
+        globalThis.globals.skills[skill].levelExp.exp,
         1,
       );
       document.getElementById(`skill${skill}LevelExpNeeded`).textContent = globalThis.helpers.intToString(
-        skills[skill].levelExp.expRequiredForNextLevel,
+        globalThis.globals.skills[skill].levelExp.expRequiredForNextLevel,
         1,
       );
       document.getElementById(`skill${skill}LevelProgress`).textContent = globalThis.helpers.intToString(levelPrc, 2);
@@ -1122,7 +1128,7 @@ class View {
       while (expGainDiv.firstChild) {
         expGainDiv.removeChild(expGainDiv.firstChild);
       }
-      for (const stat of statList) {
+      for (const stat of globalThis.globals.statList) {
         if (action[`statExp${stat}`]) {
           statExpGain += `<div class='bold'>${globalThis.Localization.txt(`stats>${stat}>short_form`)}:</div> ${
             globalThis.helpers.intToString(action[`statExp${stat}`], 2)
@@ -1555,7 +1561,9 @@ class View {
     statEntries.sort((
       [aStat, aRatio],
       [bStat, bRatio],
-    ) => ((bRatio - aRatio) || (statList.indexOf(aStat) - statList.indexOf(bStat))));
+    ) => ((bRatio - aRatio) ||
+      (globalThis.globals.statList.indexOf(aStat) - globalThis.globals.statList.indexOf(bStat)))
+    );
     let totalRatio = 0;
     let gradientOffset = 0;
     let lastArcPoint = [0, -1]; // start at 12 o'clock
@@ -1997,17 +2005,26 @@ class View {
 
   updateSoulstones() {
     let total = 0;
-    for (const stat of statList) {
-      if (stats[stat].soulstone) {
-        total += stats[stat].soulstone;
+    for (const stat of globalThis.globals.statList) {
+      if (globalThis.globals.stats[stat].soulstone) {
+        total += globalThis.globals.stats[stat].soulstone;
         globalThis.helpers.htmlElement(`stat${stat}SoulstoneLogBar`).parentElement.style.display = '';
-        this.updateLevelLogBar('statsContainer', `stat${stat}SoulstoneLogBar`, stats[stat].soulstone);
-        document.getElementById(`ss${stat}Container`).style.display = '';
-        document.getElementById(`ss${stat}`).textContent = globalThis.helpers.formatNumber(stats[stat].soulstone);
-        document.getElementById(`stat${stat}SSBonus`).textContent = globalThis.helpers.intToString(
-          stats[stat].soulstone ? stats[stat].soulstoneMult : 0,
+        this.updateLevelLogBar(
+          'statsContainer',
+          `stat${stat}SoulstoneLogBar`,
+          globalThis.globals.stats[stat].soulstone,
         );
-        document.getElementById(`stat${stat}ss`).textContent = globalThis.helpers.intToString(stats[stat].soulstone, 1);
+        document.getElementById(`ss${stat}Container`).style.display = '';
+        document.getElementById(`ss${stat}`).textContent = globalThis.helpers.formatNumber(
+          globalThis.globals.stats[stat].soulstone,
+        );
+        document.getElementById(`stat${stat}SSBonus`).textContent = globalThis.helpers.intToString(
+          globalThis.globals.stats[stat].soulstone ? globalThis.globals.stats[stat].soulstoneMult : 0,
+        );
+        document.getElementById(`stat${stat}ss`).textContent = globalThis.helpers.intToString(
+          globalThis.globals.stats[stat].soulstone,
+          1,
+        );
       } else {
         globalThis.helpers.htmlElement(`stat${stat}SoulstoneLogBar`).parentElement.style.display = 'none';
         document.getElementById(`ss${stat}Container`).style.display = 'none';
@@ -2027,7 +2044,7 @@ class View {
   }
 
   updateMultiPart(action) {
-    const town = towns[action.townNum];
+    const town = globalThis.globals.towns[action.townNum];
     document.getElementById(`multiPartName${action.varName}`).textContent = action.getPartName();
     document.getElementById(`completed${action.varName}`).textContent = ` ${
       globalThis.helpers.formatNumber(town[`total${action.varName}`])
@@ -2049,8 +2066,8 @@ class View {
   }
 
   updateTrainingLimits() {
-    for (let i = 0; i < statList.length; i++) {
-      const trainingDiv = document.getElementById(`trainingLimit${statList[i]}`);
+    for (let i = 0; i < globalThis.globals.statList.length; i++) {
+      const trainingDiv = document.getElementById(`trainingLimit${globalThis.globals.statList[i]}`);
       if (trainingDiv) {
         trainingDiv.textContent = String(globalThis.saving.vals.trainingLimits);
       }
