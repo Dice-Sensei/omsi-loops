@@ -665,6 +665,56 @@ const skillList = /** @type {const} */ ([
   'Assassin',
 ]);
 
+const dungeonFloors = [6, 9, 20];
+const buffHardCaps = {
+  Ritual: 666,
+  Imbuement: 500,
+  Imbuement2: 500,
+  Imbuement3: 7,
+  Feast: 100,
+  Aspirant: 20,
+  Heroism: 50,
+  PrestigePhysical: 100,
+  PrestigeMental: 100,
+  PrestigeCombat: 100,
+  PrestigeSpatiomancy: 100,
+  PrestigeChronomancy: 100,
+  PrestigeBartering: 100,
+  PrestigeExpOverflow: 100,
+};
+const buffCaps = {
+  Ritual: 666,
+  Imbuement: 500,
+  Imbuement2: 500,
+  Imbuement3: 7,
+  Feast: 100,
+  Aspirant: 20,
+  Heroism: 50,
+  PrestigePhysical: 100,
+  PrestigeMental: 100,
+  PrestigeCombat: 100,
+  PrestigeSpatiomancy: 100,
+  PrestigeChronomancy: 100,
+  PrestigeBartering: 100,
+  PrestigeExpOverflow: 100,
+};
+const buffs = /** @type {{[K in BuffName]: Buff}} */ ({});
+const buffList = /** @type {const} */ ([
+  'Ritual',
+  'Imbuement',
+  'Imbuement2',
+  'Feast',
+  'Aspirant',
+  'Heroism',
+  'Imbuement3',
+  'PrestigePhysical',
+  'PrestigeMental',
+  'PrestigeCombat',
+  'PrestigeSpatiomancy',
+  'PrestigeChronomancy',
+  'PrestigeBartering',
+  'PrestigeExpOverflow',
+]);
 //globals!!!!!
 const actionLog = selfIsGame ? new ActionLog() : null;
 
@@ -708,57 +758,6 @@ const resourcesTemplate = globalThis.helpers.copyObject(resources);
 let hearts = [];
 
 const skills = /** @type {{[K in SkillName]: Skill}} */ ({});
-const buffList = /** @type {const} */ ([
-  'Ritual',
-  'Imbuement',
-  'Imbuement2',
-  'Feast',
-  'Aspirant',
-  'Heroism',
-  'Imbuement3',
-  'PrestigePhysical',
-  'PrestigeMental',
-  'PrestigeCombat',
-  'PrestigeSpatiomancy',
-  'PrestigeChronomancy',
-  'PrestigeBartering',
-  'PrestigeExpOverflow',
-]);
-
-const dungeonFloors = [6, 9, 20];
-const buffHardCaps = {
-  Ritual: 666,
-  Imbuement: 500,
-  Imbuement2: 500,
-  Imbuement3: 7,
-  Feast: 100,
-  Aspirant: 20,
-  Heroism: 50,
-  PrestigePhysical: 100,
-  PrestigeMental: 100,
-  PrestigeCombat: 100,
-  PrestigeSpatiomancy: 100,
-  PrestigeChronomancy: 100,
-  PrestigeBartering: 100,
-  PrestigeExpOverflow: 100,
-};
-const buffCaps = {
-  Ritual: 666,
-  Imbuement: 500,
-  Imbuement2: 500,
-  Imbuement3: 7,
-  Feast: 100,
-  Aspirant: 20,
-  Heroism: 50,
-  PrestigePhysical: 100,
-  PrestigeMental: 100,
-  PrestigeCombat: 100,
-  PrestigeSpatiomancy: 100,
-  PrestigeChronomancy: 100,
-  PrestigeBartering: 100,
-  PrestigeExpOverflow: 100,
-};
-const buffs = /** @type {{[K in BuffName]: Buff}} */ ({});
 
 const storyFlags = {
   maxSQuestsInALoop: false,
@@ -991,6 +990,8 @@ const _globals = {
   skillList,
   buffList,
   statList,
+  buffHardCaps,
+  dungeonFloors,
 };
 
 declare global {

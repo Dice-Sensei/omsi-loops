@@ -13,7 +13,7 @@ const buffsContainer = {
   html() {
     let html = '';
 
-    for (const name of buffList) {
+    for (const name of globalThis.globals.buffList) {
       const fullName = globalThis.stats.Buff.fullNames[name];
       const XMLName = globalThis.actionList.getXMLName(fullName);
       const desc2 = globalThis.Localization.txtsObj(`buffs>${XMLName}`)[0].innerHTML.includes('desc2');
@@ -39,7 +39,7 @@ const buffsContainer = {
               type="number" 
               id="buff${name}Cap" 
               class="buffmaxinput" 
-              value="${buffHardCaps[name]}" 
+              value="${globalThis.globals.buffHardCaps[name]}" 
               onchange="globalThis.view.updateBuffCaps()">
           </div>
         </div>

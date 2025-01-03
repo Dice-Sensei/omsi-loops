@@ -999,7 +999,7 @@ const Koviko = {
         'Dark Magic': {
           affected: ['rep'],
           canStart: (input) => (input.rep <= 0),
-          effect: (r, k) => (r.rep--, k.dark += Math.floor(100 * (1 + buffs.Ritual.amt / 100))),
+          effect: (r, k) => (r.rep--, k.dark += Math.floor(100 * (1 + globalThis.globals.buffs.Ritual.amt / 100))),
         },
         'Dark Ritual': {
           affected: ['ritual', 'soul'],

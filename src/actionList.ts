@@ -1756,10 +1756,10 @@ DungeonAction.prototype.finishDungeon = function finishDungeon(floorNum) {
   floor.completed++;
   const rand = Math.random();
   if (rand <= floor.ssChance) {
-    const statToAdd = statList[Math.floor(Math.random() * statList.length)];
+    const statToAdd = globalThis.globals.statList[Math.floor(Math.random() * globalThis.globals.statList.length)];
     floor.lastStat = statToAdd;
     const countToAdd = Math.floor(Math.pow(10, dungeonNum) * globalThis.stats.getSkillBonus('Divine'));
-    stats[statToAdd].soulstone = (stats[statToAdd].soulstone ?? 0) + countToAdd;
+    stats[statToAdd].soulstone = (globalThis.globals.stats[statToAdd].soulstone ?? 0) + countToAdd;
     floor.ssChance *= 0.98;
     globalThis.saving.view.requestUpdate('updateSoulstones', null);
     globalThis.globals.actionLog.addSoulstones(this, statToAdd, countToAdd);
@@ -6290,10 +6290,10 @@ Action.TheSpire = new DungeonAction('The Spire', 2, {
     const curFloor = Math.floor(loopCounter / this.segments + 0.0000001 - 1);
     this.finishDungeon(curFloor);
     if (curFloor >= globalThis.stats.getBuffLevel('Aspirant')) globalThis.stats.addBuffAmt('Aspirant', 1, this);
-    if (curFloor == dungeonFloors[this.dungeonNum] - 1) globalThis.view.setStoryFlag('clearedSpire');
+    if (curFloor == globalThis.globals.dungeonFloors[this.dungeonNum] - 1) globalThis.view.setStoryFlag('clearedSpire');
   },
   visible() {
-    return towns[5].getLevel('Meander') >= 5;
+    return globalThis.globals.towns[5].getLevel('Meander') >= 5;
   },
   unlocked() {
     return (globalThis.stats.getSkillLevel('Combat') + globalThis.stats.getSkillLevel('Magic')) >= 35;
@@ -7826,13 +7826,13 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
       case 1:
         return storyFlags.soulInfusionAttempted;
       case 2:
-        return buffs['Imbuement3'].amt > 0;
+        return globalThis.globals.buffs['Imbuement3'].amt > 0;
       case 3:
-        return buffs['Imbuement3'].amt > 6;
+        return globalThis.globals.buffs['Imbuement3'].amt > 6;
       case 4:
-        return buffs['Imbuement'].amt > 499 &&
-          buffs['Imbuement2'].amt > 499 &&
-          buffs['Imbuement3'].amt > 6;
+        return globalThis.globals.buffs['Imbuement'].amt > 499 &&
+          globalThis.globals.buffs['Imbuement2'].amt > 499 &&
+          globalThis.globals.buffs['Imbuement3'].amt > 6;
     }
   },
   stats: {
@@ -7863,8 +7863,8 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
       stats[stat].soulstone = 0;
       globalThis.saving.view.requestUpdate('updateStat', stat);
     }
-    buffs['Imbuement'].amt = 0;
-    buffs['Imbuement2'].amt = 0;
+    globalThis.globals.buffs['Imbuement'].amt = 0;
+    globalThis.globals.buffs['Imbuement2'].amt = 0;
     globalThis.saving.vals.trainingLimits = 10;
     globalThis.stats.addBuffAmt('Imbuement3', 1, this, 'imbuement3');
     globalThis.saving.view.updateBuffs();

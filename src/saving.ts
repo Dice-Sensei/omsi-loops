@@ -314,7 +314,7 @@ function initializeTowns() {
 }
 
 function isStatName(name) {
-  return statList.includes(name);
+  return globalThis.globals.statList.includes(name);
 }
 
 function isSkillName(name) {
@@ -322,7 +322,7 @@ function isSkillName(name) {
 }
 
 function isBuffName(name) {
-  return buffList.includes(name);
+  return globalThis.globals.buffList.includes(name);
 }
 
 function initializeActions() {
@@ -546,15 +546,18 @@ function doLoad(toLoad) {
   for (const property in toLoad.buffs) {
     if (toLoad.buffs.hasOwnProperty(property)) {
       // need the min for people with broken buff amts from pre 0.93
-      buffs[property].amt = Math.min(toLoad.buffs[property].amt, buffHardCaps[property]);
+      globalThis.globals.buffs[property].amt = Math.min(
+        toLoad.buffs[property].amt,
+        globalThis.globals.buffHardCaps[property],
+      );
     }
   }
 
   if (toLoad.buffCaps !== undefined) {
-    for (const property in buffCaps) {
+    for (const property in globalThis.globals.buffCaps) {
       if (toLoad.buffCaps.hasOwnProperty(property)) {
-        buffCaps[property] = toLoad.buffCaps[property];
-        globalThis.helpers.inputElement(`buff${property}Cap`).value = buffCaps[property];
+        globalThis.globals.buffCaps[property] = toLoad.buffCaps[property];
+        globalThis.helpers.inputElement(`buff${property}Cap`).value = globalThis.globals.buffCaps[property];
       }
     }
   }
@@ -720,7 +723,7 @@ function doLoad(toLoad) {
   let floors = 0;
   if (toLoad.dungeons === undefined) toLoad.dungeons = globalThis.helpers.copyArray(globalThis.saving.vals.dungeons);
   for (let i = 0; i < globalThis.saving.vals.dungeons.length; i++) {
-    floors = dungeonFloors[i];
+    floors = globalThis.globals.dungeonFloors[i];
     for (let j = 0; j < floors; j++) {
       if (toLoad.dungeons[i] != undefined && toLoad.dungeons && toLoad.dungeons[i][j]) {
         globalThis.saving.vals.dungeons[i][j] = toLoad.dungeons[i][j];
@@ -972,7 +975,7 @@ function doSave() {
   toSave.storyVars = storyVars;
   toSave.unreadActionStories = globalThis.saving.vals.unreadActionStories;
   toSave.actionLog = globalThis.globals.actionLog;
-  toSave.buffCaps = buffCaps;
+  toSave.buffCaps = globalThis.globals.buffCaps;
 
   toSave.date = new Date();
   toSave.totalOfflineMs = globalThis.saving.vals.totalOfflineMs;

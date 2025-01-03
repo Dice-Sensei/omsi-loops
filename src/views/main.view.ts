@@ -613,7 +613,7 @@ class View {
   }
 
   updateBuff(buff) {
-    if (buffs[buff].amt === 0) {
+    if (globalThis.globals.buffs[buff].amt === 0) {
       document.getElementById(`buff${buff}Container`).style.display = 'none';
       return;
     }
@@ -627,7 +627,7 @@ class View {
   }
 
   updateBuffs() {
-    for (const buff of buffList) {
+    for (const buff of globalThis.globals.buffList) {
       this.updateBuff(buff);
     }
   }
@@ -2363,11 +2363,14 @@ function adjustActionListSize(amt) {
 }
 
 function updateBuffCaps() {
-  for (const buff of buffList) {
+  for (const buff of globalThis.globals.buffList) {
     globalThis.helpers.inputElement(`buff${buff}Cap`).value = String(
-      Math.min(parseInt(globalThis.helpers.inputElement(`buff${buff}Cap`).value), buffHardCaps[buff]),
+      Math.min(
+        parseInt(globalThis.helpers.inputElement(`buff${buff}Cap`).value),
+        globalThis.globals.buffHardCaps[buff],
+      ),
     );
-    buffCaps[buff] = parseInt(globalThis.helpers.inputElement(`buff${buff}Cap`).value);
+    globalThis.globals.buffCaps[buff] = parseInt(globalThis.helpers.inputElement(`buff${buff}Cap`).value);
   }
 }
 

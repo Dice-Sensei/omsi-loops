@@ -372,7 +372,7 @@ function initializeStats() {
 }
 
 function addNewStat(name) {
-  stats[name] = new Stat(name);
+  globalThis.globals.stats[name] = new Stat(name);
 }
 
 function initializeSkills() {
@@ -382,7 +382,7 @@ function initializeSkills() {
 }
 
 function addNewSkill(name) {
-  skills[name] = new Skill(name);
+  globalThis.globals.skills[name] = new Skill(name);
   setSkillBonusType(name);
 }
 
@@ -393,11 +393,11 @@ function initializeBuffs() {
 }
 
 function addNewBuff(name) {
-  buffs[name] = new Buff(name);
+  globalThis.globals.buffs[name] = new Buff(name);
 }
 
 function getLevel(stat) {
-  return stats[stat].statLevelExp.level;
+  return globalThis.globals.stats[stat].statLevelExp.level;
 }
 
 function getTotalTalentLevel() {
@@ -491,7 +491,7 @@ function getSkillMod(name, min, max, percentChange) {
 }
 
 function getBuffLevel(buff) {
-  return buffs[buff].amt;
+  return globalThis.globals.buffs[buff].amt;
 }
 
 function getBuffCap(buff) {
@@ -586,11 +586,18 @@ function handleSkillExp(list) {
  */
 function addBuffAmt(name, amount, action, spendType, statsSpent) {
   const oldBuffLevel = getBuffLevel(name);
-  if (oldBuffLevel === buffHardCaps[name]) return;
-  buffs[name].amt += amount;
-  if (amount === 0) buffs[name].amt = 0; // for presetige, reset to 0 when passed in.
+  if (oldBuffLevel === globalThis.globals.buffHardCaps[name]) return;
+  globalThis.globals.buffs[name].amt += amount;
+  if (amount === 0) globalThis.globals.buffs[name].amt = 0; // for presetige, reset to 0 when passed in.
   if (action) {
-    globalThis.globals.actionLog.addBuff(action, name, buffs[name].amt, oldBuffLevel, spendType, statsSpent);
+    globalThis.globals.actionLog.addBuff(
+      action,
+      name,
+      globalThis.globals.buffs[name].amt,
+      oldBuffLevel,
+      spendType,
+      statsSpent,
+    );
   }
   globalThis.saving.view.requestUpdate('updateBuff', name);
 }
