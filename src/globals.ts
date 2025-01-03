@@ -643,10 +643,32 @@ const actionLogEntryTypeMap = {
   'buff': BuffEntry,
 };
 
-const actions = new globalThis.actions.Actions();
-
 const selfIsGame = typeof globalThis?.view?.View !== 'undefined';
+const skillList = /** @type {const} */ ([
+  'Combat',
+  'Magic',
+  'Practical',
+  'Alchemy',
+  'Crafting',
+  'Dark',
+  'Chronomancy',
+  'Pyromancy',
+  'Restoration',
+  'Spatiomancy',
+  'Mercantilism',
+  'Divine',
+  'Commune',
+  'Wunderkind',
+  'Gluttony',
+  'Thievery',
+  'Leadership',
+  'Assassin',
+]);
+
+//globals!!!!!
 const actionLog = selfIsGame ? new ActionLog() : null;
+
+const actions = new globalThis.actions.Actions();
 
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 
@@ -685,26 +707,6 @@ let resources = {
 const resourcesTemplate = globalThis.helpers.copyObject(resources);
 let hearts = [];
 
-const skillList = /** @type {const} */ ([
-  'Combat',
-  'Magic',
-  'Practical',
-  'Alchemy',
-  'Crafting',
-  'Dark',
-  'Chronomancy',
-  'Pyromancy',
-  'Restoration',
-  'Spatiomancy',
-  'Mercantilism',
-  'Divine',
-  'Commune',
-  'Wunderkind',
-  'Gluttony',
-  'Thievery',
-  'Leadership',
-  'Assassin',
-]);
 const skills = /** @type {{[K in SkillName]: Skill}} */ ({});
 const buffList = /** @type {const} */ ([
   'Ritual',
@@ -976,6 +978,7 @@ const storyVars = {
 };
 
 const _globals = {
+  selfIsGame,
   storyFlags,
   storyVars,
   actionLog,
@@ -985,6 +988,9 @@ const _globals = {
   towns,
   buffs,
   stats,
+  skillList,
+  buffList,
+  statList,
 };
 
 declare global {

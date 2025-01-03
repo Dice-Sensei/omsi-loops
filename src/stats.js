@@ -376,8 +376,8 @@ function addNewStat(name) {
 }
 
 function initializeSkills() {
-  for (let i = 0; i < skillList.length; i++) {
-    addNewSkill(skillList[i]);
+  for (let i = 0; i < globalThis.globals.skillList.length; i++) {
+    addNewSkill(globalThis.globals.skillList[i]);
   }
 }
 
@@ -387,8 +387,8 @@ function addNewSkill(name) {
 }
 
 function initializeBuffs() {
-  for (let i = 0; i < buffList.length; i++) {
-    addNewBuff(buffList[i]);
+  for (let i = 0; i < globalThis.globals.buffList.length; i++) {
+    addNewBuff(globalThis.globals.buffList[i]);
   }
 }
 

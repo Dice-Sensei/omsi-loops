@@ -3,7 +3,7 @@ const challengeSaveName = 'idleLoopsChallenge';
 let saveName = defaultSaveName;
 
 const timeNeededInitial = 5 * 50;
-const view = selfIsGame ? new globalThis.view.View() : null;
+const view = globalThis.globals.selfIsGame ? new globalThis.view.View() : null;
 
 const vals = {
   trainingLimits: 10,
@@ -318,7 +318,7 @@ function isStatName(name) {
 }
 
 function isSkillName(name) {
-  return skillList.includes(name);
+  return globalThis.globals.skillList.includes(name);
 }
 
 function isBuffName(name) {

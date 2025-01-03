@@ -540,7 +540,7 @@ const Koviko = {
         (dict, el, index) => (dict[el.type + el.name] = el, dict),
         {},
       );
-      for (const skill of skillList) {
+      for (const skill of globalThis.globals.skillList) {
         Koviko.trackedStats['S' + skill.toLowerCase()] = {
           type: 'S',
           name: skill.toLowerCase(),

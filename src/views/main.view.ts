@@ -602,7 +602,7 @@ class View {
   }
 
   updateSkills() {
-    for (const skill of skillList) {
+    for (const skill of globalThis.globals.skillList) {
       this.updateSkill(skill);
     }
   }
@@ -1617,10 +1617,10 @@ class View {
                 <div class='stat-pie mask' style='background:conic-gradient(${gradientStops.join()})'></div>`;
     if (action.skills !== undefined) {
       const skillKeyNames = Object.keys(action.skills);
-      const l = skillList.length;
+      const l = globalThis.globals.skillList.length;
       for (let i = 0; i < l; i++) {
         for (const skill of skillKeyNames) {
-          if (skillList[i] === skill) {
+          if (globalThis.globals.skillList[i] === skill) {
             const xmlName = globalThis.actionList.getXMLName(skill);
             const skillLabel = `${globalThis.Localization.txt(`skills>${xmlName}>label`)} ${
               globalThis.Localization.txt('stats>tooltip>exp')
