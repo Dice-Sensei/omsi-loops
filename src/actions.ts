@@ -329,11 +329,11 @@ class Actions {
         }
       }
     }
-    guild = '';
+    globalThis.saving.vals.guild = '';
     hearts = [];
-    escapeStarted = false;
-    portalUsed = false;
-    stoneLoc = 0;
+    globalThis.saving.vals.escapeStarted = false;
+    globalThis.saving.vals.portalUsed = false;
+    globalThis.saving.vals.stoneLoc = 0;
     globalThis.saving.vals.totalMerchantMana = 7500;
     if (options.keepCurrentList && this.current?.length > 0) {
       this.currentPos = 0;

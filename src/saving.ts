@@ -668,8 +668,6 @@ const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
 
-let totalTalent = 0;
-
 let resources = {
   gold: 0,
   reputation: 0,
@@ -699,16 +697,21 @@ let resources = {
   stone: false,
   wizardCollege: false,
 };
-let hearts = [];
 const resourcesTemplate = globalThis.helpers.copyObject(resources);
-let guild = '';
-let escapeStarted = false;
-let portalUsed = false;
-let stoneLoc = 0;
+let hearts = [];
 
-let curLoadout = 0;
-let loadouts;
-let loadoutnames;
+let totalTalent = 0;
+let guild = '';
+
+vals.totalTalent = 0;
+vals.stoneLoc = 0;
+vals.guild = '';
+vals.escapeStarted = false;
+vals.portalUsed = false;
+vals.curLoadout = 0;
+vals.loadouts = undefined;
+vals.loadoutnames = undefined;
+
 const skillList = /** @type {const} */ ([
   'Combat',
   'Magic',
@@ -1040,6 +1043,7 @@ let challengeSave = {
   inChallenge: false,
 };
 
+// cursed variable
 let totalActionList = [];
 let dungeons = [[], [], []];
 
@@ -1472,11 +1476,11 @@ function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
   loadDefaults();
   loadUISettings();
 
-  loadouts = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
-  loadoutnames = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+  globalThis.saving.vals.loadouts = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
+  globalThis.saving.vals.loadoutnames = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
   // loadoutnames[-1] is what displays in the loadout renaming box when no loadout is selected
   // It isn't technically part of the array, just a property on it, so it doesn't count towards loadoutnames.length
-  loadoutnames[-1] = '';
+  globalThis.saving.vals.loadoutnames[-1] = '';
 
   let toLoad = {};
   // has a save file
@@ -1645,7 +1649,7 @@ function doLoad(toLoad) {
   }
 
   if (toLoad.loadouts) {
-    for (let i = 0; i < loadouts.length; i++) {
+    for (let i = 0; i < globalThis.saving.vals.loadouts.length; i++) {
       if (!toLoad.loadouts[i]) {
         continue;
       }
@@ -1667,27 +1671,32 @@ function doLoad(toLoad) {
           action.name = 'Buy Mana Z3';
         }
         if (totalActionList.some((x) => x.name === action.name)) {
-          loadouts[i].push(action);
+          globalThis.saving.vals.loadouts[i].push(action);
         }
       }
     }
   }
-  for (let i = 0; i < loadoutnames.length; i++) {
-    loadoutnames[i] = 'Loadout ' + (i + 1);
+  for (let i = 0; i < globalThis.saving.vals.loadoutnames.length; i++) {
+    globalThis.saving.vals.loadoutnames[i] = 'Loadout ' + (i + 1);
   }
   if (toLoad.loadoutnames) {
-    for (let i = 0; i < loadoutnames.length; i++) {
+    for (let i = 0; i < globalThis.saving.vals.loadoutnames.length; i++) {
       if (toLoad.loadoutnames[i] != undefined && toLoad.loadoutnames != '') {
-        loadoutnames[i] = toLoad.loadoutnames[i];
+        globalThis.saving.vals.loadoutnames[i] = toLoad.loadoutnames[i];
       } else {
-        loadoutnames[i] = 'Loadout ' + (i + 1);
+        globalThis.saving.vals.loadoutnames[i] = 'Loadout ' + (i + 1);
       }
     }
   }
-  curLoadout = toLoad.curLoadout;
-  const elem = typeof document === 'undefined' ? undefined : document.getElementById(`load${curLoadout}`);
+  globalThis.saving.vals.curLoadout = toLoad.curLoadout;
+  const elem = typeof document === 'undefined'
+    ? undefined
+    : document.getElementById(`load${globalThis.saving.vals.curLoadout}`);
   if (elem) {
-    globalThis.helpers.removeClassFromDiv(document.getElementById(`load${curLoadout}`), 'unused');
+    globalThis.helpers.removeClassFromDiv(
+      document.getElementById(`load${globalThis.saving.vals.curLoadout}`),
+      'unused',
+    );
   }
 
   /*if (toLoad.dungeons) {
@@ -1882,9 +1891,9 @@ function doLoad(toLoad) {
 
 function doSave() {
   const toSave = {};
-  toSave.curLoadout = curLoadout;
+  toSave.curLoadout = globalThis.saving.vals.curLoadout;
   toSave.dungeons = dungeons;
-  toSave.trials = trials;
+  toSave.trials = globalThis.saving.vals.trials;
   toSave.townsUnlocked = townsUnlocked;
   toSave.completedActions = completedActions;
 
@@ -1921,8 +1930,8 @@ function doSave() {
   }
   toSave.hiddenVars = hiddenVars;
   toSave.nextList = actions.next;
-  toSave.loadouts = loadouts;
-  toSave.loadoutnames = loadoutnames;
+  toSave.loadouts = globalThis.saving.vals.loadouts;
+  toSave.loadoutnames = globalThis.saving.vals.loadoutnames;
   toSave.options = {};
   toSave.extraOptions = {}; // to avoid crashing when exporting to lloyd, etc
   for (const option in options) {
@@ -2156,7 +2165,6 @@ const _saving = {
   buffs,
   goldInvested,
   stonesUsed,
-  loadoutnames,
   options,
   storyMax,
   storyReqs,

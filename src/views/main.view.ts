@@ -1477,10 +1477,11 @@ class View {
   }
 
   updateLoadoutNames() {
-    for (let i = 0; i < loadoutnames.length; i++) {
-      document.getElementById(`load${i + 1}`).textContent = loadoutnames[i];
+    for (let i = 0; i < globalThis.saving.vals.loadoutnames.length; i++) {
+      document.getElementById(`load${i + 1}`).textContent = globalThis.saving.vals.loadoutnames[i];
     }
-    globalThis.helpers.inputElement('renameLoadout').value = loadoutnames[curLoadout - 1];
+    globalThis.helpers.inputElement('renameLoadout').value =
+      globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1];
   }
 
   createTownActions() {

@@ -430,29 +430,30 @@ function setCustomActionAmount() {
 }
 
 function selectLoadout(num) {
-  if (curLoadout === num) {
-    curLoadout = 0;
+  if (globalThis.saving.vals.curLoadout === num) {
+    globalThis.saving.vals.curLoadout = 0;
   } else {
-    curLoadout = num;
+    globalThis.saving.vals.curLoadout = num;
   }
-  globalThis.helpers.inputElement('renameLoadout').value = loadoutnames[curLoadout - 1];
-  globalThis.saving.view.updateLoadout(curLoadout);
+  globalThis.helpers.inputElement('renameLoadout').value =
+    globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1];
+  globalThis.saving.view.updateLoadout(globalThis.saving.vals.curLoadout);
 }
 
 function loadLoadout(num) {
-  curLoadout = num;
-  globalThis.saving.view.updateLoadout(curLoadout);
+  globalThis.saving.vals.curLoadout = num;
+  globalThis.saving.view.updateLoadout(globalThis.saving.vals.curLoadout);
   loadList();
 }
 
 let globalCustomInput = '';
 function saveList() {
-  if (curLoadout === 0) {
+  if (globalThis.saving.vals.curLoadout === 0) {
     globalThis.saving.save();
     return;
   }
   nameList(false);
-  loadouts[curLoadout] = globalThis.helpers.copyArray(actions.next);
+  globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout] = globalThis.helpers.copyArray(actions.next);
   globalThis.saving.save();
   if ((globalThis.helpers.inputElement('renameLoadout').value !== 'Saved!')) {
     globalCustomInput = globalThis.helpers.inputElement('renameLoadout').value;
@@ -472,23 +473,25 @@ function nameList(saveGame) {
     if (globalThis.helpers.inputElement('renameLoadout').value.length > 30) {
       globalThis.helpers.inputElement('renameLoadout').value = '30 Letter Max';
     } else if (globalThis.helpers.inputElement('renameLoadout').value !== 'Saved!') {
-      loadoutnames[curLoadout - 1] = globalThis.helpers.inputElement('renameLoadout').value;
+      globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1] =
+        globalThis.helpers.inputElement('renameLoadout').value;
     }
-  } else if (!isNaN(parseFloat(loadoutnames[curLoadout - 1]))) {
+  } else if (!isNaN(parseFloat(globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1]))) {
     globalThis.helpers.inputElement('renameLoadout').value = 'Enter a name!';
   }
-  document.getElementById(`load${curLoadout}`).textContent = loadoutnames[curLoadout - 1];
+  document.getElementById(`load${globalThis.saving.vals.curLoadout}`).textContent =
+    globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1];
   if (saveGame) globalThis.saving.save();
 }
 
 function loadList() {
-  if (curLoadout === 0) {
+  if (globalThis.saving.vals.curLoadout === 0) {
     return;
   }
   globalThis.helpers.inputElement('amountCustom').value = actions.addAmount.toString();
   actions.clearActions();
-  if (loadouts[curLoadout]) {
-    actions.appendActionRecords(loadouts[curLoadout]);
+  if (globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout]) {
+    actions.appendActionRecords(globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout]);
   }
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.adjustDarkRitualText();

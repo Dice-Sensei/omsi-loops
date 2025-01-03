@@ -821,7 +821,7 @@ function HaulAction(townNum) {
       return towns[this.townNum].getLevel('RuinsZ' + townNum) > 0;
     },
     finish() {
-      stoneLoc = this.townNum;
+      globalThis.saving.vals.stoneLoc = this.townNum;
       towns[this.townNum].finishRegular(this.varName, 1000, () => {
         globalThis.driver.addResource('stone', true);
       });
@@ -3172,7 +3172,7 @@ Action.BuyManaZ3 = new Action('Buy Mana Z3', {
     return 100;
   },
   canStart() {
-    return !portalUsed;
+    return !globalThis.saving.vals.portalUsed;
   },
   visible() {
     return true;
@@ -5054,7 +5054,7 @@ Action.BuyManaZ5 = new Action('Buy Mana Z5', {
     return 100;
   },
   canStart() {
-    return !portalUsed;
+    return !globalThis.saving.vals.portalUsed;
   },
   visible() {
     return true;
@@ -6838,9 +6838,9 @@ Action.Escape = new Action('Escape', {
     return 1;
   },
   canStart() {
-    if (escapeStarted) return true;
+    if (globalThis.saving.vals.escapeStarted) return true;
     else if (globalThis.driver.effectiveTime < 60) {
-      escapeStarted = true;
+      globalThis.saving.vals.escapeStarted = true;
       return true;
     } else return false;
   },
@@ -6895,7 +6895,7 @@ Action.OpenPortal = new Action('Open Portal', {
     return globalThis.stats.getSkillLevel('Restoration') >= 1000;
   },
   finish() {
-    portalUsed = true;
+    globalThis.saving.vals.portalUsed = true;
     globalThis.view.setStoryFlag('portalOpened');
     globalThis.stats.handleSkillExp(this.skills);
     globalThis.driver.unlockTown(1);
@@ -7966,11 +7966,11 @@ Action.BuildTower = new Action('Build Tower', {
     return true;
   },
   finish() {
-    stonesUsed[stoneLoc]++;
+    stonesUsed[globalThis.saving.vals.stoneLoc]++;
     towns[this.townNum].finishProgress(this.varName, 505);
     globalThis.driver.addResource('stone', false);
     if (towns[this.townNum].getLevel(this.varName) >= 100) stonesUsed = { 1: 250, 3: 250, 5: 250, 6: 250 };
-    adjustRocks(stoneLoc);
+    adjustRocks(globalThis.saving.vals.stoneLoc);
   },
 });
 
