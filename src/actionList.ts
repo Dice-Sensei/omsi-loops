@@ -570,7 +570,10 @@ class TrialAction extends MultipartAction {
     const finishedFloor = this.currentFloor(loopCounter) - 1;
     //console.log("Finished floor: " + finishedFloor + " Current Floor: " + this.currentFloor());
     globalThis.saving.trials[this.trialNum][finishedFloor].completed++;
-    if (finishedFloor > globalThis.saving.trials[this.trialNum].highestFloor || globalThis.saving.trials[this.trialNum].highestFloor === undefined) {
+    if (
+      finishedFloor > globalThis.saving.trials[this.trialNum].highestFloor ||
+      globalThis.saving.trials[this.trialNum].highestFloor === undefined
+    ) {
       globalThis.saving.trials[this.trialNum].highestFloor = finishedFloor;
     }
     globalThis.saving.view.requestUpdate('updateTrialInfo', {
@@ -1238,7 +1241,7 @@ Action.TrainStrength = new Action('Train Strength', {
     Con: 0.2,
   },
   allowed() {
-    return trainingLimits;
+    return globalThis.saving.vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -2217,7 +2220,7 @@ Action.SitByWaterfall = new Action('Sit By Waterfall', {
     Soul: 0.8,
   },
   allowed() {
-    return trainingLimits;
+    return globalThis.saving.vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -2486,7 +2489,7 @@ Action.TrainDexterity = new Action('Train Dexterity', {
     Con: 0.2,
   },
   allowed() {
-    return trainingLimits;
+    return globalThis.saving.vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -2526,7 +2529,7 @@ Action.TrainSpeed = new Action('Train Speed', {
     Con: 0.2,
   },
   allowed() {
-    return trainingLimits;
+    return globalThis.saving.vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -2611,7 +2614,7 @@ Action.BirdWatching = new Action('Bird Watching', {
   },
   affectedBy: ['Buy Glasses'],
   allowed() {
-    return trainingLimits;
+    return globalThis.saving.vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -3817,7 +3820,7 @@ Action.ReadBooks = new Action('Read Books', {
   },
   affectedBy: ['Buy Glasses'],
   allowed() {
-    return trainingLimits;
+    return globalThis.saving.vals.trainingLimits;
   },
   canStart() {
     return resources.glasses;
@@ -4584,7 +4587,7 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
   grantsBuff: 'Imbuement',
   loopsFinished() {
     const spent = sacrificeSoulstones(this.goldCost());
-    trainingLimits++;
+    globalThis.saving.vals.trainingLimits++;
     globalThis.stats.addBuffAmt('Imbuement', 1, this, 'soulstone', spent);
     globalThis.saving.view.requestUpdate('updateSoulstones', null);
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'ImbueMind', cost: this.goldCost() });
@@ -5220,7 +5223,7 @@ Action.CharmSchool = new Action('Charm School', {
     Int: 0.2,
   },
   allowed() {
-    return trainingLimits;
+    return globalThis.saving.vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -5259,7 +5262,7 @@ Action.Oracle = new Action('Oracle', {
     Soul: 0.2,
   },
   allowed() {
-    return trainingLimits;
+    return globalThis.saving.vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -7887,7 +7890,7 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
     }
     buffs['Imbuement'].amt = 0;
     buffs['Imbuement2'].amt = 0;
-    trainingLimits = 10;
+    globalThis.saving.vals.trainingLimits = 10;
     globalThis.stats.addBuffAmt('Imbuement3', 1, this, 'imbuement3');
     globalThis.saving.view.updateBuffs();
     globalThis.saving.view.updateStats();
@@ -8127,7 +8130,8 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
     return 50000;
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum] && resources.power > 0 && resources.power < 8;
+    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum] && resources.power > 0 &&
+      resources.power < 8;
   },
   baseProgress() {
     return globalThis.stats.getSelfCombat();

@@ -652,7 +652,9 @@ const selfIsGame = typeof globalThis?.view?.View !== 'undefined';
 const timeNeededInitial = 5 * 50;
 const view = selfIsGame ? new globalThis.view.View() : null;
 
-const vals = {};
+const vals = {
+  trainingLimits: 10,
+};
 
 // Globals!!!!!
 const actions = new globalThis.actions.Actions();
@@ -786,7 +788,6 @@ let actionStoriesShowing = false;
 let townsUnlocked = [];
 let completedActions = [];
 
-let trainingLimits = 10;
 let storyShowing = 0;
 let storyMax = 0;
 let unreadActionStories;
@@ -1612,7 +1613,7 @@ function doLoad(toLoad) {
     });
   }
   completedActions.push('FoundGlasses');
-  trainingLimits = 10 + globalThis.stats.getBuffLevel('Imbuement');
+  globalThis.saving.vals.trainingLimits = 10 + globalThis.stats.getBuffLevel('Imbuement');
   goldInvested = toLoad.goldInvested === undefined ? 0 : toLoad.goldInvested;
   stonesUsed = toLoad.stonesUsed === undefined ? { 1: 0, 3: 0, 5: 0, 6: 0 } : toLoad.stonesUsed;
 

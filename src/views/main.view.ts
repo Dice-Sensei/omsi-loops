@@ -2051,7 +2051,7 @@ class View {
     for (let i = 0; i < statList.length; i++) {
       const trainingDiv = document.getElementById(`trainingLimit${statList[i]}`);
       if (trainingDiv) {
-        trainingDiv.textContent = String(trainingLimits);
+        trainingDiv.textContent = String(globalThis.saving.vals.trainingLimits);
       }
     }
     if (globalThis.stats.getBuffLevel('Imbuement') > 0 || globalThis.stats.getBuffLevel('Imbuement3') > 0) {

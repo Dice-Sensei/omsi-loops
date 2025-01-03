@@ -565,7 +565,7 @@ function capAmount(index, townNum) {
 function capTraining(index) {
   const action = actions.next[index];
   const alreadyExisting = globalThis.actions.getNumOnList(action.name) + (action.disabled ? action.loops : 0);
-  const newLoops = trainingLimits - alreadyExisting;
+  const newLoops = globalThis.saving.vals.trainingLimits - alreadyExisting;
   actions.updateAction(index, { loops: globalThis.helpers.clamp(action.loops + newLoops, 0, null) });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
