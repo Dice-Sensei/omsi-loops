@@ -333,7 +333,7 @@ class Actions {
       }
     }
     globalThis.saving.vals.guild = '';
-    hearts = [];
+    globalThis.globals.hearts = [];
     globalThis.saving.vals.escapeStarted = false;
     globalThis.saving.vals.portalUsed = false;
     globalThis.saving.vals.stoneLoc = 0;

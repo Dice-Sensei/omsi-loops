@@ -716,6 +716,7 @@ const buffList = /** @type {const} */ ([
   'PrestigeExpOverflow',
 ]);
 const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
+let hearts = [];
 
 //globals!!!!!
 const actionLog = selfIsGame ? new ActionLog() : null;
@@ -756,7 +757,6 @@ let resources = {
   wizardCollege: false,
 };
 const resourcesTemplate = globalThis.helpers.copyObject(resources);
-let hearts = [];
 
 const skills = /** @type {{[K in SkillName]: Skill}} */ ({});
 
@@ -993,6 +993,9 @@ const _globals = {
   statList,
   buffHardCaps,
   dungeonFloors,
+  hearts,
+  resources,
+  resourcesTemplate,
 };
 
 declare global {

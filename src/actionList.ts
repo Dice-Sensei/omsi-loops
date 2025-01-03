@@ -639,7 +639,7 @@ class AssassinAction extends MultipartAction {
   }
   loopsFinished() {
     globalThis.driver.addResource('heart', 1);
-    hearts.push(this.varName);
+    globalThis.globals.hearts.push(this.varName);
   }
   finish() {
     let rep = Math.min((this.townNum + 1) * -250 + globalThis.stats.getSkillLevel('Assassin'), 0);
