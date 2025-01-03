@@ -92,7 +92,7 @@ class ActionLog {
       this.earliestShownEntry > 0 &&
       (this.entries[this.earliestShownEntry - 1].repeatable || this.earliestShownEntry > this.entries.length - 3)
     ) {
-      view.requestUpdate('updateActionLogEntry', --this.earliestShownEntry);
+      globalThis.saving.view.requestUpdate('updateActionLogEntry', --this.earliestShownEntry);
     }
   }
 
@@ -634,6 +634,14 @@ class BuffEntry extends LeveledLogEntry {
     return super.merge(other);
   }
 }
+
+const actionLogEntryTypeMap = {
+  'story': ActionStoryEntry,
+  'global': GlobalStoryEntry,
+  'soulstone': SoulstoneEntry,
+  'skill': SkillEntry,
+  'buff': BuffEntry,
+};
 
 // Globals!!!!!
 const actions = new globalThis.actions.Actions();

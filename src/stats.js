@@ -653,7 +653,7 @@ function addExp(name, amount) {
   let talentGain = amount * getTalentMultiplier();
   stats[name].talentLevelExp.addExp(talentGain);
   globalThis.saving.vals.totalTalent += talentGain;
-  view.requestUpdate('updateStat', name);
+  globalThis.saving.view.requestUpdate('updateStat', name);
 }
 
 function restartStats() {
@@ -661,7 +661,7 @@ function restartStats() {
     if (getSkillLevel('Wunderkind') > 0) stats[statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2') * 2);
     else stats[statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2'));
   }
-  view.requestUpdate('updateStats', true);
+  globalThis.saving.view.requestUpdate('updateStats', true);
 }
 
 /** @param {typeof statList[number]} statName */

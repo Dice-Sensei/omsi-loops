@@ -1,11 +1,3 @@
-const actionLogEntryTypeMap = {
-  'story': ActionStoryEntry,
-  'global': GlobalStoryEntry,
-  'soulstone': SoulstoneEntry,
-  'skill': SkillEntry,
-  'buff': BuffEntry,
-};
-
 const defaultSaveName = 'idleLoops1';
 const challengeSaveName = 'idleLoopsChallenge';
 let saveName = defaultSaveName;
@@ -396,7 +388,7 @@ function handleOption(option, value, init, getInput) {
 
 function setOption(option, value, updateUI = false) {
   const oldValue = globalThis.saving.vals.options[option];
-  options[option] = value;
+  globalThis.saving.vals.options[option] = value;
   handleOption(option, value, false, () => globalThis.helpers.valueElement(`${option}Input`));
   if (globalThis.saving.vals.options[option] !== oldValue) {
     save();
@@ -1197,6 +1189,7 @@ const _saving = {
   timer: timeNeededInitial,
   timeNeeded: timeNeededInitial,
   vals,
+  isBuffName,
 };
 
 declare global {

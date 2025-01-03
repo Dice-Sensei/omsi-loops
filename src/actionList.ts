@@ -717,7 +717,7 @@ function SurveyAction(townNum) {
         globalThis.saving.viewalThis.driver.addResource('map', -1);
         globalThis.driver.addResource('completedMap', 1);
         globalThis.saving.vals.towns[this.townNum].finishProgress(this.varName, getExploreSkill());
-        view.requestUpdate('updateActionTooltips', null);
+        globalThis.saving.view.requestUpdate('updateActionTooltips', null);
       } else if (globalThis.saving.vals.options.pauseOnComplete) {
         globalThis.driver.pauseGame(true, 'Survey complete! (Game paused)');
       }
@@ -3688,7 +3688,7 @@ Action.Apprentice = new Action('Apprentice', {
   finish() {
     towns[2].finishProgress(this.varName, 30 * getCraftGuildRank().bonus);
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustExpGain', Action.Apprentice);
+    globalThis.saving.view.requestUpdate('adjustExpGain', Action.Apprentice);
   },
 });
 
@@ -3741,7 +3741,7 @@ Action.Mason = new Action('Mason', {
   finish() {
     towns[2].finishProgress(this.varName, 20 * getCraftGuildRank().bonus);
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustExpGain', Action.Mason);
+    globalThis.saving.view.requestUpdate('adjustExpGain', Action.Mason);
   },
 });
 
@@ -3794,7 +3794,7 @@ Action.Architect = new Action('Architect', {
   finish() {
     towns[2].finishProgress(this.varName, 10 * getCraftGuildRank().bonus);
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('adjustExpGain', Action.Architect);
+    globalThis.saving.view.requestUpdate('adjustExpGain', Action.Architect);
   },
 });
 
@@ -3947,7 +3947,7 @@ Action.HeroesTrial = new TrialAction('Heroes Trial', 0, {
   },
   finish() {
     globalThis.stats.handleSkillExp(this.skills);
-    view.requestUpdate('updateBuff', 'Heroism');
+    globalThis.saving.view.requestUpdate('updateBuff', 'Heroism');
   },
 });
 
@@ -4167,8 +4167,8 @@ Action.DecipherRunes = new Action('Decipher Runes', {
   },
   finish() {
     towns[3].finishProgress(this.varName, 100 * (resources.glasses ? 2 : 1));
-    view.requestUpdate('adjustManaCost', 'Chronomancy');
-    view.requestUpdate('adjustManaCost', 'Pyromancy');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Chronomancy');
+    globalThis.saving.view.requestUpdate('adjustManaCost', 'Pyromancy');
   },
 });
 
@@ -4610,7 +4610,9 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
   finish() {
     globalThis.saving.view.requestUpdate('updateBuff', 'Imbuement');
     if (globalThis.saving.vals.options.autoMaxTraining) globalThis.driver.capAllTraining();
-    if (globalThis.saving.vals.towns[3].ImbueMindLoopCounter >= 0) globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
+    if (globalThis.saving.vals.towns[3].ImbueMindLoopCounter >= 0) {
+      globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
+    }
   },
 });
 

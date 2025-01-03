@@ -682,7 +682,9 @@ class View {
       globalThis.saving.vals.options.speedIncrease20x ? 20 : 0,
       globalThis.saving.vals.options.speedIncreaseCustom,
     );
-    const bgSpeed = !isFinite(globalThis.saving.vals.options.speedIncreaseBackground) ? -1 : globalThis.saving.vals.options.speedIncreaseBackground ?? -1;
+    const bgSpeed = !isFinite(globalThis.saving.vals.options.speedIncreaseBackground)
+      ? -1
+      : globalThis.saving.vals.options.speedIncreaseBackground ?? -1;
     const variables = {
       __proto__: null, // toString is not a valid replacement name
       get background_info() {
@@ -1657,7 +1659,7 @@ class View {
         }
       }
     }
-    if (isBuffName(action.grantsBuff)) {
+    if (globalThis.saving.isBuffName(action.grantsBuff)) {
       const xmlName = globalThis.actionList.getXMLName(globalThis.stats.Buff.fullNames[action.grantsBuff]);
       const grantsBuff = `<div class='bold'>${globalThis.Localization.txt('actions>tooltip>grants_buff')}:</div>`;
       lockedSkills += `${grantsBuff} <span>${globalThis.Localization.txt(`buffs>${xmlName}>label`)}</span><br>`;
@@ -2123,8 +2125,10 @@ class View {
     } else {
       document.getElementById('themeVariantSection').style.display = 'none';
     }
-    document.getElementById('theBody').className = `t-${globalThis.saving.vals.options.theme} ${globalThis.saving.vals.options.themeVariant}`;
-    localStorage['latestTheme'] = `${globalThis.saving.vals.options.theme} ${globalThis.saving.vals.options.themeVariant}`;
+    document.getElementById('theBody').className =
+      `t-${globalThis.saving.vals.options.theme} ${globalThis.saving.vals.options.themeVariant}`;
+    localStorage['latestTheme'] =
+      `${globalThis.saving.vals.options.theme} ${globalThis.saving.vals.options.themeVariant}`;
   }
 
   createTravelMenu() {
@@ -2134,7 +2138,7 @@ class View {
       travelMenu.append(`"<option value=${index} class='zone-${index + 1}' hidden=''>${town}</option>`);
     });
     travelMenu.change(function () {
-      view.showTown(Number($(this).val()));
+      globalThis.saving.view.showTown(Number($(this).val()));
     });
     this.updateTravelMenu();
   }
@@ -2256,7 +2260,7 @@ function unlockGlobalStory(num) {
   if (num > globalThis.saving.vals.storyMax) {
     document.getElementById('newStory').style.display = 'inline-block';
     globalThis.saving.vals.storyMax = num;
-    view.requestUpdate('updateGlobalStory', num);
+    globalThis.saving.view.requestUpdate('updateGlobalStory', num);
   }
 }
 
@@ -2264,7 +2268,7 @@ function unlockGlobalStory(num) {
 function setStoryFlag(name) {
   if (!storyFlags[name]) {
     storyFlags[name] = true;
-    if (globalThis.saving.vals.options.actionLog) view.requestUpdate('updateStories', false);
+    if (globalThis.saving.vals.options.actionLog) globalThis.saving.view.requestUpdate('updateStories', false);
   }
 }
 const unlockStory = setStoryFlag; // compatibility alias
@@ -2273,7 +2277,7 @@ const unlockStory = setStoryFlag; // compatibility alias
 function increaseStoryVarTo(name, value) {
   if (storyVars[name] < value) {
     storyVars[name] = value;
-    if (globalThis.saving.vals.options.actionLog) view.requestUpdate('updateStories', false);
+    if (globalThis.saving.vals.options.actionLog) globalThis.saving.view.requestUpdate('updateStories', false);
   }
 }
 
