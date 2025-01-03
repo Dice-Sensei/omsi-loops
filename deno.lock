@@ -1,10 +1,10 @@
 {
   "version": "4",
   "specifiers": {
+    "npm:@nimir/a-path@2.0.2": "2.0.2",
     "npm:@types/d3@^7.4.3": "7.4.3",
     "npm:@types/jquery@^3.5.32": "3.5.32",
     "npm:@types/lz-string@^1.5.0": "1.5.0",
-    "npm:a-path@2.0.1": "2.0.1",
     "npm:d3@^7.9.0": "7.9.0_d3-selection@3.0.0",
     "npm:jquery@^3.7.1": "3.7.1",
     "npm:lz-string@^1.5.0": "1.5.0",
@@ -87,6 +87,9 @@
     },
     "@esbuild/win32-x64@0.24.2": {
       "integrity": "sha512-7VTgWzgMGvup6aSqDPLiW5zHaxYJGTO4OokMjIlrCtf+VpEL+cXKtCvg723iguPYI5oaUNdS+/V7OU2gvXVWEg=="
+    },
+    "@nimir/a-path@2.0.2": {
+      "integrity": "sha512-Abhc/bZokcCx3rLZmDDnd4FpjvQvdZFH9ujFekvBfVkyQQErjykms6+f+mOCG0u7WThtJMPB365vTYXOOQnJKg=="
     },
     "@rollup/rollup-android-arm-eabi@4.29.1": {
       "integrity": "sha512-ssKhA8RNltTZLpG6/QNkCSge+7mBQGUqJRisZ2MDQcEGaK93QESEgWK2iOpIDZ7k9zPVkG5AS3ksvD5ZWxmItw=="
@@ -325,9 +328,6 @@
     },
     "@types/sizzle@2.3.9": {
       "integrity": "sha512-xzLEyKB50yqCUPUJkIsrVvoWNfFUbIZI+RspLWt8u+tIW/BetMBZtgV2LY/2o+tYH8dRvQ+eoPf3NdhQCcLE2w=="
-    },
-    "a-path@2.0.1": {
-      "integrity": "sha512-1w5foyOYj9e3MZWCdV5YDEsIhCpHgQH0/yjGsy37PaBceVlfeA6Xm0sifMEINZnfWk9+MtrRXXzEH/mOvYhtnw=="
     },
     "commander@7.2.0": {
       "integrity": "sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw=="
@@ -659,10 +659,10 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
+        "npm:@nimir/a-path@2.0.2",
         "npm:@types/d3@^7.4.3",
         "npm:@types/jquery@^3.5.32",
         "npm:@types/lz-string@^1.5.0",
-        "npm:a-path@2.0.1",
         "npm:d3@^7.9.0",
         "npm:jquery@^3.7.1",
         "npm:lz-string@^1.5.0",

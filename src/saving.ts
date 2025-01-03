@@ -652,6 +652,8 @@ const selfIsGame = typeof globalThis?.view?.View !== 'undefined';
 const timeNeededInitial = 5 * 50;
 const view = selfIsGame ? new globalThis.view.View() : null;
 
+const vals = {};
+
 // Globals!!!!!
 const actions = new globalThis.actions.Actions();
 
@@ -1039,18 +1041,6 @@ let challengeSave = {
   inChallenge: false,
 };
 
-let vals = {
-  currentLoop: 0,
-  totalMerchantMana: 7500,
-  curAdvGuildSegment: 0,
-  curCraftGuildSegment: 0,
-  curWizCollegeSegment: 0,
-  curFightFrostGiantsSegment: 0,
-  curFightJungleMonstersSegment: 0,
-  curThievesGuildSegment: 0,
-  curGodsSegment: 0,
-  totalOfflineMs: 0,
-};
 
 let totalActionList = [];
 let dungeons = [[], [], []];
@@ -1093,6 +1083,19 @@ const options = {
   predictorBackgroundThread: true,
 };
 // Globals!!!!!
+
+Object.assign(vals, {
+  currentLoop: 0,
+  totalMerchantMana: 7500,
+  curAdvGuildSegment: 0,
+  curCraftGuildSegment: 0,
+  curWizCollegeSegment: 0,
+  curFightFrostGiantsSegment: 0,
+  curFightJungleMonstersSegment: 0,
+  curThievesGuildSegment: 0,
+  curGodsSegment: 0,
+  totalOfflineMs: 0,
+});
 
 globalThis.Data.registerAll({
   actions,
