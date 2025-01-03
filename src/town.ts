@@ -93,10 +93,7 @@ class Town<TN extends number> {
         }
       }
     }
-    globalThis.saving.view.requestUpdate('updateProgressAction', {
-      name: varName,
-      town: towns[globalThis.saving.vals.curTown],
-    });
+    globalThis.saving.view.requestUpdate('updateProgressAction', { name: varName, town: towns[curTown] });
   }
 
   getPrcToNext(varName) {

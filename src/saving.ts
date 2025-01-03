@@ -654,13 +654,18 @@ const view = selfIsGame ? new globalThis.view.View() : null;
 
 // Globals!!!!!
 const actions = new globalThis.actions.Actions();
+
 const actionLog = selfIsGame ? new ActionLog() : null;
+
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 
+let curTown = 0;
 const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
+
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
 
 let totalTalent = 0;
+let shouldRestart = true;
 
 let resources = {
   gold: 0,
@@ -691,10 +696,8 @@ let resources = {
   stone: false,
   wizardCollege: false,
 };
-const resourcesTemplate = globalThis.helpers.copyObject(resources);
-
 let hearts = [];
-
+const resourcesTemplate = globalThis.helpers.copyObject(resources);
 let guild = '';
 let escapeStarted = false;
 let portalUsed = false;
@@ -1047,7 +1050,6 @@ let vals = {
   curThievesGuildSegment: 0,
   curGodsSegment: 0,
   totalOfflineMs: 0,
-  curTown: 0,
 };
 
 let totalActionList = [];

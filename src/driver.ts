@@ -5,7 +5,7 @@ let gameTicksLeft = 0; // actually milliseconds, not ticks
 let refund = false;
 let radarUpdateTime = 0;
 let lastSave = Date.now();
-function getSpeedMult(zone = globalThis.saving.vals.curTown) {
+function getSpeedMult(zone = curTown) {
   let speedMult = 1;
 
   // Dark Ritual
@@ -54,7 +54,7 @@ function singleTick() {
 
   refreshDungeons(1);
 
-  if (globalThis.driver.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
+  if (shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
     loopEnd();
     prepareRestart();
   }
@@ -64,6 +64,7 @@ function singleTick() {
 let lastAnimationTime = 0;
 let animationFrameRequest = 0;
 let animationTicksEnabled = true;
+
 function animationTick(animationTime) {
   if (animationTime == lastAnimationTime || !animationTicksEnabled) {
     // double tick in the same frame, drop this one
@@ -153,7 +154,7 @@ function executeGameTicks(deadline) {
     manaAvailable = Math.min(manaAvailable, globalThis.saving.timeNeeded - globalThis.saving.timer);
 
     // don't run more than 1 tick
-    if (globalThis.driver.shouldRestart) {
+    if (shouldRestart) {
       manaAvailable = Math.min(manaAvailable, 1);
     }
 
@@ -183,7 +184,7 @@ function executeGameTicks(deadline) {
 
     refreshDungeons(manaSpent);
 
-    if (globalThis.driver.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
+    if (shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
       cleanExit = true;
       loopEnd();
       prepareRestart();
@@ -320,7 +321,7 @@ function prepareRestart() {
 }
 
 function restart() {
-  globalThis.driver.shouldRestart = false;
+  shouldRestart = false;
   globalThis.saving.timer = 0;
   globalThis.driver.timeCounter = 0;
   globalThis.driver.effectiveTime = 0;
@@ -509,7 +510,7 @@ function unlockTown(townNum) {
     if (challengeSave['c' + cNum] < townNum) challengeSave['c' + cNum] = townNum;
     else if (challengeSave['c' + cNum] === undefined) challengeSave['c' + cNum] = townNum;
   }
-  globalThis.saving.vals.curTown = townNum;
+  curTown = townNum;
 }
 
 function adjustAll() {
@@ -890,7 +891,6 @@ const _driver = {
   timeCounter: 0,
   baseManaPerSecond: 50,
   gameSpeed: 1,
-  shouldRestart: true,
 };
 
 declare global {
