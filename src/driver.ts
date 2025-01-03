@@ -504,16 +504,16 @@ function clearList() {
 
 function unlockTown(townNum) {
   if (!towns[townNum].unlocked()) {
-    townsUnlocked.push(townNum);
-    townsUnlocked.sort();
+    globalThis.saving.vals.townsUnlocked.push(townNum);
+    globalThis.saving.vals.townsUnlocked.sort();
     // refresh current
     globalThis.saving.view.showTown(townNum);
     globalThis.saving.view.requestUpdate('updateTravelMenu', null);
   }
   let cNum = challengeSave.challengeMode;
   if (cNum !== 0) {
-    if (challengeSave['c' + cNum] < townNum) challengeSave['c' + cNum] = townNum;
-    else if (challengeSave['c' + cNum] === undefined) challengeSave['c' + cNum] = townNum;
+    if (globalThis.saving.vals.challengeSave['c' + cNum] < townNum) globalThis.saving.vals.challengeSave['c' + cNum] = townNum;
+    else if (globalThis.saving.vals.challengeSave['c' + cNum] === undefined) globalThis.saving.vals.challengeSave['c' + cNum] = townNum;
   }
   globalThis.saving.vals.curTown = townNum;
 }

@@ -765,7 +765,9 @@ function addExpFromAction(action, manaCount) {
 function markActionsComplete(loopCompletedActions) {
   loopCompletedActions.forEach((action) => {
     let varName = globalThis.actionList.Action[globalThis.actionList.withoutSpaces(action.name)].varName;
-    if (!completedActions.includes(varName)) completedActions.push(varName);
+    if (!globalThis.saving.vals.completedActions.includes(varName)) {
+      globalThis.saving.vals.completedActions.push(varName);
+    }
   });
 }
 

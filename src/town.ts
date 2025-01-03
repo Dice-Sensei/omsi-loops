@@ -48,7 +48,7 @@ class Town<TN extends number> {
   }
 
   unlocked() {
-    return townsUnlocked.includes(this.index);
+    return globalThis.saving.vals.townsUnlocked.includes(this.index);
   }
 
   expFromLevel(level) {

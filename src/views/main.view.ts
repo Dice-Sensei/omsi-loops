@@ -751,16 +751,20 @@ class View {
     for (const resource in resources) this.updateResource(resource);
   }
   updateActionTooltips() {
-    document.getElementById('goldInvested').textContent = globalThis.helpers.intToStringRound(goldInvested);
-    document.getElementById('bankInterest').textContent = globalThis.helpers.intToStringRound(goldInvested * .001);
+    document.getElementById('goldInvested').textContent = globalThis.helpers.intToStringRound(
+      globalThis.saving.vals.goldInvested,
+    );
+    document.getElementById('bankInterest').textContent = globalThis.helpers.intToStringRound(
+      globalThis.saving.vals.goldInvested * .001,
+    );
     document.getElementById('actionAllowedPockets').textContent = globalThis.helpers.intToStringRound(
-      towns[7].totalPockets,
+      globalThis.saving.vals.towns[7].totalPockets,
     );
     document.getElementById('actionAllowedWarehouses').textContent = globalThis.helpers.intToStringRound(
-      towns[7].totalWarehouses,
+      globalThis.saving.vals.towns[7].totalWarehouses,
     );
     document.getElementById('actionAllowedInsurance').textContent = globalThis.helpers.intToStringRound(
-      towns[7].totalInsurance,
+      globalThis.saving.vals.towns[7].totalInsurance,
     );
     document.getElementById('totalSurveyProgress').textContent = `${globalThis.actionList.getExploreProgress()}`;
     Array.from(document.getElementsByClassName('surveySkill')).forEach((div) => {
@@ -1343,7 +1347,10 @@ class View {
             if (action.storyReqs(storyId)) {
               storyTooltipText += conditionHTML + text;
               lastInBranch = false;
-              if (action.visible() && action.unlocked() && completedActions.includes(action.varName)) {
+              if (
+                action.visible() && action.unlocked() &&
+                globalThis.saving.vals.completedActions.includes(action.varName)
+              ) {
                 globalThis.saving.actionLog.addActionStory(action, storyId, init);
               }
             } else {
@@ -1387,7 +1394,7 @@ class View {
       document.getElementById('townViewLeft').style.visibility = '';
     }
 
-    if (townNum === Math.max(...townsUnlocked)) {
+    if (townNum === Math.max(...globalThis.saving.vals.townsUnlocked)) {
       document.getElementById('townViewRight').style.visibility = 'hidden';
     } else {
       document.getElementById('townViewRight').style.visibility = '';
@@ -1398,15 +1405,17 @@ class View {
       actionStoriesTown[i].style.display = 'none';
       townInfos[i].style.display = 'none';
     }
-    if (actionStoriesShowing) actionStoriesTown[townNum].style.display = '';
+    if (globalThis.saving.vals.actionStoriesShowing) actionStoriesTown[townNum].style.display = '';
     else actionOptionsTown[townNum].style.display = '';
     townInfos[townNum].style.display = '';
     $('#TownSelect').val(townNum);
 
-    globalThis.helpers.htmlElement('shortTownColumn').classList.remove(`zone-${townShowing + 1}`);
+    globalThis.helpers.htmlElement('shortTownColumn').classList.remove(
+      `zone-${globalThis.saving.vals.townShowing + 1}`,
+    );
     globalThis.helpers.htmlElement('shortTownColumn').classList.add(`zone-${townNum + 1}`);
     document.getElementById('townDesc').textContent = globalThis.Localization.txt(`towns>town${townNum}>desc`);
-    townShowing = townNum;
+    globalThis.saving.vals.townShowing = townNum;
   }
 
   showActions(stories) {
@@ -1418,17 +1427,17 @@ class View {
     if (stories) {
       document.getElementById('actionsViewLeft').style.visibility = '';
       document.getElementById('actionsViewRight').style.visibility = 'hidden';
-      actionStoriesTown[townShowing].style.display = '';
+      actionStoriesTown[globalThis.saving.vals.townShowing].style.display = '';
     } else {
       document.getElementById('actionsViewLeft').style.visibility = 'hidden';
       document.getElementById('actionsViewRight').style.visibility = '';
-      actionOptionsTown[townShowing].style.display = '';
+      actionOptionsTown[globalThis.saving.vals.townShowing].style.display = '';
     }
 
     document.getElementById('actionsTitle').textContent = globalThis.Localization.txt(
       `actions>title${stories ? '_stories' : ''}`,
     );
-    actionStoriesShowing = stories;
+    globalThis.saving.vals.actionStoriesShowing = stories;
   }
 
   toggleHiding() {
@@ -1436,12 +1445,12 @@ class View {
   }
 
   toggleHidden(varName, force) {
-    const isHidden = towns[townShowing].hiddenVars.has(varName);
+    const isHidden = globalThis.saving.vals.towns[globalThis.saving.vals.townShowing].hiddenVars.has(varName);
     if ((isHidden && force !== true) || force === false) {
-      towns[townShowing].hiddenVars.delete(varName);
+      globalThis.saving.vals.towns[globalThis.saving.vals.townShowing].hiddenVars.delete(varName);
       globalThis.helpers.htmlElement(`infoContainer${varName}`).classList.remove('user-hidden');
     } else if (!isHidden || force === true) {
-      towns[townShowing].hiddenVars.add(varName);
+      globalThis.saving.vals.towns[globalThis.saving.vals.townShowing].hiddenVars.add(varName);
       globalThis.helpers.htmlElement(`infoContainer${varName}`).classList.add('user-hidden');
     }
   }
@@ -1449,7 +1458,7 @@ class View {
   updateRegular(updateInfo) {
     const varName = updateInfo.name;
     const index = updateInfo.index;
-    const town = towns[index];
+    const town = globalThis.saving.vals.towns[index];
     globalThis.helpers.htmlElement(`total${varName}`).textContent = String(town[`total${varName}`]);
     globalThis.helpers.htmlElement(`checked${varName}`).textContent = String(town[`checked${varName}`]);
     globalThis.helpers.htmlElement(`unchecked${varName}`).textContent = String(
@@ -1488,7 +1497,7 @@ class View {
 
   createTownActions() {
     if (actionOptionsTown[0].querySelector('.actionOrTravelContainer')) return;
-    for (const action of towns.flatMap((t) => t.totalActionList)) {
+    for (const action of globalThis.saving.vals.towns.flatMap((t) => t.totalActionList)) {
       this.createTownAction(action);
     }
     for (const varName of towns.flatMap((t) => t.allVarNames)) {
@@ -2134,14 +2143,14 @@ class View {
   updateTravelMenu() {
     let travelOptions = $('#TownSelect').children();
     for (let i = 0; i < travelOptions.length; i++) {
-      travelOptions[i].hidden = !townsUnlocked.includes(i);
+      travelOptions[i].hidden = !globalThis.saving.vals.townsUnlocked.includes(i);
     }
   }
 
   adjustDarkRitualText() {
     let DRdesc = document.getElementById('DRText');
     DRdesc.innerHTML = `Actions are:<br>`;
-    townsUnlocked.forEach((townNum) => {
+    globalThis.saving.vals.townsUnlocked.forEach((townNum) => {
       DRdesc.innerHTML += DarkRitualDescription[townNum];
     });
     if (globalThis.stats.getBuffLevel('Ritual') > 200) DRdesc.innerHTML += DarkRitualDescription[9];
@@ -2151,7 +2160,7 @@ class View {
     let actionDivs = Array.from(document.getElementsByClassName('actionContainer'));
     actionDivs.forEach((div) => {
       let actionName = div.id.replace('container', '');
-      if (!completedActions.includes(actionName)) {
+      if (!globalThis.saving.vals.completedActions.includes(actionName)) {
         div.classList.add('actionHighlight');
       }
     });

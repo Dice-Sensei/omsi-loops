@@ -668,6 +668,12 @@ vals.loadoutnames = undefined;
 vals.storyShowing = 0;
 vals.storyMax = 0;
 vals.unreadActionStories = undefined;
+vals.goldInvested = 0;
+vals.stonesUsed = undefined;
+vals.townShowing = 0;
+vals.actionStoriesShowing = false;
+vals.townsUnlocked = [];
+vals.completedActions = [];
 
 // Globals!!!!!
 const actions = new globalThis.actions.Actions();
@@ -675,6 +681,7 @@ const actions = new globalThis.actions.Actions();
 const actionLog = selfIsGame ? new ActionLog() : null;
 
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
+vals.towns = towns;
 
 const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
 const stats = /** @type {{[K in StatName]: Stat}} */ ({});
@@ -783,12 +790,6 @@ const buffCaps = {
   PrestigeExpOverflow: 100,
 };
 const buffs = /** @type {{[K in BuffName]: Buff}} */ ({});
-let goldInvested = 0;
-let stonesUsed;
-let townShowing = 0;
-let actionStoriesShowing = false;
-let townsUnlocked = [];
-let completedActions = [];
 
 const storyFlags = {
   maxSQuestsInALoop: false,
@@ -1105,8 +1106,8 @@ globalThis.Data.registerAll({
   skills,
   buffs,
   prestigeValues: globalThis.prestige.prestigeValues,
-  townsUnlocked,
-  completedActions,
+  townsUnlocked: vals.townsUnlocked,
+  completedActions: vals.completedActions,
   storyFlags,
   storyVars,
   totals,
@@ -1598,23 +1599,23 @@ function doLoad(toLoad) {
   }
 
   if (toLoad.maxTown) {
-    townsUnlocked = [0];
+    globalThis.saving.vals.townsUnlocked = [0];
     for (let i = 1; i <= toLoad.maxTown; i++) {
-      townsUnlocked.push(i);
+      globalThis.saving.vals.townsUnlocked.push(i);
     }
   } else {
-    townsUnlocked = toLoad.townsUnlocked === undefined ? [0] : toLoad.townsUnlocked;
+    globalThis.saving.vals.townsUnlocked = toLoad.townsUnlocked === undefined ? [0] : toLoad.townsUnlocked;
   }
-  completedActions = [];
+  globalThis.saving.vals.completedActions = [];
   if (toLoad.completedActions && toLoad.completedActions.length > 0) {
     toLoad.completedActions.forEach((action) => {
-      completedActions.push(action);
+      globalThis.saving.vals.completedActions.push(action);
     });
   }
-  completedActions.push('FoundGlasses');
+  globalThis.saving.vals.completedActions.push('FoundGlasses');
   globalThis.saving.vals.trainingLimits = 10 + globalThis.stats.getBuffLevel('Imbuement');
-  goldInvested = toLoad.goldInvested === undefined ? 0 : toLoad.goldInvested;
-  stonesUsed = toLoad.stonesUsed === undefined ? { 1: 0, 3: 0, 5: 0, 6: 0 } : toLoad.stonesUsed;
+  globalThis.saving.vals.goldInvested = toLoad.goldInvested === undefined ? 0 : toLoad.goldInvested;
+  globalThis.saving.vals.stonesUsed = toLoad.stonesUsed === undefined ? { 1: 0, 3: 0, 5: 0, 6: 0 } : toLoad.stonesUsed;
 
   actions.clearActions();
   if (toLoad.nextList) {
@@ -1887,18 +1888,18 @@ function doLoad(toLoad) {
 function doSave() {
   const toSave = {};
   toSave.curLoadout = globalThis.saving.vals.curLoadout;
-  toSave.dungeons = dungeons;
+  toSave.dungeons = globalThis.saving.vals.dungeons;
   toSave.trials = globalThis.saving.vals.trials;
-  toSave.townsUnlocked = townsUnlocked;
-  toSave.completedActions = completedActions;
+  toSave.townsUnlocked = globalThis.saving.vals.townsUnlocked;
+  toSave.completedActions = globalThis.saving.vals.completedActions;
 
   toSave.stats = stats;
   toSave.totalTalent = globalThis.saving.vals.totalTalent;
   toSave.skills = skills;
   toSave.buffs = buffs;
   toSave.prestigeValues = globalThis.prestige.prestigeValues;
-  toSave.goldInvested = goldInvested;
-  toSave.stonesUsed = stonesUsed;
+  toSave.goldInvested = globalThis.saving.vals.goldInvested;
+  toSave.stonesUsed = globalThis.saving.vals.stonesUsed;
   toSave.version75 = true;
 
   /** @type {string[][]} */
@@ -2157,8 +2158,6 @@ const _saving = {
   stats,
   skills,
   buffs,
-  goldInvested,
-  stonesUsed,
   options,
   storyReqs,
   storyVars,

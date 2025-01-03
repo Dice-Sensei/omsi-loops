@@ -781,9 +781,9 @@ Action.RuinsZ5 = new Action('RuinsZ5', RuinsAction(5));
 Action.RuinsZ6 = new Action('RuinsZ6', RuinsAction(6));
 
 function adjustRocks(townNum) {
-  let town = towns[townNum];
+  let town = globalThis.saving.vals.towns[townNum];
   let baseStones = town.getLevel('RuinsZ' + townNum) * 2500;
-  let usedStones = stonesUsed[townNum];
+  let usedStones = globalThis.saving.vals.stonesUsed[townNum];
   town[`totalStonesZ${townNum}`] = baseStones;
   town[`goodStonesZ${townNum}`] = Math.floor(town[`checkedStonesZ${townNum}`] / 1000) - usedStones;
   town[`goodTempStonesZ${townNum}`] = Math.floor(town[`checkedStonesZ${townNum}`] / 1000) - usedStones;
@@ -809,31 +809,34 @@ function HaulAction(townNum) {
     },
     affectedBy: ['SurveyZ1'],
     canStart() {
-      return !resources.stone && stonesUsed[this.townNum] < 250;
+      return !resources.stone && globalThis.saving.vals.stonesUsed[this.townNum] < 250;
     },
     manaCost() {
       return 50000;
     },
     visible() {
-      return towns[this.townNum].getLevel('RuinsZ' + townNum) > 0;
+      return globalThis.saving.vals.towns[this.townNum].getLevel('RuinsZ' + townNum) > 0;
     },
     unlocked() {
-      return towns[this.townNum].getLevel('RuinsZ' + townNum) > 0;
+      return globalThis.saving.vals.towns[this.townNum].getLevel('RuinsZ' + townNum) > 0;
     },
     finish() {
       globalThis.saving.vals.stoneLoc = this.townNum;
-      towns[this.townNum].finishRegular(this.varName, 1000, () => {
+      globalThis.saving.vals.towns[this.townNum].finishRegular(this.varName, 1000, () => {
         globalThis.driver.addResource('stone', true);
       });
     },
     storyReqs(storyNum) {
       switch (storyNum) {
         case 1:
-          return towns[this.townNum][`good${this.varName}`] + stonesUsed[this.townNum] >= 1;
+          return globalThis.saving.vals.towns[this.townNum][`good${this.varName}`] +
+              globalThis.saving.vals.stonesUsed[this.townNum] >= 1;
         case 2:
-          return towns[this.townNum][`good${this.varName}`] + stonesUsed[this.townNum] >= 100;
+          return globalThis.saving.vals.towns[this.townNum][`good${this.varName}`] +
+              globalThis.saving.vals.stonesUsed[this.townNum] >= 100;
         case 3:
-          return towns[this.townNum][`good${this.varName}`] + stonesUsed[this.townNum] >= 250;
+          return globalThis.saving.vals.towns[this.townNum][`good${this.varName}`] +
+              globalThis.saving.vals.stonesUsed[this.townNum] >= 250;
       }
       return false;
     },
@@ -1893,7 +1896,7 @@ Action.StartJourney = new Action('Start Journey', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return townsUnlocked.includes(1);
+        return globalThis.saving.vals.townsUnlocked.includes(1);
     }
     return false;
   },
@@ -2961,7 +2964,7 @@ Action.ContinueOn = new Action('Continue On', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return townsUnlocked.includes(2);
+        return globalThis.saving.vals.townsUnlocked.includes(2);
     }
     return false;
   },
@@ -3955,7 +3958,7 @@ Action.StartTrek = new Action('Start Trek', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return townsUnlocked.includes(3);
+        return globalThis.saving.vals.townsUnlocked.includes(3);
     }
     return false;
   },
@@ -6433,7 +6436,7 @@ Action.JourneyForth = new Action('Journey Forth', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return townsUnlocked.includes(6);
+        return globalThis.saving.vals.townsUnlocked.includes(6);
     }
   },
   stats: {
@@ -6828,7 +6831,7 @@ Action.Escape = new Action('Escape', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return townsUnlocked.includes(7);
+        return globalThis.saving.vals.townsUnlocked.includes(7);
     }
   },
   stats: {
@@ -7549,11 +7552,11 @@ Action.Invest = new Action('Invest', {
       case 2:
         return storyFlags.investedTwo;
       case 3:
-        return goldInvested >= 1000000;
+        return globalThis.saving.vals.goldInvested >= 1000000;
       case 4:
-        return goldInvested >= 1000000000;
+        return globalThis.saving.vals.goldInvested >= 1000000000;
       case 5:
-        return goldInvested == 999999999999;
+        return globalThis.saving.vals.goldInvested == 999999999999;
     }
   },
   stats: {
@@ -7581,8 +7584,8 @@ Action.Invest = new Action('Invest', {
   },
   finish() {
     globalThis.stats.handleSkillExp(this.skills);
-    goldInvested += resources.gold;
-    if (goldInvested > 999999999999) goldInvested = 999999999999;
+    globalThis.saving.vals.goldInvested += resources.gold;
+    if (globalThis.saving.vals.goldInvested > 999999999999) globalThis.saving.vals.goldInvested = 999999999999;
     globalThis.driver.resetResource('gold');
     if (storyFlags.investedOne) globalThis.view.setStoryFlag('investedTwo');
     globalThis.view.setStoryFlag('investedOne');
@@ -7631,7 +7634,7 @@ Action.CollectInterest = new Action('Collect Interest', {
   },
   finish() {
     globalThis.stats.handleSkillExp(this.skills);
-    let interestGold = Math.floor(goldInvested * .001);
+    let interestGold = Math.floor(globalThis.saving.vals.goldInvested * .001);
     globalThis.driver.addResource('gold', interestGold);
     globalThis.view.setStoryFlag('interestCollected');
     if (interestGold >= 1000) globalThis.view.setStoryFlag('collected1KInterest');
@@ -7808,7 +7811,7 @@ Action.LeaveCity = new Action('Leave City', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return townsUnlocked.includes(8);
+        return globalThis.saving.vals.townsUnlocked.includes(8);
     }
   },
   stats: {
@@ -7969,10 +7972,12 @@ Action.BuildTower = new Action('Build Tower', {
     return true;
   },
   finish() {
-    stonesUsed[globalThis.saving.vals.stoneLoc]++;
-    towns[this.townNum].finishProgress(this.varName, 505);
+    globalThis.saving.vals.stonesUsed[globalThis.saving.vals.stoneLoc]++;
+    globalThis.saving.vals.towns[this.townNum].finishProgress(this.varName, 505);
     globalThis.driver.addResource('stone', false);
-    if (towns[this.townNum].getLevel(this.varName) >= 100) stonesUsed = { 1: 250, 3: 250, 5: 250, 6: 250 };
+    if (globalThis.saving.vals.towns[this.townNum].getLevel(this.varName) >= 100) {
+      globalThis.saving.vals.stonesUsed = { 1: 250, 3: 250, 5: 250, 6: 250 };
+    }
     adjustRocks(globalThis.saving.vals.stoneLoc);
   },
 });

@@ -535,8 +535,18 @@ const Koviko = {
           display_name: 'Surveys',
           hidden: () => (globalThis.actionList.getExploreSkill() == 0),
         },
-        { type: 'R', name: 'invest', display_name: 'Investment', hidden: () => (goldInvested == 0) },
-        { type: 'TIME', name: 'tillKey', display_name: 'Till Key', hidden: () => (goldInvested == 0) },
+        {
+          type: 'R',
+          name: 'invest',
+          display_name: 'Investment',
+          hidden: () => (globalThis.saving.vals.goldInvested == 0),
+        },
+        {
+          type: 'TIME',
+          name: 'tillKey',
+          display_name: 'Till Key',
+          hidden: () => (globalThis.saving.vals.goldInvested == 0),
+        },
       ].reduce(
         (dict, el, index) => (dict[el.type + el.name] = el, dict),
         {},
@@ -739,9 +749,9 @@ const Koviko = {
         'RuinsZ6': { affected: [''] },
         'HaulZ1': {
           affected: ['stone'],
-          canStart: (input) => ((input.stone || 0) < 1 && stonesUsed[1] < 250),
+          canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[1] < 250),
           effect: (r) => {
-            let t = towns[1]; //Area of the Action
+            let t = globalThis.saving.vals.towns[1]; //Area of the Action
             if (t.goodStonesZ1 > 0) {
               r.stone = 1;
               return;
@@ -757,9 +767,9 @@ const Koviko = {
         },
         'HaulZ3': {
           affected: ['stone'],
-          canStart: (input) => ((input.stone || 0) < 1 && stonesUsed[3] < 250),
+          canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[3] < 250),
           effect: (r) => {
-            let t = towns[3]; //Area of the Action
+            let t = globalThis.saving.vals.towns[3]; //Area of the Action
             if (t.goodStonesZ3 > 0) {
               r.stone = 1;
               return;
@@ -775,9 +785,9 @@ const Koviko = {
         },
         'HaulZ5': {
           affected: ['stone'],
-          canStart: (input) => ((input.stone || 0) < 1 && stonesUsed[5] < 250),
+          canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[5] < 250),
           effect: (r) => {
-            let t = towns[5]; //Area of the Action
+            let t = globalThis.saving.vals.towns[5]; //Area of the Action
             if (t.goodStonesZ5 > 0) {
               r.stone = 1;
               return;
@@ -793,9 +803,9 @@ const Koviko = {
         },
         'HaulZ6': {
           affected: ['stone'],
-          canStart: (input) => ((input.stone || 0) < 1 && stonesUsed[6] < 250),
+          canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[6] < 250),
           effect: (r) => {
-            let t = towns[6]; //Area of the Action
+            let t = globalThis.saving.vals.towns[6]; //Area of the Action
             if (t.goodStonesZ6 > 0) {
               r.stone = 1;
               return;
@@ -1791,7 +1801,7 @@ const Koviko = {
           canStart: true,
           effect: (r, k) => {
             k.mercantilism += 50;
-            r.gold += Math.floor(goldInvested * .001);
+            r.gold += Math.floor(globalThis.saving.vals.goldInvested * .001);
           },
         },
         'Seminar': {
@@ -2591,7 +2601,10 @@ const Koviko = {
             // required to reach `goldTillKey / i_rate`, when you can collect enough gold from interest.
             // The actual implementation rounds your interest each loop, so this is slightly innacurate.
             let loopsNeeded =
-              Math.log((goldTillKey + state.resources.invested) / (goldInvested * i_rate + state.resources.invested)) /
+              Math.log(
+                (goldTillKey + state.resources.invested) /
+                  (globalThis.saving.vals.goldInvested * i_rate + state.resources.invested),
+              ) /
               Math.log(i_rate + 1);
             newStatisticValue = loopsNeeded * state.resources.totalTicks; // Estimate of total ticks until we can buy the key
             legend = 'till key';
