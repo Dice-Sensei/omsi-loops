@@ -740,19 +740,19 @@ class View {
   }
   updateResource(resource) {
     const element = globalThis.helpers.htmlElement(`${resource}Div`, false, false);
-    if (element) element.style.display = resources[resource] ? 'inline-block' : 'none';
+    if (element) element.style.display = globalThis.globals.resources[resource] ? 'inline-block' : 'none';
 
     if (resource === 'supplies') document.getElementById('suppliesCost').textContent = String(towns[0].suppliesCost);
     if (resource === 'teamMembers') {
-      document.getElementById('teamCost').textContent = `${(resources.teamMembers + 1) * 100}`;
+      document.getElementById('teamCost').textContent = `${(globalThis.globals.resources.teamMembers + 1) * 100}`;
     }
 
-    if (Number.isFinite(resources[resource])) {
-      globalThis.helpers.htmlElement(resource).textContent = resources[resource];
+    if (Number.isFinite(globalThis.globals.resources[resource])) {
+      globalThis.helpers.htmlElement(resource).textContent = globalThis.globals.resources[resource];
     }
   }
   updateResources() {
-    for (const resource in resources) this.updateResource(resource);
+    for (const resource in globalThis.globals.resources) this.updateResource(resource);
   }
   updateActionTooltips() {
     document.getElementById('goldInvested').textContent = globalThis.helpers.intToStringRound(
@@ -1077,14 +1077,23 @@ class View {
       div.style.height = '30%';
       div.style.marginTop = '5px';
       if (action.name === 'Heal The Sick') setStoryFlag('failedHeal');
-      if (action.name === 'Brew Potions' && resources.reputation >= 0 && resources.herbs >= 10) {
+      if (
+        action.name === 'Brew Potions' && globalThis.globals.resources.reputation >= 0 &&
+        globalThis.globals.resources.herbs >= 10
+      ) {
         setStoryFlag('failedBrewPotions');
       }
-      if (action.name === 'Brew Potions' && resources.reputation < 0 && resources.herbs >= 10) {
+      if (
+        action.name === 'Brew Potions' && globalThis.globals.resources.reputation < 0 &&
+        globalThis.globals.resources.herbs >= 10
+      ) {
         setStoryFlag('failedBrewPotionsNegativeRep');
       }
-      if (action.name === 'Gamble' && resources.reputation < -5) setStoryFlag('failedGamble');
-      if (action.name === 'Gamble' && resources.gold < 20 && resources.reputation > -6) {
+      if (action.name === 'Gamble' && globalThis.globals.resources.reputation < -5) setStoryFlag('failedGamble');
+      if (
+        action.name === 'Gamble' && globalThis.globals.resources.gold < 20 &&
+        globalThis.globals.resources.reputation > -6
+      ) {
         setStoryFlag('failedGambleLowMoney');
       }
       if (action.name === 'Gather Team') setStoryFlag('failedGatherTeam');
