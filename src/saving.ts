@@ -1,3 +1,5 @@
+import { compressToBase64 as lZStringCompressToBase64, decompressFromBase64 as lZStringDecompressFromBase64 } from 'lz-string';
+
 const defaultSaveName = 'idleLoops1';
 const challengeSaveName = 'idleLoopsChallenge';
 let saveName = defaultSaveName;
@@ -267,11 +269,11 @@ if (globalThis.globals.selfIsGame) {
 }
 
 function decompressFromBase64(item) {
-  return globalThis.trash.LZString.decompressFromBase64(item);
+  return lZStringDecompressFromBase64(item);
 }
 
 function compressToBase64(item) {
-  return globalThis.trash.LZString.compressToBase64(item);
+  return lZStringCompressToBase64(item);
 }
 
 function startGame() {

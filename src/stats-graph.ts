@@ -296,5 +296,3 @@ export class StatGraph {
     globalThis.saving.view.updateStatGraphNeeded = false;
   }
 }
-
-globalThis.trash.StatGraph = StatGraph;

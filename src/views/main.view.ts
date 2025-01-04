@@ -1,4 +1,6 @@
 import $ from 'jquery';
+import * as d3 from 'd3';
+import { StatGraph } from '../stats-graph.ts';
 
 const DarkRitualDescription = [
   `10% faster in Beginnersville per ritual from 1-20<br>`,
@@ -51,7 +53,7 @@ let dungeonShowing;
 
 class View {
   initalize() {
-    this.statGraph = new globalThis.trash.StatGraph();
+    this.statGraph = new StatGraph();
 
     this.createTravelMenu();
     this.createStats();
@@ -826,7 +828,7 @@ class View {
       globalThis.Koviko.preUpdateHandler(nextActionsDiv);
     }
 
-    globalThis.trash.d3.select(nextActionsDiv)
+    d3.select(nextActionsDiv)
       .selectAll('.nextActionContainer')
       .data(
         globalThis.globals.actions.next.map((a, index) => ({
