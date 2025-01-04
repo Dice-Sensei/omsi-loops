@@ -46,9 +46,15 @@
             <div class="showthis localized" data-locale="stats>tooltip>explanation" style="width: 550px"></div>
           </div>
           <div id="statViewSelector" class="block">
-            <input type="radio" id="regularStats" name="statView" onclick="view.changeStatView()" checked />
+            <input
+              type="radio"
+              id="regularStats"
+              name="statView"
+              onclick="globalThis.saving.view.changeStatView()"
+              checked
+            />
             <label for="regularStats" class="localized" data-locale="stats>view>regular"></label>
-            <input type="radio" id="radarStats" name="statView" onclick="view.changeStatView()" />
+            <input type="radio" id="radarStats" name="statView" onclick="globalThis.saving.view.changeStatView()" />
             <label for="radarStats" class="localized" data-locale="stats>view>radar"></label>
           </div>
           <div class="showthat block" id="radarChart">
