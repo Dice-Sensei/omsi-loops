@@ -1,7 +1,4 @@
-// @ts-check
-'use strict';
-
-class LevelExp {
+export class LevelExp {
   level = 0;
   exp = 0;
 
@@ -122,7 +119,7 @@ class Localizable2 {
   }
 }
 
-class Stat extends Localizable2 {
+export class Stat extends Localizable2 {
   name;
   statLevelExp = new LevelExp();
   talentLevelExp = new LevelExp();
@@ -272,7 +269,7 @@ const Skill_increase = 1;
 const Skill_decrease = 2;
 const Skill_custom = 3;
 
-class Skill extends Localizable2 {
+export class Skill extends Localizable2 {
   name;
   levelExp = new LevelExp();
 
@@ -330,7 +327,7 @@ class Skill extends Localizable2 {
   }
 }
 
-class Buff extends Localizable2 {
+export class Buff extends Localizable2 {
   static fullNames = ({
     Ritual: 'Dark Ritual',
     Imbuement: 'Imbue Mind',

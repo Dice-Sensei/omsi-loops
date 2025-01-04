@@ -315,21 +315,6 @@ function initializeActions() {
   }
 }
 
-function virtualizeGlobalVariables(variables) {
-  const globals = Data.rootObjects.globals ?? {};
-  for (const name in variables) {
-    const get = new Function(`return ${name};`);
-    const set = new Function('v__', `${name} = v__`);
-    Object.defineProperty(globals, name, {
-      get,
-      set,
-      enumerable: true,
-      configurable: true,
-    });
-  }
-  return globalThis.Data.register('globals', globals);
-}
-
 function isNumericOption(option) {
   return numericOptions.includes(option);
 }
@@ -339,9 +324,7 @@ function isStringOption(option) {
 }
 
 function isBooleanOption(option) {
-  // I'm explicitly deciding to leave this open-ended, so unknown options are treated as booleans
-  return !numericOptions.includes(option) &&
-    !stringOptions.includes(option);
+  return !numericOptions.includes(option) && !stringOptions.includes(option);
 }
 
 function importPredictorSettings() {

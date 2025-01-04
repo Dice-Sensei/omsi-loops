@@ -1,5 +1,4 @@
-// @ts-check
-'use strict';
+import {} from './stats.ts';
 
 class ClassNameNotFoundError extends TypeError {}
 
