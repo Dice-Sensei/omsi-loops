@@ -1,15 +1,28 @@
-importScripts('./data.ts');
-importScripts('./Localization.ts');
-importScripts('./helpers.ts');
-importScripts('./actionList.ts');
-importScripts('./driver.ts');
-importScripts('./stats.js');
-importScripts('./actions.ts');
-importScripts('./town.ts');
-importScripts('./prestige.ts');
-importScripts('./globals.ts');
-importScripts('./saving.ts');
-importScripts('./predictor.ts');
+// importScripts('./data.ts');
+// importScripts('./Localization.ts');
+// importScripts('./helpers.ts');
+// importScripts('./actionList.ts');
+// importScripts('./driver.ts');
+// importScripts('./stats.js');
+// importScripts('./actions.ts');
+// importScripts('./town.ts');
+// importScripts('./prestige.ts');
+// importScripts('./globals.ts');
+// importScripts('./saving.ts');
+// importScripts('./predictor.ts');
+
+import './data.ts';
+import './Localization.ts';
+import './helpers.ts';
+import './actionList.ts';
+import './driver.ts';
+import './stats.ts';
+import './actions.ts';
+import './town.ts';
+import './prestige.ts';
+import './globals.ts';
+import './saving.ts';
+import './predictor.ts';
 
 /**
  * @typedef {{
