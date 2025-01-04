@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 namespace SearchParams {
   const self = () => new URLSearchParams(globalThis.location.search);
 

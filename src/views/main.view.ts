@@ -1,4 +1,4 @@
-'use strict';
+import $ from 'jquery';
 
 const DarkRitualDescription = [
   `10% faster in Beginnersville per ritual from 1-20<br>`,
