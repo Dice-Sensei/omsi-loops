@@ -1,3 +1,5 @@
+import './styles.css';
+
 import { renderViews } from './views/register-all.ts';
 
 globalThis.saving.loadDefaults();
