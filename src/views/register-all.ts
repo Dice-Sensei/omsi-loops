@@ -581,16 +581,16 @@ const timeControls = {
     return `
       <div id='timeControlsMain'>
         <button id='pausePlay' onclick='globalThis.driver.pauseGame()'' class='button control'>
-          ${globalThis.Localization.txt('time_controls>pause_button')}
+          ${t('time_controls.pause_button')}
         </button>
         <button onclick='globalThis.driver.manualRestart()' class='button showthatO control'>
-          ${globalThis.Localization.txt('time_controls>restart_button')}
+          ${t('time_controls.restart_button')}
           <div class='showthis' style='color:var(--default-color);width:230px;'>
-          ${globalThis.Localization.txt('time_controls>restart_text')}</div>
+          ${t('time_controls.restart_text')}</div>
         </button>
         <input id='bonusIsActiveInput' type='checkbox' onchange='setOption("bonusIsActive", this.checked)'/>
         <button class='button showthatO control' onclick='globalThis.driver.toggleOffline()'>
-          ${globalThis.Localization.txt('time_controls>bonus_seconds>title')}
+          ${t('time_controls.bonus_seconds.title')}
           <div class='showthis' id='bonusText' style='max-width:500px;color:var(--default-color);'>
             ${globalThis.saving.view.getBonusText()}
           </div>
@@ -598,7 +598,7 @@ const timeControls = {
         <div class='control'>
           <div tabindex='0' id='story_control' class='showthatH' onmouseover='globalThis.saving.view.updateStory(globalThis.saving.vals.storyShowing)' onfocus='globalThis.sglobalThis.saving.vals.storyShowingpdateStory(storyShowing)' style='height:30px;'>
             <div class='large bold'>
-              ${globalThis.Localization.txt('time_controls>story_title')}
+              ${t('time_controls.story_title')}
             </div>
             <div id='newStory' style='color:var(--alert-color);display:none;'>(!)</div>
             <div id='story_tooltip' class='showthisH' style='width:400px;'>
@@ -613,19 +613,15 @@ const timeControls = {
       <div id='timeControlsOptions'>
         <div class='control'>
           <input type='checkbox' id='pauseBeforeRestartInput' onchange='globalThis.saving.setOption("pauseBeforeRestart", this.checked)'>
-          <label for='pauseBeforeRestartInput'>${
-      globalThis.Localization.txt('time_controls>pause_before_restart')
-    }</label>
+          <label for='pauseBeforeRestartInput'>${t('time_controls.pause_before_restart')}</label>
         </div>
         <div class='control'>
           <input type='checkbox' id='pauseOnFailedLoopInput' onchange='globalThis.saving.setOption("pauseOnFailedLoop", this.checked)'>
-          <label for='pauseOnFailedLoopInput'>${
-      globalThis.Localization.txt('time_controls>pause_on_failed_loop')
-    }</label>
+          <label for='pauseOnFailedLoopInput'>${t('time_controls.pause_on_failed_loop')}</label>
         </div>
         <div class='control'>
           <input type='checkbox' id='pauseOnCompleteInput' onchange='globalThis.saving.setOption("pauseOnComplete", this.checked)'>
-          <label for='pauseOnCompleteInput'>${globalThis.Localization.txt('time_controls>pause_on_complete')}</label>
+          <label for='pauseOnCompleteInput'>${t('time_controls.pause_on_complete')}</label>
         </div>
       </div>
     `;
@@ -639,7 +635,7 @@ const trackedResources = {
 
     const resources = globalThis.Localization.txtsObj('tracked_resources>resource');
 
-    $(resources).each((_index, resource) => {
+    for (const resource of resources) {
       const hasCount = !$(resource).attr('no_count');
       const resetOnRestart = !$(resource).attr('no_reset_on_restart');
       const isHidden = $(resource).attr('initially_hidden');
@@ -650,11 +646,11 @@ const trackedResources = {
           ${hasCount ? `<div id='${$(resource).attr('id')}'>0</div>` : ''}
           <div class='showthis'>
             ${$(resource).find('desc').text()}
-            ${resetOnRestart ? `<br>${globalThis.Localization.txt('tracked_resources>reset_on_restart_txt')}` : ''}
+            ${resetOnRestart ? `<br>${t('tracked_resources.reset_on_restart_txt')}` : ''}
           </div>
         </div>
       `;
-    });
+    }
 
     return html;
   },

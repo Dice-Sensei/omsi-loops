@@ -443,20 +443,21 @@ class SoulstoneEntry extends RepeatableLogEntry {
 
   getReplacement(key) {
     if (key === 'count') return globalThis.helpers.intToString(this.count, 1);
-    if (key === 'stat_long') return globalThis.Localization.txt(`stats>${Object.keys(this.stones)[0]}>long_form`);
-    if (key === 'stat') return globalThis.Localization.txt(`stats>${Object.keys(this.stones)[0]}>short_form`);
+    if (key === 'stat_long') return t(`stats.${Object.keys(this.stones)[0]}.long_form`);
+    if (key === 'stat') return t(`stats.${Object.keys(this.stones)[0]}.short_form`);
     if (key === 'stats') {
       const strs = [];
       const template = globalThis.Localization.txt(
         Object.keys(this.stones).length > 3 ? 'actions>log>soulstone_stat_short' : 'actions>log>soulstone_stat',
       );
+
       for (const stat in stats) {
         if (stat in this.stones) {
           strs.push(
             template
               .replace('{count}', globalThis.helpers.intToString(this.stones[stat], 1))
-              .replace('{stat_long}', globalThis.Localization.txt(`stats>${stat}>long_form`))
-              .replace('{stat}', globalThis.Localization.txt(`stats>${stat}>short_form`)),
+              .replace('{stat_long}', t(`stats.${stat}.long_form`))
+              .replace('{stat}', t(`stats.${stat}.short_form`)),
           );
         }
       }
@@ -750,7 +751,16 @@ let resources = {
 const resourcesTemplate = globalThis.helpers.copyObject(resources);
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 const skills = /** @type {{[K in SkillName]: Skill}} */ ({});
-const stats = /** @type {{[K in StatName]: Stat}} */ ({});
+
+type StatName = 'Dex' | 'Str' | 'Con' | 'Spd' | 'Per' | 'Cha' | 'Int' | 'Luck' | 'Soul';
+
+type Stat = {
+  blurb: string;
+  long_form: string;
+  short_form: string;
+};
+
+const stats: Record<StatName, Stat> = {};
 const actionLog = selfIsGame ? new ActionLog() : null;
 const actions = new globalThis.actions.Actions();
 

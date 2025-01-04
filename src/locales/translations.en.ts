@@ -1108,4 +1108,114 @@ export const translationsEn = {
     hideActions: 'Hide actions',
     undoLastAction: 'Undo last action',
   },
+  stats: {
+    title: 'Stats',
+    dex: {
+      blurb: 'Know your body.',
+      long_form: 'Dexterity',
+      short_form: 'Dex',
+    },
+    str: {
+      blurb: 'Train your body.',
+      long_form: 'Strength',
+      short_form: 'Str',
+    },
+    con: {
+      blurb: 'Just a little longer. Just a little more.',
+      long_form: 'Constitution',
+      short_form: 'Con',
+    },
+    spd: {
+      blurb: 'Gotta go fast.',
+      long_form: 'Speed',
+      short_form: 'Spd',
+    },
+    cha: {
+      blurb: 'Conversation is a battle.',
+      long_form: 'Charisma',
+      short_form: 'Cha',
+    },
+    int: {
+      blurb: 'Learning to learn.',
+      long_form: 'Intelligence',
+      short_form: 'Int',
+    },
+    luck: {
+      blurb: 'Opportunity favors the fortunate.',
+      long_form: 'Luck',
+      short_form: 'Luck',
+    },
+    soul: {
+      blurb: 'You are the captain.',
+      long_form: 'Soul',
+      short_form: 'Soul',
+    },
+    total: {
+      blurb: 'It all adds up.',
+      singular: 'Total',
+      plural: 'Totals',
+    },
+    tooltip: {
+      level: 'Level',
+      level_exp: 'Level Exp',
+      exp: 'Exp',
+      talent: 'Talent',
+      talent_exp: 'Talent Exp',
+      talent_multiplier: 'Talent Mult',
+      soulstone: 'Soulstones',
+      soulstone_multiplier: 'Soulstone Mult',
+      total_multiplier: 'Total Mult',
+      bonus_xp: 'Bonus XP',
+      mana_cost_reduction: 'Mana Cost Reduction',
+      explanation:
+        `Each stat level reduces the relevant part of an action's mana cost by a percentage. Talent exp gain is equal to 1% of stat exp gain, and persists through loops. Talent multiplies xp gain by (1+(talentLevel)^0.4/3). XP gain towards a stat per action is (original mana / actual mana) * (talent bonus) per tick. Total Mult is the product of your talent and soulstone bonuses. e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%. This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>. If your <div class="bold">Cha</div> is level 20 when the action is started, the bonus would be x1.2 so it'd be 640 / 1.2 = 533.33 Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~87% of the original mana cost. The action would give (800/694)*(1+(talent)^0.4/3) level exp per mana for the 694 mana.`,
+      graph_legend:
+        `Click the legend to show/hide each. Upon freshly starting, Levels and Talent won't change much. Hover Stats for more info.`,
+    },
+    view: {
+      regular: 'Regular View',
+      radar: 'Radar Chart',
+    },
+  },
+  time_controls: {
+    play_button: 'Play',
+    pause_button: 'Pause',
+    rewind_button: 'Rewind',
+    pause_before_restart: 'Pause before restart',
+    pause_on_failed_loop: 'Pause on failed loop',
+    pause_on_complete: 'Pause on progress complete',
+    restart_button: 'Restart',
+    restart_text: 'Resets the loop. Not a hard reset.',
+    days: 'd',
+    hours: 'h',
+    minutes: 'm',
+    seconds: 's',
+    talents_button: 'Talents',
+    story_title: 'Story',
+    bonus_seconds: {
+      title: 'Bonus Seconds',
+      main_text: 'While this bonus is on, you get {speed-1} extra seconds per second ({speed}x game speed). ',
+      background_disabled:
+        'You can adjust this speed or set a different speed for while this tab is in the background in the Extras menu.',
+      background_0x:
+        'While this tab is in the background (regardless of if this bonus is on or off), the game will not run, and you will gain bonus time as though paused.',
+      background_regen:
+        'While this tab is in the background (regardless of if this bonus is on or off), the game will run at {background_speed}x speed, and you will gain bonus time at a rate of {1-background_speed} bonus seconds per second.',
+      background_1x:
+        'While this tab is in the background (regardless of if this bonus is on or off), the game will run at normal speed and consume no bonus time.',
+      background_slower:
+        'While the bonus is on and this tab is in the background, the game will only consume {background_speed-1} seconds of bonus time per second ({background_speed}x game speed).',
+      background_faster:
+        'While the bonus is on and this tab is in the background, the game will consume an additional {background_speed-speed} seconds of bonus time per second ({background_speed}x game speed).',
+      state: {
+        on: 'ON',
+        off: 'OFF',
+      },
+      counter_text: 'Total Bonus Seconds',
+      lag_warning: 'Lag detected! Current effective game speed is {lagSpeed}x.',
+    },
+  },
+  tracked_resources: {
+    reset_on_restart_txt: 'Resets when the loop restarts.',
+  },
 } as const;

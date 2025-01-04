@@ -553,7 +553,7 @@ const Koviko = {
         Koviko.trackedStats['T' + stat] = {
           type: 'T',
           name: stat,
-          display_name: globalThis.Localization.txt('stats>' + stat + '>long_form'),
+          display_name: t(`stats.${stat}.long_form`),
         };
       }
       for (const [key, stat] of Object.entries(Koviko.trackedStats)) {
@@ -2632,7 +2632,7 @@ const Koviko = {
           break;
         case 'T':
           newStatisticValue = (state.talents[trackedStat.name] - statisticStart) / totalMinutes;
-          legend = globalThis.Localization.txt('stats>' + trackedStat.name + '>short_form');
+          legend = t(`stats.${trackedStat.name}.short_form`);
           break;
       }
 
