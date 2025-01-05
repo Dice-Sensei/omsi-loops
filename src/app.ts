@@ -1,6 +1,6 @@
 import './stats-graph.ts';
 import './data.ts';
-import './Localization.ts';
+import './localization.ts';
 import './helpers.ts';
 import './actionList.ts';
 import './interval.ts';
