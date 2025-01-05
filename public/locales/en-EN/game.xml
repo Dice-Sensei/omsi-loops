@@ -646,26 +646,6 @@
                 <title>Options</title>
             </meta>
             <localization_title>Language</localization_title>
-            <theme_title>Theme</theme_title>
-            <theme_variant_title>Theme Variant</theme_variant_title>
-            <theme>
-                <normal>Normal</normal>
-            </theme>
-            <theme>
-                <dark>Dark</dark>
-            </theme>
-            <theme>
-                <cubic>Cubic</cubic>
-            </theme>
-            <theme>
-                <cubic_t-dark>Cubic Dark</cubic_t-dark>
-            </theme>
-            <theme>
-                <zen>Zen</zen>
-            </theme>
-            <theme>
-                <zen_t-dark>Zen Dark</zen_t-dark>
-            </theme>
             <!--changed discord link for analytical reasons-->
             <discord>
                 <link>https://discord.gg/dnKA6Xd</link>

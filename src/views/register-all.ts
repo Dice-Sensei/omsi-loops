@@ -203,7 +203,6 @@ const menu = {
           <a target='_blank' href='${globalThis.Localization.txt('menu>options>discord>link')}'>
             ${globalThis.Localization.txt('menu>options>discord>title')}
           </a><br>
-          ${menu.htmlThemeMenu()}
           ${menu.htmlLocalizationMenu()}
           ${globalThis.Localization.txt('menu>options>adblock_warning')}<br>
           <input id='responsiveUIInput' type='checkbox' onchange='globalThis.saving.setOption("responsiveUI", this.checked)'/>
@@ -259,34 +258,6 @@ const menu = {
       </div>
       <br>
     `;
-  },
-  htmlThemeMenu() {
-    const themeList = ['normal', 'dark', 'cubic', 'cubic t-dark', 'zen', 'zen t-dark'];
-
-    const themes = globalThis.Localization.txtsObj('menu>options>theme');
-
-    let html = `${
-      globalThis.Localization.txt('menu>options>theme_title')
-    }: <select id='themeInput' onchange='globalThis.saving.view.changeTheme();'>`;
-
-    $(themes).each((index, theme) => {
-      html += `<option value='${themeList[index]}'>${
-        $(theme).find(themeList[index].replaceAll(' ', '_')).text()
-      }</option>`;
-    });
-    html += '</select><br>';
-    html += `<div class='block' id='themeVariantSection'>${
-      globalThis.Localization.txt('menu>options>theme_variant_title')
-    }: <select id='themeVariantInput' onchange='globalThis.saving.view.changeTheme();'>`;
-    $(themes).each((index, theme) => {
-      $(theme).find('variants>*').each((vindex, variant) => {
-        html += `<option class='variant-${themeList[index].replaceAll(' ', '_')}' value='${variant.tagName}'>${
-          $(variant).text()
-        }</option>`;
-      });
-    });
-    html += '</select></div>';
-    return html;
   },
   htmlExtrasMenu() {
     const html =

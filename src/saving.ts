@@ -37,8 +37,6 @@ vals.totalActionList = [];
 vals.dungeons = [[], [], []];
 
 vals.options = {
-  theme: 'normal',
-  themeVariant: '',
   responsiveUI: true,
   actionLog: true,
   fractionalMana: false,
@@ -114,14 +112,10 @@ const numericOptions = [
   'predictorSlowTimer',
 ];
 const stringOptions = [
-  'theme',
-  'themeVariant',
   'predictorTrackedStat',
 ];
 
 const isStandardOption = {
-  theme: true,
-  themeVariant: false,
   responsiveUI: false,
   actionLog: false,
   fractionalMana: false,

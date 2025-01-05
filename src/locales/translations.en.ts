@@ -721,14 +721,6 @@ export const translationsEn = {
       localization_title: 'Language',
       theme_title: 'Theme',
       theme_variant_title: 'Theme Variant',
-      theme: {
-        normal: 'Normal',
-        dark: 'Dark',
-        cubic: 'Cubic',
-        cubic_dark: 'Cubic Dark',
-        zen: 'Zen',
-        zen_dark: 'Zen Dark',
-      },
       discord: {
         link: 'https://discord.gg/dnKA6Xd',
         title: 'Discord Link',
