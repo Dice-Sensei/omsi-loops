@@ -1,6 +1,4 @@
-import './styles.css';
 import './stats-graph.ts';
-import './index-theme.ts';
 import './data.ts';
 import './Localization.ts';
 import './helpers.ts';
@@ -19,10 +17,6 @@ import './keyboard.hotkeys.ts';
 import './predictor.ts';
 
 import { renderViews } from './views/register-all.ts';
-import { Tutorial } from './modules/tutorial.tsx';
-import { render } from 'solid-js/web';
-
-render(Tutorial, document.getElementById('tutorial')!);
 
 globalThis.saving.loadDefaults();
 
