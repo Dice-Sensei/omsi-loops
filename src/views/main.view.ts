@@ -2137,7 +2137,9 @@ class View {
     if (init) themeVariantInput.value = globalThis.saving.vals.options.themeVariant;
     globalThis.saving.vals.options.theme = themeInput.value;
     globalThis.saving.vals.options.themeVariant = themeVariantInput.value;
+
     const variants = $(themeVariantInput).find(`.variant-${globalThis.saving.vals.options.theme.replaceAll(' ', '_')}`);
+
     if (variants.length) {
       document.getElementById('themeVariantSection').style.display = '';
       $(themeVariantInput).find('option').css('display', 'none');
@@ -2145,8 +2147,10 @@ class View {
     } else {
       document.getElementById('themeVariantSection').style.display = 'none';
     }
-    document.getElementById('theBody').className =
+
+    document.body.className =
       `t-${globalThis.saving.vals.options.theme} ${globalThis.saving.vals.options.themeVariant}`;
+
     localStorage['latestTheme'] =
       `${globalThis.saving.vals.options.theme} ${globalThis.saving.vals.options.themeVariant}`;
   }

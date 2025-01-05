@@ -1,4 +1,7 @@
-import { compressToBase64 as lZStringCompressToBase64, decompressFromBase64 as lZStringDecompressFromBase64 } from 'lz-string';
+import {
+  compressToBase64 as lZStringCompressToBase64,
+  decompressFromBase64 as lZStringDecompressFromBase64,
+} from 'lz-string';
 
 const defaultSaveName = 'idleLoops1';
 const challengeSaveName = 'idleLoopsChallenge';
@@ -409,10 +412,6 @@ function clearPauseNotification() {
   }
 }
 
-function closeTutorial() {
-  document.getElementById('tutorial').style.display = 'none';
-}
-
 function clearSave() {
   globalThis.localStorage[globalThis.saving.defaultSaveName] = '';
   globalThis.localStorage[challengeSaveName] = '';
@@ -465,7 +464,6 @@ function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
   let toLoad = {};
   // has a save file
   if (saveJson && saveJson !== 'null') {
-    closeTutorial();
     toLoad = JSON.parse(saveJson);
   }
 
@@ -1155,7 +1153,6 @@ const _saving = {
   view,
   loadDefaults,
   needsDataSnapshots,
-  closeTutorial,
   startGame,
   cheat,
   setOption,

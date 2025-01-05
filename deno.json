@@ -4,7 +4,11 @@
       "esnext",
       "dom",
       "dom.iterable"
-    ]
+    ],
+    "strict": true,
+    "jsx": "precompile",
+    "jsxImportSource": "solid-js",
+    "noImplicitOverride": true
   },
   "lint": {
     "rules": {

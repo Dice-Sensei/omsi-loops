@@ -9,10 +9,7 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="manifest" href="manifest.webmanifest">
   </head>
-  <body id="theBody" style="min-width: 1210px">
-    <div id="loadingBox" class="showWhileLoading hideWhenLoaded">
-      <div id="loadingText" class="localized" data-locale="misc>loading">Initial load (this may take a while)...</div>
-    </div>
+  <body>
     <header id="timeInfo" style="width: 100%; text-align: center">
       <button
         id="cheat"
@@ -965,33 +962,7 @@
         onclick="return globalThis.view.scrollToPanel(event, 'statsColumn')"
       ></a>
     </nav>
-    <div id="tutorial" style="position: absolute; width: 100%; height: 100%; left: 0; top: 0; z-index: 9999">
-      <div style="width: 100%; height: 100%; background-color: grey; position: relative; opacity: 0.5"></div>
-      <div
-        style="padding: 20px; background-color: var(--body-background); border: 1px solid var(--input-border); position: absolute; text-align: left; left: 150px; top: 150px"
-      >
-        <span class="localized" data-locale="tutorial"></span>
-        <button class="button" onclick="globalThis.saving.closeTutorial()">OK</button>
-      </div>
-    </div>
-    <script defer type="module" src="./src/stats-graph.ts"></script>
-    <script defer type="module" src="./src/index-theme.ts"></script>
-    <script defer type="module" src="./src/data.ts"></script>
-    <script defer type="module" src="./src/Localization.ts"></script>
-    <script defer type="module" src="./src/helpers.ts"></script>
-    <script defer type="module" src="./src/actionList.ts"></script>
-    <script defer type="module" src="./src/interval.ts"></script>
-    <script defer type="module" src="./src/driver.ts"></script>
-    <script defer type="module" src="./src/stats.ts"></script>
-    <script defer type="module" src="./src/actions.ts"></script>
-    <script defer type="module" src="./src/views/main.view.ts"></script>
-    <script defer type="module" src="./src/town.ts"></script>
-    <script defer type="module" src="./src/prestige.ts"></script>
-    <script defer type="module" src="./src/globals.ts"></script>
-    <script defer type="module" src="./src/saving.ts"></script>
-    <script defer type="module" src="./src/challenges.ts"></script>
-    <script defer type="module" src="./src/keyboard.hotkeys.ts"></script>
-    <script defer type="module" src="./src/predictor.ts"></script>
-    <script defer type="module" src="./src/app.ts"></script>
+    <div id="tutorial"></div>
+    <script type="module" src="./src/app.ts"></script>
   </body>
 </html>

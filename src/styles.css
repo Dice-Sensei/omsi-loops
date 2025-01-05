@@ -750,25 +750,6 @@ main, #actionLogContainer, #timeControlsMain, #timeControlsOptions {
   display: none;
 }
 
-#loadingBox {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: grid;
-}
-
-#loadingText {
-  font-size: 200%;
-  place-self: center;
-}
-
-body.loading > *:not(.showWhileLoading),
-body:not(.loading) > .hideWhenLoaded {
-  visibility: hidden;
-}
-
 .showthis {
   pointer-events: none;
 }
