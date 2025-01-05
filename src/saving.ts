@@ -188,7 +188,6 @@ const optionValueHandlers = {
   },
   actionLog(value, init) {
     document.getElementById('actionLogContainer').style.display = value ? '' : 'none';
-    document.getElementById('navbar_action_log').style.display = value ? '' : 'none';
   },
   predictor(value, init) {
     localStorage['loadPredictor'] = value || '';
@@ -277,11 +276,6 @@ function startGame() {
   // load calls recalcInterval, which will start the callbacks
   load();
   globalThis.view.setScreenSize();
-}
-
-function cheat() {
-  if (globalThis.driver.gameSpeed === 1) globalThis.driver.gameSpeed = 20;
-  else globalThis.driver.gameSpeed = 1;
 }
 
 function _town(townNum) {
@@ -1148,7 +1142,6 @@ const _saving = {
   loadDefaults,
   needsDataSnapshots,
   startGame,
-  cheat,
   setOption,
   defaultSaveName,
   timeNeededInitial,
