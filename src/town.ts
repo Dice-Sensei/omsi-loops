@@ -46,7 +46,7 @@ export class Town<TN extends number> {
   hiddenVars: Set<string> = new Set();
 
   unlocked() {
-    return globalThis.saving.vals.townsUnlocked.includes(this.index);
+    return globalThis.globals.townsUnlocked.includes(this.index);
   }
 
   expFromLevel(level) {
@@ -87,14 +87,14 @@ export class Town<TN extends number> {
       globalThis.saving.view.requestUpdate('updateLockedHidden', null);
       globalThis.driver.adjustAll();
       for (const action of globalThis.saving.vals.totalActionList) {
-        if (globalThis.saving.vals.towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
+        if (globalThis.globals.towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
           globalThis.saving.view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
         }
       }
     }
     globalThis.saving.view.requestUpdate('updateProgressAction', {
       name: varName,
-      town: globalThis.saving.vals.towns[globalThis.saving.vals.curTown],
+      town: globalThis.globals.towns[globalThis.saving.vals.curTown],
     });
   }
 

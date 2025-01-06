@@ -20,7 +20,7 @@ function setControlKey(value: boolean): void {
 
 function moveToTown(townNum: number | undefined): void {
   if (townNum === undefined) return;
-  if (!globalThis.saving.vals.townsUnlocked.includes(townNum)) return;
+  if (!globalThis.globals.townsUnlocked.includes(townNum)) return;
 
   globalThis.saving.view.showTown(townNum);
 }
@@ -183,7 +183,7 @@ Keyboard
       fn: () =>
         moveToTown(
           globalThis.saving.vals
-            .townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.saving.vals.townShowing) + 1],
+            .townsUnlocked[globalThis.globals.townsUnlocked.indexOf(globalThis.globals.townshowing) + 1],
         ),
       description: t('shortcuts.moveToNextTown'),
     },
@@ -193,7 +193,7 @@ Keyboard
       fn: () =>
         moveToTown(
           globalThis.saving.vals
-            .townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.saving.vals.townShowing) - 1],
+            .townsUnlocked[globalThis.globals.townsUnlocked.indexOf(globalThis.globals.townshowing) - 1],
         ),
       description: t('shortcuts.moveToPreviousTown'),
     },

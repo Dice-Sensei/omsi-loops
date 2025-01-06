@@ -5,14 +5,15 @@ import {
   capitalizeFirst,
   delay,
   fibonacci,
+  formatNumber,
   htmlElement,
   inputElement,
   intToString,
   nextIdle,
   precision3,
   selectElement,
-  formatNumber  
 } from './helpers.ts';
+import { calcSoulstoneMult, getNumOnCurList, getNumOnList } from './actions.ts';
 
 // prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
 
@@ -198,7 +199,7 @@ const Koviko = {
     }
 
     getTotalBonusXP(statName, t, ss) {
-      const soulstoneBonus = ss[statName] ? globalThis.actions.calcSoulstoneMult(ss[statName]) : 1;
+      const soulstoneBonus = ss[statName] ? calcSoulstoneMult(ss[statName]) : 1;
 
       var statBonus = 1;
       if (['Dex', 'Str', 'Con', 'Spd', 'Per'].includes(statName)) {
@@ -753,7 +754,7 @@ const Koviko = {
           affected: ['stone'],
           canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[1] < 250),
           effect: (r) => {
-            let t = globalThis.saving.vals.towns[1]; //Area of the Action
+            let t = globalThis.globals.towns[1]; //Area of the Action
             if (t.goodStonesZ1 > 0) {
               r.stone = 1;
               return;
@@ -771,7 +772,7 @@ const Koviko = {
           affected: ['stone'],
           canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[3] < 250),
           effect: (r) => {
-            let t = globalThis.saving.vals.towns[3]; //Area of the Action
+            let t = globalThis.globals.towns[3]; //Area of the Action
             if (t.goodStonesZ3 > 0) {
               r.stone = 1;
               return;
@@ -789,7 +790,7 @@ const Koviko = {
           affected: ['stone'],
           canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[5] < 250),
           effect: (r) => {
-            let t = globalThis.saving.vals.towns[5]; //Area of the Action
+            let t = globalThis.globals.towns[5]; //Area of the Action
             if (t.goodStonesZ5 > 0) {
               r.stone = 1;
               return;
@@ -807,7 +808,7 @@ const Koviko = {
           affected: ['stone'],
           canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[6] < 250),
           effect: (r) => {
-            let t = globalThis.saving.vals.towns[6]; //Area of the Action
+            let t = globalThis.globals.towns[6]; //Area of the Action
             if (t.goodStonesZ6 > 0) {
               r.stone = 1;
               return;
@@ -2673,7 +2674,7 @@ const Koviko = {
       this.totalDisplay.parentElement.classList.remove('expired');
 
       if (
-        globalThis.actions.getNumOnCurList('Open Portal') > 0 && (globalThis.actions.getNumOnList('Open Portal') == 0)
+        getNumOnCurList('Open Portal') > 0 && (getNumOnList('Open Portal') == 0)
       ) {
         this.totalDisplay.innerHTML += 'PORTAL MISSING';
         this.totalDisplay.style.color = 'var(--predictor-warning-color)';

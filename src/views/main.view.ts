@@ -14,6 +14,7 @@ import {
   removeClassFromDiv,
   toSuffix,
 } from '../helpers.ts';
+import { getNumOnList } from '../actions.ts';
 
 const DarkRitualDescription = [
   `10% faster in Beginnersville per ritual from 1-20<br>`,
@@ -778,13 +779,13 @@ class View {
       globalThis.saving.vals.goldInvested * .001,
     );
     document.getElementById('actionAllowedPockets').textContent = intToStringRound(
-      globalThis.saving.vals.towns[7].totalPockets,
+      globalThis.globals.towns[7].totalPockets,
     );
     document.getElementById('actionAllowedWarehouses').textContent = intToStringRound(
-      globalThis.saving.vals.towns[7].totalWarehouses,
+      globalThis.globals.towns[7].totalWarehouses,
     );
     document.getElementById('actionAllowedInsurance').textContent = intToStringRound(
-      globalThis.saving.vals.towns[7].totalInsurance,
+      globalThis.globals.towns[7].totalInsurance,
     );
     document.getElementById('totalSurveyProgress').textContent = `${globalThis.actionList.getExploreProgress()}`;
     Array.from(document.getElementsByClassName('surveySkill')).forEach((div) => {
@@ -1259,7 +1260,7 @@ class View {
   }
 
   updateProgressActions() {
-    for (const town of globalThis.saving.vals.towns) {
+    for (const town of globalThis.globals.towns) {
       for (let i = 0; i < town.progressVars.length; i++) {
         const varName = town.progressVars[i];
         this.updateProgressAction({ name: varName, town: town });
@@ -1272,7 +1273,7 @@ class View {
       const actionDiv = document.getElementById(`container${action.varName}`);
       const infoDiv = document.getElementById(`infoContainer${action.varName}`);
       const storyDiv = document.getElementById(`storyContainer${action.varName}`);
-      if (action.allowed && globalThis.actions.getNumOnList(action.name) >= action.allowed()) {
+      if (action.allowed && getNumOnList(action.name) >= action.allowed()) {
         addClassToDiv(actionDiv, 'capped');
       } else if (action.unlocked()) {
         if (infoDiv) {
@@ -1401,7 +1402,7 @@ class View {
       document.getElementById('townViewLeft').style.visibility = '';
     }
 
-    if (townNum === Math.max(...globalThis.saving.vals.townsUnlocked)) {
+    if (townNum === Math.max(...globalThis.globals.townsUnlocked)) {
       document.getElementById('townViewRight').style.visibility = 'hidden';
     } else {
       document.getElementById('townViewRight').style.visibility = '';
@@ -1418,11 +1419,11 @@ class View {
     $('#TownSelect').val(townNum);
 
     htmlElement('shortTownColumn').classList.remove(
-      `zone-${globalThis.saving.vals.townShowing + 1}`,
+      `zone-${globalThis.globals.townshowing + 1}`,
     );
     htmlElement('shortTownColumn').classList.add(`zone-${townNum + 1}`);
     document.getElementById('townDesc').textContent = Localization.txt(`towns>town${townNum}>desc`);
-    globalThis.saving.vals.townShowing = townNum;
+    globalThis.globals.townshowing = townNum;
   }
 
   showActions(stories) {
@@ -1434,11 +1435,11 @@ class View {
     if (stories) {
       document.getElementById('actionsViewLeft').style.visibility = '';
       document.getElementById('actionsViewRight').style.visibility = 'hidden';
-      actionStoriesTown[globalThis.saving.vals.townShowing].style.display = '';
+      actionStoriesTown[globalThis.globals.townshowing].style.display = '';
     } else {
       document.getElementById('actionsViewLeft').style.visibility = 'hidden';
       document.getElementById('actionsViewRight').style.visibility = '';
-      actionOptionsTown[globalThis.saving.vals.townShowing].style.display = '';
+      actionOptionsTown[globalThis.globals.townshowing].style.display = '';
     }
 
     document.getElementById('actionsTitle').textContent = Localization.txt(
@@ -1452,12 +1453,12 @@ class View {
   }
 
   toggleHidden(varName, force) {
-    const isHidden = globalThis.saving.vals.towns[globalThis.saving.vals.townShowing].hiddenVars.has(varName);
+    const isHidden = globalThis.globals.towns[globalThis.globals.townshowing].hiddenVars.has(varName);
     if ((isHidden && force !== true) || force === false) {
-      globalThis.saving.vals.towns[globalThis.saving.vals.townShowing].hiddenVars.delete(varName);
+      globalThis.globals.towns[globalThis.globals.townshowing].hiddenVars.delete(varName);
       htmlElement(`infoContainer${varName}`).classList.remove('user-hidden');
     } else if (!isHidden || force === true) {
-      globalThis.saving.vals.towns[globalThis.saving.vals.townShowing].hiddenVars.add(varName);
+      globalThis.globals.towns[globalThis.globals.townshowing].hiddenVars.add(varName);
       htmlElement(`infoContainer${varName}`).classList.add('user-hidden');
     }
   }
@@ -1465,7 +1466,7 @@ class View {
   updateRegular(updateInfo) {
     const varName = updateInfo.name;
     const index = updateInfo.index;
-    const town = globalThis.saving.vals.towns[index];
+    const town = globalThis.globals.towns[index];
     htmlElement(`total${varName}`).textContent = String(town[`total${varName}`]);
     htmlElement(`checked${varName}`).textContent = String(town[`checked${varName}`]);
     htmlElement(`unchecked${varName}`).textContent = String(
@@ -1503,7 +1504,7 @@ class View {
 
   createTownActions() {
     if (actionOptionsTown[0].querySelector('.actionOrTravelContainer')) return;
-    for (const action of globalThis.saving.vals.towns.flatMap((t) => t.totalActionList)) {
+    for (const action of globalThis.globals.towns.flatMap((t) => t.totalActionList)) {
       this.createTownAction(action);
     }
     for (const varName of globalThis.globals.towns.flatMap((t) => t.allVarNames)) {
@@ -2127,14 +2128,14 @@ class View {
   updateTravelMenu() {
     let travelOptions = $('#TownSelect').children();
     for (let i = 0; i < travelOptions.length; i++) {
-      travelOptions[i].hidden = !globalThis.saving.vals.townsUnlocked.includes(i);
+      travelOptions[i].hidden = !globalThis.globals.townsUnlocked.includes(i);
     }
   }
 
   adjustDarkRitualText() {
     let DRdesc = document.getElementById('DRText');
     DRdesc.innerHTML = `Actions are:<br>`;
-    globalThis.saving.vals.townsUnlocked.forEach((townNum) => {
+    globalThis.globals.townsUnlocked.forEach((townNum) => {
       DRdesc.innerHTML += DarkRitualDescription[townNum];
     });
     if (globalThis.stats.getBuffLevel('Ritual') > 200) DRdesc.innerHTML += DarkRitualDescription[9];

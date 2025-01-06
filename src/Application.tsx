@@ -343,7 +343,7 @@ const Towns = () => (
           style='float: left; margin-left: 150px'
           class='actionIcon fa fa-arrow-left'
           id='townViewLeft'
-          onclick='globalThis.saving.view.showTown(globalThis.saving.vals.townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.saving.vals.townShowing)-1])'
+          onclick='globalThis.saving.view.showTown(globalThis.globals.townsUnlocked[globalThis.globals.townsUnlocked.indexOf(globalThis.globals.townshowing)-1])'
         >
         </div>
         <div class='showthat'>
@@ -356,7 +356,7 @@ const Towns = () => (
           style='float: right; margin-right: 150px'
           class='actionIcon fa fa-arrow-right'
           id='townViewRight'
-          onclick='globalThis.saving.view.showTown(globalThis.saving.vals.townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.saving.vals.townShowing)+1])'
+          onclick='globalThis.saving.view.showTown(globalThis.globals.townsUnlocked[globalThis.globals.townsUnlocked.indexOf(globalThis.globals.townshowing)+1])'
         >
         </div>
         <div id='hideVarsButton' class='far fa-eye' onclick='globalThis.saving.view.toggleHiding()'></div>

@@ -52,8 +52,8 @@ const setupManaBurn = () => {
     document.title = 'Idle Loops';
     globalThis.driver.resetResources();
     globalThis.stats.restartStats();
-    for (let i = 0; i < globalThis.saving.vals.towns.length; i++) {
-      globalThis.saving.vals.towns[i].restart();
+    for (let i = 0; i < globalThis.globals.towns.length; i++) {
+      globalThis.globals.towns[i].restart();
     }
     globalThis.saving.view.requestUpdate('updateSkills');
     globalThis.saving.actions.restart();

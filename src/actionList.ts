@@ -2,6 +2,7 @@ import { Data } from './data.ts';
 import { Localizable } from './localizable.ts';
 import { Localization } from './Localization.ts';
 import { camelize, fibonacci, numberToWords, precision3 } from './helpers.ts';
+import { getNumOnList } from './actions.ts';
 import {} from './stats.ts';
 
 class ClassNameNotFoundError extends TypeError {}
@@ -668,10 +669,10 @@ function SurveyAction(townNum) {
       return getExploreProgress() > 0;
     },
     finish() {
-      if (globalThis.saving.vals.towns[this.townNum].getLevel('Survey') != 100) {
+      if (globalThis.globals.towns[this.townNum].getLevel('Survey') != 100) {
         globalThis.saving.viewalThis.driver.addResource('map', -1);
         globalThis.driver.addResource('completedMap', 1);
-        globalThis.saving.vals.towns[this.townNum].finishProgress(this.varName, getExploreSkill());
+        globalThis.globals.towns[this.townNum].finishProgress(this.varName, getExploreSkill());
         globalThis.saving.view.requestUpdate('updateActionTooltips', null);
       } else if (globalThis.saving.vals.options.pauseOnComplete) {
         globalThis.driver.pauseGame(true, 'Survey complete! (Game paused)');
@@ -735,7 +736,7 @@ Action.RuinsZ5 = new Action('RuinsZ5', RuinsAction(5));
 Action.RuinsZ6 = new Action('RuinsZ6', RuinsAction(6));
 
 function adjustRocks(townNum) {
-  let town = globalThis.saving.vals.towns[townNum];
+  let town = globalThis.globals.towns[townNum];
   let baseStones = town.getLevel('RuinsZ' + townNum) * 2500;
   let usedStones = globalThis.saving.vals.stonesUsed[townNum];
   town[`totalStonesZ${townNum}`] = baseStones;
@@ -768,27 +769,27 @@ function HaulAction(townNum) {
       return 50000;
     },
     visible() {
-      return globalThis.saving.vals.towns[this.townNum].getLevel('RuinsZ' + townNum) > 0;
+      return globalThis.globals.towns[this.townNum].getLevel('RuinsZ' + townNum) > 0;
     },
     unlocked() {
-      return globalThis.saving.vals.towns[this.townNum].getLevel('RuinsZ' + townNum) > 0;
+      return globalThis.globals.towns[this.townNum].getLevel('RuinsZ' + townNum) > 0;
     },
     finish() {
       globalThis.saving.vals.stoneLoc = this.townNum;
-      globalThis.saving.vals.towns[this.townNum].finishRegular(this.varName, 1000, () => {
+      globalThis.globals.towns[this.townNum].finishRegular(this.varName, 1000, () => {
         globalThis.driver.addResource('stone', true);
       });
     },
     storyReqs(storyNum) {
       switch (storyNum) {
         case 1:
-          return globalThis.saving.vals.towns[this.townNum][`good${this.varName}`] +
+          return globalThis.globals.towns[this.townNum][`good${this.varName}`] +
               globalThis.saving.vals.stonesUsed[this.townNum] >= 1;
         case 2:
-          return globalThis.saving.vals.towns[this.townNum][`good${this.varName}`] +
+          return globalThis.globals.towns[this.townNum][`good${this.varName}`] +
               globalThis.saving.vals.stonesUsed[this.townNum] >= 100;
         case 3:
-          return globalThis.saving.vals.towns[this.townNum][`good${this.varName}`] +
+          return globalThis.globals.towns[this.townNum][`good${this.varName}`] +
               globalThis.saving.vals.stonesUsed[this.townNum] >= 250;
       }
       return false;
@@ -1856,7 +1857,7 @@ Action.StartJourney = new Action('Start Journey', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(1);
+        return globalThis.globals.townsUnlocked.includes(1);
     }
     return false;
   },
@@ -2925,7 +2926,7 @@ Action.ContinueOn = new Action('Continue On', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(2);
+        return globalThis.globals.townsUnlocked.includes(2);
     }
     return false;
   },
@@ -2935,7 +2936,7 @@ Action.ContinueOn = new Action('Continue On', {
     Spd: 0.4,
   },
   allowed() {
-    return globalThis.actions.getNumOnList('Open Portal') > 0 ? 2 : 1;
+    return getNumOnList('Open Portal') > 0 ? 2 : 1;
   },
   manaCost() {
     return Math.ceil(8000 - (60 * globalThis.globals.towns[1].getLevel('Shortcut')));
@@ -3925,7 +3926,7 @@ Action.StartTrek = new Action('Start Trek', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(3);
+        return globalThis.globals.townsUnlocked.includes(3);
     }
     return false;
   },
@@ -3935,7 +3936,7 @@ Action.StartTrek = new Action('Start Trek', {
     Spd: 0.1,
   },
   allowed() {
-    return globalThis.actions.getNumOnList('Open Portal') > 0 ? 2 : 1;
+    return getNumOnList('Open Portal') > 0 ? 2 : 1;
   },
   manaCost() {
     return Math.ceil(12000);
@@ -4578,7 +4579,7 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
   finish() {
     globalThis.saving.view.requestUpdate('updateBuff', 'Imbuement');
     if (globalThis.saving.vals.options.autoMaxTraining) globalThis.driver.capAllTraining();
-    if (globalThis.saving.vals.towns[3].ImbueMindLoopCounter >= 0) {
+    if (globalThis.globals.towns[3].ImbueMindLoopCounter >= 0) {
       globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
     }
   },
@@ -6407,7 +6408,7 @@ Action.JourneyForth = new Action('Journey Forth', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(6);
+        return globalThis.globals.townsUnlocked.includes(6);
     }
   },
   stats: {
@@ -6416,7 +6417,7 @@ Action.JourneyForth = new Action('Journey Forth', {
     Spd: 0.3,
   },
   allowed() {
-    return globalThis.actions.getNumOnList('Open Portal') > 0 ? 2 : 1;
+    return getNumOnList('Open Portal') > 0 ? 2 : 1;
   },
   manaCost() {
     return 20000;
@@ -6802,7 +6803,7 @@ Action.Escape = new Action('Escape', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(7);
+        return globalThis.globals.townsUnlocked.includes(7);
     }
   },
   stats: {
@@ -7785,7 +7786,7 @@ Action.LeaveCity = new Action('Leave City', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(8);
+        return globalThis.globals.townsUnlocked.includes(8);
     }
   },
   stats: {
@@ -7947,9 +7948,9 @@ Action.BuildTower = new Action('Build Tower', {
   },
   finish() {
     globalThis.saving.vals.stonesUsed[globalThis.saving.vals.stoneLoc]++;
-    globalThis.saving.vals.towns[this.townNum].finishProgress(this.varName, 505);
+    globalThis.globals.towns[this.townNum].finishProgress(this.varName, 505);
     globalThis.driver.addResource('stone', false);
-    if (globalThis.saving.vals.towns[this.townNum].getLevel(this.varName) >= 100) {
+    if (globalThis.globals.towns[this.townNum].getLevel(this.varName) >= 100) {
       globalThis.saving.vals.stonesUsed = { 1: 250, 3: 250, 5: 250, 6: 250 };
     }
     adjustRocks(globalThis.saving.vals.stoneLoc);

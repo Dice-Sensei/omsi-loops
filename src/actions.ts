@@ -1,5 +1,5 @@
 import { Data } from './data.ts';
-import { Mana, clamp } from './helpers.ts';
+import { clamp, Mana } from './helpers.ts';
 
 /**
  * ActionLoopType is an enum that describes what the "loops" property means. Actions without
@@ -55,7 +55,7 @@ function isMultipartAction(action) {
   return 'loopStats' in action;
 }
 
-class Actions {
+export class Actions {
   current = [];
 
   next = [];
@@ -150,7 +150,7 @@ class Actions {
         manaLeft -= manaUsed;
         manaToSpend += manaUsed;
         // console.log("using: "+curAction.loopStats[(towns[curAction.townNum][curAction.varName + "LoopCounter"]+segment) % curAction.loopStats.length]+" to add: " + toAdd + " to segment: " + segment + " and part " +towns[curAction.townNum][curAction.varName + "LoopCounter"]+" of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
-        globalThis.saving.vals.towns[curAction.townNum][curAction.varName] += toAdd;
+        globalThis.globals.towns[curAction.townNum][curAction.varName] += toAdd;
         curProgress += toAdd;
         while (curProgress >= loopCost(segment)) {
           curProgress -= loopCost(segment);
@@ -159,20 +159,20 @@ class Actions {
             // part finished
             if (
               curAction.name === 'Dark Ritual' &&
-              globalThis.saving.vals.towns[curAction.townNum][curAction.varName] >= 4000000
+              globalThis.globals.towns[curAction.townNum][curAction.varName] >= 4000000
             ) {
               globalThis.view.setStoryFlag('darkRitualThirdSegmentReached');
             }
             if (
               curAction.name === 'Imbue Mind' &&
-              globalThis.saving.vals.towns[curAction.townNum][curAction.varName] >= 700000000
+              globalThis.globals.towns[curAction.townNum][curAction.varName] >= 700000000
             ) {
               globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
             }
-            globalThis.saving.vals.towns[curAction.townNum][curAction.varName] = 0;
-            loopCounter = globalThis.saving.vals.towns[curAction.townNum][`${curAction.varName}LoopCounter`] +=
+            globalThis.globals.towns[curAction.townNum][curAction.varName] = 0;
+            loopCounter = globalThis.globals.towns[curAction.townNum][`${curAction.varName}LoopCounter`] +=
               curAction.segments;
-            globalThis.saving.vals.towns[curAction.townNum][`total${curAction.varName}`]++;
+            globalThis.globals.towns[curAction.townNum][`total${curAction.varName}`]++;
             segment -= curAction.segments;
             loopCosts = {};
             curAction.loopsFinished();
@@ -188,7 +188,7 @@ class Actions {
               globalThis.saving.vals.totals.actions++;
               break manaLoop;
             }
-            globalThis.saving.vals.towns[curAction.townNum][curAction.varName] = curProgress;
+            globalThis.globals.towns[curAction.townNum][curAction.varName] = curProgress;
           }
           if (curAction.segmentFinished) {
             curAction.segmentFinished();
@@ -333,7 +333,7 @@ class Actions {
       }
     }
     globalThis.saving.vals.guild = '';
-    globalThis.globals.hearts = [];
+    globalThis.globals.hearts.length = [];
     globalThis.saving.vals.escapeStarted = false;
     globalThis.saving.vals.portalUsed = false;
     globalThis.saving.vals.stoneLoc = 0;
@@ -705,15 +705,10 @@ function setAdjustedTicks(action) {
   );
 }
 
-function calcSoulstoneMult(soulstones) {
+export function calcSoulstoneMult(soulstones) {
   return 1 + Math.pow(soulstones, 0.8) / 30;
 }
 
-function calcTalentMult(talent) {
-  return 1 + Math.pow(talent, 0.4) / 3;
-}
-
-// how many ticks would it take to get to the first level up
 function getMaxTicksForAction(action, talentOnly = false) {
   let maxTicks = Number.MAX_SAFE_INTEGER;
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
@@ -752,7 +747,7 @@ function addExpFromAction(action, manaCount) {
   }
 }
 
-function markActionsComplete(loopCompletedActions) {
+export function markActionsComplete(loopCompletedActions) {
   loopCompletedActions.forEach((action) => {
     let varName = globalThis.actionList.Action[globalThis.actionList.withoutSpaces(action.name)].varName;
     if (!globalThis.saving.vals.completedActions.includes(varName)) {
@@ -761,14 +756,14 @@ function markActionsComplete(loopCompletedActions) {
   });
 }
 
-function actionStory(loopCompletedActions) {
+export function actionStory(loopCompletedActions) {
   loopCompletedActions.forEach((action) => {
     let completed = action.loops - action.loopsLeft;
     if (action.story !== undefined) action.story(completed);
   });
 }
 
-function getNumOnList(actionName) {
+export function getNumOnList(actionName) {
   let count = 0;
   for (const action of globalThis.saving.actions.next) {
     if (!action.disabled && action.name === actionName) {
@@ -778,17 +773,7 @@ function getNumOnList(actionName) {
   return count;
 }
 
-function getOtherSurveysOnList(surveyName) {
-  let count = 0;
-  for (const action of globalThis.saving.actions.next) {
-    if (!action.disabled && action.name.startsWith('Survey') && action.name != surveyName) {
-      count += action.loops;
-    }
-  }
-  return count;
-}
-
-function getNumOnCurList(actionName) {
+export function getNumOnCurList(actionName) {
   let count = 0;
   for (const action of globalThis.saving.actions.current) {
     if (action.name === actionName) {
@@ -799,19 +784,11 @@ function getNumOnCurList(actionName) {
 }
 
 const _actions = {
-  isMultipartAction,
   Actions,
-  ZoneSpan,
-  setAdjustedTicks,
   calcSoulstoneMult,
-  calcTalentMult,
-  getMaxTicksForAction,
-  getMaxTicksForStat,
-  addExpFromAction,
   markActionsComplete,
   actionStory,
   getNumOnList,
-  getOtherSurveysOnList,
   getNumOnCurList,
 };
 

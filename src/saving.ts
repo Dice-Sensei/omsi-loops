@@ -1,6 +1,7 @@
 import { Town } from './town.ts';
 import { Data } from './data.ts';
-import { valueElement, inputElement, removeClassFromDiv, copyArray, textAreaElement} from './helpers.ts';
+import { copyArray, inputElement, removeClassFromDiv, textAreaElement, valueElement } from './helpers.ts';
+import { selfIsGame } from './globals.ts';
 
 import {
   compressToBase64 as lZStringCompressToBase64,
@@ -13,12 +14,11 @@ const challengeSaveName = 'idleLoopsChallenge';
 let saveName = defaultSaveName;
 
 const timeNeededInitial = 5 * 50;
-const view = globalThis.globals.selfIsGame ? new globalThis.view.View() : null;
+const view = selfIsGame ? new globalThis.view.View() : null;
 
 const vals = {
   trainingLimits: 10,
 };
-vals.towns = globalThis.globals.towns;
 vals.curTown = 0;
 vals.shouldRestart = true;
 vals.totalTalent = 0;
@@ -582,12 +582,12 @@ function doLoad(toLoad) {
   }
 
   if (toLoad.maxTown) {
-    globalThis.saving.vals.townsUnlocked = [0];
+    globalThis.globals.townsUnlocked = [0];
     for (let i = 1; i <= toLoad.maxTown; i++) {
-      globalThis.saving.vals.townsUnlocked.push(i);
+      globalThis.globals.townsUnlocked.push(i);
     }
   } else {
-    globalThis.saving.vals.townsUnlocked = toLoad.townsUnlocked === undefined ? [0] : toLoad.townsUnlocked;
+    globalThis.globals.townsUnlocked = toLoad.townsUnlocked === undefined ? [0] : toLoad.townsUnlocked;
   }
   globalThis.saving.vals.completedActions = [];
   if (toLoad.completedActions && toLoad.completedActions.length > 0) {
@@ -747,7 +747,7 @@ function doLoad(toLoad) {
 
   const hiddenVarNames = toLoad.hiddenVars?.slice() ?? [];
 
-  for (const town of globalThis.saving.vals.towns) {
+  for (const town of globalThis.globals.towns) {
     const hiddenVars = hiddenVarNames.shift() ?? [];
     town.hiddenVars.clear();
     for (const action of town.totalActionList) {
@@ -788,7 +788,7 @@ function doLoad(toLoad) {
   loadChallenge();
   view.initalize();
 
-  for (const town of globalThis.saving.vals.towns) {
+  for (const town of globalThis.globals.towns) {
     for (const action of town.totalActionList) {
       if (action.type === 'limited') {
         const varName = action.varName;
@@ -844,7 +844,7 @@ function doLoad(toLoad) {
     globalThis.saving.vals.dungeons[0][3].completed = Math.floor(total / 16);
     globalThis.saving.vals.dungeons[0][4].completed = Math.floor(total / 32);
     globalThis.saving.vals.dungeons[0][5].completed = Math.floor(total / 64);
-    globalThis.saving.vals.towns[0].totalSDungeon = globalThis.saving.vals.dungeons[0][0].completed +
+    globalThis.globals.towns[0].totalSDungeon = globalThis.saving.vals.dungeons[0][0].completed +
       globalThis.saving.vals.dungeons[0][1].completed + globalThis.saving.vals.dungeons[0][2].completed +
       globalThis.saving.vals.dungeons[0][3].completed + globalThis.saving.vals.dungeons[0][4].completed +
       globalThis.saving.vals.dungeons[0][5].completed;
@@ -883,7 +883,7 @@ function doSave() {
   toSave.curLoadout = globalThis.saving.vals.curLoadout;
   toSave.dungeons = globalThis.saving.vals.dungeons;
   toSave.trials = globalThis.saving.vals.trials;
-  toSave.townsUnlocked = globalThis.saving.vals.townsUnlocked;
+  toSave.townsUnlocked = globalThis.globals.townsUnlocked;
   toSave.completedActions = globalThis.saving.vals.completedActions;
 
   toSave.stats = globalThis.globals.stats;

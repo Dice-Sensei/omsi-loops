@@ -1,7 +1,8 @@
 import { Data } from './data.ts';
 import { KeyboardKey } from './keyboard.hotkeys.ts';
 import { Localization } from './Localization.ts';
-import { inputElement, Mana, beep, copyObject, copyArray, clamp } from './helpers.ts';
+import { beep, clamp, copyArray, inputElement, Mana } from './helpers.ts';
+import { actionStory, getNumOnList, markActionsComplete } from './actions.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
@@ -293,8 +294,8 @@ function loopEnd() {
     ) {
       loopCompletedActions.push(actions.current[actions.currentPos]);
     }
-    globalThis.actions.markActionsComplete(loopCompletedActions);
-    globalThis.actions.actionStory(loopCompletedActions);
+    markActionsComplete(loopCompletedActions);
+    actionStory(loopCompletedActions);
     if (globalThis.saving.vals.options.highlightNew) {
       globalThis.saving.view.requestUpdate('removeAllHighlights', null);
       globalThis.saving.view.requestUpdate('highlightIncompleteActions', null);
@@ -362,12 +363,12 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
     if (action.name === name) {
       if (
         action.visible() && action.unlocked() &&
-        (!action.allowed || globalThis.actions.getNumOnList(action.name) < action.allowed())
+        (!action.allowed || getNumOnList(action.name) < action.allowed())
       ) {
         let addAmount = globalThis.globals.actions.addAmount;
         if (action.allowed) {
           const numMax = action.allowed();
-          const numHave = globalThis.actions.getNumOnList(action.name);
+          const numHave = getNumOnList(action.name);
           if (numMax - numHave < addAmount) {
             addAmount = numMax - numHave;
           }
@@ -413,7 +414,8 @@ function resetResource(resource) {
 }
 
 function resetResources() {
-  globalThis.globals.resources = copyObject(globalThis.globals.resourcesTemplate);
+  Object.assign(globalThis.globals.resources, globalThis.globals.resourcesTemplate);
+
   if (globalThis.actionList.getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
     addResource('glasses', true);
   }
@@ -442,8 +444,7 @@ function selectLoadout(num) {
   } else {
     globalThis.saving.vals.curLoadout = num;
   }
-  inputElement('renameLoadout').value =
-    globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1];
+  inputElement('renameLoadout').value = globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1];
   globalThis.saving.view.updateLoadout(globalThis.saving.vals.curLoadout);
 }
 
@@ -480,8 +481,7 @@ function nameList(saveGame) {
     if (inputElement('renameLoadout').value.length > 30) {
       inputElement('renameLoadout').value = '30 Letter Max';
     } else if (inputElement('renameLoadout').value !== 'Saved!') {
-      globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1] =
-        inputElement('renameLoadout').value;
+      globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1] = inputElement('renameLoadout').value;
     }
   } else if (!isNaN(parseFloat(globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1]))) {
     inputElement('renameLoadout').value = 'Enter a name!';
@@ -511,8 +511,8 @@ function clearList() {
 
 function unlockTown(townNum) {
   if (!globalThis.globals.towns[townNum].unlocked()) {
-    globalThis.saving.vals.townsUnlocked.push(townNum);
-    globalThis.saving.vals.townsUnlocked.sort();
+    globalThis.globals.townsUnlocked.push(townNum);
+    globalThis.globals.townsUnlocked.sort();
     // refresh current
     globalThis.saving.view.showTown(townNum);
     globalThis.saving.view.requestUpdate('updateTravelMenu', null);
@@ -565,7 +565,7 @@ function capAmount(index, townNum) {
   const action = globalThis.globals.actions.next[index];
   const varName = `good${globalThis.actionList.getActionPrototype(action.name)?.varName}`;
   let alreadyExisting;
-  alreadyExisting = globalThis.actions.globalThis.actions.getNumOnList(action.name) +
+  alreadyExisting = getNumOnList(action.name) +
     (action.disabled ? action.loops : 0);
   let newLoops;
   if (action.name.startsWith('Survey')) newLoops = 500 - alreadyExisting;
@@ -579,7 +579,7 @@ function capAmount(index, townNum) {
 
 function capTraining(index) {
   const action = globalThis.globals.actions.next[index];
-  const alreadyExisting = globalThis.actions.getNumOnList(action.name) + (action.disabled ? action.loops : 0);
+  const alreadyExisting = getNumOnList(action.name) + (action.disabled ? action.loops : 0);
   const newLoops = globalThis.saving.vals.trainingLimits - alreadyExisting;
   globalThis.globals.actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
   globalThis.saving.view.updateNextActions();
@@ -602,7 +602,7 @@ function addLoop(actionId) {
   let addAmount = globalThis.globals.actions.addAmount;
   if (theClass.allowed) {
     const numMax = theClass.allowed();
-    const numHave = globalThis.actions.getNumOnList(theClass.name) + (action.disabled ? action.loops : 0);
+    const numHave = getNumOnList(theClass.name) + (action.disabled ? action.loops : 0);
     if ((numMax - numHave) < addAmount) {
       addAmount = numMax - numHave;
     }
@@ -726,7 +726,7 @@ function disableAction(actionId) {
   const action = globalThis.globals.actions.next[index];
   const translated = globalThis.actionList.getActionPrototype(action.name);
   if (action.disabled) {
-    if (!translated.allowed || globalThis.actions.getNumOnList(action.name) + action.loops <= translated.allowed()) {
+    if (!translated.allowed || getNumOnList(action.name) + action.loops <= translated.allowed()) {
       globalThis.globals.actions.updateAction(index, { disabled: false });
     }
   } else {
