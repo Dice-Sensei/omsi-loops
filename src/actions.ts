@@ -51,10 +51,6 @@ import { clamp, Mana } from './helpers.ts';
  * @prop {number}     [actionId]
  */
 
-function isMultipartAction(action) {
-  return 'loopStats' in action;
-}
-
 export class Actions {
   current = [];
 
@@ -644,6 +640,46 @@ export class Actions {
   }
 }
 
+export function calcSoulstoneMult(soulstones) {
+  return 1 + Math.pow(soulstones, 0.8) / 30;
+}
+
+export function markActionsComplete(loopCompletedActions) {
+  loopCompletedActions.forEach((action) => {
+    let varName = globalThis.actionList.Action[globalThis.actionList.withoutSpaces(action.name)].varName;
+    if (!globalThis.saving.vals.completedActions.includes(varName)) {
+      globalThis.saving.vals.completedActions.push(varName);
+    }
+  });
+}
+
+export function actionStory(loopCompletedActions) {
+  loopCompletedActions.forEach((action) => {
+    let completed = action.loops - action.loopsLeft;
+    if (action.story !== undefined) action.story(completed);
+  });
+}
+
+export function getNumOnList(actionName) {
+  let count = 0;
+  for (const action of globalThis.saving.actions.next) {
+    if (!action.disabled && action.name === actionName) {
+      count += action.loops;
+    }
+  }
+  return count;
+}
+
+export function getNumOnCurList(actionName) {
+  let count = 0;
+  for (const action of globalThis.saving.actions.current) {
+    if (action.name === actionName) {
+      count += action.loops;
+    }
+  }
+  return count;
+}
+
 class ZoneSpan {
   start;
   end;
@@ -693,6 +729,10 @@ class ZoneSpan {
   }
 }
 
+function isMultipartAction(action) {
+  return 'loopStats' in action;
+}
+
 function setAdjustedTicks(action) {
   let newCost = 0;
   for (const actionStatName in action.stats) {
@@ -703,10 +743,6 @@ function setAdjustedTicks(action) {
     globalThis.saving.vals.options.fractionalMana ? 0 : 1,
     Mana.ceil(action.rawTicks),
   );
-}
-
-export function calcSoulstoneMult(soulstones) {
-  return 1 + Math.pow(soulstones, 0.8) / 30;
 }
 
 function getMaxTicksForAction(action, talentOnly = false) {
@@ -746,50 +782,3 @@ function addExpFromAction(action, manaCount) {
     globalThis.stats.addExp(stat, expToAdd);
   }
 }
-
-export function markActionsComplete(loopCompletedActions) {
-  loopCompletedActions.forEach((action) => {
-    let varName = globalThis.actionList.Action[globalThis.actionList.withoutSpaces(action.name)].varName;
-    if (!globalThis.saving.vals.completedActions.includes(varName)) {
-      globalThis.saving.vals.completedActions.push(varName);
-    }
-  });
-}
-
-export function actionStory(loopCompletedActions) {
-  loopCompletedActions.forEach((action) => {
-    let completed = action.loops - action.loopsLeft;
-    if (action.story !== undefined) action.story(completed);
-  });
-}
-
-export function getNumOnList(actionName) {
-  let count = 0;
-  for (const action of globalThis.saving.actions.next) {
-    if (!action.disabled && action.name === actionName) {
-      count += action.loops;
-    }
-  }
-  return count;
-}
-
-export function getNumOnCurList(actionName) {
-  let count = 0;
-  for (const action of globalThis.saving.actions.current) {
-    if (action.name === actionName) {
-      count += action.loops;
-    }
-  }
-  return count;
-}
-
-const _actions = {
-  Actions,
-  calcSoulstoneMult,
-  markActionsComplete,
-  actionStory,
-  getNumOnList,
-  getNumOnCurList,
-};
-
-globalThis.actions = _actions;
