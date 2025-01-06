@@ -15,6 +15,7 @@ import {
   toSuffix,
 } from '../helpers.ts';
 import { getNumOnList } from '../actions.ts';
+import { actions } from '../actions.ts';
 
 const DarkRitualDescription = [
   `10% faster in Beginnersville per ritual from 1-20<br>`,
@@ -748,7 +749,7 @@ class View {
     );
   }
   updateTotalTicks() {
-    document.getElementById('totalTicks').textContent = `${formatNumber(globalThis.globals.actions.completedTicks)} | ${
+    document.getElementById('totalTicks').textContent = `${formatNumber(actions.completedTicks)} | ${
       formatTime(globalThis.driver.timeCounter)
     }`;
     document.getElementById('effectiveTime').textContent = `${formatTime(globalThis.driver.effectiveTime)}`;
@@ -842,7 +843,7 @@ class View {
     d3.select(nextActionsDiv)
       .selectAll('.nextActionContainer')
       .data(
-        globalThis.globals.actions.next.map((a, index) => ({
+        actions.next.map((a, index) => ({
           ...a,
           actionId: a.actionId,
           index,
@@ -963,12 +964,12 @@ class View {
       .classed('action-is-training', (a) => globalThis.actionList.isTraining(a.name))
       .classed('action-is-singular', (a) => a.action.allowed?.() === 1)
       .classed('action-is-travel', (a) => globalThis.actionList.getPossibleTravel(a.name).length > 0)
-      .classed('action-disabled', (a) => !globalThis.globals.actions.isValidAndEnabled(a))
+      .classed('action-disabled', (a) => !actions.isValidAndEnabled(a))
       .classed('user-disabled', (a) => !!a.disabled)
       .classed('user-collapsed', (a) => !!a.collapsed)
-      .classed('zone-collapsed', (a) => globalThis.globals.actions.zoneSpanAtIndex(a.index).isCollapsed)
+      .classed('zone-collapsed', (a) => actions.zoneSpanAtIndex(a.index).isCollapsed)
       .classed('action-is-collapsing-zone', (a) => {
-        const zoneSpan = globalThis.globals.actions.zoneSpanAtIndex(a.index);
+        const zoneSpan = actions.zoneSpanAtIndex(a.index);
         return zoneSpan.end === a.index && zoneSpan.isCollapsed;
       })
       .style('background', ({ action }) => {
@@ -1000,7 +1001,7 @@ class View {
       );
 
     if (globalThis.saving.vals.options.predictor) {
-      Koviko.postUpdateHandler(globalThis.globals.actions.next, nextActionsDiv);
+      Koviko.postUpdateHandler(actions.next, nextActionsDiv);
     }
     nextActionsDiv.scrollTop = Math.max(nextActionsDiv.scrollTop, scrollTop); // scrolling down to see the new thing added is okay, scrolling up when you click an action button is not
   }
@@ -1009,8 +1010,8 @@ class View {
     let totalDivText = '';
 
     // definite leak - need to remove listeners and image
-    for (let i = 0; i < globalThis.globals.actions.current.length; i++) {
-      const action = globalThis.globals.actions.current[i];
+    for (let i = 0; i < actions.current.length; i++) {
+      const action = actions.current[i];
       const actionLoops = action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops);
       const actionLoopsDone = (action.loops - action.loopsLeft) > 99999
         ? toSuffix(action.loops - action.loopsLeft)
@@ -1030,8 +1031,8 @@ class View {
 
     totalDivText = '';
 
-    for (let i = 0; i < globalThis.globals.actions.current.length; i++) {
-      const action = globalThis.globals.actions.current[i];
+    for (let i = 0; i < actions.current.length; i++) {
+      const action = actions.current[i];
       totalDivText += `<div id='actionTooltip${i}' style='display:none;padding-left:10px;width:90%'>` +
         `<div style='text-align:center;width:100%'>${action.label}</div><br><br>` +
         `<b>${Localization.txt('actions>current_action>mana_original')}</b> <div id='action${i}ManaOrig'></div><br>` +
@@ -1063,7 +1064,7 @@ class View {
     if (!div) {
       return;
     }
-    const action = globalThis.globals.actions.current[index];
+    const action = actions.current[index];
     if (!action) {
       return;
     }
@@ -1224,7 +1225,7 @@ class View {
   }
 
   updateCurrentActionLoops(index) {
-    const action = globalThis.globals.actions.current[index];
+    const action = actions.current[index];
     if (action !== undefined) {
       document.getElementById(`action${index}LoopsDone`).textContent = (action.loops - action.loopsLeft) > 99999
         ? toSuffix(action.loops - action.loopsLeft)

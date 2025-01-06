@@ -3,6 +3,7 @@ import { KeyboardKey } from './keyboard.hotkeys.ts';
 import { Localization } from './Localization.ts';
 import { beep, clamp, copyArray, inputElement, Mana } from './helpers.ts';
 import { actionStory, getNumOnList, markActionsComplete } from './actions.ts';
+import { actions } from './actions.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
@@ -237,7 +238,7 @@ let gameIsStopped = false;
 function stopGame() {
   gameIsStopped = true;
   globalThis.saving.view.requestUpdate('updateTime', null);
-  globalThis.saving.view.requestUpdate('updateCurrentActionBar', globalThis.globals.actions.currentPos);
+  globalThis.saving.view.requestUpdate('updateCurrentActionBar', actions.currentPos);
   globalThis.saving.view.update();
   document.title = '*PAUSED* Idle Loops';
   document.getElementById('pausePlay').textContent = Localization.txt('time_controls>play_button');
@@ -256,7 +257,7 @@ function pauseGame(ping, message) {
     Data.recordSnapshot('pause');
   }
   globalThis.saving.view.requestUpdate('updateTime', null);
-  globalThis.saving.view.requestUpdate('updateCurrentActionBar', globalThis.globals.actions.currentPos);
+  globalThis.saving.view.requestUpdate('updateCurrentActionBar', actions.currentPos);
   globalThis.saving.view.update();
   if (!gameIsStopped && globalThis.saving.vals.options.notifyOnPause) {
     globalThis.saving.clearPauseNotification();
@@ -286,11 +287,11 @@ function loopEnd() {
     globalThis.saving.vals.totals.effectiveTime += globalThis.driver.effectiveTime;
     globalThis.saving.vals.totals.loops++;
     globalThis.saving.view.requestUpdate('updateTotals', null);
-    const loopCompletedActions = globalThis.globals.actions.current.slice(0, globalThis.globals.actions.currentPos);
+    const loopCompletedActions = actions.current.slice(0, actions.currentPos);
     if (
-      globalThis.globals.actions.current[actions.currentPos] !== undefined &&
-      globalThis.globals.actions.current[actions.currentPos].loopsLeft <
-        globalThis.globals.actions.current[actions.currentPos].loops
+      actions.current[actions.currentPos] !== undefined &&
+      actions.current[actions.currentPos].loopsLeft <
+        actions.current[actions.currentPos].loops
     ) {
       loopCompletedActions.push(actions.current[actions.currentPos]);
     }
@@ -304,7 +305,7 @@ function loopEnd() {
 }
 
 function prepareRestart() {
-  const curAction = globalThis.globals.actions.getNextValidAction();
+  const curAction = actions.getNextValidAction();
   if (
     globalThis.saving.vals.options.pauseBeforeRestart ||
     (globalThis.saving.vals.options.pauseOnFailedLoop &&
@@ -318,10 +319,10 @@ function prepareRestart() {
       globalThis.saving.showPauseNotification('Game paused!');
     }
     if (curAction) {
-      globalThis.globals.actions.completedTicks += globalThis.globals.actions.getNextValidAction().ticks;
+      actions.completedTicks += actions.getNextValidAction().ticks;
       globalThis.saving.view.requestUpdate('updateTotalTicks', null);
     }
-    for (let i = 0; i < globalThis.globals.actions.current.length; i++) {
+    for (let i = 0; i < actions.current.length; i++) {
       globalThis.saving.view.requestUpdate('updateCurrentActionBar', i);
     }
     stopGame();
@@ -344,7 +345,7 @@ function restart() {
     globalThis.globals.towns[i].restart();
   }
   globalThis.saving.view.requestUpdate('updateSkills');
-  globalThis.globals.actions.restart();
+  actions.restart();
   globalThis.saving.view.requestUpdate('updateCurrentActionsDivs');
   globalThis.saving.view.requestUpdate('updateTrials', null);
   if (globalThis.saving.needsDataSnapshots()) {
@@ -365,7 +366,7 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
         action.visible() && action.unlocked() &&
         (!action.allowed || getNumOnList(action.name) < action.allowed())
       ) {
-        let addAmount = globalThis.globals.actions.addAmount;
+        let addAmount = actions.addAmount;
         if (action.allowed) {
           const numMax = action.allowed();
           const numHave = getNumOnList(action.name);
@@ -374,10 +375,10 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
           }
         }
         if (isTravelAction) {
-          const index = globalThis.globals.actions.addAction(name, 1, insertAtIndex);
+          const index = actions.addAction(name, 1, insertAtIndex);
           globalThis.saving.view.requestUpdate('highlightAction', index);
         } else {
-          const index = globalThis.globals.actions.addAction(name, addAmount, insertAtIndex);
+          const index = actions.addAction(name, addAmount, insertAtIndex);
           globalThis.saving.view.requestUpdate('highlightAction', index);
           if (KeyboardKey.shift && globalThis.actionList.hasLimit(name)) {
             capAmount(index, townNum);
@@ -425,7 +426,7 @@ function resetResources() {
 function changeActionAmount(amount) {
   amount = Math.max(amount, 1);
   amount = Math.min(amount, 1e12);
-  globalThis.globals.actions.addAmount = amount;
+  actions.addAmount = amount;
   const customInput = inputElement('amountCustom');
   if (document.activeElement !== customInput) {
     customInput.value = amount;
@@ -495,17 +496,17 @@ function loadList() {
   if (globalThis.saving.vals.curLoadout === 0) {
     return;
   }
-  inputElement('amountCustom').value = globalThis.globals.actions.addAmount.toString();
-  globalThis.globals.actions.clearActions();
+  inputElement('amountCustom').value = actions.addAmount.toString();
+  actions.clearActions();
   if (globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout]) {
-    globalThis.globals.actions.appendActionRecords(globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout]);
+    actions.appendActionRecords(globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout]);
   }
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.adjustDarkRitualText();
 }
 
 function clearList() {
-  globalThis.globals.actions.clearActions(KeyboardKey.shiftDown ? ((a) => (a.disabled || a.loops === 0)) : null);
+  actions.clearActions(KeyboardKey.shiftDown ? ((a) => (a.disabled || a.loops === 0)) : null);
   globalThis.saving.view.updateNextActions();
 }
 
@@ -552,7 +553,7 @@ function adjustAll() {
 }
 
 function capAction(actionId) {
-  const action = globalThis.globals.actions.findActionWithId(actionId);
+  const action = actions.findActionWithId(actionId);
   if (!action) return;
   if (globalThis.actionList.hasLimit(action.name)) {
     return capAmount(action.index, globalThis.actionList.getActionPrototype(action.name).townNum);
@@ -562,7 +563,7 @@ function capAction(actionId) {
 }
 
 function capAmount(index, townNum) {
-  const action = globalThis.globals.actions.next[index];
+  const action = actions.next[index];
   const varName = `good${globalThis.actionList.getActionPrototype(action.name)?.varName}`;
   let alreadyExisting;
   alreadyExisting = getNumOnList(action.name) +
@@ -572,22 +573,22 @@ function capAmount(index, townNum) {
   if (action.name === 'Gather Team') {
     newLoops = 5 + Math.floor(globalThis.stats.getSkillLevel('Leadership') / 100) - alreadyExisting;
   } else newLoops = globalThis.globals.towns[townNum][varName] - alreadyExisting;
-  globalThis.globals.actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
+  actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
 }
 
 function capTraining(index) {
-  const action = globalThis.globals.actions.next[index];
+  const action = actions.next[index];
   const alreadyExisting = getNumOnList(action.name) + (action.disabled ? action.loops : 0);
   const newLoops = globalThis.saving.vals.trainingLimits - alreadyExisting;
-  globalThis.globals.actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
+  actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
 }
 
 function capAllTraining() {
-  for (const [index, action] of globalThis.globals.actions.next.entries()) {
+  for (const [index, action] of actions.next.entries()) {
     // @ts-ignore
     if (globalThis.actionList.trainingActions.includes(action.name)) {
       //console.log("Training Action on list: " + action.name);
@@ -597,9 +598,9 @@ function capAllTraining() {
 }
 
 function addLoop(actionId) {
-  const action = globalThis.globals.actions.findActionWithId(actionId);
+  const action = actions.findActionWithId(actionId);
   const theClass = globalThis.actionList.getActionPrototype(action.name);
-  let addAmount = globalThis.globals.actions.addAmount;
+  let addAmount = actions.addAmount;
   if (theClass.allowed) {
     const numMax = theClass.allowed();
     const numHave = getNumOnList(theClass.name) + (action.disabled ? action.loops : 0);
@@ -607,29 +608,29 @@ function addLoop(actionId) {
       addAmount = numMax - numHave;
     }
   }
-  globalThis.globals.actions.updateAction(action.index, {
+  actions.updateAction(action.index, {
     loops: clamp(action.loops + addAmount, 0, 1e12),
   });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
 }
 function removeLoop(actionId) {
-  const action = globalThis.globals.actions.findActionWithId(actionId);
-  globalThis.globals.actions.updateAction(action.index, {
-    loops: clamp(action.loops - globalThis.globals.actions.addAmount, 0, 1e12),
+  const action = actions.findActionWithId(actionId);
+  actions.updateAction(action.index, {
+    loops: clamp(action.loops - actions.addAmount, 0, 1e12),
   });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
 }
 function split(actionId) {
-  const action = globalThis.globals.actions.findActionWithId(actionId);
-  globalThis.globals.actions.splitAction(action.index);
+  const action = actions.findActionWithId(actionId);
+  actions.splitAction(action.index);
   globalThis.saving.view.updateNextActions();
 }
 
 function collapse(actionId) {
-  const action = globalThis.globals.actions.findActionWithId(actionId);
-  globalThis.globals.actions.updateAction(action.index, { collapsed: !action.collapsed });
+  const action = actions.findActionWithId(actionId);
+  actions.updateAction(action.index, { collapsed: !action.collapsed });
   globalThis.saving.view.updateNextActions();
 }
 
@@ -680,7 +681,7 @@ function handleDragOver(event) {
 
 function handleDragDrop(event) {
   const idOfDroppedOverElement = event.target.getAttribute('data-action-id');
-  const indexOfDroppedOverElement = globalThis.globals.actions.findIndexOfActionWithId(idOfDroppedOverElement);
+  const indexOfDroppedOverElement = actions.findIndexOfActionWithId(idOfDroppedOverElement);
   globalThis.view.dragExitUndecorate(idOfDroppedOverElement);
   const initialId = event.dataTransfer.getData('text/html');
   if (initialId === '') {
@@ -694,50 +695,50 @@ function handleDragDrop(event) {
 
 function moveQueuedAction(initialIndex, resultingIndex) {
   if (
-    initialIndex < 0 || initialIndex > globalThis.globals.actions.next.length || resultingIndex < 0 ||
-    resultingIndex > globalThis.globals.actions.next.length - 1
+    initialIndex < 0 || initialIndex > actions.next.length || resultingIndex < 0 ||
+    resultingIndex > actions.next.length - 1
   ) {
     return;
   }
 
-  globalThis.globals.actions.moveAction(initialIndex, resultingIndex, true);
+  actions.moveAction(initialIndex, resultingIndex, true);
 
   globalThis.saving.view.updateNextActions();
 }
 
 function moveUp(actionId) {
-  const index = globalThis.globals.actions.findIndexOfActionWithId(actionId);
+  const index = actions.findIndexOfActionWithId(actionId);
   if (index <= 0) {
     return;
   }
-  globalThis.globals.actions.moveAction(index, index - 1);
+  actions.moveAction(index, index - 1);
   globalThis.saving.view.updateNextActions();
 }
 function moveDown(actionId) {
-  const index = globalThis.globals.actions.findIndexOfActionWithId(actionId);
-  if (index >= globalThis.globals.actions.next.length - 1) {
+  const index = actions.findIndexOfActionWithId(actionId);
+  if (index >= actions.next.length - 1) {
     return;
   }
-  globalThis.globals.actions.moveAction(index, index + 1);
+  actions.moveAction(index, index + 1);
   globalThis.saving.view.updateNextActions();
 }
 function disableAction(actionId) {
-  const index = globalThis.globals.actions.findIndexOfActionWithId(actionId);
-  const action = globalThis.globals.actions.next[index];
+  const index = actions.findIndexOfActionWithId(actionId);
+  const action = actions.next[index];
   const translated = globalThis.actionList.getActionPrototype(action.name);
   if (action.disabled) {
     if (!translated.allowed || getNumOnList(action.name) + action.loops <= translated.allowed()) {
-      globalThis.globals.actions.updateAction(index, { disabled: false });
+      actions.updateAction(index, { disabled: false });
     }
   } else {
-    globalThis.globals.actions.updateAction(index, { disabled: true });
+    actions.updateAction(index, { disabled: true });
   }
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.requestUpdate('updateLockedHidden', null);
 }
 function removeAction(actionId) {
-  const index = globalThis.globals.actions.findIndexOfActionWithId(actionId);
-  globalThis.globals.actions.removeAction(index);
+  const index = actions.findIndexOfActionWithId(actionId);
+  actions.removeAction(index);
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.requestUpdate('updateLockedHidden', null);
 }

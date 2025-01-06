@@ -1,6 +1,7 @@
 import { Keyboard } from './logic/keyboard.ts';
 import { Listeners } from './logic/listeners.ts';
 import { t } from './locales/translations.utils.ts';
+import { actions } from './actions.ts';
 
 function setShiftKey(value: boolean): void {
   if (KeyboardKey.shift === value) return;
@@ -213,7 +214,7 @@ Keyboard
   }, {
     onDown: {
       fn: () => {
-        globalThis.globals.actions.undoLast();
+        actions.undoLast();
         globalThis.saving.view.updateNextActions();
         globalThis.saving.view.updateLockedHidden();
       },

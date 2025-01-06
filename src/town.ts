@@ -1,4 +1,5 @@
 import { inputElement } from './helpers.ts';
+import { towns } from './globals.ts';
 
 'use strict';
 /**
@@ -87,14 +88,14 @@ export class Town<TN extends number> {
       globalThis.saving.view.requestUpdate('updateLockedHidden', null);
       globalThis.driver.adjustAll();
       for (const action of globalThis.saving.vals.totalActionList) {
-        if (globalThis.globals.towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
+        if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
           globalThis.saving.view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
         }
       }
     }
     globalThis.saving.view.requestUpdate('updateProgressAction', {
       name: varName,
-      town: globalThis.globals.towns[globalThis.saving.vals.curTown],
+      town: towns[globalThis.saving.vals.curTown],
     });
   }
 

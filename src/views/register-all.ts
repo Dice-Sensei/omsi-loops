@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { Localization } from '../Localization.ts';
 import { camelize, htmlElement } from '../helpers.ts';
+import { buffHardCaps, buffList } from '../globals.ts';
 
 const getDisabledMenus = () => {
   let disabledMenus = [];
@@ -17,7 +18,7 @@ const buffsContainer = {
   html() {
     let html = '';
 
-    for (const name of globalThis.globals.buffList) {
+    for (const name of buffList) {
       const fullName = globalThis.stats.Buff.fullNames[name];
       const XMLName = globalThis.actionList.getXMLName(fullName);
       const desc2 = Localization.txtsObj(`buffs>${XMLName}`)[0].innerHTML.includes('desc2');
@@ -43,7 +44,7 @@ const buffsContainer = {
               type="number" 
               id="buff${name}Cap" 
               class="buffmaxinput" 
-              value="${globalThis.globals.buffHardCaps[name]}" 
+              value="${buffHardCaps[name]}" 
               onchange="globalThis.view.updateBuffCaps()">
           </div>
         </div>

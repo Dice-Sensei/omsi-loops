@@ -283,10 +283,10 @@ class Action extends Localizable {
     return this.memoize('labelGlobal', '>label_global');
   }
 
-  static {
-    // listing these means they won't get stored even if memoized
-    Data.omitProperties(this.prototype, ['tooltip', 'tooltip2', 'label', 'labelDone', 'labelGlobal']);
-  }
+  // static {
+  //   // listing these means they won't get stored even if memoized
+  //   Data.omitProperties(this.prototype, ['tooltip', 'tooltip2', 'label', 'labelDone', 'labelGlobal']);
+  // }
 
   // all actions to date with info text have the same info text, so presently this is
   // centralized here (function will not be called by the game code if info text is not
@@ -393,9 +393,9 @@ class MultipartAction extends Action {
     return this._segmentModifiers;
   }
 
-  static {
-    Data.omitProperties(this.prototype, ['segmentNames', 'altSegmentNames', 'segmentModifiers']);
-  }
+  // static {
+  //   Data.omitProperties(this.prototype, ['segmentNames', 'altSegmentNames', 'segmentModifiers']);
+  // }
 
   getSegmentName(segment) {
     return this.segmentNames[segment % this.segmentNames.length];

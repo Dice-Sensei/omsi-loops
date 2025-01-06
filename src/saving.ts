@@ -2,6 +2,7 @@ import { Town } from './town.ts';
 import { Data } from './data.ts';
 import { copyArray, inputElement, removeClassFromDiv, textAreaElement, valueElement } from './helpers.ts';
 import { selfIsGame } from './globals.ts';
+import { actions } from './actions.ts';
 
 import {
   compressToBase64 as lZStringCompressToBase64,
@@ -600,7 +601,7 @@ function doLoad(toLoad) {
   globalThis.saving.vals.goldInvested = toLoad.goldInvested === undefined ? 0 : toLoad.goldInvested;
   globalThis.saving.vals.stonesUsed = toLoad.stonesUsed === undefined ? { 1: 0, 3: 0, 5: 0, 6: 0 } : toLoad.stonesUsed;
 
-  globalThis.globals.actions.clearActions();
+  actions.clearActions();
   if (toLoad.nextList) {
     for (const action of toLoad.nextList) {
       if (action.name === 'Sell Gold') {
@@ -622,7 +623,7 @@ function doLoad(toLoad) {
         action.name = 'Buy Mana Z3';
       }
       if (globalThis.saving.vals.totalActionList.some((x) => x.name === action.name)) {
-        globalThis.globals.actions.addActionRecord(action, -1, false);
+        actions.addActionRecord(action, -1, false);
       }
     }
   }
@@ -917,7 +918,7 @@ function doSave() {
     }
   }
   toSave.hiddenVars = hiddenVars;
-  toSave.nextList = globalThis.globals.actions.next;
+  toSave.nextList = actions.next;
   toSave.loadouts = globalThis.saving.vals.loadouts;
   toSave.loadoutnames = globalThis.saving.vals.loadoutnames;
   toSave.options = {};
@@ -987,8 +988,8 @@ function processSave(saveData) {
   if (saveJson) {
     storeSaveJson(saveJson);
   }
-  globalThis.globals.actions.clearActions();
-  globalThis.globals.actions.current = [];
+  actions.clearActions();
+  actions.current = [];
   load(null, saveJson);
   globalThis.driver.pauseGame();
   globalThis.driver.restart();
@@ -1047,7 +1048,7 @@ function importSaveFile(e) {
 
 function exportCurrentList() {
   let toReturn = '';
-  for (const action of globalThis.globals.actions.next) {
+  for (const action of actions.next) {
     toReturn += `${action.loops}x ${action.name}`;
     toReturn += '\n';
   }
@@ -1058,7 +1059,7 @@ function exportCurrentList() {
 
 function importCurrentList() {
   const toImport = textAreaElement('exportImportList').value.split('\n');
-  globalThis.globals.actions.clearActions();
+  actions.clearActions();
   for (let i = 0; i < toImport.length; i++) {
     if (!toImport[i]) {
       continue;
@@ -1068,7 +1069,7 @@ function importCurrentList() {
     try {
       const action = globalThis.actionList.getActionPrototype(name);
       if (action.unlocked()) {
-        globalThis.globals.actions.addActionRecord({ name, loops: Number(loops), disabled: false }, -1, false);
+        actions.addActionRecord({ name, loops: Number(loops), disabled: false }, -1, false);
       }
     } catch (e) {
       if (e instanceof globalThis.actionList.ClassNameNotFoundError) {
@@ -1142,7 +1143,7 @@ const _saving = {
   resumeChallenge,
   trials,
   trialFloors,
-  actions: globalThis.globals.actions,
+  actions: actions,
   view,
   loadDefaults,
   needsDataSnapshots,

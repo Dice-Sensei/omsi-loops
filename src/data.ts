@@ -60,7 +60,9 @@ export class Data {
     return this.snapshotStack[1];
   }
 
-  static objectIdMap = new WeakMap();
+  static objectIdMap = new WeakMap([
+    [this.rootObjects, 1],
+  ]);
   // these language invariants need a way to have their identities transmitted across thread boundaries
   static get wellKnownObjects() {
     const wellKnownObjects = Object.freeze({
@@ -124,11 +126,6 @@ export class Data {
     }
     this.objectIdMap.set(obj, id);
     this.#nextObjectId = Math.max(this.#nextObjectId, id + 1);
-  }
-
-  static {
-    // root always gets id 1
-    this.setObjectId(this.rootObjects, 1);
   }
 
   static register(key, object) {

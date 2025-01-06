@@ -1,6 +1,5 @@
 import { copyObject } from './helpers.ts';
 import { ActionLog } from './actionlog.ts';
-import { Actions } from './actions.ts';
 
 export const selfIsGame = !(typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope);
 export const skillList = /** @type {const} */ ([
@@ -121,7 +120,6 @@ export type Stat = {
 
 export const stats: Record<StatName, Stat> = {};
 export const actionLog = selfIsGame ? new ActionLog() : null;
-export const actions = new Actions();
 
 export const storyFlags = {
   maxSQuestsInALoop: false,
@@ -346,7 +344,6 @@ const _globals = {
   storyVars,
   actionLog,
   buffCaps,
-  actions,
   skills,
   towns,
   buffs,

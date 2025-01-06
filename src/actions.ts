@@ -1,5 +1,5 @@
-import { Data } from './data.ts';
 import { clamp, Mana } from './helpers.ts';
+import { hearts, resources, statList, stats, towns } from './globals.ts';
 
 /**
  * ActionLoopType is an enum that describes what the "loops" property means. Actions without
@@ -70,9 +70,9 @@ export class Actions {
 
   currentAction;
 
-  static {
-    Data.omitProperties(this.prototype, ['next']);
-  }
+  // static {
+  //   Data.omitProperties(this.prototype, ['next']);
+  // }
 
   tick(availableMana) {
     availableMana ??= 1;
@@ -105,7 +105,7 @@ export class Actions {
     // only for multi-part progress bars
     if (isMultipartAction(curAction)) {
       let loopCosts = {};
-      let loopCounter = globalThis.globals.towns[curAction.townNum][`${curAction.varName}LoopCounter`];
+      let loopCounter = towns[curAction.townNum][`${curAction.varName}LoopCounter`];
       const loopStats = curAction.loopStats;
 
       function loopCost(segment) {
@@ -114,7 +114,7 @@ export class Actions {
       }
 
       let segment = 0;
-      let curProgress = globalThis.globals.towns[curAction.townNum][curAction.varName];
+      let curProgress = towns[curAction.townNum][curAction.varName];
       while (curProgress >= loopCost(segment)) {
         curProgress -= loopCost(segment);
         segment++;
@@ -135,7 +135,7 @@ export class Actions {
       manaLoop:
       while (manaLeftForCurrentSegment > 0 && curAction.canMakeProgress(segment)) {
         //const toAdd = curAction.tickProgress(segment) * (curAction.manaCost() / curAction.adjustedTicks);
-        const loopStat = globalThis.globals.stats[loopStats[(loopCounter + segment) % loopStats.length]];
+        const loopStat = stats[loopStats[(loopCounter + segment) % loopStats.length]];
         const progressMultiplier = curAction.tickProgress(segment) * tickMultiplier * loopStat.effortMultiplier;
         const toAdd = Math.min(
           manaLeftForCurrentSegment * progressMultiplier, // how much progress would we make if we spend all available mana?
@@ -146,7 +146,7 @@ export class Actions {
         manaLeft -= manaUsed;
         manaToSpend += manaUsed;
         // console.log("using: "+curAction.loopStats[(towns[curAction.townNum][curAction.varName + "LoopCounter"]+segment) % curAction.loopStats.length]+" to add: " + toAdd + " to segment: " + segment + " and part " +towns[curAction.townNum][curAction.varName + "LoopCounter"]+" of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
-        globalThis.globals.towns[curAction.townNum][curAction.varName] += toAdd;
+        towns[curAction.townNum][curAction.varName] += toAdd;
         curProgress += toAdd;
         while (curProgress >= loopCost(segment)) {
           curProgress -= loopCost(segment);
@@ -155,20 +155,19 @@ export class Actions {
             // part finished
             if (
               curAction.name === 'Dark Ritual' &&
-              globalThis.globals.towns[curAction.townNum][curAction.varName] >= 4000000
+              towns[curAction.townNum][curAction.varName] >= 4000000
             ) {
               globalThis.view.setStoryFlag('darkRitualThirdSegmentReached');
             }
             if (
               curAction.name === 'Imbue Mind' &&
-              globalThis.globals.towns[curAction.townNum][curAction.varName] >= 700000000
+              towns[curAction.townNum][curAction.varName] >= 700000000
             ) {
               globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
             }
-            globalThis.globals.towns[curAction.townNum][curAction.varName] = 0;
-            loopCounter = globalThis.globals.towns[curAction.townNum][`${curAction.varName}LoopCounter`] +=
-              curAction.segments;
-            globalThis.globals.towns[curAction.townNum][`total${curAction.varName}`]++;
+            towns[curAction.townNum][curAction.varName] = 0;
+            loopCounter = towns[curAction.townNum][`${curAction.varName}LoopCounter`] += curAction.segments;
+            towns[curAction.townNum][`total${curAction.varName}`]++;
             segment -= curAction.segments;
             loopCosts = {};
             curAction.loopsFinished();
@@ -179,12 +178,12 @@ export class Actions {
               curAction.loopsLeft = 0;
               curAction.ticks = 0;
               curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
-              curAction.goldRemaining = globalThis.globals.resources.gold;
+              curAction.goldRemaining = resources.gold;
               curAction.finish();
               globalThis.saving.vals.totals.actions++;
               break manaLoop;
             }
-            globalThis.globals.towns[curAction.townNum][curAction.varName] = curProgress;
+            towns[curAction.townNum][curAction.varName] = curProgress;
           }
           if (curAction.segmentFinished) {
             curAction.segmentFinished();
@@ -234,7 +233,7 @@ export class Actions {
       if (curAction.cost) {
         curAction.cost();
       }
-      curAction.goldRemaining = globalThis.globals.resources.gold;
+      curAction.goldRemaining = resources.gold;
 
       this.adjustTicksNeeded();
       globalThis.saving.view.requestUpdate('updateCurrentActionLoops', this.currentPos);
@@ -311,7 +310,7 @@ export class Actions {
     this.completedTicks = 0;
     this.currentAction = null;
     globalThis.saving.vals.curTown = 0;
-    globalThis.globals.towns[0].suppliesCost = 300;
+    towns[0].suppliesCost = 300;
     globalThis.saving.view.requestUpdate('updateResource', 'supplies');
     globalThis.saving.vals.curAdvGuildSegment = 0;
     globalThis.saving.vals.curCraftGuildSegment = 0;
@@ -320,7 +319,7 @@ export class Actions {
     globalThis.saving.vals.curFightJungleMonstersSegment = 0;
     globalThis.saving.vals.curThievesGuildSegment = 0;
     globalThis.saving.vals.curGodsSegment = 0;
-    for (const town of globalThis.globals.towns) {
+    for (const town of towns) {
       for (const action of town.totalActionList) {
         if (action.type === 'multipart') {
           town[action.varName] = 0;
@@ -329,7 +328,7 @@ export class Actions {
       }
     }
     globalThis.saving.vals.guild = '';
-    globalThis.globals.hearts.length = [];
+    hearts.length = [];
     globalThis.saving.vals.escapeStarted = false;
     globalThis.saving.vals.portalUsed = false;
     globalThis.saving.vals.stoneLoc = 0;
@@ -736,7 +735,7 @@ function isMultipartAction(action) {
 function setAdjustedTicks(action) {
   let newCost = 0;
   for (const actionStatName in action.stats) {
-    newCost += action.stats[actionStatName] * globalThis.globals.stats[actionStatName].manaMultiplier;
+    newCost += action.stats[actionStatName] * stats[actionStatName].manaMultiplier;
   }
   action.rawTicks = action.manaCost() * newCost - (globalThis.saving.vals.options.fractionalMana ? 0 : 0.000001);
   action.adjustedTicks = Math.max(
@@ -749,7 +748,7 @@ function getMaxTicksForAction(action, talentOnly = false) {
   let maxTicks = Number.MAX_SAFE_INTEGER;
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
-  for (const stat of globalThis.globals.statList) {
+  for (const stat of statList) {
     const expToNext = globalThis.stats.getExpToLevel(stat, talentOnly);
     const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) *
       globalThis.stats.getTotalBonusXP(stat);
@@ -770,7 +769,7 @@ function getMaxTicksForStat(action, stat, talentOnly = false) {
 function addExpFromAction(action, manaCount) {
   const adjustedExp = manaCount * action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
-  for (const stat of globalThis.globals.statList) {
+  for (const stat of statList) {
     const expToAdd = ((action.stats[stat] ?? 0) + overFlow) * adjustedExp * globalThis.stats.getTotalBonusXP(stat);
 
     // Used for updating the menus when hovering over a completed item in the actionList
@@ -782,3 +781,5 @@ function addExpFromAction(action, manaCount) {
     globalThis.stats.addExp(stat, expToAdd);
   }
 }
+
+export const actions = new Actions();
