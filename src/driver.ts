@@ -1,6 +1,7 @@
 import { Data } from './data.ts';
 import { KeyboardKey } from './keyboard.hotkeys.ts';
 import { Localization } from './Localization.ts';
+import { inputElement, Mana, beep, copyObject, copyArray, clamp } from './helpers.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
@@ -82,7 +83,7 @@ function animationTick(animationTime) {
 function tick() {
   const newTime = Date.now();
   gameTicksLeft += newTime - curTime;
-  if (globalThis.helpers.inputElement('radarStats').checked) radarUpdateTime += newTime - curTime;
+  if (inputElement('radarStats').checked) radarUpdateTime += newTime - curTime;
   const delta = newTime - curTime;
   curTime = newTime;
 
@@ -114,7 +115,7 @@ function executeGameTicks(deadline) {
   // convert "gameTicksLeft" (actually milliseconds) into equivalent base-mana count, aka actual game ticks
   // including the gameSpeed multiplier here because it is effectively constant over the course of a single
   // update, and it affects how many actual game ticks pass in a given span of realtime.
-  let baseManaToBurn = globalThis.helpers.Mana.floor(
+  let baseManaToBurn = Mana.floor(
     gameTicksLeft * globalThis.driver.baseManaPerSecond * globalThis.driver.gameSpeed / 1000,
   );
   const originalManaToBurn = baseManaToBurn;
@@ -143,7 +144,7 @@ function executeGameTicks(deadline) {
       // can't spend more mana than offline time available
       manaAvailable = Math.min(
         manaAvailable,
-        globalThis.helpers.Mana.ceil(
+        Mana.ceil(
           globalThis.saving.vals.totalOfflineMs * globalThis.driver.baseManaPerSecond * globalThis.driver.gameSpeed *
             bonusSpeed / 1000,
         ),
@@ -165,7 +166,7 @@ function executeGameTicks(deadline) {
 
     // a single action may not use a partial tick, so ceil() to be sure unless fractionalMana.
     // Even with fractionalMana, we need to set a minimum so that mana usages aren't lost to floating-point precision.
-    const manaSpent = globalThis.helpers.Mana.ceil(
+    const manaSpent = Mana.ceil(
       globalThis.saving.actions.tick(manaAvailable),
       globalThis.saving.timer / 1e15,
     );
@@ -269,8 +270,8 @@ function pauseGame(ping, message) {
     restart();
   } else if (ping) {
     if (globalThis.saving.vals.options.pingOnPause) {
-      globalThis.helpers.beep(250);
-      setTimeout(() => globalThis.helpers.beep(250), 500);
+      beep(250);
+      setTimeout(() => beep(250), 500);
     }
     if (globalThis.saving.vals.options.notifyOnPause) {
       globalThis.saving.showPauseNotification(message || 'Game paused!');
@@ -309,8 +310,8 @@ function prepareRestart() {
       (actions.current.filter((action) => action.loopsLeft - action.extraLoops > 0).length > 0))
   ) {
     if (globalThis.saving.vals.options.pingOnPause) {
-      globalThis.helpers.beep(250);
-      setTimeout(() => globalThis.helpers.beep(250), 500);
+      beep(250);
+      setTimeout(() => beep(250), 500);
     }
     if (globalThis.saving.vals.options.notifyOnPause) {
       globalThis.saving.showPauseNotification('Game paused!');
@@ -412,7 +413,7 @@ function resetResource(resource) {
 }
 
 function resetResources() {
-  globalThis.globals.resources = globalThis.helpers.copyObject(globalThis.globals.resourcesTemplate);
+  globalThis.globals.resources = copyObject(globalThis.globals.resourcesTemplate);
   if (globalThis.actionList.getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
     addResource('glasses', true);
   }
@@ -423,7 +424,7 @@ function changeActionAmount(amount) {
   amount = Math.max(amount, 1);
   amount = Math.min(amount, 1e12);
   globalThis.globals.actions.addAmount = amount;
-  const customInput = globalThis.helpers.inputElement('amountCustom');
+  const customInput = inputElement('amountCustom');
   if (document.activeElement !== customInput) {
     customInput.value = amount;
   }
@@ -431,7 +432,7 @@ function changeActionAmount(amount) {
 }
 
 function setCustomActionAmount() {
-  const value = parseInt(globalThis.helpers.inputElement('amountCustom').value) || 1;
+  const value = parseInt(inputElement('amountCustom').value) || 1;
   changeActionAmount(value);
 }
 
@@ -441,7 +442,7 @@ function selectLoadout(num) {
   } else {
     globalThis.saving.vals.curLoadout = num;
   }
-  globalThis.helpers.inputElement('renameLoadout').value =
+  inputElement('renameLoadout').value =
     globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1];
   globalThis.saving.view.updateLoadout(globalThis.saving.vals.curLoadout);
 }
@@ -459,14 +460,14 @@ function saveList() {
     return;
   }
   nameList(false);
-  globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout] = globalThis.helpers.copyArray(actions.next);
+  globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout] = copyArray(actions.next);
   globalThis.saving.save();
-  if ((globalThis.helpers.inputElement('renameLoadout').value !== 'Saved!')) {
-    globalCustomInput = globalThis.helpers.inputElement('renameLoadout').value;
+  if ((inputElement('renameLoadout').value !== 'Saved!')) {
+    globalCustomInput = inputElement('renameLoadout').value;
   }
-  globalThis.helpers.inputElement('renameLoadout').value = 'Saved!';
+  inputElement('renameLoadout').value = 'Saved!';
   setTimeout(() => {
-    globalThis.helpers.inputElement('renameLoadout').value = globalCustomInput;
+    inputElement('renameLoadout').value = globalCustomInput;
   }, 1000);
 }
 
@@ -476,14 +477,14 @@ function nameList(saveGame) {
   // be saved under an old name
   // if both the old AND the new names are numeric, then we insist on a non-numeric name
   if (isNaN(parseFloat(inputElement('renameLoadout').value))) {
-    if (globalThis.helpers.inputElement('renameLoadout').value.length > 30) {
-      globalThis.helpers.inputElement('renameLoadout').value = '30 Letter Max';
-    } else if (globalThis.helpers.inputElement('renameLoadout').value !== 'Saved!') {
+    if (inputElement('renameLoadout').value.length > 30) {
+      inputElement('renameLoadout').value = '30 Letter Max';
+    } else if (inputElement('renameLoadout').value !== 'Saved!') {
       globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1] =
-        globalThis.helpers.inputElement('renameLoadout').value;
+        inputElement('renameLoadout').value;
     }
   } else if (!isNaN(parseFloat(globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1]))) {
-    globalThis.helpers.inputElement('renameLoadout').value = 'Enter a name!';
+    inputElement('renameLoadout').value = 'Enter a name!';
   }
   document.getElementById(`load${globalThis.saving.vals.curLoadout}`).textContent =
     globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1];
@@ -494,7 +495,7 @@ function loadList() {
   if (globalThis.saving.vals.curLoadout === 0) {
     return;
   }
-  globalThis.helpers.inputElement('amountCustom').value = globalThis.globals.actions.addAmount.toString();
+  inputElement('amountCustom').value = globalThis.globals.actions.addAmount.toString();
   globalThis.globals.actions.clearActions();
   if (globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout]) {
     globalThis.globals.actions.appendActionRecords(globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout]);
@@ -571,7 +572,7 @@ function capAmount(index, townNum) {
   if (action.name === 'Gather Team') {
     newLoops = 5 + Math.floor(globalThis.stats.getSkillLevel('Leadership') / 100) - alreadyExisting;
   } else newLoops = globalThis.globals.towns[townNum][varName] - alreadyExisting;
-  globalThis.globals.actions.updateAction(index, { loops: globalThis.helpers.clamp(action.loops + newLoops, 0, null) });
+  globalThis.globals.actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
 }
@@ -580,7 +581,7 @@ function capTraining(index) {
   const action = globalThis.globals.actions.next[index];
   const alreadyExisting = globalThis.actions.getNumOnList(action.name) + (action.disabled ? action.loops : 0);
   const newLoops = globalThis.saving.vals.trainingLimits - alreadyExisting;
-  globalThis.globals.actions.updateAction(index, { loops: globalThis.helpers.clamp(action.loops + newLoops, 0, null) });
+  globalThis.globals.actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
 }
@@ -607,7 +608,7 @@ function addLoop(actionId) {
     }
   }
   globalThis.globals.actions.updateAction(action.index, {
-    loops: globalThis.helpers.clamp(action.loops + addAmount, 0, 1e12),
+    loops: clamp(action.loops + addAmount, 0, 1e12),
   });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
@@ -615,7 +616,7 @@ function addLoop(actionId) {
 function removeLoop(actionId) {
   const action = globalThis.globals.actions.findActionWithId(actionId);
   globalThis.globals.actions.updateAction(action.index, {
-    loops: globalThis.helpers.clamp(action.loops - globalThis.globals.actions.addAmount, 0, 1e12),
+    loops: clamp(action.loops - globalThis.globals.actions.addAmount, 0, 1e12),
   });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();

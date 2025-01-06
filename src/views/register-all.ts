@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import { Localization } from '../Localization.ts';
+import { camelize, htmlElement } from '../helpers.ts';
 
 const getDisabledMenus = () => {
   let disabledMenus = [];
@@ -28,7 +29,7 @@ const buffsContainer = {
           onmouseover="globalThis.saving.view.showBuff('${name}')" 
           onmouseout="globalThis.saving.view.showBuff(undefined)">
           <div class="buffNameContainer">
-            <img class="buffIcon" src="icons/${globalThis.helpers.camelize(fullName)}.svg">
+            <img class="buffIcon" src="icons/${camelize(fullName)}.svg">
             <div class="skillLabel medium bold">${Localization.txt(`buffs>${XMLName}>label`)}</div>
             <div class="showthis">
               <span>${Localization.txt(`buffs>${XMLName}>desc`)}</span>
@@ -621,7 +622,7 @@ const views = [
 
 globalThis.onEnableMenu = (input) => {
   const menu = input.dataset.menu;
-  globalThis.helpers.htmlElement('menusMenu').classList.toggle(`disabled-${menu}`, !input.checked);
+  htmlElement('menusMenu').classList.toggle(`disabled-${menu}`, !input.checked);
 
   const disabledMenus = getDisabledMenus();
 

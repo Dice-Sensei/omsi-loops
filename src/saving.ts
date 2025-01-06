@@ -1,5 +1,6 @@
 import { Town } from './town.ts';
 import { Data } from './data.ts';
+import { valueElement, inputElement, removeClassFromDiv, copyArray, textAreaElement} from './helpers.ts';
 
 import {
   compressToBase64 as lZStringCompressToBase64,
@@ -366,7 +367,7 @@ function handleOption(option, value, init, getInput) {
 function setOption(option, value, updateUI = false) {
   const oldValue = globalThis.saving.vals.options[option];
   globalThis.saving.vals.options[option] = value;
-  handleOption(option, value, false, () => globalThis.helpers.valueElement(`${option}Input`));
+  handleOption(option, value, false, () => valueElement(`${option}Input`));
   if (globalThis.saving.vals.options[option] !== oldValue) {
     save();
   }
@@ -379,7 +380,7 @@ function setOption(option, value, updateUI = false) {
 }
 
 function loadOption(option, value, callHandler = true) {
-  const input = globalThis.helpers.valueElement(`${option}Input`, false); // this is allowed to have errors
+  const input = valueElement(`${option}Input`, false); // this is allowed to have errors
   if (!input) return;
   if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = !!value;
   else if (option === 'speedIncreaseBackground' && (typeof value !== 'number' || isNaN(value) || value < 0)) {
@@ -514,7 +515,7 @@ function doLoad(toLoad) {
     for (const property in globalThis.globals.buffCaps) {
       if (toLoad.buffCaps.hasOwnProperty(property)) {
         globalThis.globals.buffCaps[property] = toLoad.buffCaps[property];
-        globalThis.helpers.inputElement(`buff${property}Cap`).value = globalThis.globals.buffCaps[property];
+        inputElement(`buff${property}Cap`).value = globalThis.globals.buffCaps[property];
       }
     }
   }
@@ -671,7 +672,7 @@ function doLoad(toLoad) {
     ? undefined
     : document.getElementById(`load${globalThis.saving.vals.curLoadout}`);
   if (elem) {
-    globalThis.helpers.removeClassFromDiv(
+    removeClassFromDiv(
       document.getElementById(`load${globalThis.saving.vals.curLoadout}`),
       'unused',
     );
@@ -680,14 +681,14 @@ function doLoad(toLoad) {
   globalThis.saving.vals.dungeons = [[], [], []];
   const level = { ssChance: 1, completed: 0 };
   let floors = 0;
-  if (toLoad.dungeons === undefined) toLoad.dungeons = globalThis.helpers.copyArray(globalThis.saving.vals.dungeons);
+  if (toLoad.dungeons === undefined) toLoad.dungeons = copyArray(globalThis.saving.vals.dungeons);
   for (let i = 0; i < globalThis.saving.vals.dungeons.length; i++) {
     floors = globalThis.globals.dungeonFloors[i];
     for (let j = 0; j < floors; j++) {
       if (toLoad.dungeons[i] != undefined && toLoad.dungeons && toLoad.dungeons[i][j]) {
         globalThis.saving.vals.dungeons[i][j] = toLoad.dungeons[i][j];
       } else {
-        globalThis.saving.vals.dungeons[i][j] = globalThis.helpers.copyArray(level);
+        globalThis.saving.vals.dungeons[i][j] = copyArray(level);
       }
       globalThis.saving.vals.dungeons[i][j].lastStat = 'NA';
     }
@@ -695,7 +696,7 @@ function doLoad(toLoad) {
 
   globalThis.saving.vals.trials = [[], [], [], [], []];
   const trialLevel = { completed: 0 };
-  if (toLoad.trials === undefined) toLoad.trials = globalThis.helpers.copyArray(globalThis.saving.vals.trials);
+  if (toLoad.trials === undefined) toLoad.trials = copyArray(globalThis.saving.vals.trials);
   for (let i = 0; i < globalThis.saving.trials.length; i++) {
     floors = trialFloors[i];
     trials[i].highestFloor = 0;
@@ -704,7 +705,7 @@ function doLoad(toLoad) {
         trials[i][j] = toLoad.trials[i][j];
         if (trials[i][j].completed > 0) trials[i].highestFloor = j;
       } else {
-        trials[i][j] = globalThis.helpers.copyArray(trialLevel);
+        trials[i][j] = copyArray(trialLevel);
       }
     }
   }
@@ -792,7 +793,7 @@ function doLoad(toLoad) {
       if (action.type === 'limited') {
         const varName = action.varName;
         if (toLoad[`searchToggler${varName}`] !== undefined) {
-          globalThis.helpers.inputElement(`searchToggler${varName}`).checked = toLoad[`searchToggler${varName}`];
+          inputElement(`searchToggler${varName}`).checked = toLoad[`searchToggler${varName}`];
         }
         view.updateRegular({ name: action.varName, index: town.index });
       }
@@ -910,7 +911,7 @@ function doSave() {
         toSave[`good${varName}`] = town[`good${varName}`];
         toSave[`goodTemp${varName}`] = town[`good${varName}`];
         if (document.getElementById(`searchToggler${varName}`)) {
-          toSave[`searchToggler${varName}`] = globalThis.helpers.inputElement(`searchToggler${varName}`).checked;
+          toSave[`searchToggler${varName}`] = inputElement(`searchToggler${varName}`).checked;
         }
       }
     }
@@ -959,15 +960,15 @@ function save() {
 function exportSave() {
   const saveJson = save();
   // idle loops save version 01. patch v0.94, moved from old save system to lzstring base 64
-  globalThis.helpers.inputElement('exportImport').value = `ILSV01${compressToBase64(saveJson)}`;
-  globalThis.helpers.inputElement('exportImport').select();
+  inputElement('exportImport').value = `ILSV01${compressToBase64(saveJson)}`;
+  inputElement('exportImport').select();
   if (!document.execCommand('copy')) {
     alert('Copying the save to the clipboard failed! You will need to copy the highlighted value yourself.');
   }
 }
 
 function importSave() {
-  const saveData = globalThis.helpers.inputElement('exportImport').value;
+  const saveData = inputElement('exportImport').value;
   processSave(saveData);
 }
 
@@ -1050,13 +1051,13 @@ function exportCurrentList() {
     toReturn += `${action.loops}x ${action.name}`;
     toReturn += '\n';
   }
-  globalThis.helpers.textAreaElement('exportImportList').value = toReturn.slice(0, -1);
-  globalThis.helpers.textAreaElement('exportImportList').select();
+  textAreaElement('exportImportList').value = toReturn.slice(0, -1);
+  textAreaElement('exportImportList').select();
   document.execCommand('copy');
 }
 
 function importCurrentList() {
-  const toImport = globalThis.helpers.textAreaElement('exportImportList').value.split('\n');
+  const toImport = textAreaElement('exportImportList').value.split('\n');
   globalThis.globals.actions.clearActions();
   for (let i = 0; i < toImport.length; i++) {
     if (!toImport[i]) {

@@ -1,4 +1,5 @@
 import { Localization } from './Localization.ts';
+import { copyObject, extractStrings, formatNumber, intToString, restoreStrings } from './helpers.ts';
 
 class ActionLog {
   /** @type {ActionLogEntry[]} */
@@ -53,7 +54,7 @@ class ActionLog {
   }
 
   toJSON() {
-    return globalThis.helpers.extractStrings(this.entries);
+    return extractStrings(this.entries);
   }
 
   initialize() {
@@ -68,7 +69,7 @@ class ActionLog {
   load(data) {
     this.initialize();
     if (!Array.isArray(data)) return;
-    for (const entryData of globalThis.helpers.restoreStrings(data)) {
+    for (const entryData of restoreStrings(data)) {
       const entry = ActionLogEntry.create(entryData);
       if (entry) {
         this.addOrUpdateEntry(entry, true);
@@ -233,9 +234,9 @@ class ActionLogEntry {
 
   /** @type {(key: string) => string} */
   getReplacement(key) {
-    if (key === 'loop') return globalThis.helpers.formatNumber(this.loop);
-    if (key === 'loopStart') return globalThis.helpers.formatNumber(this.loop);
-    if (key === 'loopEnd') return globalThis.helpers.formatNumber(this.loop);
+    if (key === 'loop') return formatNumber(this.loop);
+    if (key === 'loopStart') return formatNumber(this.loop);
+    if (key === 'loopEnd') return formatNumber(this.loop);
     if (key === 'town') return globalThis.actionList.townNames[this.action?.townNum];
     if (key === 'action') return this.action?.label;
     if (key === 'header') return Localization.txt('actions>log>header');
@@ -284,11 +285,9 @@ class RepeatableLogEntry extends ActionLogEntry {
   /** @param {string} key  */
   getReplacement(key) {
     if (key === 'loop') {
-      return this.loop === this.loopEnd
-        ? globalThis.helpers.formatNumber(this.loop)
-        : Localization.txt('actions>log>multiloop');
+      return this.loop === this.loopEnd ? formatNumber(this.loop) : Localization.txt('actions>log>multiloop');
     }
-    if (key === 'loopEnd') return globalThis.helpers.formatNumber(this.loopEnd);
+    if (key === 'loopEnd') return formatNumber(this.loopEnd);
     return super.getReplacement(key);
   }
 
@@ -444,7 +443,7 @@ class SoulstoneEntry extends RepeatableLogEntry {
   }
 
   getReplacement(key) {
-    if (key === 'count') return globalThis.helpers.intToString(this.count, 1);
+    if (key === 'count') return intToString(this.count, 1);
     if (key === 'stat_long') return t(`stats.${Object.keys(this.stones)[0]}.long_form`);
     if (key === 'stat') return t(`stats.${Object.keys(this.stones)[0]}.short_form`);
     if (key === 'stats') {
@@ -457,7 +456,7 @@ class SoulstoneEntry extends RepeatableLogEntry {
         if (stat in this.stones) {
           strs.push(
             template
-              .replace('{count}', globalThis.helpers.intToString(this.stones[stat], 1))
+              .replace('{count}', intToString(this.stones[stat], 1))
               .replace('{stat_long}', t(`stats.${stat}.long_form`))
               .replace('{stat}', t(`stats.${stat}.short_form`)),
           );
@@ -514,9 +513,9 @@ class LeveledLogEntry extends RepeatableLogEntry {
   }
 
   getReplacement(key) {
-    if (key === 'levels') return globalThis.helpers.formatNumber(this.toLevel - this.fromLevel);
-    if (key === 'fromLevel') return globalThis.helpers.formatNumber(this.fromLevel);
-    if (key === 'toLevel') return globalThis.helpers.formatNumber(this.toLevel);
+    if (key === 'levels') return formatNumber(this.toLevel - this.fromLevel);
+    if (key === 'fromLevel') return formatNumber(this.fromLevel);
+    if (key === 'toLevel') return formatNumber(this.toLevel);
     return super.getReplacement(key);
   }
 
@@ -750,7 +749,7 @@ let resources = {
   stone: false,
   wizardCollege: false,
 };
-const resourcesTemplate = globalThis.helpers.copyObject(resources);
+const resourcesTemplate = copyObject(resources);
 const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
 const skills = /** @type {{[K in SkillName]: Skill}} */ ({});
 

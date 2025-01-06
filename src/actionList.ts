@@ -1,6 +1,7 @@
 import { Data } from './data.ts';
 import { Localizable } from './localizable.ts';
 import { Localization } from './Localization.ts';
+import { camelize, fibonacci, numberToWords, precision3 } from './helpers.ts';
 import {} from './stats.ts';
 
 class ClassNameNotFoundError extends TypeError {}
@@ -246,7 +247,7 @@ class Action extends Localizable {
   }
 
   get imageName() {
-    return globalThis.helpers.camelize(this.name);
+    return camelize(this.name);
   }
 
   /* eslint-disable no-invalid-this */
@@ -447,7 +448,7 @@ class DungeonAction extends MultipartAction {
     const floor = Math.floor(loopCounter / this.segments + 1);
     return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       floor <= globalThis.saving.vals.dungeons[this.dungeonNum].length
-        ? globalThis.helpers.numberToWords(floor)
+        ? numberToWords(floor)
         : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
   }
@@ -495,7 +496,7 @@ class TrialAction extends MultipartAction {
     const floor = Math.floor((loopCounter + 0.0001) / this.segments + 1);
     return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       floor <= globalThis.saving.trials[this.trialNum].length
-        ? globalThis.helpers.numberToWords(floor)
+        ? numberToWords(floor)
         : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
   }
@@ -504,7 +505,7 @@ class TrialAction extends MultipartAction {
   }
 
   loopCost(segment, loopCounter = globalThis.globals.towns[this.townNum][`${this.varName}LoopCounter`]) {
-    return globalThis.helpers.precision3(
+    return precision3(
       Math.pow(this.baseScaling, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) *
         this.exponentScaling * globalThis.stats.getSkillBonus('Assassin'),
     );
@@ -1554,7 +1555,7 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
     return globalThis.globals.resources.reputation >= 1;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[0].HealLoopCounter) {
-    return globalThis.helpers.fibonacci(2 + Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 5000;
+    return fibonacci(2 + Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 5000;
   },
   tickProgress(_offset, _loopCounter, totalCompletions = globalThis.globals.towns[0].totalHeal) {
     return globalThis.stats.getSkillLevel('Magic') * Math.max(globalThis.stats.getSkillLevel('Restoration') / 50, 1) *
@@ -1565,7 +1566,7 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
   },
   getPartName(loopCounter = globalThis.globals.towns[0].HealLoopCounter) {
     return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
-      globalThis.helpers.numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
+      numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },
   visible() {
@@ -1625,7 +1626,7 @@ Action.FightMonsters = new MultipartAction('Fight Monsters', {
     return globalThis.globals.resources.reputation >= 2;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[0].FightLoopCounter) {
-    return globalThis.helpers.fibonacci(Math.floor((loopCounter + segment) - loopCounter / 3 + 0.0000001)) * 10000;
+    return fibonacci(Math.floor((loopCounter + segment) - loopCounter / 3 + 0.0000001)) * 10000;
   },
   tickProgress(_offset, _loopCounter, totalCompletions = globalThis.globals.towns[0].totalFight) {
     return globalThis.stats.getSelfCombat() * Math.sqrt(1 + totalCompletions / 100);
@@ -1696,7 +1697,7 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
       curFloor < globalThis.saving.vals.dungeons[this.dungeonNum].length;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[this.townNum].SDungeonLoopCounter) {
-    return globalThis.helpers.precision3(
+    return precision3(
       Math.pow(2, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 15000,
     );
   },
@@ -3246,7 +3247,7 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
     return globalThis.saving.vals.guild === '';
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[2][`${this.varName}LoopCounter`]) {
-    return globalThis.helpers.precision3(Math.pow(1.2, loopCounter + segment)) * 5e6;
+    return precision3(Math.pow(1.2, loopCounter + segment)) * 5e6;
   },
   tickProgress(offset, loopCounter, totalCompletions = globalThis.globals.towns[2][`total${this.varName}`]) {
     return (globalThis.stats.getSkillLevel('Magic') / 2 +
@@ -3304,7 +3305,7 @@ function getAdvGuildRank(offset) {
 
   const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curAdvGuildSegment % 3)) +
     globalThis.saving.vals.curAdvGuildSegment;
-  let bonus = globalThis.helpers.precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
+  let bonus = precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
   if (name) {
     if (offset === undefined) {
       name += ['-', '', '+'][globalThis.saving.vals.curAdvGuildSegment % 3];
@@ -3410,7 +3411,7 @@ Action.LargeDungeon = new DungeonAction('Large Dungeon', 1, {
       curFloor < globalThis.saving.vals.dungeons[this.dungeonNum].length;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[this.townNum].LDungeonLoopCounter) {
-    return globalThis.helpers.precision3(
+    return precision3(
       Math.pow(3, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 5e5,
     );
   },
@@ -3483,7 +3484,7 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
     return globalThis.saving.vals.guild === '';
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[2][`${this.varName}LoopCounter`]) {
-    return globalThis.helpers.precision3(Math.pow(1.2, loopCounter + segment)) * 2e6;
+    return precision3(Math.pow(1.2, loopCounter + segment)) * 2e6;
   },
   tickProgress(_offset, _loopCounter, totalCompletions = globalThis.globals.towns[2][`total${this.varName}`]) {
     return (globalThis.stats.getSkillLevel('Magic') / 2 +
@@ -3542,7 +3543,7 @@ function getCraftGuildRank(offset) {
 
   const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curCraftGuildSegment % 3)) +
     globalThis.saving.vals.curCraftGuildSegment;
-  let bonus = globalThis.helpers.precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
+  let bonus = precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
   if (name) {
     if (offset === undefined) {
       name += ['-', '', '+'][globalThis.saving.vals.curCraftGuildSegment % 3];
@@ -4394,7 +4395,7 @@ Action.HuntTrolls = new MultipartAction('Hunt Trolls', {
     return 8000;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[this.townNum].HuntTrollsLoopCounter) {
-    return globalThis.helpers.precision3(
+    return precision3(
       Math.pow(2, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 1e6,
     );
   },
@@ -4978,7 +4979,7 @@ Action.TidyUp = new MultipartAction('Tidy Up', {
     return 10000;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[4].TidyLoopCounter) {
-    return globalThis.helpers.fibonacci(Math.floor((loopCounter + segment) - loopCounter / 3 + 0.0000001)) * 1000000; // Temp.
+    return fibonacci(Math.floor((loopCounter + segment) - loopCounter / 3 + 0.0000001)) * 1000000; // Temp.
   },
   tickProgress(offset, _loopCounter, totalCompletions = globalThis.globals.towns[4].totalTidy) {
     return globalThis.stats.getSkillLevel('Practical') * Math.sqrt(1 + totalCompletions / 100);
@@ -4993,7 +4994,7 @@ Action.TidyUp = new MultipartAction('Tidy Up', {
   },
   getPartName(loopCounter = globalThis.globals.towns[4].TidyLoopCounter) {
     return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
-      globalThis.helpers.numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
+      numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },
   visible() {
@@ -5344,7 +5345,7 @@ Action.WizardCollege = new MultipartAction('Wizard College', {
     globalThis.driver.addResource('favors', -10);
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[4][`${this.varName}LoopCounter`]) {
-    return globalThis.helpers.precision3(Math.pow(1.3, loopCounter + segment)) * 1e7; // Temp
+    return precision3(Math.pow(1.3, loopCounter + segment)) * 1e7; // Temp
   },
   tickProgress(offset, _loopCounter, totalCompletions = globalThis.globals.towns[4][`total${this.varName}`]) {
     return (
@@ -5406,7 +5407,7 @@ function getWizCollegeRank(offset) {
   ][Math.floor(globalThis.saving.vals.curWizCollegeSegment / 3 + 0.00001)];
   const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curWizCollegeSegment % 3)) +
     globalThis.saving.vals.curWizCollegeSegment;
-  let bonus = globalThis.helpers.precision3(1 + 0.02 * Math.pow(segment, 1.05));
+  let bonus = precision3(1 + 0.02 * Math.pow(segment, 1.05));
   if (name) {
     if (offset === undefined) {
       name += ['-', '', '+'][globalThis.saving.vals.curWizCollegeSegment % 3];
@@ -5763,7 +5764,7 @@ Action.FightFrostGiants = new MultipartAction('Fight Frost Giants', {
     return globalThis.globals.resources.pegasus;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[4][`${this.varName}LoopCounter`]) {
-    return globalThis.helpers.precision3(Math.pow(1.3, loopCounter + segment)) * 1e7; // Temp
+    return precision3(Math.pow(1.3, loopCounter + segment)) * 1e7; // Temp
   },
   tickProgress(_offset, _loopCounter, totalCompletions = globalThis.globals.towns[4][`total${this.varName}`]) {
     return (globalThis.stats.getSelfCombat() *
@@ -5832,7 +5833,7 @@ function getFrostGiantsRank(offset) {
   ][Math.floor(globalThis.saving.vals.curFightFrostGiantsSegment / 3 + 0.00001)];
   const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curFightFrostGiantsSegment % 3)) +
     globalThis.saving.vals.curFightFrostGiantsSegment;
-  let bonus = globalThis.helpers.precision3(1 + 0.05 * Math.pow(segment, 1.05));
+  let bonus = precision3(1 + 0.05 * Math.pow(segment, 1.05));
   if (name) {
     if (offset === undefined) {
       name += ['-', '', '+'][globalThis.saving.vals.curFightFrostGiantsSegment % 3];
@@ -6277,7 +6278,7 @@ Action.TheSpire = new DungeonAction('The Spire', 2, {
     return curFloor < globalThis.saving.vals.dungeons[this.dungeonNum].length;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[this.townNum].TheSpireLoopCounter) {
-    return globalThis.helpers.precision3(
+    return precision3(
       Math.pow(2, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 1e7,
     );
   },
@@ -6536,7 +6537,7 @@ Action.FightJungleMonsters = new MultipartAction('Fight Jungle Monsters', {
     return true;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[6][`${this.varName}LoopCounter`]) {
-    return globalThis.helpers.precision3(Math.pow(1.3, loopCounter + segment)) * 1e8; // Temp
+    return precision3(Math.pow(1.3, loopCounter + segment)) * 1e8; // Temp
   },
   tickProgress(_offset, _loopCounter, totalCompletions = globalThis.globals.towns[6][`total${this.varName}`]) {
     return (globalThis.stats.getSelfCombat() *
@@ -6622,7 +6623,7 @@ function getFightJungleMonstersRank(offset) {
   ][Math.floor(globalThis.saving.vals.curFightJungleMonstersSegment / 3 + 0.00001)];
   const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curFightJungleMonstersSegment % 3)) +
     globalThis.saving.vals.curFightJungleMonstersSegment;
-  let bonus = globalThis.helpers.precision3(1 + 0.05 * Math.pow(segment, 1.05));
+  let bonus = precision3(1 + 0.05 * Math.pow(segment, 1.05));
   if (name) {
     if (offset === undefined) {
       name += ['-', '', '+'][globalThis.saving.vals.curFightJungleMonstersSegment % 3];
@@ -6669,7 +6670,7 @@ Action.RescueSurvivors = new MultipartAction('Rescue Survivors', {
     return true;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[6].RescueLoopCounter) {
-    return globalThis.helpers.fibonacci(2 + Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 5000;
+    return fibonacci(2 + Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 5000;
   },
   tickProgress(offset, loopCounter, totalCompletions = globalThis.globals.towns[6].totalRescue) {
     return globalThis.stats.getSkillLevel('Magic') * Math.max(globalThis.stats.getSkillLevel('Restoration') / 100, 1) *
@@ -6683,7 +6684,7 @@ Action.RescueSurvivors = new MultipartAction('Rescue Survivors', {
   },
   getPartName(loopCounter = globalThis.globals.towns[6].RescueLoopCounter) {
     return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
-      globalThis.helpers.numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
+      numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },
   visible() {
@@ -7184,7 +7185,7 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
     return globalThis.saving.vals.guild === '' && globalThis.globals.resources.reputation < 0;
   },
   loopCost(segment, loopCounter = globalThis.globals.towns[7][`${this.varName}LoopCounter`]) {
-    return globalThis.helpers.precision3(Math.pow(1.2, loopCounter + segment)) * 5e8;
+    return precision3(Math.pow(1.2, loopCounter + segment)) * 5e8;
   },
   tickProgress(_offset, _loopCounter, totalCompletions = globalThis.globals.towns[7][`total${this.varName}`]) {
     return (globalThis.stats.getSkillLevel('Practical') +
@@ -7247,7 +7248,7 @@ function getThievesGuildRank(offset) {
 
   const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curThievesGuildSegment % 3)) +
     globalThis.saving.vals.curThievesGuildSegment;
-  let bonus = globalThis.helpers.precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
+  let bonus = precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
   if (name) {
     if (offset === undefined) {
       name += ['-', '', '+'][globalThis.saving.vals.curThievesGuildSegment % 3];

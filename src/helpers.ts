@@ -1,20 +1,20 @@
-function precision3(num) {
+export function precision3(num) {
   return Number(num.toPrecision(3));
 }
 
-function formatNumber(num) {
+export function formatNumber(num) {
   return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
 }
 
-function copyArray(arr) {
+export function copyArray(arr) {
   return JSON.parse(JSON.stringify(arr));
 }
 
-function copyObject(obj) {
+export function copyObject(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
-function intToString(value, amount, fixPrecision = false) {
+export function intToString(value, amount, fixPrecision = false) {
   const prefix = value < 0 ? '-' : '';
   value = Math.abs(parseFloat(value));
   if (value >= 10000) {
@@ -35,14 +35,14 @@ function intToString(value, amount, fixPrecision = false) {
   return prefix + parseFloat(value).toFixed(baseValue - 1);
 }
 
-function intToStringRound(value) {
+export function intToStringRound(value) {
   if (value >= 10000) {
     return nFormatter(value, 3);
   }
   return Math.floor(value);
 }
 
-function toSuffix(value) {
+export function toSuffix(value) {
   value = Math.round(value);
   const suffixes = [
     '',
@@ -74,7 +74,7 @@ function toSuffix(value) {
   return valueRepr + suffixes[suffixNum];
 }
 
-const Mana = {
+export const Mana = {
   ceil(value, minNonZero) {
     return value === 0
       ? 0
@@ -112,7 +112,7 @@ const Mana = {
   },
 };
 
-function clamp(value, min, max) {
+export function clamp(value, min, max) {
   value = Math.max(value, min ?? -Infinity);
   value = Math.min(value, max ?? Infinity);
   return value;
@@ -141,6 +141,7 @@ const si = [
   { value: 1E6, symbol: 'M' },
   { value: 1E3, symbol: 'K' },
 ];
+
 const rx = /\.0+$|(\.[0-9]*[1-9])0+$/u;
 
 function nFormatter(num, digits, fixPrecision = false) {
@@ -154,7 +155,7 @@ function nFormatter(num, digits, fixPrecision = false) {
   return num.toPrecision(digits).replace(rx, fixPrecision ? '$&' : '$1');
 }
 
-function camelize(str) {
+export function camelize(str) {
   return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/gu, (match, index) => {
     if (Number(match) === 0) return '';
     return index === 0 ? match.toLowerCase() : match.toUpperCase();
@@ -162,7 +163,7 @@ function camelize(str) {
 }
 
 const fibonaccis = [];
-function fibonacci(n) {
+export function fibonacci(n) {
   if (n === 0 || n === 1 || n === undefined) {
     return 1;
   }
@@ -171,21 +172,18 @@ function fibonacci(n) {
   }
   return fibonaccis[n] = fibonacci(n - 1) + fibonacci(n - 2);
 }
-
-function addClassToDiv(div, className) {
+export function addClassToDiv(div, className) {
   const arr = div.className.split(' ');
   if (arr.indexOf(className) === -1) {
     div.className += ` ${className}`;
   }
 }
-
-function removeClassFromDiv(div, className) {
+export function removeClassFromDiv(div, className) {
   div.classList.remove(className);
 }
 
 const wrappedElementSymbol = Symbol('wrappedElement');
-
-function getElement(
+export function getElement(
   elementOrId,
   expectedClass = Element,
   throwIfMissing = true,
@@ -218,24 +216,19 @@ function getElement(
   }
   return undefined;
 }
-
-function htmlElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
+export function htmlElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(elementOrId, HTMLElement, throwIfMissing, warnIfMissing);
 }
-
-function inputElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
+export function inputElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(elementOrId, HTMLInputElement, throwIfMissing, warnIfMissing);
 }
-
-function textAreaElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
+export function textAreaElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(elementOrId, HTMLTextAreaElement, throwIfMissing, warnIfMissing);
 }
-
-function selectElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
+export function selectElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(elementOrId, HTMLSelectElement, throwIfMissing, warnIfMissing);
 }
-
-function valueElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
+export function valueElement(elementOrId, throwIfMissing = true, warnIfMissing = true) {
   return getElement(
     elementOrId,
     [HTMLInputElement, HTMLTextAreaElement, HTMLSelectElement],
@@ -250,7 +243,7 @@ const numbers =
 
 const tens = 'twenty thirty forty fifty sixty seventy eighty ninety'.split(' ');
 
-function number2Words(n) {
+export function number2Words(n) {
   if (n < 20) return numbers[n];
   const digit = n % 10;
   if (n < 100) return tens[~~(n / 10) - 2] + (digit ? `-${numbers[digit]}` : '');
@@ -258,15 +251,15 @@ function number2Words(n) {
   return `${number2Words(~~(n / 1000))} thousand${n % 1000 === 0 ? '' : ` ${number2Words(n % 1000)}`}`;
 }
 
-function capitalizeFirst(s) {
+export function capitalizeFirst(s) {
   return s.charAt(0).toUpperCase() + s.substr(1);
 }
 
-function numberToWords(n) {
+export function numberToWords(n) {
   return capitalizeFirst(number2Words(n));
 }
 
-function extractStrings(object, strings, map) {
+export function extractStrings(object, strings, map) {
   const isToplevel = strings == undefined;
   strings ??= [];
   map ??= {};
@@ -299,7 +292,7 @@ function extractStrings(object, strings, map) {
   return object;
 }
 
-function restoreStrings(object, strings) {
+export function restoreStrings(object, strings) {
   const isTopLevel = strings == undefined;
   if (isTopLevel) {
     if (Array.isArray(object)) {
@@ -332,15 +325,15 @@ function restoreStrings(object, strings) {
   return object;
 }
 
-async function delay(milliseconds) {
+export async function delay(milliseconds) {
   await new Promise((r) => setTimeout(r, milliseconds));
 }
 
-function nextIdle(idleRequestOptions) {
+export function nextIdle(idleRequestOptions) {
   return new Promise((r) => requestIdleCallback(r, idleRequestOptions));
 }
 
-function beep(duration) {
+export function beep(duration) {
   const ctx = new AudioContext();
   const osc = ctx.createOscillator();
 
@@ -354,37 +347,3 @@ function beep(duration) {
     if (osc.stop) osc.stop();
   }, duration);
 }
-
-const _helpers = {
-  precision3,
-  formatNumber,
-  copyArray,
-  copyObject,
-  intToString,
-  intToStringRound,
-  numberToWords,
-  capitalizeFirst,
-  extractStrings,
-  restoreStrings,
-  delay,
-  nextIdle,
-  beep,
-  getElement,
-  htmlElement,
-  inputElement,
-  textAreaElement,
-  selectElement,
-  valueElement,
-  addClassToDiv,
-  removeClassFromDiv,
-  camelize,
-  fibonacci,
-  Mana,
-  clamp,
-} as const;
-
-declare global {
-  var helpers: typeof _helpers;
-}
-
-globalThis.helpers = _helpers;
