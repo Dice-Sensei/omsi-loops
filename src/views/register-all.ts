@@ -2,6 +2,7 @@ import $ from 'jquery';
 import { Localization } from '../Localization.ts';
 import { camelize, htmlElement } from '../helpers.ts';
 import { buffHardCaps, buffList } from '../globals.ts';
+import { borrowTime, manualRestart, pauseGame, returnTime, toggleOffline } from '../driver.ts';
 
 const getDisabledMenus = () => {
   let disabledMenus = [];
@@ -290,13 +291,13 @@ const menu = {
         Localization.txt('menu>options>speedIncreaseBackground_warning')
       }</div>
                 <br>
-                <button id='borrowTimeButton' class='button showthat control' onclick='globalThis.driver.borrowTime()'>${
+                <button id='borrowTimeButton' class='button showthat control'>${
         Localization.txt('menu>options>borrow_time')
       }
                     <div class='showthis'>${Localization.txt('menu>options>borrow_time_tooltip')}</div>
                 </button>
                 <div class='show-when-time-borrowed'>
-                    <button id='returnTimeButton' class='button control' onclick='globalThis.driver.returnTime()'>${
+                    <button id='returnTimeButton' class='button control'>${
         Localization.txt('menu>options>return_time')
       }</button>
                     ${Localization.txt('menu>options>time_borrowed')} <span id='borrowedTimeDays'></span>
@@ -335,6 +336,7 @@ const menu = {
                 </div>
             </div>
         </li>`;
+
     return html;
   },
   htmlChallengeMenu() {
@@ -538,16 +540,16 @@ const timeControls = {
 
     return `
       <div id='timeControlsMain'>
-        <button id='pausePlay' onclick='globalThis.driver.pauseGame()'' class='button control'>
+        <button id='pausePlay' class='button control'>
           ${t('time_controls.pause_button')}
         </button>
-        <button onclick='globalThis.driver.manualRestart()' class='button showthatO control'>
+        <button id='manualRestart' class='button showthatO control'>
           ${t('time_controls.restart_button')}
           <div class='showthis' style='color:var(--default-color);width:230px;'>
           ${t('time_controls.restart_text')}</div>
         </button>
         <input id='bonusIsActiveInput' type='checkbox' onchange='setOption("bonusIsActive", this.checked)'/>
-        <button class='button showthatO control' onclick='globalThis.driver.toggleOffline()'>
+        <button id='toggleOfflineButton' class='button showthatO control'>
           ${t('time_controls.bonus_seconds.title')}
           <div class='showthis' id='bonusText' style='max-width:500px;color:var(--default-color);'>
             ${globalThis.saving.view.getBonusText()}
@@ -643,5 +645,28 @@ export const renderViews = () => {
     if (!element) throw Error(`Invalid selector for globalThis.saving.view ${selector}`);
 
     element.innerHTML = html();
+
+    requestAnimationFrame(() => {
+      const borrowTimeButtonId = 'borrowTimeButton';
+      const returnTimeButtonId = 'returnTimeButton';
+      const pauseButtonId = 'pausePlay';
+      const restartButtonId = 'manualRestart';
+      const offlineButtonId = 'toggleOfflineButton';
+
+      const borrowTimeButton = document.getElementById(borrowTimeButtonId)!;
+      borrowTimeButton.onclick = () => borrowTime();
+
+      const returnTimeButton = document.getElementById(returnTimeButtonId)!;
+      returnTimeButton.onclick = () => returnTime();
+
+      const pauseButton = document.getElementById(pauseButtonId)!;
+      pauseButton.onclick = () => pauseGame();
+
+      const restartButton = document.getElementById(restartButtonId)!;
+      restartButton.onclick = () => manualRestart();
+
+      const offlineButton = document.getElementById(offlineButtonId)!;
+      offlineButton.onclick = () => toggleOffline();
+    });
   }
 };

@@ -1,6 +1,6 @@
 import { clamp, Mana } from './helpers.ts';
 import { hearts, resources, statList, stats, towns } from './globals.ts';
-import { getSpeedMult, pauseGame } from './driver.ts';
+import { driverVals, getSpeedMult, pauseGame } from './driver.ts';
 
 /**
  * ActionLoopType is an enum that describes what the "loops" property means. Actions without
@@ -206,8 +206,8 @@ export class Actions {
 
     curAction.ticks += manaToSpend;
     curAction.manaUsed += manaToSpend;
-    curAction.timeSpent += manaToSpend / globalThis.driver.baseManaPerSecond / getSpeedMult();
-    curAction.effectiveTimeElapsed += manaToSpend / globalThis.driver.baseManaPerSecond /
+    curAction.timeSpent += manaToSpend / driverVals.baseManaPerSecond / getSpeedMult();
+    curAction.effectiveTimeElapsed += manaToSpend / driverVals.baseManaPerSecond /
       getSpeedMult();
 
     // exp gets added here, where it can factor in to adjustTicksNeeded
@@ -285,7 +285,7 @@ export class Actions {
     }
     if (curAction && this.currentAction !== curAction) {
       this.currentAction = curAction;
-      curAction.effectiveTimeElapsed = globalThis.driver.effectiveTime;
+      curAction.effectiveTimeElapsed = driverVals.effectiveTime;
     }
     return curAction;
   }

@@ -39,7 +39,7 @@ export function getSpeedMult(zone = globalThis.saving.vals.curTown) {
 }
 
 export function getActualGameSpeed() {
-  return globalThis.driver.gameSpeed * getSpeedMult() * bonusSpeed;
+  return driverVals.gameSpeed * getSpeedMult() * bonusSpeed;
 }
 
 export function refreshDungeons(manaSpent) {
@@ -53,8 +53,8 @@ export function refreshDungeons(manaSpent) {
 
 export function singleTick() {
   globalThis.saving.timer++;
-  globalThis.driver.timeCounter += 1 / globalThis.driver.baseManaPerSecond;
-  globalThis.driver.effectiveTime += 1 / globalThis.driver.baseManaPerSecond;
+  driverVals.timeCounter += 1 / driverVals.baseManaPerSecond;
+  driverVals.effectiveTime += 1 / driverVals.baseManaPerSecond;
 
   globalThis.saving.actions.tick();
 
@@ -64,7 +64,7 @@ export function singleTick() {
     loopEnd();
     prepareRestart();
   }
-  gameTicksLeft -= 1000 / globalThis.driver.baseManaPerSecond;
+  gameTicksLeft -= 1000 / driverVals.baseManaPerSecond;
 }
 
 let lastAnimationTime = 0;
@@ -119,7 +119,7 @@ export function executeGameTicks(deadline) {
   // including the gameSpeed multiplier here because it is effectively constant over the course of a single
   // update, and it affects how many actual game ticks pass in a given span of realtime.
   let baseManaToBurn = Mana.floor(
-    gameTicksLeft * globalThis.driver.baseManaPerSecond * globalThis.driver.gameSpeed / 1000,
+    gameTicksLeft * driverVals.baseManaPerSecond * driverVals.gameSpeed / 1000,
   );
   const originalManaToBurn = baseManaToBurn;
   let cleanExit = false;
@@ -148,7 +148,7 @@ export function executeGameTicks(deadline) {
       manaAvailable = Math.min(
         manaAvailable,
         Mana.ceil(
-          globalThis.saving.vals.totalOfflineMs * globalThis.driver.baseManaPerSecond * globalThis.driver.gameSpeed *
+          globalThis.saving.vals.totalOfflineMs * driverVals.baseManaPerSecond * driverVals.gameSpeed *
             bonusSpeed / 1000,
         ),
       );
@@ -177,12 +177,12 @@ export function executeGameTicks(deadline) {
     // okay, so the current action has used manaSpent effective ticks. figure out how much of our realtime
     // that accounts for, in base ticks and in seconds.
     const baseManaSpent = manaSpent / totalMultiplier;
-    const timeSpent = baseManaSpent / globalThis.driver.gameSpeed / globalThis.driver.baseManaPerSecond;
+    const timeSpent = baseManaSpent / driverVals.gameSpeed / driverVals.baseManaPerSecond;
 
     // update timers
     globalThis.saving.timer += manaSpent; // number of effective mana ticks
-    globalThis.driver.timeCounter += timeSpent; // realtime seconds
-    globalThis.driver.effectiveTime += timeSpent * globalThis.driver.gameSpeed * bonusSpeed; // "seconds" modified only by gameSpeed and offline bonus
+    driverVals.timeCounter += timeSpent; // realtime seconds
+    driverVals.effectiveTime += timeSpent * driverVals.gameSpeed * bonusSpeed; // "seconds" modified only by gameSpeed and offline bonus
     baseManaToBurn -= baseManaSpent; // burn spent mana
     gameTicksLeft -= timeSpent * 1000;
 
@@ -207,7 +207,7 @@ export function executeGameTicks(deadline) {
   }
 
   if (!gameIsStopped && baseManaToBurn * bonusSpeed >= 10) {
-    if (!cleanExit || globalThis.driver.lagSpeed > 0) {
+    if (!cleanExit || driverVals.lagSpeed > 0) {
       // lagging. refund all backlog as bonus time to clear the queue
       addOffline(gameTicksLeft);
       gameTicksLeft = 0;
@@ -283,9 +283,9 @@ export function pauseGame(ping, message) {
 }
 
 export function loopEnd() {
-  if (globalThis.driver.effectiveTime > 0) {
-    globalThis.saving.vals.totals.time += globalThis.driver.timeCounter;
-    globalThis.saving.vals.totals.effectiveTime += globalThis.driver.effectiveTime;
+  if (driverVals.effectiveTime > 0) {
+    globalThis.saving.vals.totals.time += driverVals.timeCounter;
+    globalThis.saving.vals.totals.effectiveTime += driverVals.effectiveTime;
     globalThis.saving.vals.totals.loops++;
     globalThis.saving.view.requestUpdate('updateTotals', null);
     const loopCompletedActions = actions.current.slice(0, actions.currentPos);
@@ -335,8 +335,8 @@ export function prepareRestart() {
 export function restart() {
   globalThis.saving.vals.shouldRestart = false;
   globalThis.saving.timer = 0;
-  globalThis.driver.timeCounter = 0;
-  globalThis.driver.effectiveTime = 0;
+  driverVals.timeCounter = 0;
+  driverVals.effectiveTime = 0;
   globalThis.saving.timeNeeded = globalThis.saving.timeNeededInitial;
   document.title = 'Idle Loops';
   globalThis.saving.vals.currentLoop = globalThis.saving.vals.totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
@@ -751,24 +751,24 @@ let lagStart = 0;
 let lagSpent = 0;
 export function updateLag(manaSpent) {
   if (manaSpent === 0) { // cancel lag display
-    if (globalThis.driver.lagSpeed !== 0) {
-      globalThis.driver.lagSpeed = 0;
+    if (driverVals.lagSpeed !== 0) {
+      driverVals.lagSpeed = 0;
       globalThis.saving.view.requestUpdate('updateBonusText', null);
     }
     return;
   }
-  if (globalThis.driver.lagSpeed === 0) {
+  if (driverVals.lagSpeed === 0) {
     // initial lag.
     lagStart = performance.now();
     lagSpent = 0;
-    globalThis.driver.lagSpeed = 1;
+    driverVals.lagSpeed = 1;
     return;
   }
   // update lag
   lagSpent += manaSpent;
   const now = performance.now();
-  const measuredSpeed = lagSpent / (now - lagStart) * 1000 / globalThis.driver.baseManaPerSecond;
-  globalThis.driver.lagSpeed = measuredSpeed;
+  const measuredSpeed = lagSpent / (now - lagStart) * 1000 / driverVals.baseManaPerSecond;
+  driverVals.lagSpeed = measuredSpeed;
   globalThis.saving.view.requestUpdate('updateBonusText', null);
 }
 
@@ -839,75 +839,10 @@ export function checkExtraSpeed() {
   }
 }
 
-const _driver = {
-  getSpeedMult,
-  getActualGameSpeed,
-  refreshDungeons,
-  singleTick,
-  animationTick,
-  tick,
-  executeGameTicks,
-  recalcInterval,
-  stopGame,
-  pauseGame,
-  loopEnd,
-  prepareRestart,
-  restart,
-  manualRestart,
-  addActionToList,
-  addMana,
-  addResource,
-  resetResource,
-  resetResources,
-  changeActionAmount,
-  setCustomActionAmount,
-  selectLoadout,
-  loadLoadout,
-  saveList,
-  nameList,
-  loadList,
-  clearList,
-  unlockTown,
-  adjustAll,
-  capAction,
-  capAmount,
-  capTraining,
-  capAllTraining,
-  addLoop,
-  removeLoop,
-  split,
-  collapse,
-  showNotification,
-  hideNotification,
-  hideActionIcons,
-  showActionIcons,
-  handleDragStart,
-  handleDirectActionDragStart,
-  handleDirectActionDragEnd,
-  handleDragOver,
-  handleDragDrop,
-  moveQueuedAction,
-  moveUp,
-  moveDown,
-  disableAction,
-  removeAction,
-  borrowTime,
-  returnTime,
-  updateLag,
-  addOffline,
-  toggleOffline,
-  isBonusActive,
-  checkExtraSpeed,
-
+export const driverVals = {
   lagSpeed: 0,
   effectiveTime: 0,
   timeCounter: 0,
   baseManaPerSecond: 50,
   gameSpeed: 1,
 };
-
-declare global {
-  var driver: typeof _driver;
-}
-
-globalThis.driver = _driver;

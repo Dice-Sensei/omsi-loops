@@ -1,5 +1,5 @@
 import { towns } from './globals.ts';
-import { addMana, addResource, resetResources } from './driver.ts';
+import { addMana, addResource, driverVals, resetResources } from './driver.ts';
 
 enum ChallengeMode {
   ManaDrought = 1,
@@ -8,7 +8,7 @@ enum ChallengeMode {
 }
 
 const setupManaDrought = () => {
-  globalThis.driver.gameSpeed = 2;
+  driverVals.gameSpeed = 2;
 
   globalThis.actionList.Action.BuyManaZ1.canStart = function () {
     return globalThis.saving.vals.totalMerchantMana > 0;
@@ -49,8 +49,8 @@ const setupManaBurn = () => {
   restart = function () {
     globalThis.saving.vals.shouldRestart = false;
     globalThis.saving.timer = 0;
-    globalThis.driver.timeCounter = 0;
-    globalThis.driver.effectiveTime = 0;
+    driverVals.timeCounter = 0;
+    driverVals.effectiveTime = 0;
     globalThis.saving.timeNeeded = 4320000 - globalThis.saving.vals.totals.effectiveTime * 50;
     document.title = 'Idle Loops';
     resetResources();

@@ -15,7 +15,16 @@ import {
   storyVars,
   towns,
 } from './globals.ts';
-import { addMana, addResource, adjustAll, capAllTraining, pauseGame, resetResource, unlockTown } from './driver.ts';
+import {
+  addMana,
+  addResource,
+  adjustAll,
+  capAllTraining,
+  driverVals,
+  pauseGame,
+  resetResource,
+  unlockTown,
+} from './driver.ts';
 import {} from './stats.ts';
 
 class ClassNameNotFoundError extends TypeError {}
@@ -5524,7 +5533,7 @@ Action.Spatiomancy = new Action('Spatiomancy', {
     if (globalThis.stats.getSkillLevel('Spatiomancy') !== oldSpatioSkill) {
       globalThis.saving.view.requestUpdate('adjustManaCost', 'Mana Geyser');
       globalThis.saving.view.requestUpdate('adjustManaCost', 'Mana Well');
-      
+
       adjustAll();
       for (const action of globalThis.saving.vals.totalActionList) {
         if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
@@ -6096,7 +6105,7 @@ Action.ManaWell = new Action('Mana Well', {
     return towns[5].getLevel('Meander') >= 2;
   },
   goldCost() { // in this case, "amount of mana in well"
-    return Math.max(5000 - Math.floor(10 * globalThis.driver.effectiveTime), 0);
+    return Math.max(5000 - Math.floor(10 * driverVals.effectiveTime), 0);
   },
   finish() {
     towns[5].finishRegular(this.varName, 100, () => {
@@ -6827,7 +6836,7 @@ Action.Escape = new Action('Escape', {
   },
   canStart() {
     if (globalThis.saving.vals.escapeStarted) return true;
-    else if (globalThis.driver.effectiveTime < 60) {
+    else if (driverVals.effectiveTime < 60) {
       globalThis.saving.vals.escapeStarted = true;
       return true;
     } else return false;
@@ -7900,7 +7909,7 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
   },
   finish() {
     globalThis.saving.view.requestUpdate('updateBuff', 'Imbuement3');
-    
+
     capAllTraining();
     adjustTrainingExpMult();
   },

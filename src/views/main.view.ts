@@ -47,6 +47,7 @@ import {
   showActionIcons,
   showNotification,
   split,
+  driverVals,
 } from '../driver.ts';
 
 const DarkRitualDescription = [
@@ -764,11 +765,11 @@ class View {
         return `<span id='bonusSeconds'>${formatTime(globalThis.saving.vals.totalOfflineMs / 1000)}</span>`;
       },
       get lag_warning() {
-        return globalThis.driver.lagSpeed > 0 ? Localization.txt('time_controls>bonus_seconds>lag_warning') : '';
+        return driverVals.lagSpeed > 0 ? Localization.txt('time_controls>bonus_seconds>lag_warning') : '';
       },
       speed: fgSpeed,
       background_speed: bgSpeed,
-      lagSpeed: globalThis.driver.lagSpeed,
+      lagSpeed: driverVals.lagSpeed,
     };
     const lval = variables[lhs] ?? (parseFloat(lhs) || 0);
     const rval = variables[rhs] ?? (parseFloat(rhs) || 0);
@@ -778,9 +779,9 @@ class View {
   }
   updateTotalTicks() {
     document.getElementById('totalTicks').textContent = `${formatNumber(actions.completedTicks)} | ${
-      formatTime(globalThis.driver.timeCounter)
+      formatTime(driverVals.timeCounter)
     }`;
-    document.getElementById('effectiveTime').textContent = `${formatTime(globalThis.driver.effectiveTime)}`;
+    document.getElementById('effectiveTime').textContent = `${formatTime(driverVals.effectiveTime)}`;
   }
   updateResource(resource) {
     const element = htmlElement(`${resource}Div`, false, false);
@@ -1728,10 +1729,10 @@ class View {
                 id='container${action.varName}'
                 class='${divClass} actionOrTravelContainer ${action.type}ActionContainer showthat'
                 draggable='true'
-                ondragover='globalThis.driver.handleDragOver(event)'
-                ondragstart='globalThis.driver.handleDirectActionDragStart(event, "${action.name}", ${action.townNum}, "${action.varName}", false)'
-                ondragend='globalThis.driver.handleDirectActionDragEnd("${action.varName}")'
-                onclick='globalThis.driver.addActionToList("${action.name}", ${action.townNum})'
+                ondragover='driverVals.handleDragOver(event)'
+                ondragstart='driverVals.handleDirectActionDragStart(event, "${action.name}", ${action.townNum}, "${action.varName}", false)'
+                ondragend='driverVals.handleDirectActionDragEnd("${action.varName}")'
+                onclick='driverVals.addActionToList("${action.name}", ${action.townNum})'
                 onmouseover='.updateAction("${action.varName}")'
                 onmouseout='.updateAction(undefined)'
             >
@@ -1787,7 +1788,7 @@ class View {
       }
 
       const storyDivText =
-        `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='globalThis.driver.hideNotification("storyContainer${action.varName}")'>${action.label}
+        `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='driverVals.hideNotification("storyContainer${action.varName}")'>${action.label}
                     <br>
                     <div style='position:relative'>
                         <img src='icons/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>
