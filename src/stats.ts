@@ -1,3 +1,5 @@
+import { Localizable } from './localizable.ts';
+
 export class LevelExp {
   level = 0;
   exp = 0;
@@ -89,37 +91,7 @@ export class LevelExp {
   }
 }
 
-class Localizable2 {
-  #txtsObj;
-  #rootPath;
-  #lib;
-
-  get rootPath() {
-    return this.#rootPath;
-  }
-  get lib() {
-    return this.#lib;
-  }
-  get txtsObj() {
-    return this.#txtsObj ??= globalThis.Localization.txtsObj(this.#rootPath, this.#lib);
-  }
-
-  constructor(rootPath, lib) {
-    this.#rootPath = rootPath;
-    this.#lib = lib;
-  }
-
-  memoize(property, subPath = `>${property}`) {
-    let value = this.txtsObj.find(subPath).text();
-    if (!value) value = globalThis.Localization.txt(this.#rootPath + subPath, this.#lib);
-
-    Object.defineProperty(this, property, { value, configurable: true });
-
-    return value;
-  }
-}
-
-export class Stat extends Localizable2 {
+export class Stat extends Localizable {
   name;
   statLevelExp = new LevelExp();
   talentLevelExp = new LevelExp();
@@ -269,7 +241,7 @@ const Skill_increase = 1;
 const Skill_decrease = 2;
 const Skill_custom = 3;
 
-export class Skill extends Localizable2 {
+export class Skill extends Localizable {
   name;
   levelExp = new LevelExp();
 
@@ -327,7 +299,7 @@ export class Skill extends Localizable2 {
   }
 }
 
-export class Buff extends Localizable2 {
+export class Buff extends Localizable {
   static fullNames = ({
     Ritual: 'Dark Ritual',
     Imbuement: 'Imbue Mind',

@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { Data } from './data.ts';
 // prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
 
 const Koviko = {

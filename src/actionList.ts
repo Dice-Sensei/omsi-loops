@@ -1,4 +1,5 @@
 import { Data } from './data.ts';
+import { Localizable } from './localizable.ts';
 import {} from './stats.ts';
 
 class ClassNameNotFoundError extends TypeError {}
@@ -220,37 +221,7 @@ const actionTypes = ['normal', 'progress', 'limited', 'multipart'];
  * @template {ActionExtras} [E=ActionExtras] The extras parameter passed to the constructor
  */
 
-class Localizable1 {
-  #txtsObj;
-  #rootPath;
-  #lib;
-
-  get rootPath() {
-    return this.#rootPath;
-  }
-  get lib() {
-    return this.#lib;
-  }
-  get txtsObj() {
-    return this.#txtsObj ??= globalThis.Localization.txtsObj(this.#rootPath, this.#lib);
-  }
-
-  constructor(rootPath, lib) {
-    this.#rootPath = rootPath;
-    this.#lib = lib;
-  }
-
-  memoize(property, subPath = `>${property}`) {
-    let value = this.txtsObj.find(subPath).text();
-    if (!value) value = globalThis.Localization.txt(this.#rootPath + subPath, this.#lib);
-
-    Object.defineProperty(this, property, { value, configurable: true });
-
-    return value;
-  }
-}
-
-class Action extends Localizable1 {
+class Action extends Localizable {
   name;
 
   varName;
