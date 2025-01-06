@@ -5,6 +5,7 @@ import {
   compressToBase64 as lZStringCompressToBase64,
   decompressFromBase64 as lZStringDecompressFromBase64,
 } from 'lz-string';
+import { loadChallenge } from './challenges.ts';
 
 const defaultSaveName = 'idleLoops1';
 const challengeSaveName = 'idleLoopsChallenge';
@@ -783,7 +784,7 @@ function doLoad(toLoad) {
     }
   }
 
-  globalThis.trash.loadChallenge();
+  loadChallenge();
   view.initalize();
 
   for (const town of globalThis.saving.vals.towns) {

@@ -3,21 +3,18 @@ import { Listeners } from './logic/listeners.ts';
 import { t } from './locales/translations.utils.ts';
 
 function setShiftKey(value: boolean): void {
-  const previous = globalThis.trash.shiftDown;
-  globalThis.trash.shiftDown = value;
+  if (KeyboardKey.shift === value) return;
+  KeyboardKey.shift = value;
 
   document.documentElement.classList.toggle('shift-key-pressed', value);
-  if (globalThis.trash.shiftDown === previous) return;
   globalThis.dispatchEvent(new Event('modifierkeychange'));
 }
 
 function setControlKey(value: boolean): void {
-  const previous = globalThis.trash.controlDown;
-  globalThis.trash.controlDown = value;
+  if (KeyboardKey.control === value) return;
+  KeyboardKey.control = value;
 
   document.documentElement.classList.toggle('control-key-pressed', value);
-
-  if (globalThis.trash.controlDown === previous) return;
   globalThis.dispatchEvent(new Event('modifierkeychange'));
 }
 
@@ -236,12 +233,7 @@ Listeners.add('blur', () => {
   globalThis.driver.checkExtraSpeed();
 });
 
-declare global {
-  interface Trash {
-    shiftDown: boolean;
-    controlDown: boolean;
-  }
+export namespace KeyboardKey {
+  export const shift = false;
+  export const control = false;
 }
-
-globalThis.trash.shiftDown = false;
-globalThis.trash.controlDown = false;

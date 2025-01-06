@@ -62,7 +62,7 @@ const setupManaBurn = () => {
   };
 };
 
-function loadChallenge() {
+export function loadChallenge() {
   switch (globalThis.saving.vals.challengeSave.challengeMode) {
     case ChallengeMode.ManaDrought:
       return setupManaDrought();
@@ -72,6 +72,3 @@ function loadChallenge() {
       return setupManaBurn();
   }
 }
-
-globalThis.trash ??= {};
-globalThis.trash.loadChallenge = loadChallenge;

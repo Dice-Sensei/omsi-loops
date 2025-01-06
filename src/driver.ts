@@ -1,4 +1,5 @@
 import { Data } from './data.ts';
+import { KeyboardKey } from './keyboard.hotkeys.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
@@ -375,9 +376,9 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
         } else {
           const index = globalThis.globals.actions.addAction(name, addAmount, insertAtIndex);
           globalThis.saving.view.requestUpdate('highlightAction', index);
-          if (globalThis.trash.shiftDown && globalThis.actionList.hasLimit(name)) {
+          if (KeyboardKey.shift && globalThis.actionList.hasLimit(name)) {
             capAmount(index, townNum);
-          } else if (globalThis.trash.shiftDown && globalThis.actionList.isTraining(name)) {
+          } else if (KeyboardKey.shift && globalThis.actionList.isTraining(name)) {
             capTraining(index);
           }
         }
@@ -502,7 +503,7 @@ function loadList() {
 }
 
 function clearList() {
-  globalThis.globals.actions.clearActions(globalThis.trash.shiftDown ? ((a) => (a.disabled || a.loops === 0)) : null);
+  globalThis.globals.actions.clearActions(KeyboardKey.shiftDown ? ((a) => (a.disabled || a.loops === 0)) : null);
   globalThis.saving.view.updateNextActions();
 }
 

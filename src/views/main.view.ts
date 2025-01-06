@@ -133,7 +133,7 @@ class View {
   }
 
   modifierkeychangeHandler() {
-    globalThis.helpers.htmlElement('clearList').textContent = globalThis.trash.shiftDown
+    globalThis.helpers.htmlElement('clearList').textContent = KeyboardKey.shift
       ? globalThis.Localization.txt('actions>tooltip>clear_disabled')
       : globalThis.Localization.txt('actions>tooltip>clear_list');
   }
