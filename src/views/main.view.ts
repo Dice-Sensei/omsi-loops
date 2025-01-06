@@ -16,6 +16,19 @@ import {
 } from '../helpers.ts';
 import { getNumOnList } from '../actions.ts';
 import { actions } from '../actions.ts';
+import {
+  actionLog,
+  buffCaps,
+  buffHardCaps,
+  buffList,
+  buffs,
+  resources,
+  skillList,
+  skills,
+  statList,
+  stats,
+  towns,
+} from '../globals.ts';
 
 const DarkRitualDescription = [
   `10% faster in Beginnersville per ritual from 1-20<br>`,
@@ -167,7 +180,7 @@ class View {
 
     this.statGraph.init(document.getElementById('statsContainer'));
     const totalContainer = htmlElement('totalStatContainer');
-    for (const stat of globalThis.globals.statList) {
+    for (const stat of statList) {
       const axisTip = this.statGraph.getAxisTip(stat);
       totalContainer.insertAdjacentHTML(
         'beforebegin',
@@ -416,10 +429,8 @@ class View {
   updateStat(stat) {
     const level = globalThis.stats.getLevel(stat);
     const talent = globalThis.stats.getTalent(stat);
-    const totalLevel = Object.values(globalThis.globals.stats).map((s) => s.statLevelExp.level).reduce((a, b) => a + b);
-    const totalTalent = Object.values(globalThis.globals.stats).map((s) => s.talentLevelExp.level).reduce((a, b) =>
-      a + b
-    );
+    const totalLevel = Object.values(stats).map((s) => s.statLevelExp.level).reduce((a, b) => a + b);
+    const totalTalent = Object.values(stats).map((s) => s.talentLevelExp.level).reduce((a, b) => a + b);
     const levelPrc = `${globalThis.stats.getPrcToNextLevel(stat)}%`;
     const talentPrc = `${globalThis.stats.getPrcToNextTalent(stat)}%`;
 
@@ -436,26 +447,26 @@ class View {
     if (statShowing === stat || document.getElementById(`stat${stat}LevelExp`).innerHTML === '') {
       document.getElementById(`stat${stat}Level2`).textContent = formatNumber(level);
       document.getElementById(`stat${stat}LevelExp`).textContent = intToString(
-        globalThis.globals.stats[stat].statLevelExp.exp,
+        stats[stat].statLevelExp.exp,
         1,
       );
       document.getElementById(`stat${stat}LevelExpNeeded`).textContent = intToString(
-        globalThis.globals.stats[stat].statLevelExp.expRequiredForNextLevel,
+        stats[stat].statLevelExp.expRequiredForNextLevel,
         1,
       );
       document.getElementById(`stat${stat}LevelProgress`).textContent = intToString(levelPrc, 2);
 
       document.getElementById(`stat${stat}Talent2`).textContent = formatNumber(talent);
       document.getElementById(`stat${stat}TalentExp`).textContent = intToString(
-        globalThis.globals.stats[stat].talentLevelExp.exp,
+        stats[stat].talentLevelExp.exp,
         1,
       );
       document.getElementById(`stat${stat}TalentExpNeeded`).textContent = intToString(
-        globalThis.globals.stats[stat].talentLevelExp.expRequiredForNextLevel,
+        stats[stat].talentLevelExp.expRequiredForNextLevel,
         1,
       );
       document.getElementById(`stat${stat}TalentMult`).textContent = intToString(
-        globalThis.globals.stats[stat].talentMult,
+        stats[stat].talentMult,
         3,
       );
       document.getElementById(`stat${stat}TalentProgress`).textContent = intToString(talentPrc, 2);
@@ -495,12 +506,12 @@ class View {
 
   updateStats(skipAnimation) {
     let maxValue = 100; // I really need to stop writing this default explicitly everywhere
-    for (const stat of globalThis.globals.statList) {
+    for (const stat of statList) {
       for (
         const value of [
           globalThis.stats.getLevel(stat),
           globalThis.stats.getTalent(stat),
-          globalThis.globals.stats[stat].soulstone,
+          stats[stat].soulstone,
         ]
       ) {
         maxValue = Math.max(value, maxValue);
@@ -517,7 +528,7 @@ class View {
       requestAnimationFrame(() => statsContainer.classList.add('animate-logBars'));
     }
 
-    for (const stat of globalThis.globals.statList) {
+    for (const stat of statList) {
       this.updateStat(stat);
     }
   }
@@ -528,7 +539,7 @@ class View {
   }
 
   updateSkill(skill) {
-    if (globalThis.globals.skills[skill].levelExp.level === 0) {
+    if (skills[skill].levelExp.level === 0) {
       document.getElementById(`skill${skill}Container`).style.display = 'none';
       return;
     }
@@ -546,11 +557,11 @@ class View {
 
     if (skillShowing === skill) {
       document.getElementById(`skill${skill}LevelExp`).textContent = intToString(
-        globalThis.globals.skills[skill].levelExp.exp,
+        skills[skill].levelExp.exp,
         1,
       );
       document.getElementById(`skill${skill}LevelExpNeeded`).textContent = intToString(
-        globalThis.globals.skills[skill].levelExp.expRequiredForNextLevel,
+        skills[skill].levelExp.expRequiredForNextLevel,
         1,
       );
       document.getElementById(`skill${skill}LevelProgress`).textContent = intToString(levelPrc, 2);
@@ -626,7 +637,7 @@ class View {
   }
 
   updateSkills() {
-    for (const skill of globalThis.globals.skillList) {
+    for (const skill of skillList) {
       this.updateSkill(skill);
     }
   }
@@ -637,7 +648,7 @@ class View {
   }
 
   updateBuff(buff) {
-    if (globalThis.globals.buffs[buff].amt === 0) {
+    if (buffs[buff].amt === 0) {
       document.getElementById(`buff${buff}Container`).style.display = 'none';
       return;
     }
@@ -651,7 +662,7 @@ class View {
   }
 
   updateBuffs() {
-    for (const buff of globalThis.globals.buffList) {
+    for (const buff of buffList) {
       this.updateBuff(buff);
     }
   }
@@ -756,21 +767,21 @@ class View {
   }
   updateResource(resource) {
     const element = htmlElement(`${resource}Div`, false, false);
-    if (element) element.style.display = globalThis.globals.resources[resource] ? 'inline-block' : 'none';
+    if (element) element.style.display = resources[resource] ? 'inline-block' : 'none';
 
     if (resource === 'supplies') {
-      document.getElementById('suppliesCost').textContent = String(globalThis.globals.towns[0].suppliesCost);
+      document.getElementById('suppliesCost').textContent = String(towns[0].suppliesCost);
     }
     if (resource === 'teamMembers') {
-      document.getElementById('teamCost').textContent = `${(globalThis.globals.resources.teamMembers + 1) * 100}`;
+      document.getElementById('teamCost').textContent = `${(resources.teamMembers + 1) * 100}`;
     }
 
-    if (Number.isFinite(globalThis.globals.resources[resource])) {
-      htmlElement(resource).textContent = globalThis.globals.resources[resource];
+    if (Number.isFinite(resources[resource])) {
+      htmlElement(resource).textContent = resources[resource];
     }
   }
   updateResources() {
-    for (const resource in globalThis.globals.resources) this.updateResource(resource);
+    for (const resource in resources) this.updateResource(resource);
   }
   updateActionTooltips() {
     document.getElementById('goldInvested').textContent = intToStringRound(
@@ -780,25 +791,25 @@ class View {
       globalThis.saving.vals.goldInvested * .001,
     );
     document.getElementById('actionAllowedPockets').textContent = intToStringRound(
-      globalThis.globals.towns[7].totalPockets,
+      towns[7].totalPockets,
     );
     document.getElementById('actionAllowedWarehouses').textContent = intToStringRound(
-      globalThis.globals.towns[7].totalWarehouses,
+      towns[7].totalWarehouses,
     );
     document.getElementById('actionAllowedInsurance').textContent = intToStringRound(
-      globalThis.globals.towns[7].totalInsurance,
+      towns[7].totalInsurance,
     );
     document.getElementById('totalSurveyProgress').textContent = `${globalThis.actionList.getExploreProgress()}`;
     Array.from(document.getElementsByClassName('surveySkill')).forEach((div) => {
       div.textContent = `${globalThis.actionList.getExploreSkill()}`;
     });
-    for (const town of globalThis.globals.towns) {
+    for (const town of towns) {
       const varName = town.progressVars.find((v) => v.startsWith('Survey'));
       this.updateGlobalSurvey(varName, town);
     }
   }
   updateTeamCombat() {
-    if (globalThis.globals.towns[2].unlocked) {
+    if (towns[2].unlocked) {
       document.getElementById('skillSCombatContainer').style.display = 'inline-block';
       document.getElementById('skillTCombatContainer').style.display = 'inline-block';
       document.getElementById('skillSCombatLevel').textContent = intToString(
@@ -953,7 +964,7 @@ class View {
       })
       .property('data-index', (_a, i) => i)
       .call((container) => {
-        for (const { index } of globalThis.globals.towns) {
+        for (const { index } of towns) {
           container.classed(`zone-${index + 1}`, (a) => a.action.townNum === index);
         }
         for (const type of globalThis.actionList.actionTypes) {
@@ -1078,21 +1089,21 @@ class View {
       div.style.marginTop = '5px';
       if (action.name === 'Heal The Sick') setStoryFlag('failedHeal');
       if (
-        action.name === 'Brew Potions' && globalThis.globals.resources.reputation >= 0 &&
-        globalThis.globals.resources.herbs >= 10
+        action.name === 'Brew Potions' && resources.reputation >= 0 &&
+        resources.herbs >= 10
       ) {
         setStoryFlag('failedBrewPotions');
       }
       if (
-        action.name === 'Brew Potions' && globalThis.globals.resources.reputation < 0 &&
-        globalThis.globals.resources.herbs >= 10
+        action.name === 'Brew Potions' && resources.reputation < 0 &&
+        resources.herbs >= 10
       ) {
         setStoryFlag('failedBrewPotionsNegativeRep');
       }
-      if (action.name === 'Gamble' && globalThis.globals.resources.reputation < -5) setStoryFlag('failedGamble');
+      if (action.name === 'Gamble' && resources.reputation < -5) setStoryFlag('failedGamble');
       if (
-        action.name === 'Gamble' && globalThis.globals.resources.gold < 20 &&
-        globalThis.globals.resources.reputation > -6
+        action.name === 'Gamble' && resources.gold < 20 &&
+        resources.reputation > -6
       ) {
         setStoryFlag('failedGambleLowMoney');
       }
@@ -1137,7 +1148,7 @@ class View {
       while (expGainDiv.firstChild) {
         expGainDiv.removeChild(expGainDiv.firstChild);
       }
-      for (const stat of globalThis.globals.statList) {
+      for (const stat of statList) {
         if (action[`statExp${stat}`]) {
           statExpGain += `<div class='bold'>${Localization.txt(`stats>${stat}>short_form`)}:</div> ${
             intToString(action[`statExp${stat}`], 2)
@@ -1184,8 +1195,8 @@ class View {
     if (index === 'clear') {
       log.innerHTML = this.actionLogClearHTML; // nuke it, dot it
     }
-    const entry = globalThis.globals.actionLog.getEntry(index);
-    if (globalThis.globals.actionLog.hasPrevious()) {
+    const entry = actionLog.getEntry(index);
+    if (actionLog.hasPrevious()) {
       log.classList.add('hasPrevious');
     } else {
       log.classList.remove('hasPrevious');
@@ -1203,7 +1214,7 @@ class View {
       const nextEntry = htmlElement(`actionLogEntry${index + 1}`, false, false);
       log.insertBefore(element, nextEntry ?? htmlElement('actionLogLatest'));
     }
-    if ((globalThis.globals.actionLog.firstNewOrUpdatedEntry ?? Infinity) <= index) {
+    if ((actionLog.firstNewOrUpdatedEntry ?? Infinity) <= index) {
       element.classList.add('highlight');
       // this is just causing problems right now. disable, it's not all that important if scroll anchors work properly
       // element.scrollIntoView({block: "nearest", inline: "nearest", behavior: "auto"});
@@ -1261,7 +1272,7 @@ class View {
   }
 
   updateProgressActions() {
-    for (const town of globalThis.globals.towns) {
+    for (const town of towns) {
       for (let i = 0; i < town.progressVars.length; i++) {
         const varName = town.progressVars[i];
         this.updateProgressAction({ name: varName, town: town });
@@ -1336,7 +1347,7 @@ class View {
   }
 
   updateGlobalStory(num) {
-    globalThis.globals.actionLog.addGlobalStory(num);
+    actionLog.addGlobalStory(num);
   }
 
   updateStories(init) {
@@ -1360,7 +1371,7 @@ class View {
                 action.visible() && action.unlocked() &&
                 globalThis.saving.vals.completedActions.includes(action.varName)
               ) {
-                globalThis.globals.actionLog.addActionStory(action, storyId, init);
+                actionLog.addActionStory(action, storyId, init);
               }
             } else {
               allStoriesForActionUnlocked = false;
@@ -1395,7 +1406,7 @@ class View {
   }
 
   showTown(townNum) {
-    if (!globalThis.globals.towns[townNum].unlocked()) return;
+    if (!towns[townNum].unlocked()) return;
 
     if (townNum === 0) {
       document.getElementById('townViewLeft').style.visibility = 'hidden';
@@ -1454,12 +1465,12 @@ class View {
   }
 
   toggleHidden(varName, force) {
-    const isHidden = globalThis.globals.towns[globalThis.saving.vals.townshowing].hiddenVars.has(varName);
+    const isHidden = towns[globalThis.saving.vals.townshowing].hiddenVars.has(varName);
     if ((isHidden && force !== true) || force === false) {
-      globalThis.globals.towns[globalThis.saving.vals.townshowing].hiddenVars.delete(varName);
+      towns[globalThis.saving.vals.townshowing].hiddenVars.delete(varName);
       htmlElement(`infoContainer${varName}`).classList.remove('user-hidden');
     } else if (!isHidden || force === true) {
-      globalThis.globals.towns[globalThis.saving.vals.townshowing].hiddenVars.add(varName);
+      towns[globalThis.saving.vals.townshowing].hiddenVars.add(varName);
       htmlElement(`infoContainer${varName}`).classList.add('user-hidden');
     }
   }
@@ -1467,7 +1478,7 @@ class View {
   updateRegular(updateInfo) {
     const varName = updateInfo.name;
     const index = updateInfo.index;
-    const town = globalThis.globals.towns[index];
+    const town = towns[index];
     htmlElement(`total${varName}`).textContent = String(town[`total${varName}`]);
     htmlElement(`checked${varName}`).textContent = String(town[`checked${varName}`]);
     htmlElement(`unchecked${varName}`).textContent = String(
@@ -1505,10 +1516,10 @@ class View {
 
   createTownActions() {
     if (actionOptionsTown[0].querySelector('.actionOrTravelContainer')) return;
-    for (const action of globalThis.globals.towns.flatMap((t) => t.totalActionList)) {
+    for (const action of towns.flatMap((t) => t.totalActionList)) {
       this.createTownAction(action);
     }
-    for (const varName of globalThis.globals.towns.flatMap((t) => t.allVarNames)) {
+    for (const varName of towns.flatMap((t) => t.allVarNames)) {
       const action = globalThis.saving.vals.totalActionList.find((a) => a.varName === varName);
       if (globalThis.actionList.isActionOfType(action, 'limited')) this.createTownInfo(action);
       if (globalThis.actionList.isActionOfType(action, 'progress')) {
@@ -1551,7 +1562,7 @@ class View {
     progressDiv.style.display = '';
     progressDiv.innerHTML = totalDivText;
     townInfos[action.townNum].appendChild(progressDiv);
-    if (globalThis.globals.towns[action.townNum].hiddenVars.has(`${action.varName}${varSuffix}`)) {
+    if (towns[action.townNum].hiddenVars.has(`${action.varName}${varSuffix}`)) {
       progressDiv.classList.add('user-hidden');
     }
   }
@@ -1570,7 +1581,7 @@ class View {
       [aStat, aRatio],
       [bStat, bRatio],
     ) => ((bRatio - aRatio) ||
-      (globalThis.globals.statList.indexOf(aStat) - globalThis.globals.statList.indexOf(bStat)))
+      (statList.indexOf(aStat) - statList.indexOf(bStat)))
     );
     let totalRatio = 0;
     let gradientOffset = 0;
@@ -1633,10 +1644,10 @@ class View {
                 <div class='stat-pie mask' style='background:conic-gradient(${gradientStops.join()})'></div>`;
     if (action.skills !== undefined) {
       const skillKeyNames = Object.keys(action.skills);
-      const l = globalThis.globals.skillList.length;
+      const l = skillList.length;
       for (let i = 0; i < l; i++) {
         for (const skill of skillKeyNames) {
-          if (globalThis.globals.skillList[i] === skill) {
+          if (skillList[i] === skill) {
             const xmlName = globalThis.actionList.getXMLName(skill);
             const skillLabel = `${Localization.txt(`skills>${xmlName}>label`)} ${
               Localization.txt('stats>tooltip>exp')
@@ -1848,7 +1859,7 @@ class View {
     infoDiv.style.display = '';
     infoDiv.innerHTML = totalInfoText;
     townInfos[action.townNum].appendChild(infoDiv);
-    if (globalThis.globals.towns[action.townNum].hiddenVars.has(action.varName)) {
+    if (towns[action.townNum].hiddenVars.has(action.varName)) {
       infoDiv.classList.add('user-hidden');
     }
   }
@@ -1903,7 +1914,7 @@ class View {
     progressDiv.style.display = '';
     progressDiv.innerHTML = totalDivText;
     townInfos[action.townNum].appendChild(progressDiv);
-    if (globalThis.globals.towns[action.townNum].hiddenVars.has(action.varName)) {
+    if (towns[action.townNum].hiddenVars.has(action.varName)) {
       progressDiv.firstElementChild.classList.add('user-hidden');
     }
   }
@@ -1919,7 +1930,7 @@ class View {
 
   updateMultiPartSegments(action) {
     let segment = 0;
-    let curProgress = globalThis.globals.towns[action.townNum][action.varName];
+    let curProgress = towns[action.townNum][action.varName];
     // update previous segments
     let loopCost = action.loopCost(segment);
     while (curProgress >= loopCost && segment < action.segments) {
@@ -2004,24 +2015,24 @@ class View {
 
   updateSoulstones() {
     let total = 0;
-    for (const stat of globalThis.globals.statList) {
-      if (globalThis.globals.stats[stat].soulstone) {
-        total += globalThis.globals.stats[stat].soulstone;
+    for (const stat of statList) {
+      if (stats[stat].soulstone) {
+        total += stats[stat].soulstone;
         htmlElement(`stat${stat}SoulstoneLogBar`).parentElement.style.display = '';
         this.updateLevelLogBar(
           'statsContainer',
           `stat${stat}SoulstoneLogBar`,
-          globalThis.globals.stats[stat].soulstone,
+          stats[stat].soulstone,
         );
         document.getElementById(`ss${stat}Container`).style.display = '';
         document.getElementById(`ss${stat}`).textContent = formatNumber(
-          globalThis.globals.stats[stat].soulstone,
+          stats[stat].soulstone,
         );
         document.getElementById(`stat${stat}SSBonus`).textContent = intToString(
-          globalThis.globals.stats[stat].soulstone ? globalThis.globals.stats[stat].soulstoneMult : 0,
+          stats[stat].soulstone ? stats[stat].soulstoneMult : 0,
         );
         document.getElementById(`stat${stat}ss`).textContent = intToString(
-          globalThis.globals.stats[stat].soulstone,
+          stats[stat].soulstone,
           1,
         );
       } else {
@@ -2043,7 +2054,7 @@ class View {
   }
 
   updateMultiPart(action) {
-    const town = globalThis.globals.towns[action.townNum];
+    const town = towns[action.townNum];
     document.getElementById(`multiPartName${action.varName}`).textContent = action.getPartName();
     document.getElementById(`completed${action.varName}`).textContent = ` ${
       formatNumber(town[`total${action.varName}`])
@@ -2065,8 +2076,8 @@ class View {
   }
 
   updateTrainingLimits() {
-    for (let i = 0; i < globalThis.globals.statList.length; i++) {
-      const trainingDiv = document.getElementById(`trainingLimit${globalThis.globals.statList[i]}`);
+    for (let i = 0; i < statList.length; i++) {
+      const trainingDiv = document.getElementById(`trainingLimit${statList[i]}`);
       if (trainingDiv) {
         trainingDiv.textContent = String(globalThis.saving.vals.trainingLimits);
       }
@@ -2244,16 +2255,16 @@ function unlockGlobalStory(num) {
 }
 
 function setStoryFlag(name) {
-  if (!globalThis.globals.storyFlags[name]) {
-    globalThis.globals.storyFlags[name] = true;
+  if (!storyFlags[name]) {
+    storyFlags[name] = true;
     if (globalThis.saving.vals.options.actionLog) globalThis.saving.view.requestUpdate('updateStories', false);
   }
 }
 const unlockStory = setStoryFlag; // compatibility alias
 
 function increaseStoryVarTo(name, value) {
-  if (globalThis.globals.storyVars[name] < value) {
-    globalThis.globals.storyVars[name] = value;
+  if (storyVars[name] < value) {
+    storyVars[name] = value;
     if (globalThis.saving.vals.options.actionLog) globalThis.saving.view.requestUpdate('updateStories', false);
   }
 }
@@ -2354,14 +2365,14 @@ function adjustActionListSize(amt) {
 }
 
 function updateBuffCaps() {
-  for (const buff of globalThis.globals.buffList) {
+  for (const buff of buffList) {
     inputElement(`buff${buff}Cap`).value = String(
       Math.min(
         parseInt(inputElement(`buff${buff}Cap`).value),
-        globalThis.globals.buffHardCaps[buff],
+        buffHardCaps[buff],
       ),
     );
-    globalThis.globals.buffCaps[buff] = parseInt(inputElement(`buff${buff}Cap`).value);
+    buffCaps[buff] = parseInt(inputElement(`buff${buff}Cap`).value);
   }
 }
 

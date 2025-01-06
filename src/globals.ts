@@ -337,29 +337,3 @@ export const storyVars = {
   maxWizardGuildSegmentCleared: -1,
   maxZombiesRaised: -1,
 };
-
-const _globals = {
-  selfIsGame,
-  storyFlags,
-  storyVars,
-  actionLog,
-  buffCaps,
-  skills,
-  towns,
-  buffs,
-  stats,
-  skillList,
-  buffList,
-  statList,
-  buffHardCaps,
-  dungeonFloors,
-  hearts,
-  resources,
-  resourcesTemplate,
-};
-
-declare global {
-  var globals: typeof _globals;
-}
-
-globalThis.globals = _globals;

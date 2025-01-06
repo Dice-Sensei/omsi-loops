@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { Localization } from './Localization.ts';
-
+import { statList, stats } from './globals.ts';
 type Dataset = {
   name: string;
   label: string;
@@ -71,7 +71,7 @@ export class StatGraph {
   init(container: HTMLElement): void {
     if (this.initalized) return;
 
-    const orderedStats = globalThis.globals.statList.map((s) => globalThis.globals.stats[s]);
+    const orderedStats = statList.map((s) => stats[s]);
     const datasets: Dataset[] = [{
       name: 'mana_cost_reduction',
       label: Localization.txt('stats>tooltip>mana_cost_reduction'),
@@ -91,7 +91,7 @@ export class StatGraph {
     this.svg.append('g').classed(`layer scaleLines`, true);
     this.svg.append('g').classed(`layer data`, true);
 
-    const tScale = d3.scaleBand<StatName>(globalThis.globals.statList, [0, Math.PI * 2]);
+    const tScale = d3.scaleBand<StatName>(statList, [0, Math.PI * 2]);
     this.statScale = tScale;
 
     this.svg.selectChild('g.layer.axes')
@@ -225,8 +225,8 @@ export class StatGraph {
     const line = d3.lineRadial().angle(tScale);
     const ticks = d3.ticks(1, autoscale[1], 3);
 
-    const closedStatNames = [...globalThis.globals.statList, globalThis.globals.statList[0]];
-    const closedStats = closedStatNames.map((name) => globalThis.globals.stats[name]);
+    const closedStatNames = [...statList, statList[0]];
+    const closedStats = closedStatNames.map((name) => stats[name]);
     const transition = d3.transition()
       .duration(skipAnimation ? 0 : 250)
       .ease(d3.easeSinIn);

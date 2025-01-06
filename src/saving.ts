@@ -1,7 +1,22 @@
 import { Town } from './town.ts';
 import { Data } from './data.ts';
 import { copyArray, inputElement, removeClassFromDiv, textAreaElement, valueElement } from './helpers.ts';
-import { selfIsGame } from './globals.ts';
+import {
+  actionLog,
+  buffCaps,
+  buffHardCaps,
+  buffList,
+  buffs,
+  dungeonFloors,
+  selfIsGame,
+  skillList,
+  skills,
+  statList,
+  stats,
+  storyFlags,
+  storyVars,
+  towns,
+} from './globals.ts';
 import { actions } from './actions.ts';
 
 import {
@@ -266,7 +281,7 @@ const storyInitializers = {
   },
 };
 
-if (globalThis.globals.selfIsGame) {
+if (selfIsGame) {
   Object.assign(vals.options, importPredictorSettings()); // override hardcoded defaults if not in worker
 }
 
@@ -285,25 +300,25 @@ function startGame() {
 }
 
 function _town(townNum) {
-  return globalThis.globals.towns[townNum];
+  return towns[townNum];
 }
 
 function initializeTowns() {
   for (let i = 0; i <= 8; i++) {
-    globalThis.globals.towns[i] = new Town(i);
+    towns[i] = new Town(i);
   }
 }
 
 function isStatName(name) {
-  return globalThis.globals.statList.includes(name);
+  return statList.includes(name);
 }
 
 function isSkillName(name) {
-  return globalThis.globals.skillList.includes(name);
+  return skillList.includes(name);
 }
 
 function isBuffName(name) {
-  return globalThis.globals.buffList.includes(name);
+  return buffList.includes(name);
 }
 
 function initializeActions() {
@@ -491,32 +506,32 @@ function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
 
 function doLoad(toLoad) {
   for (const property of Object.getOwnPropertyNames(toLoad.stats ?? {})) {
-    if (property in globalThis.globals.stats) {
-      globalThis.globals.stats[property].load(toLoad.stats[property]);
+    if (property in stats) {
+      stats[property].load(toLoad.stats[property]);
     }
   }
 
   for (const property of Object.getOwnPropertyNames(toLoad.skills ?? {})) {
-    if (property in globalThis.globals.skills) {
-      globalThis.globals.skills[property].load(toLoad.skills[property]);
+    if (property in skills) {
+      skills[property].load(toLoad.skills[property]);
     }
   }
 
   for (const property in toLoad.buffs) {
     if (toLoad.buffs.hasOwnProperty(property)) {
       // need the min for people with broken buff amts from pre 0.93
-      globalThis.globals.buffs[property].amt = Math.min(
+      buffs[property].amt = Math.min(
         toLoad.buffs[property].amt,
-        globalThis.globals.buffHardCaps[property],
+        buffHardCaps[property],
       );
     }
   }
 
   if (toLoad.buffCaps !== undefined) {
-    for (const property in globalThis.globals.buffCaps) {
+    for (const property in buffCaps) {
       if (toLoad.buffCaps.hasOwnProperty(property)) {
-        globalThis.globals.buffCaps[property] = toLoad.buffCaps[property];
-        inputElement(`buff${property}Cap`).value = globalThis.globals.buffCaps[property];
+        buffCaps[property] = toLoad.buffCaps[property];
+        inputElement(`buff${property}Cap`).value = buffCaps[property];
       }
     }
   }
@@ -540,34 +555,32 @@ function doLoad(toLoad) {
         : toLoad.prestigeValues['completedAnyPrestige'];
   }
 
-  for (const property in globalThis.globals.storyFlags) {
+  for (const property in storyFlags) {
     if (toLoad.storyReqs?.hasOwnProperty(property)) {
-      globalThis.globals.storyFlags[property] = toLoad.storyReqs[property];
+      storyFlags[property] = toLoad.storyReqs[property];
     } else {
-      globalThis.globals.storyFlags[property] =
-        storyInitializers.storyFlags[property]?.(toLoad.storyReqs ?? {}, toLoad.storyVars ?? {}) ??
-          false;
+      storyFlags[property] = storyInitializers.storyFlags[property]?.(toLoad.storyReqs ?? {}, toLoad.storyVars ?? {}) ??
+        false;
     }
   }
 
-  for (const property in globalThis.globals.storyVars) {
+  for (const property in storyVars) {
     if (toLoad.storyVars?.hasOwnProperty(property)) {
-      globalThis.globals.storyVars[property] = toLoad.storyVars[property];
+      storyVars[property] = toLoad.storyVars[property];
     } else {
-      globalThis.globals.storyVars[property] =
-        storyInitializers.storyVars[property]?.(toLoad.storyReqs ?? {}, toLoad.storyVars ?? {}) ??
-          -1;
+      storyVars[property] = storyInitializers.storyVars[property]?.(toLoad.storyReqs ?? {}, toLoad.storyVars ?? {}) ??
+        -1;
     }
   }
 
   if (toLoad.actionLog !== undefined) {
-    globalThis.globals.actionLog.load(toLoad.actionLog);
-    globalThis.globals.actionLog.loadRecent();
+    actionLog.load(toLoad.actionLog);
+    actionLog.loadRecent();
   } else {
-    globalThis.globals.actionLog.initialize();
+    actionLog.initialize();
   }
-  if (globalThis.globals.actionLog.entries.length === 0) {
-    globalThis.globals.actionLog.addGlobalStory(0);
+  if (actionLog.entries.length === 0) {
+    actionLog.addGlobalStory(0);
   }
 
   if (toLoad.totalTalent === undefined) {
@@ -684,7 +697,7 @@ function doLoad(toLoad) {
   let floors = 0;
   if (toLoad.dungeons === undefined) toLoad.dungeons = copyArray(globalThis.saving.vals.dungeons);
   for (let i = 0; i < globalThis.saving.vals.dungeons.length; i++) {
-    floors = globalThis.globals.dungeonFloors[i];
+    floors = dungeonFloors[i];
     for (let j = 0; j < floors; j++) {
       if (toLoad.dungeons[i] != undefined && toLoad.dungeons && toLoad.dungeons[i][j]) {
         globalThis.saving.vals.dungeons[i][j] = toLoad.dungeons[i][j];
@@ -748,7 +761,7 @@ function doLoad(toLoad) {
 
   const hiddenVarNames = toLoad.hiddenVars?.slice() ?? [];
 
-  for (const town of globalThis.globals.towns) {
+  for (const town of towns) {
     const hiddenVars = hiddenVarNames.shift() ?? [];
     town.hiddenVars.clear();
     for (const action of town.totalActionList) {
@@ -789,7 +802,7 @@ function doLoad(toLoad) {
   loadChallenge();
   view.initalize();
 
-  for (const town of globalThis.globals.towns) {
+  for (const town of towns) {
     for (const action of town.totalActionList) {
       if (action.type === 'limited') {
         const varName = action.varName;
@@ -838,14 +851,14 @@ function doLoad(toLoad) {
   globalThis.driver.addOffline(Math.min(Math.floor(Date.now() - Date.parse(toLoad.date)), 2678400000));
 
   if (toLoad.version75 === undefined) {
-    const total = globalThis.globals.towns[0].totalSDungeon;
+    const total = towns[0].totalSDungeon;
     globalThis.saving.vals.dungeons[0][0].completed = Math.floor(total / 2);
     globalThis.saving.vals.dungeons[0][1].completed = Math.floor(total / 4);
     globalThis.saving.vals.dungeons[0][2].completed = Math.floor(total / 8);
     globalThis.saving.vals.dungeons[0][3].completed = Math.floor(total / 16);
     globalThis.saving.vals.dungeons[0][4].completed = Math.floor(total / 32);
     globalThis.saving.vals.dungeons[0][5].completed = Math.floor(total / 64);
-    globalThis.globals.towns[0].totalSDungeon = globalThis.saving.vals.dungeons[0][0].completed +
+    towns[0].totalSDungeon = globalThis.saving.vals.dungeons[0][0].completed +
       globalThis.saving.vals.dungeons[0][1].completed + globalThis.saving.vals.dungeons[0][2].completed +
       globalThis.saving.vals.dungeons[0][3].completed + globalThis.saving.vals.dungeons[0][4].completed +
       globalThis.saving.vals.dungeons[0][5].completed;
@@ -887,10 +900,10 @@ function doSave() {
   toSave.townsUnlocked = globalThis.saving.vals.townsUnlocked;
   toSave.completedActions = globalThis.saving.vals.completedActions;
 
-  toSave.stats = globalThis.globals.stats;
+  toSave.stats = stats;
   toSave.totalTalent = globalThis.saving.vals.totalTalent;
-  toSave.skills = globalThis.globals.skills;
-  toSave.buffs = globalThis.globals.buffs;
+  toSave.skills = skills;
+  toSave.buffs = buffs;
   toSave.prestigeValues = globalThis.prestige.prestigeValues;
   toSave.goldInvested = globalThis.saving.vals.goldInvested;
   toSave.stonesUsed = globalThis.saving.vals.stonesUsed;
@@ -898,7 +911,7 @@ function doSave() {
 
   const hiddenVars = [];
 
-  for (const town of globalThis.globals.towns) {
+  for (const town of towns) {
     hiddenVars.push(Array.from(town.hiddenVars));
     for (const action of town.totalActionList) {
       if (action.type === 'progress') {
@@ -932,11 +945,11 @@ function doSave() {
   }
   toSave.storyShowing = globalThis.saving.vals.storyShowing;
   toSave.storyMax = globalThis.saving.vals.storyMax;
-  toSave.storyReqs = globalThis.globals.storyFlags; // save uses the legacy name "storyReqs" for compatibility
+  toSave.storyReqs = storyFlags; // save uses the legacy name "storyReqs" for compatibility
   toSave.storyVars = globalThis.saving.vals.storyVars;
   toSave.unreadActionStories = globalThis.saving.vals.unreadActionStories;
-  toSave.actionLog = globalThis.globals.actionLog;
-  toSave.buffCaps = globalThis.globals.buffCaps;
+  toSave.actionLog = actionLog;
+  toSave.buffCaps = buffCaps;
 
   toSave.date = new Date();
   toSave.totalOfflineMs = globalThis.saving.vals.totalOfflineMs;
