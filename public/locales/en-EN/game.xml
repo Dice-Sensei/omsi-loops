@@ -1373,7 +1373,7 @@
             <name>Beginnersville</name>
             <desc>Rats in basements, aggressive solo boars, bouncing slimes, and strangers that love exposition are some
                 of the less common things you'll see around Beginnersville. Some people are missing helmets or shoes, and
-                the fanciest sword around is still made out of iron. You got lucky with decent globalThis.globals.towns to start looping at.
+                the fanciest sword around is still made out of iron. You got lucky with decent towns to start looping at.
                 If only there weren't so many rules not letting you do dangerous things, it'd be perfect.
             </desc>
         </town0>
