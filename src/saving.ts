@@ -18,6 +18,18 @@ import {
   towns,
 } from './globals.ts';
 import { actions } from './actions.ts';
+import {
+  addOffline,
+  addResource,
+  adjustAll,
+  checkExtraSpeed,
+  isBonusActive,
+  pauseGame,
+  recalcInterval,
+  restart,
+  showNotification,
+  toggleOffline,
+} from './driver.ts';
 
 import {
   compressToBase64 as lZStringCompressToBase64,
@@ -205,7 +217,7 @@ const optionValueHandlers = {
     }
   },
   updateRate(value, init) {
-    if (!init) globalThis.driver.recalcInterval(value);
+    if (!init) recalcInterval(value);
   },
   actionLog(value, init) {
     document.getElementById('actionLogContainer').style.display = value ? '' : 'none';
@@ -213,11 +225,11 @@ const optionValueHandlers = {
   predictor(value, init) {
     localStorage['loadPredictor'] = value || '';
   },
-  speedIncrease10x: globalThis.driver.checkExtraSpeed,
-  speedIncrease20x: globalThis.driver.checkExtraSpeed,
-  speedIncreaseCustom: globalThis.driver.checkExtraSpeed,
+  speedIncrease10x: checkExtraSpeed,
+  speedIncrease20x: checkExtraSpeed,
+  speedIncreaseCustom: checkExtraSpeed,
   speedIncreaseBackground(value, init) {
-    globalThis.driver.checkExtraSpeed();
+    checkExtraSpeed();
     if (typeof value === 'number' && !isNaN(value) && value < 1 && value >= 0) {
       document.getElementById('speedIncreaseBackgroundWarning').style.display = '';
     } else {
@@ -225,8 +237,8 @@ const optionValueHandlers = {
     }
   },
   bonusIsActive(value, init) {
-    if (!value !== !globalThis.driver.isBonusActive()) {
-      globalThis.driver.toggleOffline();
+    if (!value !== !isBonusActive()) {
+      toggleOffline();
     }
   },
   repeatLastAction() {
@@ -829,7 +841,7 @@ function doLoad(toLoad) {
   } else {
     globalThis.saving.vals.unreadActionStories = toLoad.unreadActionStories;
     for (const name of globalThis.saving.vals.unreadActionStories) {
-      globalThis.driver.showNotification(name);
+      showNotification(name);
     }
   }
 
@@ -848,7 +860,7 @@ function doLoad(toLoad) {
   view.updatePrestigeValues();
 
   // capped at 1 month of gain
-  globalThis.driver.addOffline(Math.min(Math.floor(Date.now() - Date.parse(toLoad.date)), 2678400000));
+  addOffline(Math.min(Math.floor(Date.now() - Date.parse(toLoad.date)), 2678400000));
 
   if (toLoad.version75 === undefined) {
     const total = towns[0].totalSDungeon;
@@ -876,9 +888,9 @@ function doLoad(toLoad) {
     location.reload();
   }
 
-  if (globalThis.actionList.getExploreProgress() >= 100) globalThis.driver.addResource('glasses', true);
+  if (globalThis.actionList.getExploreProgress() >= 100) addResource('glasses', true);
 
-  globalThis.driver.adjustAll();
+  adjustAll();
 
   Data.recordBase();
 
@@ -888,8 +900,8 @@ function doLoad(toLoad) {
   view.updateMultiPartActions();
   view.updateStories(true);
   view.update();
-  globalThis.driver.recalcInterval(globalThis.saving.vals.options.updateRate);
-  globalThis.driver.pauseGame();
+  recalcInterval(globalThis.saving.vals.options.updateRate);
+  pauseGame();
 }
 
 function doSave() {
@@ -1004,8 +1016,8 @@ function processSave(saveData) {
   actions.clearActions();
   actions.current = [];
   load(null, saveJson);
-  globalThis.driver.pauseGame();
-  globalThis.driver.restart();
+  pauseGame();
+  restart();
 }
 
 let overquotaWarned = false;
@@ -1114,8 +1126,8 @@ function beginChallenge(challengeNum) {
   load(true);
   globalThis.saving.vals.totalOfflineMs = 1000000;
   save();
-  globalThis.driver.pauseGame();
-  globalThis.driver.restart();
+  pauseGame();
+  restart();
 }
 
 function exitChallenge() {
@@ -1137,8 +1149,8 @@ function resumeChallenge() {
     saveName = challengeSaveName;
     load(true);
     save();
-    globalThis.driver.pauseGame();
-    globalThis.driver.restart();
+    pauseGame();
+    restart();
   }
 }
 

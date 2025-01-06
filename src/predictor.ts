@@ -15,7 +15,7 @@ import {
 } from './helpers.ts';
 import { calcSoulstoneMult, getNumOnCurList, getNumOnList } from './actions.ts';
 import { buffs, skillList, skills, statList, stats, towns } from './globals.ts';
-
+import { getSpeedMult } from './driver.ts';
 // prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
 
 const Koviko = {
@@ -2498,7 +2498,7 @@ const Koviko = {
 
                 // Calculate time spent
                 // @ts-ignore
-                let temp = (currentMana - state.resources.mana) / globalThis.driver.getSpeedMult(state.resources.town);
+                let temp = (currentMana - state.resources.mana) / getSpeedMult(state.resources.town);
                 state.resources.totalTicks += temp;
                 state.resources.actionTicks += temp;
 

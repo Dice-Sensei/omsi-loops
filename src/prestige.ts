@@ -1,4 +1,5 @@
 import { towns } from './globals.ts';
+import { clearList, pauseGame, restart } from './driver.ts';
 
 const prestigeValues: Record<string, number> = {};
 
@@ -91,9 +92,9 @@ function prestigeWithNewValues(
 
   // Remove all progress and save totals
   globalThis.saving.load(false);
-  globalThis.driver.clearList();
-  globalThis.driver.restart();
-  globalThis.driver.pauseGame();
+  clearList();
+  restart();
+  pauseGame();
 
   // Regain prestige values and Totals
   for (const [key, value] of Object.entries(nextPrestigeBuffs)) {
