@@ -1419,11 +1419,11 @@ class View {
     $('#TownSelect').val(townNum);
 
     htmlElement('shortTownColumn').classList.remove(
-      `zone-${globalThis.globals.townshowing + 1}`,
+      `zone-${globalThis.saving.vals.townshowing + 1}`,
     );
     htmlElement('shortTownColumn').classList.add(`zone-${townNum + 1}`);
     document.getElementById('townDesc').textContent = Localization.txt(`towns>town${townNum}>desc`);
-    globalThis.globals.townshowing = townNum;
+    globalThis.saving.vals.townshowing = townNum;
   }
 
   showActions(stories) {
@@ -1435,11 +1435,11 @@ class View {
     if (stories) {
       document.getElementById('actionsViewLeft').style.visibility = '';
       document.getElementById('actionsViewRight').style.visibility = 'hidden';
-      actionStoriesTown[globalThis.globals.townshowing].style.display = '';
+      actionStoriesTown[globalThis.saving.vals.townshowing].style.display = '';
     } else {
       document.getElementById('actionsViewLeft').style.visibility = 'hidden';
       document.getElementById('actionsViewRight').style.visibility = '';
-      actionOptionsTown[globalThis.globals.townshowing].style.display = '';
+      actionOptionsTown[globalThis.saving.vals.townshowing].style.display = '';
     }
 
     document.getElementById('actionsTitle').textContent = Localization.txt(
@@ -1453,12 +1453,12 @@ class View {
   }
 
   toggleHidden(varName, force) {
-    const isHidden = globalThis.globals.towns[globalThis.globals.townshowing].hiddenVars.has(varName);
+    const isHidden = globalThis.globals.towns[globalThis.saving.vals.townshowing].hiddenVars.has(varName);
     if ((isHidden && force !== true) || force === false) {
-      globalThis.globals.towns[globalThis.globals.townshowing].hiddenVars.delete(varName);
+      globalThis.globals.towns[globalThis.saving.vals.townshowing].hiddenVars.delete(varName);
       htmlElement(`infoContainer${varName}`).classList.remove('user-hidden');
     } else if (!isHidden || force === true) {
-      globalThis.globals.towns[globalThis.globals.townshowing].hiddenVars.add(varName);
+      globalThis.globals.towns[globalThis.saving.vals.townshowing].hiddenVars.add(varName);
       htmlElement(`infoContainer${varName}`).classList.add('user-hidden');
     }
   }

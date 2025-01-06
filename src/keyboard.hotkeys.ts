@@ -183,7 +183,7 @@ Keyboard
       fn: () =>
         moveToTown(
           globalThis.saving.vals
-            .townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.globals.townshowing) + 1],
+            .townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.saving.vals.townshowing) + 1],
         ),
       description: t('shortcuts.moveToNextTown'),
     },
@@ -193,7 +193,7 @@ Keyboard
       fn: () =>
         moveToTown(
           globalThis.saving.vals
-            .townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.globals.townshowing) - 1],
+            .townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.saving.vals.townshowing) - 1],
         ),
       description: t('shortcuts.moveToPreviousTown'),
     },
