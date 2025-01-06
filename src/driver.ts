@@ -1,5 +1,6 @@
 import { Data } from './data.ts';
 import { KeyboardKey } from './keyboard.hotkeys.ts';
+import { Localization } from './Localization.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
@@ -237,7 +238,7 @@ function stopGame() {
   globalThis.saving.view.requestUpdate('updateCurrentActionBar', globalThis.globals.actions.currentPos);
   globalThis.saving.view.update();
   document.title = '*PAUSED* Idle Loops';
-  document.getElementById('pausePlay').textContent = globalThis.Localization.txt('time_controls>play_button');
+  document.getElementById('pausePlay').textContent = Localization.txt('time_controls>play_button');
   if (globalThis.saving.needsDataSnapshots()) {
     Data.updateSnapshot('stop', 'base');
   }
@@ -259,7 +260,7 @@ function pauseGame(ping, message) {
     globalThis.saving.clearPauseNotification();
   }
   document.title = gameIsStopped ? '*PAUSED* Idle Loops' : 'Idle Loops';
-  document.getElementById('pausePlay').textContent = globalThis.Localization.txt(
+  document.getElementById('pausePlay').textContent = Localization.txt(
     `time_controls>${gameIsStopped ? 'play_button' : 'pause_button'}`,
   );
   if (
@@ -800,13 +801,13 @@ function toggleOffline() {
     bonusSpeed = 5;
     bonusActive = true;
     checkExtraSpeed();
-    document.getElementById('isBonusOn').textContent = globalThis.Localization.txt(
+    document.getElementById('isBonusOn').textContent = Localization.txt(
       'time_controls>bonus_seconds>state>on',
     );
   } else {
     bonusSpeed = 1;
     bonusActive = false;
-    document.getElementById('isBonusOn').textContent = globalThis.Localization.txt(
+    document.getElementById('isBonusOn').textContent = Localization.txt(
       'time_controls>bonus_seconds>state>off',
     );
   }

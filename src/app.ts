@@ -1,5 +1,4 @@
-import './data.ts';
-import './localization.ts';
+import { Localization } from './localization.ts';
 import './helpers.ts';
 import './actionList.ts';
 import './interval.ts';
@@ -18,9 +17,9 @@ import { renderViews } from './views/register-all.ts';
 
 globalThis.saving.loadDefaults();
 
-await globalThis.Localization.init();
+await Localization.init();
 
 renderViews();
-globalThis.Localization.populate();
+Localization.populate();
 
 globalThis.saving.startGame();

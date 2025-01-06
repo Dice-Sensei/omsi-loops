@@ -1,5 +1,5 @@
-import './types.ts';
 import * as d3 from 'd3';
+import { Localization } from './Localization.ts';
 
 type Dataset = {
   name: string;
@@ -74,7 +74,7 @@ export class StatGraph {
     const orderedStats = globalThis.globals.statList.map((s) => globalThis.globals.stats[s]);
     const datasets: Dataset[] = [{
       name: 'mana_cost_reduction',
-      label: globalThis.Localization.txt('stats>tooltip>mana_cost_reduction'),
+      label: Localization.txt('stats>tooltip>mana_cost_reduction'),
       data: ({ manaMultiplier }) => (1 - manaMultiplier) * 100,
       enabled: true,
     }];

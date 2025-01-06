@@ -1,5 +1,6 @@
 import { Data } from './data.ts';
 import { Localizable } from './localizable.ts';
+import { Localization } from './Localization.ts';
 import {} from './stats.ts';
 
 class ClassNameNotFoundError extends TypeError {}
@@ -277,16 +278,16 @@ class Action extends Localizable {
   // centralized here (function will not be called by the game code if info text is not
   // applicable)
   infoText() {
-    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>info_text1`)}
+    return `${Localization.txt(`actions>${getXMLName(this.name)}>info_text1`)}
                 <i class='fa fa-arrow-left'></i>
-                ${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>info_text2`)}
+                ${Localization.txt(`actions>${getXMLName(this.name)}>info_text2`)}
                 <i class='fa fa-arrow-left'></i>
-                ${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>info_text3`)}
+                ${Localization.txt(`actions>${getXMLName(this.name)}>info_text3`)}
                 <br><span class='bold'>${`${
-      globalThis.Localization.txt('actions>tooltip>total_found')
+      Localization.txt('actions>tooltip>total_found')
     }: `}</span><div id='total${this.varName}'></div>
                 <br><span class='bold'>${`${
-      globalThis.Localization.txt('actions>tooltip>total_checked')
+      Localization.txt('actions>tooltip>total_checked')
     }: `}</span><div id='checked${this.varName}'></div>`;
   }
 
@@ -430,24 +431,24 @@ class DungeonAction extends MultipartAction {
       for (let i = 0; i < globalThis.saving.vals.dungeons[this.dungeonNum].length; i++) {
         ssDivContainer += `Floor ${i + 1} |
                                     <div class='bold'>${
-          globalThis.Localization.txt(`actions>${getXMLName(this.name)}>chance_label`)
+          Localization.txt(`actions>${getXMLName(this.name)}>chance_label`)
         } </div> <div id='soulstoneChance${this.dungeonNum}_${i}'></div>% -
                                     <div class='bold'>${
-          globalThis.Localization.txt(`actions>${getXMLName(this.name)}>last_stat_label`)
+          Localization.txt(`actions>${getXMLName(this.name)}>last_stat_label`)
         } </div> <div id='soulstonePrevious${this.dungeonNum}_${i}'>NA</div> -
                                     <div class='bold'>${
-          globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_done`)
+          Localization.txt(`actions>${getXMLName(this.name)}>label_done`)
         }</div> <div id='soulstoneCompleted${this.dungeonNum}_${i}'></div><br>`;
       }
     }
-    return globalThis.Localization.txt(`actions>${getXMLName(this.name)}>completed_tooltip`) + ssDivContainer;
+    return Localization.txt(`actions>${getXMLName(this.name)}>completed_tooltip`) + ssDivContainer;
   }
   getPartName(loopCounter = globalThis.globals.towns[this.townNum][`${this.varName}LoopCounter`] + 0.0001) {
     const floor = Math.floor(loopCounter / this.segments + 1);
-    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       floor <= globalThis.saving.vals.dungeons[this.dungeonNum].length
         ? globalThis.helpers.numberToWords(floor)
-        : globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
+        : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
   }
 }
@@ -492,10 +493,10 @@ class TrialAction extends MultipartAction {
   }
   getPartName(loopCounter = globalThis.globals.towns[this.townNum][`${this.varName}LoopCounter`]) {
     const floor = Math.floor((loopCounter + 0.0001) / this.segments + 1);
-    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       floor <= globalThis.saving.trials[this.trialNum].length
         ? globalThis.helpers.numberToWords(floor)
-        : globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
+        : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
   }
   currentFloor(loopCounter = globalThis.globals.towns[this.townNum][`${this.varName}LoopCounter`]) {
@@ -571,7 +572,7 @@ class AssassinAction extends MultipartAction {
   }
 
   getStoryTexts(
-    rawStoriesDataForAction = globalThis.Localization.txtsObj(this.name.toLowerCase().replace(/ /gu, '_'))[0].children,
+    rawStoriesDataForAction = Localization.txtsObj(this.name.toLowerCase().replace(/ /gu, '_'))[0].children,
   ) { // I hate this
     return super.getStoryTexts(rawStoriesDataForAction);
   }
@@ -1563,7 +1564,7 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
     globalThis.driver.addResource('reputation', 3);
   },
   getPartName(loopCounter = globalThis.globals.towns[0].HealLoopCounter) {
-    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       globalThis.helpers.numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },
@@ -4991,7 +4992,7 @@ Action.TidyUp = new MultipartAction('Tidy Up', {
     // empty.
   },
   getPartName(loopCounter = globalThis.globals.towns[4].TidyLoopCounter) {
-    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       globalThis.helpers.numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },
@@ -6681,7 +6682,7 @@ Action.RescueSurvivors = new MultipartAction('Rescue Survivors', {
     if (loopCounter >= 20) globalThis.view.setStoryFlag('rescued20Survivors');
   },
   getPartName(loopCounter = globalThis.globals.towns[6].RescueLoopCounter) {
-    return `${globalThis.Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
       globalThis.helpers.numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },

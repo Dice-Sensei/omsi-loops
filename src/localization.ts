@@ -1,33 +1,7 @@
 import $ from 'jquery';
+import { SearchParams } from './logic/search-params.ts';
 
-namespace SearchParams {
-  const self = () => new URLSearchParams(globalThis.location.search);
-
-  type GetOptions<T extends string | null> = {
-    expected: T[];
-    fallback: T;
-  };
-
-  export const get = <T extends string | null = string | null>(name: string, options: GetOptions<T>): T => {
-    const value = self().get(name) as T;
-
-    return value && options.expected.includes(value) ? value : options.fallback;
-  };
-
-  export const set = <T extends string>(name: string, value: T | null): void => {
-    const params = self();
-
-    if (value === null) {
-      params.delete(name);
-    } else {
-      params.set(name, value);
-    }
-
-    globalThis.location.search = params.toString();
-  };
-}
-
-namespace Localization {
+export namespace Localization {
   export const languages = { 'en-EN': 'English' };
   export const fallback = 'en-EN';
 
@@ -35,13 +9,11 @@ namespace Localization {
 
   export const bundles: Record<string, XMLDocument> = {};
 
-  export let language: null;
+  export let language: string = SearchParams.get(searchParam, {
+    expected: Object.keys(languages),
+    fallback: fallback,
+  });
   export async function init() {
-    language = SearchParams.get(searchParam, {
-      expected: Object.keys(languages),
-      fallback: fallback,
-    });
-
     bundles[fallback] = await loadXml(fallback);
     bundles[language] = await loadXml(language);
   }
@@ -73,11 +45,3 @@ namespace Localization {
     return $(Localization.bundles[language]).find(path);
   }
 }
-
-const _localization = Localization;
-
-declare global {
-  var Localization: typeof _localization;
-}
-
-globalThis.Localization = _localization;

@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import { Data } from './data.ts';
+import { Localization } from './Localization.ts';
 // prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
 
 const Koviko = {
@@ -2764,7 +2765,7 @@ const Koviko = {
             end: globalThis.stats.getLevelFromExp(stats[i].value),
           };
 
-          tooltip += '<tr><td><b>' + globalThis.Localization.txt(`stats>${i}>short_form`).toUpperCase() +
+          tooltip += '<tr><td><b>' + Localization.txt(`stats>${i}>short_form`).toUpperCase() +
             '</b></td><td>' +
             globalThis.helpers.intToString(level.end, 1) + '</td><td>(+' +
             globalThis.helpers.intToString(level.end - level.start, 1) + ')</td></tr>';

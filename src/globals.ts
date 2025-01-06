@@ -1,3 +1,5 @@
+import { Localization } from './Localization.ts';
+
 class ActionLog {
   /** @type {ActionLogEntry[]} */
   entries = [];
@@ -236,7 +238,7 @@ class ActionLogEntry {
     if (key === 'loopEnd') return globalThis.helpers.formatNumber(this.loop);
     if (key === 'town') return globalThis.actionList.townNames[this.action?.townNum];
     if (key === 'action') return this.action?.label;
-    if (key === 'header') return globalThis.Localization.txt('actions>log>header');
+    if (key === 'header') return Localization.txt('actions>log>header');
     throw new Error(`Bad key ${key}`);
   }
 
@@ -284,7 +286,7 @@ class RepeatableLogEntry extends ActionLogEntry {
     if (key === 'loop') {
       return this.loop === this.loopEnd
         ? globalThis.helpers.formatNumber(this.loop)
-        : globalThis.Localization.txt('actions>log>multiloop');
+        : Localization.txt('actions>log>multiloop');
     }
     if (key === 'loopEnd') return globalThis.helpers.formatNumber(this.loopEnd);
     return super.getReplacement(key);
@@ -333,7 +335,7 @@ class ActionStoryEntry extends UniqueLogEntry {
   }
 
   getText() {
-    return globalThis.Localization.txt('actions>log>action_story');
+    return Localization.txt('actions>log>action_story');
   }
 
   getReplacement(key) {
@@ -347,7 +349,7 @@ class ActionStoryEntry extends UniqueLogEntry {
         if (key === 'story') return storyInfo.text;
       } else {
         if (key === 'condition') return '???';
-        if (key === 'story') return globalThis.Localization.txt(`actions>log>action_story_not_found`);
+        if (key === 'story') return Localization.txt(`actions>log>action_story_not_found`);
       }
     }
 
@@ -380,11 +382,11 @@ class GlobalStoryEntry extends UniqueLogEntry {
   }
 
   getText() {
-    return globalThis.Localization.txt('actions>log>global_story');
+    return Localization.txt('actions>log>global_story');
   }
 
   getReplacement(key) {
-    if (key === 'story') return globalThis.Localization.txt(`time_controls>stories>story[num="${this.chapter}"]`);
+    if (key === 'story') return Localization.txt(`time_controls>stories>story[num="${this.chapter}"]`);
     return super.getReplacement(key);
   }
 }
@@ -432,7 +434,7 @@ class SoulstoneEntry extends RepeatableLogEntry {
   }
 
   getText() {
-    return globalThis.Localization.txt(
+    return Localization.txt(
       this.count === 1
         ? 'actions>log>soulstone'
         : Object.keys(this.stones).length === 1
@@ -447,7 +449,7 @@ class SoulstoneEntry extends RepeatableLogEntry {
     if (key === 'stat') return t(`stats.${Object.keys(this.stones)[0]}.short_form`);
     if (key === 'stats') {
       const strs = [];
-      const template = globalThis.Localization.txt(
+      const template = Localization.txt(
         Object.keys(this.stones).length > 3 ? 'actions>log>soulstone_stat_short' : 'actions>log>soulstone_stat',
       );
 
@@ -544,14 +546,14 @@ class SkillEntry extends LeveledLogEntry {
   }
 
   getText() {
-    return globalThis.Localization.txt(
+    return Localization.txt(
       this.toLevel === this.fromLevel + 1 ? 'actions>log>skill' : 'actions>log>skill_multi',
     );
   }
 
   getReplacement(key) {
     if (key === 'skill') {
-      return globalThis.Localization.txt(`skills>${globalThis.actionList.getXMLName(this.name)}>label`);
+      return Localization.txt(`skills>${globalThis.actionList.getXMLName(this.name)}>label`);
     }
     return super.getReplacement(key);
   }
@@ -598,19 +600,19 @@ class BuffEntry extends LeveledLogEntry {
     let tag = 'buff';
     if (this.fromLevel === 0) tag += '_from0';
     if (this.toLevel !== this.fromLevel + 1) tag += '_multi';
-    return globalThis.Localization.txt(`actions>log>${tag}`);
+    return Localization.txt(`actions>log>${tag}`);
   }
 
   /** @param {string} key */
   getReplacement(key) {
     if (key === 'buff') {
-      return globalThis.Localization.txt(
+      return Localization.txt(
         `buffs>${globalThis.actionList.getXMLName(globalThis.stats.Buff.fullNames[this.name])}>label`,
       );
     }
     if (key === 'buff_cost') {
       return this.statSpendType
-        ? globalThis.Localization.txt(
+        ? Localization.txt(
           `actions>log>buff_cost_${
             this.statSpendType === 'soulstone' && Object.keys(this.soulstoneEntry.stones).length === 1
               ? 'soulstone_single'
