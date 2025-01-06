@@ -748,7 +748,7 @@ class View {
     );
   }
   updateTotalTicks() {
-    document.getElementById('totalTicks').textContent = `${formatNumber(actions.completedTicks)} | ${
+    document.getElementById('totalTicks').textContent = `${formatNumber(globalThis.globals.actions.completedTicks)} | ${
       formatTime(globalThis.driver.timeCounter)
     }`;
     document.getElementById('effectiveTime').textContent = `${formatTime(globalThis.driver.effectiveTime)}`;
