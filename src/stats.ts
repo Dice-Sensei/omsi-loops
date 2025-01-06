@@ -698,4 +698,9 @@ const _stats = {
   restartStats,
   getTotalBonusXP,
 };
+
+declare global {
+  var stats: typeof _stats;
+}
+
 globalThis.stats = _stats;
