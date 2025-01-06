@@ -70,23 +70,23 @@ function handleMessage(data) {
       predictor.setOptions(data.options);
       break;
     case 'verifyDefaultIds':
-      if (!globalThis.Data.verifyDefaultIds(data.idRefs)) {
+      if (!Data.verifyDefaultIds(data.idRefs)) {
         postMessage({ type: 'error', message: 'default id verification failed' });
       }
       break;
     case 'importSnapshots': {
       if (data.resetToDefaults) {
-        globalThis.Data.resetToDefaults();
+        Data.resetToDefaults();
       }
       const { snapshotExports } = data;
       let loadCount = 0;
       try {
         for (const exportToLoad of snapshotExports) {
-          if (globalThis.Data.getSnapshotIndex({ id: exportToLoad.id }) >= 0) {
+          if (Data.getSnapshotIndex({ id: exportToLoad.id }) >= 0) {
             console.debug(`Already loaded snapshot ${exportToLoad.id}`);
             continue;
           }
-          globalThis.Data.importSnapshot(exportToLoad);
+          Data.importSnapshot(exportToLoad);
           loadCount++;
         }
       } catch (e) {
@@ -108,13 +108,13 @@ function handleMessage(data) {
     case 'startUpdate': {
       const { runData, snapshotHeritage } = data;
       const id = snapshotHeritage.at(-1);
-      if (globalThis.Data.getSnapshotIndex({ id }) >= 0) {
+      if (Data.getSnapshotIndex({ id }) >= 0) {
         // console.debug(`Loading snapshot ${id}`);
-        globalThis.Data.getSnapshot({ id }).applyState();
+        Data.getSnapshot({ id }).applyState();
         predictor.workerUpdate(runData);
         // console.debug("started update");
       } else {
-        const requiredSnapshots = snapshotHeritage.filter((id) => globalThis.Data.getSnapshotIndex({ id }) === -1);
+        const requiredSnapshots = snapshotHeritage.filter((id) => Data.getSnapshotIndex({ id }) === -1);
         // console.debug(`Requesting ${requiredSnapshots.length} snapshots for heritage of length ${snapshotHeritage.length}: ${requiredSnapshots.join(", ")}`, snapshotHeritage);
         queuedUpdate = data;
         postMessage({ type: 'getSnapshots', snapshotIds: requiredSnapshots });

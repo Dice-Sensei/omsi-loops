@@ -1,4 +1,4 @@
-'use strict';
+import { Data } from './data.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
@@ -238,7 +238,7 @@ function stopGame() {
   document.title = '*PAUSED* Idle Loops';
   document.getElementById('pausePlay').textContent = globalThis.Localization.txt('time_controls>play_button');
   if (globalThis.saving.needsDataSnapshots()) {
-    globalThis.Data.updateSnapshot('stop', 'base');
+    Data.updateSnapshot('stop', 'base');
   }
   if (globalThis.saving.vals.options.predictor) {
     globalThis.saving.view.requestUpdate('updateNextActions');
@@ -248,8 +248,8 @@ function stopGame() {
 function pauseGame(ping, message) {
   gameIsStopped = !gameIsStopped;
   if (globalThis.saving.needsDataSnapshots()) {
-    globalThis.Data.discardToSnapshot('base', 1);
-    globalThis.Data.recordSnapshot('pause');
+    Data.discardToSnapshot('base', 1);
+    Data.recordSnapshot('pause');
   }
   globalThis.saving.view.requestUpdate('updateTime', null);
   globalThis.saving.view.requestUpdate('updateCurrentActionBar', globalThis.globals.actions.currentPos);
@@ -344,7 +344,7 @@ function restart() {
   globalThis.saving.view.requestUpdate('updateCurrentActionsDivs');
   globalThis.saving.view.requestUpdate('updateTrials', null);
   if (globalThis.saving.needsDataSnapshots()) {
-    globalThis.Data.updateSnapshot('restart', 'base');
+    Data.updateSnapshot('restart', 'base');
   }
 }
 

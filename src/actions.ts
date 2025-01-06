@@ -1,6 +1,4 @@
-// @ts-check
-'use strict';
-
+import { Data } from './data.ts';
 /**
  * ActionLoopType is an enum that describes what the "loops" property means. Actions without
  * a loopsType property default to the classic behavior of "actions" for non-multipart actions
@@ -75,7 +73,7 @@ class Actions {
   currentAction;
 
   static {
-    globalThis.Data.omitProperties(this.prototype, ['next']);
+    Data.omitProperties(this.prototype, ['next']);
   }
 
   tick(availableMana) {

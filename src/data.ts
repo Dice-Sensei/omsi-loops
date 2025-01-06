@@ -132,7 +132,7 @@ export class Data {
   }
 
   static register(key, object) {
-    globalThis.Data.rootObjects[key] = object;
+    Data.rootObjects[key] = object;
     this.getObjectId(object);
     return object;
   }
@@ -203,7 +203,7 @@ export class Data {
       ? null
       : data.baseId === 0
       ? this.defaultSnapshot
-      : globalThis.Data.getSnapshot({ id: data.baseId });
+      : Data.getSnapshot({ id: data.baseId });
     if (data.type === 'delta' && !baseSnapshot) {
       throw new SnapshotMissingError(data.baseId);
     }
@@ -374,7 +374,6 @@ export class Data {
   }
 }
 
-/* global consts for typing */
 const DataSnapshot_NAME = Symbol('DataSnapshot_NAME');
 const DataSnapshot_OWNER = Symbol('DataSnapshot_OWNER');
 const DataSnapshot_DELETED = Symbol('DataSnapshot_DELETED');
@@ -523,9 +522,9 @@ class DataSnapshot {
     this.tag = Symbol(name);
     if (typeof id === 'number') {
       this.id = id;
-      globalThis.Data.setObjectId(this, id);
+      Data.setObjectId(this, id);
     } else {
-      this.id = globalThis.Data.getObjectId(this);
+      this.id = Data.getObjectId(this);
     }
   }
 
@@ -597,18 +596,18 @@ class DataSnapshot {
 
   exportIds() {
     const idRefs = {
-      [globalThis.Data.getObjectId(this)]: {
-        root: globalThis.Data.getObjectId(this.root),
+      [Data.getObjectId(this)]: {
+        root: Data.getObjectId(this.root),
       },
     };
     for (const [object, record] of this.objects) {
-      const id = globalThis.Data.getObjectId(object);
+      const id = Data.getObjectId(object);
 
       const refs = {};
       for (const prop of Object.getOwnPropertyNames(record)) {
         const value = record[prop];
         if (value && typeof value === 'object') {
-          refs[prop] = globalThis.Data.getObjectId(object);
+          refs[prop] = Data.getObjectId(object);
         }
       }
       idRefs[id] = refs;
@@ -617,17 +616,17 @@ class DataSnapshot {
   }
 
   verifyIds(idRefs) {
-    const rootId = idRefs[globalThis.Data.getObjectId(this)]?.root;
-    if (rootId !== globalThis.Data.getObjectId(this.root)) {
+    const rootId = idRefs[Data.getObjectId(this)]?.root;
+    if (rootId !== Data.getObjectId(this.root)) {
       console.error(
-        `Data out of sync! Our root id is ${globalThis.Data.getObjectId(this.root)}, imported id is ${rootId}`,
+        `Data out of sync! Our root id is ${Data.getObjectId(this.root)}, imported id is ${rootId}`,
         this,
         idRefs,
       );
       return false;
     }
     for (const [object, record] of this.objects) {
-      const id = globalThis.Data.getObjectId(object);
+      const id = Data.getObjectId(object);
       const refs = idRefs[id];
       if (!refs) {
         console.error(`Data out of sync! We have object ${id} but imported data does not`, this, idRefs);
@@ -636,10 +635,10 @@ class DataSnapshot {
       for (const prop of Object.getOwnPropertyNames(record)) {
         const value = record[prop];
         if (value && typeof value === 'object') {
-          if (refs[prop] !== globalThis.Data.getObjectId(object)) {
+          if (refs[prop] !== Data.getObjectId(object)) {
             console.error(
               `Data out of sync! our ${record[DataSnapshot_NAME]}.${prop} is id ${
-                globalThis.Data.getObjectId(object)
+                Data.getObjectId(object)
               }, imported id is ${refs[prop]}`,
               this,
               idRefs,
@@ -663,20 +662,20 @@ class DataSnapshot {
       name: this.name,
       id: this.id,
       baseId: this instanceof DeltaSnapshot ? this.deltaBase.id : null,
-      rootId: globalThis.Data.getObjectId(this.#root),
+      rootId: Data.getObjectId(this.#root),
       objects: {},
       idList: [],
     };
     const prototypes = {};
     for (const [object, record] of this.objects) {
-      const id = globalThis.Data.getObjectId(object);
+      const id = Data.getObjectId(object);
       const name = record[DataSnapshot_NAME];
       data.idList.push(id);
       const values = {};
 
       const refs = {};
       const deleted = [];
-      const prototypeId = globalThis.Data.getObjectId(Object.getPrototypeOf(object));
+      const prototypeId = Data.getObjectId(Object.getPrototypeOf(object));
       prototypes[prototypeId] = [name, object];
       for (const prop of Object.getOwnPropertyNames(record)) {
         const value = record[prop];
@@ -687,7 +686,7 @@ class DataSnapshot {
         } else if (!value || typeof value !== 'object') {
           values[prop] = value;
         } else {
-          refs[prop] = globalThis.Data.getObjectId(value);
+          refs[prop] = Data.getObjectId(value);
         }
       }
       data.objects[id] = {
@@ -707,7 +706,7 @@ class DataSnapshot {
     this.#root = root;
     const idMap = {
       __proto__: null,
-      ...globalThis.Data.wellKnownObjects,
+      ...Data.wellKnownObjects,
       [data.rootId]: root,
     };
     // idMap will get extended with the ids of our base's objects if this is a DeltaSnapshot
@@ -731,12 +730,12 @@ class DataSnapshot {
           throw new TypeError(`Could not find prototype with id ${exportRecord.prototypeId}`, idMap);
         }
 
-        if (exportRecord.prototypeId in globalThis.Data.wellKnownConstructors) {
-          object = globalThis.Data.wellKnownConstructors[exportRecord.prototypeId](exportRecord.values);
+        if (exportRecord.prototypeId in Data.wellKnownConstructors) {
+          object = Data.wellKnownConstructors[exportRecord.prototypeId](exportRecord.values);
         } else {
           object = { __proto__: prototype };
         }
-        globalThis.Data.setObjectId(object, id);
+        Data.setObjectId(object, id);
         idMap[id] = object;
       }
     }
@@ -815,7 +814,7 @@ class DataSnapshot {
 
   finalize() {
     for (const [object, record] of this.objects) {
-      this.idMap[globalThis.Data.getObjectId(object)] = object;
+      this.idMap[Data.getObjectId(object)] = object;
       this.sizeEstimate += this.estimateSize(record);
     }
     Object.freeze(this);
@@ -896,7 +895,7 @@ class DataSnapshot {
     yield [object, undefined];
 
     for (const [prop, value] of this.processRecord(object, recorder, getEntries)) {
-      yield* this.walkHierarchy(value, globalThis.Data.subkey(object, name, prop), getEntries, seen);
+      yield* this.walkHierarchy(value, Data.subkey(object, name, prop), getEntries, seen);
     }
 
     yield [object, recorder.finalize()];
@@ -1121,11 +1120,4 @@ class DeltaSnapshot extends DataSnapshot {
   get namedObjects() {
     return super.namedObjects;
   }
-}
-
-globalThis.Data = Data;
-const _data = Data;
-
-declare global {
-  var Data: typeof _data;
 }

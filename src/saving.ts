@@ -1,4 +1,5 @@
 import { Town } from './town.ts';
+import { Data } from './data.ts';
 
 import {
   compressToBase64 as lZStringCompressToBase64,
@@ -411,7 +412,7 @@ function clearSave() {
 let defaultsRecorded = false;
 function loadDefaults() {
   if (defaultsRecorded) {
-    globalThis.Data.resetToDefaults();
+    Data.resetToDefaults();
   }
   globalThis.stats.initializeStats();
   globalThis.stats.initializeSkills();
@@ -423,7 +424,7 @@ function loadDefaults() {
   globalThis.prestige.prestigeValues['prestigeTotalCompletions'] = 0;
   globalThis.prestige.prestigeValues['completedCurrentPrestige'] = false;
   globalThis.prestige.prestigeValues['completedAnyPrestige'] = false;
-  globalThis.Data.recordDefaults();
+  Data.recordDefaults();
   defaultsRecorded = true;
 }
 
@@ -863,7 +864,7 @@ function doLoad(toLoad) {
 
   globalThis.driver.adjustAll();
 
-  globalThis.Data.recordBase();
+  Data.recordBase();
 
   view.updateLoadoutNames();
   view.changeStatView();
