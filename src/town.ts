@@ -46,7 +46,7 @@ export class Town<TN extends number> {
   hiddenVars: Set<string> = new Set();
 
   unlocked() {
-    return globalThis.globals.townsUnlocked.includes(this.index);
+    return globalThis.saving.vals.townsUnlocked.includes(this.index);
   }
 
   expFromLevel(level) {

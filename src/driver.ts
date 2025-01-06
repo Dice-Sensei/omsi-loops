@@ -511,8 +511,8 @@ function clearList() {
 
 function unlockTown(townNum) {
   if (!globalThis.globals.towns[townNum].unlocked()) {
-    globalThis.globals.townsUnlocked.push(townNum);
-    globalThis.globals.townsUnlocked.sort();
+    globalThis.saving.vals.townsUnlocked.push(townNum);
+    globalThis.saving.vals.townsUnlocked.sort();
     // refresh current
     globalThis.saving.view.showTown(townNum);
     globalThis.saving.view.requestUpdate('updateTravelMenu', null);

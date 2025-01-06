@@ -1857,7 +1857,7 @@ Action.StartJourney = new Action('Start Journey', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.globals.townsUnlocked.includes(1);
+        return globalThis.saving.vals.townsUnlocked.includes(1);
     }
     return false;
   },
@@ -2926,7 +2926,7 @@ Action.ContinueOn = new Action('Continue On', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.globals.townsUnlocked.includes(2);
+        return globalThis.saving.vals.townsUnlocked.includes(2);
     }
     return false;
   },
@@ -3926,7 +3926,7 @@ Action.StartTrek = new Action('Start Trek', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.globals.townsUnlocked.includes(3);
+        return globalThis.saving.vals.townsUnlocked.includes(3);
     }
     return false;
   },
@@ -6408,7 +6408,7 @@ Action.JourneyForth = new Action('Journey Forth', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.globals.townsUnlocked.includes(6);
+        return globalThis.saving.vals.townsUnlocked.includes(6);
     }
   },
   stats: {
@@ -6803,7 +6803,7 @@ Action.Escape = new Action('Escape', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.globals.townsUnlocked.includes(7);
+        return globalThis.saving.vals.townsUnlocked.includes(7);
     }
   },
   stats: {
@@ -7786,7 +7786,7 @@ Action.LeaveCity = new Action('Leave City', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.globals.townsUnlocked.includes(8);
+        return globalThis.saving.vals.townsUnlocked.includes(8);
     }
   },
   stats: {

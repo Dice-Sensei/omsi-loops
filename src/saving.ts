@@ -582,12 +582,12 @@ function doLoad(toLoad) {
   }
 
   if (toLoad.maxTown) {
-    globalThis.globals.townsUnlocked = [0];
+    globalThis.saving.vals.townsUnlocked = [0];
     for (let i = 1; i <= toLoad.maxTown; i++) {
-      globalThis.globals.townsUnlocked.push(i);
+      globalThis.saving.vals.townsUnlocked.push(i);
     }
   } else {
-    globalThis.globals.townsUnlocked = toLoad.townsUnlocked === undefined ? [0] : toLoad.townsUnlocked;
+    globalThis.saving.vals.townsUnlocked = toLoad.townsUnlocked === undefined ? [0] : toLoad.townsUnlocked;
   }
   globalThis.saving.vals.completedActions = [];
   if (toLoad.completedActions && toLoad.completedActions.length > 0) {
@@ -883,7 +883,7 @@ function doSave() {
   toSave.curLoadout = globalThis.saving.vals.curLoadout;
   toSave.dungeons = globalThis.saving.vals.dungeons;
   toSave.trials = globalThis.saving.vals.trials;
-  toSave.townsUnlocked = globalThis.globals.townsUnlocked;
+  toSave.townsUnlocked = globalThis.saving.vals.townsUnlocked;
   toSave.completedActions = globalThis.saving.vals.completedActions;
 
   toSave.stats = globalThis.globals.stats;

@@ -1402,7 +1402,7 @@ class View {
       document.getElementById('townViewLeft').style.visibility = '';
     }
 
-    if (townNum === Math.max(...globalThis.globals.townsUnlocked)) {
+    if (townNum === Math.max(...globalThis.saving.vals.townsUnlocked)) {
       document.getElementById('townViewRight').style.visibility = 'hidden';
     } else {
       document.getElementById('townViewRight').style.visibility = '';
@@ -2128,14 +2128,14 @@ class View {
   updateTravelMenu() {
     let travelOptions = $('#TownSelect').children();
     for (let i = 0; i < travelOptions.length; i++) {
-      travelOptions[i].hidden = !globalThis.globals.townsUnlocked.includes(i);
+      travelOptions[i].hidden = !globalThis.saving.vals.townsUnlocked.includes(i);
     }
   }
 
   adjustDarkRitualText() {
     let DRdesc = document.getElementById('DRText');
     DRdesc.innerHTML = `Actions are:<br>`;
-    globalThis.globals.townsUnlocked.forEach((townNum) => {
+    globalThis.saving.vals.townsUnlocked.forEach((townNum) => {
       DRdesc.innerHTML += DarkRitualDescription[townNum];
     });
     if (globalThis.stats.getBuffLevel('Ritual') > 200) DRdesc.innerHTML += DarkRitualDescription[9];
