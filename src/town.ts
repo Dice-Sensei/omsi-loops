@@ -33,7 +33,7 @@
 /**
  * @template {number} TN Town number
  */
-class Town<TN extends number> {
+export class Town<TN extends number> {
   index: TN;
   allVarNames: string[] = [];
   varNames: string[] = [];
@@ -42,10 +42,6 @@ class Town<TN extends number> {
   progressScaling: Record<string, ProgressScalingType> = {};
   totalActionList: AnyAction[] = [];
   hiddenVars: Set<string> = new Set();
-
-  static {
-    globalThis.Data.omitProperties(this.prototype, ['hiddenVars']);
-  }
 
   unlocked() {
     return globalThis.saving.vals.townsUnlocked.includes(this.index);
@@ -110,7 +106,6 @@ class Town<TN extends number> {
     return Math.floor(curLevelProgress / nextLevelNeeds * 100 * 10) / 10;
   }
 
-  // finishes actions that have checkable aspects
   finishRegular(varName, rewardRatio, rewardFunc) {
     // error state, negative numbers.
     if (this[`total${varName}`] - this[`checked${varName}`] < 0) {
@@ -208,12 +203,3 @@ class Town<TN extends number> {
     }
   }
 }
-
-declare global {
-  interface Trash {
-    Town: typeof Town;
-  }
-}
-
-globalThis.trash ??= {};
-globalThis.trash.Town = Town;

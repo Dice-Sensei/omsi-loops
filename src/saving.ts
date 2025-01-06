@@ -1,3 +1,5 @@
+import { Town } from './town.ts';
+
 import {
   compressToBase64 as lZStringCompressToBase64,
   decompressFromBase64 as lZStringDecompressFromBase64,
@@ -284,7 +286,7 @@ function _town(townNum) {
 
 function initializeTowns() {
   for (let i = 0; i <= 8; i++) {
-    globalThis.globals.towns[i] = new globalThis.trash.Town(i);
+    globalThis.globals.towns[i] = new Town(i);
   }
 }
 

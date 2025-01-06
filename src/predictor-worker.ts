@@ -1,4 +1,4 @@
-import './data.ts';
+import { Data, SnapshotMissingError } from './data.ts';
 import './localization.ts';
 import './helpers.ts';
 import './actionList.ts';
@@ -90,7 +90,7 @@ function handleMessage(data) {
           loadCount++;
         }
       } catch (e) {
-        if (e instanceof globalThis.SnapshotMissingError) {
+        if (e instanceof SnapshotMissingError) {
           console.error(`missing snapshot ${e.id}?`, e);
           postMessage({ type: 'error', message: e.message });
         } else {

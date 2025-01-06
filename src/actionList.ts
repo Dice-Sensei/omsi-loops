@@ -1,3 +1,4 @@
+import { Data } from './data.ts';
 import {} from './stats.ts';
 
 class ClassNameNotFoundError extends TypeError {}
@@ -298,7 +299,7 @@ class Action extends Localizable1 {
 
   static {
     // listing these means they won't get stored even if memoized
-    globalThis.Data.omitProperties(this.prototype, ['tooltip', 'tooltip2', 'label', 'labelDone', 'labelGlobal']);
+    Data.omitProperties(this.prototype, ['tooltip', 'tooltip2', 'label', 'labelDone', 'labelGlobal']);
   }
 
   // all actions to date with info text have the same info text, so presently this is
@@ -407,7 +408,7 @@ class MultipartAction extends Action {
   }
 
   static {
-    globalThis.Data.omitProperties(this.prototype, ['segmentNames', 'altSegmentNames', 'segmentModifiers']);
+    Data.omitProperties(this.prototype, ['segmentNames', 'altSegmentNames', 'segmentModifiers']);
   }
 
   getSegmentName(segment) {

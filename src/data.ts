@@ -1,3 +1,5 @@
+import { Town } from './town.ts';
+
 /**
  * Many methods on the Data class take an "identifier" of a snapshot, which can be:
  * @typedef {string            // Matches the portion of the snapshot name up to the first colon
@@ -39,7 +41,7 @@
  * @typedef {StaticSnapshotExport | DeltaSnapshotExport} SnapshotExport
  */
 
-class SnapshotMissingError extends ReferenceError {
+export class SnapshotMissingError extends ReferenceError {
   id;
 
   constructor(id) {
@@ -47,7 +49,7 @@ class SnapshotMissingError extends ReferenceError {
     this.id = id;
   }
 }
-class Data {
+export class Data {
   static rootObjects = { __proto__: null };
 
   static snapshotStack = [];
@@ -65,7 +67,7 @@ class Data {
       __proto__: null,
       [-1]: Object.prototype,
       [-2]: Array.prototype,
-      [-3]: globalThis.trash.Town.prototype,
+      [-3]: Town.prototype,
       [-4]: globalThis.stats.Stat.prototype,
       [-5]: globalThis.stats.LevelExp.prototype,
       [-6]: globalThis.stats.Skill.prototype,
@@ -87,7 +89,7 @@ class Data {
     __proto__: null,
     [-1]: () => ({}),
     [-2]: () => [],
-    [-3]: (t) => new globalThis.trash.Town(t.index),
+    [-3]: (t) => new Town(t.index),
     [-4]: (s) => new globalThis.stats.Stat(s.name),
     [-5]: () => new globalThis.stats.LevelExp(),
     [-6]: (s) => new globalThis.stats.Skill(s.name),
@@ -1121,13 +1123,9 @@ class DeltaSnapshot extends DataSnapshot {
   }
 }
 
-globalThis.SnapshotMissingError = SnapshotMissingError;
 globalThis.Data = Data;
-
 const _data = Data;
-const _snapshotMissingError = SnapshotMissingError;
 
 declare global {
   var Data: typeof _data;
-  var SnapshotMissingError: typeof _snapshotMissingError;
 }
