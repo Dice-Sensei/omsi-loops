@@ -1,5 +1,5 @@
 import './data.ts';
-import './Localization.ts';
+import './localization.ts';
 import './helpers.ts';
 import './actionList.ts';
 import './driver.ts';
