@@ -2,8 +2,8 @@ import { Data } from './data.ts';
 import { KeyboardKey } from './keyboard.hotkeys.ts';
 import { Localization } from './Localization.ts';
 import { beep, clamp, copyArray, inputElement, Mana } from './helpers.ts';
-import { actionStory, getNumOnList, markActionsComplete } from './actions.ts';
-import { actions } from './actions.ts';
+import { actions, actionStory, getNumOnList, markActionsComplete } from './actions.ts';
+import { towns, resources, resourcesTemplate } from './globals.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
@@ -341,8 +341,8 @@ function restart() {
   globalThis.saving.vals.currentLoop = globalThis.saving.vals.totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
   resetResources();
   globalThis.stats.restartStats();
-  for (let i = 0; i < globalThis.globals.towns.length; i++) {
-    globalThis.globals.towns[i].restart();
+  for (let i = 0; i < towns.length; i++) {
+    towns[i].restart();
   }
   globalThis.saving.view.requestUpdate('updateSkills');
   actions.restart();
@@ -360,7 +360,7 @@ function manualRestart() {
 }
 
 function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
-  for (const action of globalThis.globals.towns[townNum].totalActionList) {
+  for (const action of towns[townNum].totalActionList) {
     if (action.name === name) {
       if (
         action.visible() && action.unlocked() &&
@@ -400,8 +400,8 @@ function addMana(amount) {
 }
 
 function addResource(resource, amount) {
-  if (Number.isFinite(amount)) globalThis.globals.resources[resource] += amount;
-  else globalThis.globals.resources[resource] = amount;
+  if (Number.isFinite(amount)) resources[resource] += amount;
+  else resources[resource] = amount;
   globalThis.saving.view.requestUpdate('updateResource', resource);
 
   if (resource === 'teamMembers' || resource === 'armor' || resource === 'zombie') {
@@ -410,12 +410,12 @@ function addResource(resource, amount) {
 }
 
 function resetResource(resource) {
-  globalThis.globals.resources[resource] = globalThis.globals.resourcesTemplate[resource];
+  resources[resource] = resourcesTemplate[resource];
   globalThis.saving.view.requestUpdate('updateResource', resource);
 }
 
 function resetResources() {
-  Object.assign(globalThis.globals.resources, globalThis.globals.resourcesTemplate);
+  Object.assign(resources, resourcesTemplate);
 
   if (globalThis.actionList.getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
     addResource('glasses', true);
@@ -511,7 +511,7 @@ function clearList() {
 }
 
 function unlockTown(townNum) {
-  if (!globalThis.globals.towns[townNum].unlocked()) {
+  if (!towns[townNum].unlocked()) {
     globalThis.saving.vals.townsUnlocked.push(townNum);
     globalThis.saving.vals.townsUnlocked.sort();
     // refresh current
@@ -572,7 +572,7 @@ function capAmount(index, townNum) {
   if (action.name.startsWith('Survey')) newLoops = 500 - alreadyExisting;
   if (action.name === 'Gather Team') {
     newLoops = 5 + Math.floor(globalThis.stats.getSkillLevel('Leadership') / 100) - alreadyExisting;
-  } else newLoops = globalThis.globals.towns[townNum][varName] - alreadyExisting;
+  } else newLoops = towns[townNum][varName] - alreadyExisting;
   actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();

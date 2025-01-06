@@ -1,3 +1,5 @@
+import { towns } from './globals.ts';
+
 enum ChallengeMode {
   ManaDrought = 1,
   NoodleArms = 2,
@@ -52,8 +54,8 @@ const setupManaBurn = () => {
     document.title = 'Idle Loops';
     globalThis.driver.resetResources();
     globalThis.stats.restartStats();
-    for (let i = 0; i < globalThis.globals.towns.length; i++) {
-      globalThis.globals.towns[i].restart();
+    for (let i = 0; i < towns.length; i++) {
+      towns[i].restart();
     }
     globalThis.saving.view.requestUpdate('updateSkills');
     globalThis.saving.actions.restart();

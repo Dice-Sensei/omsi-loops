@@ -1,4 +1,5 @@
 import { WelcomeMessage } from './modules/WelcomeMessage.tsx';
+import { actionLog } from './globals.ts';
 
 const Header = () => (
   <header id='timeInfo' style='width: 100%; text-align: center'>
@@ -427,7 +428,7 @@ const Towns = () => (
           id='actionLogLoadPrevious'
           class='small italic localized'
           data-locale='actions>log>load_previous'
-          onclick='globalThis.globals.actionLog.loadHistory(5)'
+          onClick={() => actionLog.loadHistory(5)}
         >
         </li>
         <li id='actionLogLatest' class='small italic localized' data-locale='actions>log>latest'></li>
