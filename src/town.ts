@@ -1,5 +1,6 @@
 import { inputElement } from './helpers.ts';
 import { towns } from './globals.ts';
+import { adjustAll, pauseGame } from './driver.ts';
 
 'use strict';
 /**
@@ -73,7 +74,7 @@ export class Town<TN extends number> {
     // return if capped, for performance
     if (this[`exp${varName}`] === 505000) {
       if (globalThis.saving.vals.options.pauseOnComplete) {
-        globalThis.driver.pauseGame(true, 'Progress complete! (Game paused)');
+        pauseGame(true, 'Progress complete! (Game paused)');
       } else return;
     }
 
@@ -86,7 +87,7 @@ export class Town<TN extends number> {
     const level = this.getLevel(varName);
     if (level !== prevLevel) {
       globalThis.saving.view.requestUpdate('updateLockedHidden', null);
-      globalThis.driver.adjustAll();
+      adjustAll();
       for (const action of globalThis.saving.vals.totalActionList) {
         if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
           globalThis.saving.view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });

@@ -1,5 +1,15 @@
 import { WelcomeMessage } from './modules/WelcomeMessage.tsx';
 import { actionLog } from './globals.ts';
+import {
+  capAllTraining,
+  changeActionAmount,
+  clearList,
+  loadList,
+  nameList,
+  saveList,
+  selectLoadout,
+  setCustomActionAmount,
+} from './driver.ts';
 
 const Header = () => (
   <header id='timeInfo' style='width: 100%; text-align: center'>
@@ -85,13 +95,13 @@ const Actions = () => {
             </div>
             <div id='nextActionsAmountButtons'>
               <div class='bold localized' data-locale='actions>tooltip>amount'></div>
-              <button class='button change-amount' onclick='globalThis.driver.changeActionAmount(1)'>1</button>
-              <button class='button change-amount' onclick='globalThis.driver.changeActionAmount(5)'>5</button>
-              <button class='button change-amount' onclick='globalThis.driver.changeActionAmount(10)'>10</button>
+              <button class='button change-amount' onClick={() => changeActionAmount(1)}>1</button>
+              <button class='button change-amount' onClick={() => changeActionAmount(5)}>5</button>
+              <button class='button change-amount' onClick={() => changeActionAmount(10)}>10</button>
               <input
                 id='amountCustom'
-                oninput='globalThis.driver.setCustomActionAmount()'
-                onblur='globalThis.driver.setCustomActionAmount()'
+                onInput={() => setCustomActionAmount()}
+                onBlur={() => setCustomActionAmount()}
                 value='1'
                 style='width: 75px; position: relative; left: 0; top: -2px; border: 1px solid var(--input-border); height: 16px'
               >
@@ -143,7 +153,7 @@ const Actions = () => {
               id='maxTraining'
               class='button localized'
               style='margin-right: 0px; display: none'
-              onclick='globalThis.driver.capAllTraining()'
+              onClick={() => capAllTraining()}
               data-locale='actions>tooltip>max_training'
             >
             </button>
@@ -151,7 +161,7 @@ const Actions = () => {
               id='clearList'
               class='button localized'
               style='margin-right: 0px'
-              onclick='globalThis.driver.clearList()'
+              onClick={() => clearList()}
               data-locale='actions>tooltip>clear_list'
             >
             </button>
@@ -161,7 +171,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load1'
-                  onclick='globalThis.driver.selectLoadout(1)'
+                  onClick={() => selectLoadout(1)}
                   style='width: 200px'
                 >
                   Loadout 1
@@ -170,7 +180,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load2'
-                  onclick='globalThis.driver.selectLoadout(2)'
+                  onClick={() => selectLoadout(2)}
                   style='width: 200px'
                 >
                   Loadout 2
@@ -179,7 +189,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load3'
-                  onclick='globalThis.driver.selectLoadout(3)'
+                  onClick={() => selectLoadout(3)}
                   style='width: 200px'
                 >
                   Loadout 3
@@ -188,7 +198,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load4'
-                  onclick='globalThis.driver.selectLoadout(4)'
+                  onClick={() => selectLoadout(4)}
                   style='width: 200px'
                 >
                   Loadout 4
@@ -197,7 +207,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load5'
-                  onclick='globalThis.driver.selectLoadout(5)'
+                  onClick={() => selectLoadout(5)}
                   style='width: 200px'
                 >
                   Loadout 5
@@ -206,7 +216,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load6'
-                  onclick='globalThis.driver.selectLoadout(6)'
+                  onClick={() => selectLoadout(6)}
                   style='width: 200px'
                 >
                   Loadout 6
@@ -215,7 +225,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load7'
-                  onclick='globalThis.driver.selectLoadout(7)'
+                  onClick={() => selectLoadout(7)}
                   style='width: 200px'
                 >
                   Loadout 7
@@ -224,7 +234,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load8'
-                  onclick='globalThis.driver.selectLoadout(8)'
+                  onClick={() => selectLoadout(8)}
                   style='width: 200px'
                 >
                   Loadout 8
@@ -233,7 +243,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load9'
-                  onclick='globalThis.driver.selectLoadout(9)'
+                  onClick={() => selectLoadout(9)}
                   style='width: 200px'
                 >
                   Loadout 9
@@ -242,7 +252,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load10'
-                  onclick='globalThis.driver.selectLoadout(10)'
+                  onClick={() => selectLoadout(10)}
                   style='width: 200px'
                 >
                   Loadout 10
@@ -251,7 +261,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load11'
-                  onclick='globalThis.driver.selectLoadout(11)'
+                  onClick={() => selectLoadout(11)}
                   style='width: 200px'
                 >
                   Loadout 11
@@ -260,7 +270,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load12'
-                  onclick='globalThis.driver.selectLoadout(12)'
+                  onClick={() => selectLoadout(12)}
                   style='width: 200px'
                 >
                   Loadout 12
@@ -269,7 +279,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load13'
-                  onclick='globalThis.driver.selectLoadout(13)'
+                  onClick={() => selectLoadout(13)}
                   style='width: 200px'
                 >
                   Loadout 13
@@ -278,7 +288,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load14'
-                  onclick='globalThis.driver.selectLoadout(14)'
+                  onClick={() => selectLoadout(14)}
                   style='width: 200px'
                 >
                   Loadout 14
@@ -287,7 +297,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton unused'
                   id='load15'
-                  onclick='globalThis.driver.selectLoadout(15)'
+                  onClick={() => selectLoadout(15)}
                   style='width: 200px'
                 >
                   Loadout 15
@@ -296,14 +306,14 @@ const Actions = () => {
                 <button
                   class='loadoutbutton localized'
                   style='margin-bottom: 5px; margin-top: 3px'
-                  onclick='globalThis.driver.saveList()'
+                  onClick={() => saveList()}
                   data-locale='actions>tooltip>save_loadout'
                 >
                 </button>
                 <button
                   class='loadoutbutton localized'
                   style='margin-bottom: 5px'
-                  onclick='globalThis.driver.loadList()'
+                  onClick={() => loadList()}
                   data-locale='actions>tooltip>load_loadout'
                 >
                 </button>
@@ -317,7 +327,7 @@ const Actions = () => {
                 <button
                   class='loadoutbutton'
                   style='margin-bottom: 5px; margin-top: 3px; margin-right: -4px'
-                  onclick='globalThis.driver.nameList(true)'
+                  onClick={() => nameList(true)}
                 >
                   Rename
                 </button>

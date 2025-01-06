@@ -3,14 +3,15 @@ import { KeyboardKey } from './keyboard.hotkeys.ts';
 import { Localization } from './Localization.ts';
 import { beep, clamp, copyArray, inputElement, Mana } from './helpers.ts';
 import { actions, actionStory, getNumOnList, markActionsComplete } from './actions.ts';
-import { towns, resources, resourcesTemplate } from './globals.ts';
+import { resources, resourcesTemplate, towns } from './globals.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
 let refund = false;
 let radarUpdateTime = 0;
 let lastSave = Date.now();
-function getSpeedMult(zone = globalThis.saving.vals.curTown) {
+
+export function getSpeedMult(zone = globalThis.saving.vals.curTown) {
   let speedMult = 1;
 
   // Dark Ritual
@@ -37,11 +38,11 @@ function getSpeedMult(zone = globalThis.saving.vals.curTown) {
   return speedMult;
 }
 
-function getActualGameSpeed() {
+export function getActualGameSpeed() {
   return globalThis.driver.gameSpeed * getSpeedMult() * bonusSpeed;
 }
 
-function refreshDungeons(manaSpent) {
+export function refreshDungeons(manaSpent) {
   for (const dungeon of globalThis.saving.vals.dungeons) {
     for (const level of dungeon) {
       const chance = level.ssChance;
@@ -50,7 +51,7 @@ function refreshDungeons(manaSpent) {
   }
 }
 
-function singleTick() {
+export function singleTick() {
   globalThis.saving.timer++;
   globalThis.driver.timeCounter += 1 / globalThis.driver.baseManaPerSecond;
   globalThis.driver.effectiveTime += 1 / globalThis.driver.baseManaPerSecond;
@@ -70,7 +71,7 @@ let lastAnimationTime = 0;
 let animationFrameRequest = 0;
 let animationTicksEnabled = true;
 
-function animationTick(animationTime) {
+export function animationTick(animationTime) {
   if (animationTime == lastAnimationTime || !animationTicksEnabled) {
     // double tick in the same frame, drop this one
     return;
@@ -82,7 +83,7 @@ function animationTick(animationTime) {
   }
 }
 
-function tick() {
+export function tick() {
   const newTime = Date.now();
   gameTicksLeft += newTime - curTime;
   if (inputElement('radarStats').checked) radarUpdateTime += newTime - curTime;
@@ -113,7 +114,7 @@ function tick() {
   executeGameTicks(deadline);
 }
 
-function executeGameTicks(deadline) {
+export function executeGameTicks(deadline) {
   // convert "gameTicksLeft" (actually milliseconds) into equivalent base-mana count, aka actual game ticks
   // including the gameSpeed multiplier here because it is effectively constant over the course of a single
   // update, and it affects how many actual game ticks pass in a given span of realtime.
@@ -221,7 +222,7 @@ function executeGameTicks(deadline) {
 }
 let windowFps = 50;
 let mainTickLoop;
-function recalcInterval(fps) {
+export function recalcInterval(fps) {
   windowFps = fps;
   if (mainTickLoop !== undefined) {
     clearInterval(mainTickLoop);
@@ -235,7 +236,7 @@ function recalcInterval(fps) {
 }
 
 let gameIsStopped = false;
-function stopGame() {
+export function stopGame() {
   gameIsStopped = true;
   globalThis.saving.view.requestUpdate('updateTime', null);
   globalThis.saving.view.requestUpdate('updateCurrentActionBar', actions.currentPos);
@@ -250,7 +251,7 @@ function stopGame() {
   }
 }
 
-function pauseGame(ping, message) {
+export function pauseGame(ping, message) {
   gameIsStopped = !gameIsStopped;
   if (globalThis.saving.needsDataSnapshots()) {
     Data.discardToSnapshot('base', 1);
@@ -281,7 +282,7 @@ function pauseGame(ping, message) {
   }
 }
 
-function loopEnd() {
+export function loopEnd() {
   if (globalThis.driver.effectiveTime > 0) {
     globalThis.saving.vals.totals.time += globalThis.driver.timeCounter;
     globalThis.saving.vals.totals.effectiveTime += globalThis.driver.effectiveTime;
@@ -304,7 +305,7 @@ function loopEnd() {
   }
 }
 
-function prepareRestart() {
+export function prepareRestart() {
   const curAction = actions.getNextValidAction();
   if (
     globalThis.saving.vals.options.pauseBeforeRestart ||
@@ -331,7 +332,7 @@ function prepareRestart() {
   }
 }
 
-function restart() {
+export function restart() {
   globalThis.saving.vals.shouldRestart = false;
   globalThis.saving.timer = 0;
   globalThis.driver.timeCounter = 0;
@@ -353,13 +354,13 @@ function restart() {
   }
 }
 
-function manualRestart() {
+export function manualRestart() {
   loopEnd();
   restart();
   globalThis.saving.view.update();
 }
 
-function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
+export function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
   for (const action of towns[townNum].totalActionList) {
     if (action.name === name) {
       if (
@@ -395,11 +396,11 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
 
 // mana and resources
 
-function addMana(amount) {
+export function addMana(amount) {
   globalThis.saving.timeNeeded += amount;
 }
 
-function addResource(resource, amount) {
+export function addResource(resource, amount) {
   if (Number.isFinite(amount)) resources[resource] += amount;
   else resources[resource] = amount;
   globalThis.saving.view.requestUpdate('updateResource', resource);
@@ -409,12 +410,12 @@ function addResource(resource, amount) {
   }
 }
 
-function resetResource(resource) {
+export function resetResource(resource) {
   resources[resource] = resourcesTemplate[resource];
   globalThis.saving.view.requestUpdate('updateResource', resource);
 }
 
-function resetResources() {
+export function resetResources() {
   Object.assign(resources, resourcesTemplate);
 
   if (globalThis.actionList.getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
@@ -423,7 +424,7 @@ function resetResources() {
   globalThis.saving.view.requestUpdate('updateResources', null);
 }
 
-function changeActionAmount(amount) {
+export function changeActionAmount(amount) {
   amount = Math.max(amount, 1);
   amount = Math.min(amount, 1e12);
   actions.addAmount = amount;
@@ -434,12 +435,12 @@ function changeActionAmount(amount) {
   globalThis.saving.view.updateAddAmount(amount);
 }
 
-function setCustomActionAmount() {
+export function setCustomActionAmount() {
   const value = parseInt(inputElement('amountCustom').value) || 1;
   changeActionAmount(value);
 }
 
-function selectLoadout(num) {
+export function selectLoadout(num) {
   if (globalThis.saving.vals.curLoadout === num) {
     globalThis.saving.vals.curLoadout = 0;
   } else {
@@ -449,14 +450,14 @@ function selectLoadout(num) {
   globalThis.saving.view.updateLoadout(globalThis.saving.vals.curLoadout);
 }
 
-function loadLoadout(num) {
+export function loadLoadout(num) {
   globalThis.saving.vals.curLoadout = num;
   globalThis.saving.view.updateLoadout(globalThis.saving.vals.curLoadout);
   loadList();
 }
 
 let globalCustomInput = '';
-function saveList() {
+export function saveList() {
   if (globalThis.saving.vals.curLoadout === 0) {
     globalThis.saving.save();
     return;
@@ -473,7 +474,7 @@ function saveList() {
   }, 1000);
 }
 
-function nameList(saveGame) {
+export function nameList(saveGame) {
   // if the loadout has already been saved under a non-numeric name
   // and the user tries to save under a numeric name, the loadout will
   // be saved under an old name
@@ -492,7 +493,7 @@ function nameList(saveGame) {
   if (saveGame) globalThis.saving.save();
 }
 
-function loadList() {
+export function loadList() {
   if (globalThis.saving.vals.curLoadout === 0) {
     return;
   }
@@ -504,13 +505,11 @@ function loadList() {
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.adjustDarkRitualText();
 }
-
-function clearList() {
+export function clearList() {
   actions.clearActions(KeyboardKey.shiftDown ? ((a) => (a.disabled || a.loops === 0)) : null);
   globalThis.saving.view.updateNextActions();
 }
-
-function unlockTown(townNum) {
+export function unlockTown(townNum) {
   if (!towns[townNum].unlocked()) {
     globalThis.saving.vals.townsUnlocked.push(townNum);
     globalThis.saving.vals.townsUnlocked.sort();
@@ -528,8 +527,7 @@ function unlockTown(townNum) {
   }
   globalThis.saving.vals.curTown = townNum;
 }
-
-function adjustAll() {
+export function adjustAll() {
   globalThis.actionList.adjustPots();
   globalThis.actionList.adjustLocks();
   globalThis.actionList.adjustSQuests();
@@ -551,8 +549,7 @@ function adjustAll() {
   globalThis.actionList.adjustTrainingExpMult();
   globalThis.saving.view.requestUpdate('adjustManaCost', 'Continue On');
 }
-
-function capAction(actionId) {
+export function capAction(actionId) {
   const action = actions.findActionWithId(actionId);
   if (!action) return;
   if (globalThis.actionList.hasLimit(action.name)) {
@@ -561,8 +558,7 @@ function capAction(actionId) {
     return capTraining(action.index);
   }
 }
-
-function capAmount(index, townNum) {
+export function capAmount(index, townNum) {
   const action = actions.next[index];
   const varName = `good${globalThis.actionList.getActionPrototype(action.name)?.varName}`;
   let alreadyExisting;
@@ -577,8 +573,7 @@ function capAmount(index, townNum) {
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
 }
-
-function capTraining(index) {
+export function capTraining(index) {
   const action = actions.next[index];
   const alreadyExisting = getNumOnList(action.name) + (action.disabled ? action.loops : 0);
   const newLoops = globalThis.saving.vals.trainingLimits - alreadyExisting;
@@ -586,8 +581,7 @@ function capTraining(index) {
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
 }
-
-function capAllTraining() {
+export function capAllTraining() {
   for (const [index, action] of actions.next.entries()) {
     // @ts-ignore
     if (globalThis.actionList.trainingActions.includes(action.name)) {
@@ -596,8 +590,7 @@ function capAllTraining() {
     }
   }
 }
-
-function addLoop(actionId) {
+export function addLoop(actionId) {
   const action = actions.findActionWithId(actionId);
   const theClass = globalThis.actionList.getActionPrototype(action.name);
   let addAmount = actions.addAmount;
@@ -614,7 +607,7 @@ function addLoop(actionId) {
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
 }
-function removeLoop(actionId) {
+export function removeLoop(actionId) {
   const action = actions.findActionWithId(actionId);
   actions.updateAction(action.index, {
     loops: clamp(action.loops - actions.addAmount, 0, 1e12),
@@ -622,45 +615,40 @@ function removeLoop(actionId) {
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.updateLockedHidden();
 }
-function split(actionId) {
+export function split(actionId) {
   const action = actions.findActionWithId(actionId);
   actions.splitAction(action.index);
   globalThis.saving.view.updateNextActions();
 }
-
-function collapse(actionId) {
+export function collapse(actionId) {
   const action = actions.findActionWithId(actionId);
   actions.updateAction(action.index, { collapsed: !action.collapsed });
   globalThis.saving.view.updateNextActions();
 }
-
-function showNotification(name) {
+export function showNotification(name) {
   document.getElementById(`${name}Notification`).style.display = 'block';
 }
-
-function hideNotification(name) {
+export function hideNotification(name) {
   globalThis.saving.vals.unreadActionStories = globalThis.saving.vals.unreadActionStories.filter((toRead) =>
     toRead !== name
   );
   document.getElementById(`${name}Notification`).style.display = 'none';
 }
-
-function hideActionIcons() {
+export function hideActionIcons() {
   document.getElementById('nextActionsList').className = 'disabled';
 }
-
-function showActionIcons() {
+export function showActionIcons() {
   document.getElementById('nextActionsList').className = '';
 }
 
-function handleDragStart(event) {
+export function handleDragStart(event) {
   const index = event.target.getAttribute('data-action-id');
   globalThis.view.draggedDecorate(index);
   event.dataTransfer.setData('text/html', index);
   hideActionIcons();
 }
 
-function handleDirectActionDragStart(event, actionName, townNum, actionVarName, isTravelAction) {
+export function handleDirectActionDragStart(event, actionName, townNum, actionVarName, isTravelAction) {
   // @ts-ignore
   document.getElementById(`container${actionVarName}`).children[2].style.display = 'none';
   const actionData = { _actionName: actionName, _townNum: townNum, _isTravelAction: isTravelAction };
@@ -669,17 +657,17 @@ function handleDirectActionDragStart(event, actionName, townNum, actionVarName, 
   hideActionIcons();
 }
 
-function handleDirectActionDragEnd(actionVarName) {
+export function handleDirectActionDragEnd(actionVarName) {
   // @ts-ignore
   document.getElementById(`container${actionVarName}`).children[2].style.display = '';
   showActionIcons();
 }
 
-function handleDragOver(event) {
+export function handleDragOver(event) {
   event.preventDefault();
 }
 
-function handleDragDrop(event) {
+export function handleDragDrop(event) {
   const idOfDroppedOverElement = event.target.getAttribute('data-action-id');
   const indexOfDroppedOverElement = actions.findIndexOfActionWithId(idOfDroppedOverElement);
   globalThis.view.dragExitUndecorate(idOfDroppedOverElement);
@@ -693,7 +681,7 @@ function handleDragDrop(event) {
   showActionIcons();
 }
 
-function moveQueuedAction(initialIndex, resultingIndex) {
+export function moveQueuedAction(initialIndex, resultingIndex) {
   if (
     initialIndex < 0 || initialIndex > actions.next.length || resultingIndex < 0 ||
     resultingIndex > actions.next.length - 1
@@ -706,7 +694,7 @@ function moveQueuedAction(initialIndex, resultingIndex) {
   globalThis.saving.view.updateNextActions();
 }
 
-function moveUp(actionId) {
+export function moveUp(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
   if (index <= 0) {
     return;
@@ -714,7 +702,7 @@ function moveUp(actionId) {
   actions.moveAction(index, index - 1);
   globalThis.saving.view.updateNextActions();
 }
-function moveDown(actionId) {
+export function moveDown(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
   if (index >= actions.next.length - 1) {
     return;
@@ -722,7 +710,7 @@ function moveDown(actionId) {
   actions.moveAction(index, index + 1);
   globalThis.saving.view.updateNextActions();
 }
-function disableAction(actionId) {
+export function disableAction(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
   const action = actions.next[index];
   const translated = globalThis.actionList.getActionPrototype(action.name);
@@ -736,21 +724,21 @@ function disableAction(actionId) {
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.requestUpdate('updateLockedHidden', null);
 }
-function removeAction(actionId) {
+export function removeAction(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
   actions.removeAction(index);
   globalThis.saving.view.updateNextActions();
   globalThis.saving.view.requestUpdate('updateLockedHidden', null);
 }
 
-function borrowTime() {
+export function borrowTime() {
   addOffline(86400_000);
   globalThis.saving.vals.totals.borrowedTime += 86400;
   globalThis.saving.view.requestUpdate('updateOffline', null);
   globalThis.saving.view.requestUpdate('updateTotals', null);
 }
 
-function returnTime() {
+export function returnTime() {
   if (globalThis.saving.vals.totalOfflineMs >= 86400_000) {
     addOffline(-86400_000);
     globalThis.saving.vals.totals.borrowedTime -= 86400;
@@ -761,7 +749,7 @@ function returnTime() {
 
 let lagStart = 0;
 let lagSpent = 0;
-function updateLag(manaSpent) {
+export function updateLag(manaSpent) {
   if (manaSpent === 0) { // cancel lag display
     if (globalThis.driver.lagSpeed !== 0) {
       globalThis.driver.lagSpeed = 0;
@@ -784,7 +772,7 @@ function updateLag(manaSpent) {
   globalThis.saving.view.requestUpdate('updateBonusText', null);
 }
 
-function addOffline(num) {
+export function addOffline(num) {
   if (num) {
     if (globalThis.saving.vals.totalOfflineMs + num < 0 && bonusSpeed > 1) {
       toggleOffline();
@@ -797,7 +785,7 @@ function addOffline(num) {
   }
 }
 
-function toggleOffline() {
+export function toggleOffline() {
   if (globalThis.saving.vals.totalOfflineMs === 0) return;
   if (!isBonusActive()) {
     bonusSpeed = 5;
@@ -819,11 +807,11 @@ function toggleOffline() {
 
 let bonusSpeed = 1;
 let bonusActive = false;
-function isBonusActive() {
+export function isBonusActive() {
   return bonusActive && bonusSpeed !== 1;
 }
 
-function checkExtraSpeed() {
+export function checkExtraSpeed() {
   globalThis.saving.view.requestUpdate('updateBonusText', null);
   if (
     typeof globalThis.saving.vals.options.speedIncreaseBackground === 'number' &&
