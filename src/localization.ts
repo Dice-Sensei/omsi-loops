@@ -74,4 +74,10 @@ namespace Localization {
   }
 }
 
-globalThis.Localization = Localization;
+const _localization = Localization;
+
+declare global {
+  var Localization: typeof _localization;
+}
+
+globalThis.Localization = _localization;

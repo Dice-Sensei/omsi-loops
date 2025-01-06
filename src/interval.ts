@@ -1,4 +1,4 @@
-import { Listeners } from './components/listeners.ts';
+import { Listeners } from './logic/listeners.ts';
 
 interface IntervalMessage {
   start: boolean;

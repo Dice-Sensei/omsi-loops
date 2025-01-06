@@ -1,4 +1,7 @@
 @import url('https://use.fontawesome.com/releases/v5.15.4/css/all.css');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @font-face {
   font-family: IdleLoopsIcons;
@@ -1914,8 +1917,10 @@ li#actionLogLatest {
 :root.responsive {
   height: 100%;
   overflow: clip;
+
   /* Default browser font size = 16px, 16px * 7/8 = 14px */
   font-size: 0.875rem;
+
   /* don't let anything bleed outside and cause overscrolling issues */
   contain: strict;
 }

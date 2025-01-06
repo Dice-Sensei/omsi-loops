@@ -1,5 +1,5 @@
-import { Keyboard } from './components/keyboard.ts';
-import { Listeners } from './components/listeners.ts';
+import { Keyboard } from './logic/keyboard.ts';
+import { Listeners } from './logic/listeners.ts';
 import { t } from './locales/translations.utils.ts';
 
 function setShiftKey(value: boolean): void {

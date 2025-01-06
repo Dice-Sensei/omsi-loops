@@ -815,22 +815,6 @@ export const translationsEn = {
       action_log: 'Log',
       stats: 'Stats',
     },
-    tutorial: {
-      meta: {
-        title: 'Tutorial:',
-      },
-      contents: [
-        'Click the Wander action and click Play to start.',
-        'Wander for a bit, then smash pots.',
-        'Watch the numbers change, read all the tooltips.',
-        'Complete the town, go to the next one.',
-        "Hey there, it looks like you're starting the game on a site other than stopsign.github.io.",
-        'Before you start, you should know that this is a fanmade modification',
-        'for the original game, located at https://stopsign.github.io/idleLoops/. You can import your save from the',
-        "original, but if you import it back to the original, you'll lose any progress in features specific to this version.",
-        'Thanks for playing, and have fun!',
-      ],
-    },
     tracked_resources: {
       reset_on_restart_txt: 'Resets when the loop restarts.',
       resources: {
@@ -1209,5 +1193,20 @@ export const translationsEn = {
   },
   tracked_resources: {
     reset_on_restart_txt: 'Resets when the loop restarts.',
+  },
+  modals: {
+    welcome: {
+      title: 'Introduction',
+      welcome: 'Welcome to Idle Loops!',
+      content: `
+      Idle Loops is a game where you can loop through time and explore the world. 
+      You can do this by clicking the Wander action and clicking Play.
+      Watch the numbers change, read all the tooltips, and complete towns to unlock new actions and zones.
+      Thank you for playing, and have fun!
+      `,
+      actions: {
+        begin: 'Begin!',
+      }
+    },
   },
 } as const;
