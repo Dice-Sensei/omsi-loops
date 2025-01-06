@@ -14,15 +14,15 @@ interface ModalTitleProps extends ParentProps {
 
 const ModalTitle = (props: ModalTitleProps) => (
   <span class='text-lg font-bold text-amber-700'>
-    <div class='flex justify-between items-center'>
+    <div class='flex justify-between items-center min-h-8'>
       {props.title}
-      <Show when={!props.onClose}>
+      <Show when={props.onClose}>
         <button
           onClick={props.onClose}
           class='
           hover:bg-neutral-300 focus:bg-neutral-300 
           text-neutral-500 hover:text-neutral-700 focus:text-neutral-700
-          w-8 h-8 rounded-full
+          aspect-square min-w-8 min-h-8 rounded-full
           transition-all duration-100
         '
         >
