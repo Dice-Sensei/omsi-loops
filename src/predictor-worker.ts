@@ -5,7 +5,7 @@ import './stats.ts';
 import './actions.ts';
 import './globals.ts';
 import './saving.ts';
-import './predictor.ts';
+import { Koviko } from './predictor.ts';
 
 /**
  * @typedef {{
@@ -47,7 +47,7 @@ console.log('starting predictor worker');
 
 globalThis.saving.loadDefaults();
 
-const predictor = globalThis.Koviko.initWorkerPredictor();
+const predictor = Koviko.initWorkerPredictor();
 
 let queuedUpdate: MessageToPredictor | undefined;
 

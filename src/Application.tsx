@@ -10,6 +10,7 @@ import {
   selectLoadout,
   setCustomActionAmount,
 } from './driver.ts';
+import { createKeyboardHotkeys } from './keyboard.hotkeys.ts';
 
 const Header = () => (
   <header id='timeInfo' style='width: 100%; text-align: center'>
@@ -1018,6 +1019,8 @@ const Stats = () => (
 );
 
 export const Application = () => {
+  createKeyboardHotkeys();
+
   return (
     <>
       <Header />

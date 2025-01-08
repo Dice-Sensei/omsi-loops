@@ -1,3 +1,4 @@
+// prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
 import $ from 'jquery';
 import { Data } from './data.ts';
 import { Localization } from './Localization.ts';
@@ -17,54 +18,8 @@ import {
 import { calcSoulstoneMult, getNumOnCurList, getNumOnList } from './actions.ts';
 import { buffs, skillList, skills, statList, stats, towns } from './globals.ts';
 import { getSpeedMult } from './driver.ts';
-// prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
 
-const Koviko = {
-  /**
-   * IdleLoops view
-   * @typedef {Object} Koviko__View
-   * @prop {function} updateNextActions Method responsible for updating the view
-   */
-
-  /**
-   * Represents an action in the action list
-   * @typedef {Object} Koviko__ListedAction
-   * @prop {string} name Name of the action
-   * @prop {number} loops Number of loops to perform
-   */
-
-  /**
-   * IdleLoops action
-   * @typedef {Object} Koviko__Action
-   * @prop {string} name Name of the action
-   * @prop {number} expMult Experience multiplier (typically 1)
-   * @prop {number} townNum The town to which the action belongs
-   * @prop {string} varName The unique identifier used for variables in the `towns` array
-   * @prop {number} [segments] Amount of segments per loop
-   * @prop {number} [dungeonNum] The dungeon to which the action belongs
-   * @prop {Object.<string, number>} stats Stats that affect and are affected by the action
-   * @prop {Array.<string>} [loopStats] Stats used in the respective segment per loop
-   * @prop {function} manaCost Mana cost to complete the action
-   */
-
-  /**
-   * IdleLoops town, which includes total progression for all actions
-   * @typedef {Object} Koviko__Town
-   */
-
-  /**
-   * IdleLoops dungeon floor
-   * @typedef {Object} Koviko__DungeonFloor
-   * @prop {number} ssChance Chance to get a soulstone
-   * @prop {number} completed Amount of times completed
-   */
-
-  /**
-   * IdleLoops skill
-   * @typedef {Object} Koviko__Skill
-   * @prop {number} exp Experience
-   */
-
+export const Koviko = {
   Prediction: class {
     /**
      * Loop attributes for a prediction
@@ -311,51 +266,39 @@ const Koviko = {
     }
   },
 
-  Cache:
-    /**
-     * @template {*} K type for keys
-     * @template {*} R type for reset data
-     * @template {*} T type for add data
-     */
-    class {
-      constructor() {
-        this.cache = [];
-        this.index = 0;
+  Cache: class {
+    constructor() {
+      this.cache = [];
+      this.index = 0;
+    }
+    next(key) {
+      if (this.cache.length > (this.index + 1) && this.equals(this.cache[this.index + 1].key, key)) {
+        return structuredClone(this.cache[++this.index].data);
+      } else {
+        this.miss();
+        return null;
       }
-      /**
-       * @param {K} key
-       * @returns {T|null}
-       */
-      next(key) {
-        if (this.cache.length > (this.index + 1) && this.equals(this.cache[this.index + 1].key, key)) {
-          return structuredClone(this.cache[++this.index].data);
-        } else {
-          this.miss();
-          return null;
-        }
-      }
-      // Use current = true to invalidate the entry after reading it, current = false to invalidate the next entry
-      miss(current = false) {
-        this.cache = this.cache.slice(0, this.index + (current ? 0 : 1));
-      }
+    }
+    miss(current = false) {
+      this.cache = this.cache.slice(0, this.index + (current ? 0 : 1));
+    }
 
-      reset(data) {
-        this.index = 0;
-        if (!this.equals(data, this.cache[0]?.data)) {
-          this.cache = [{ key: '', data: structuredClone(data) }];
-          return false;
-        }
-        return true;
+    reset(data) {
+      this.index = 0;
+      if (!this.equals(data, this.cache[0]?.data)) {
+        this.cache = [{ key: '', data: structuredClone(data) }];
+        return false;
       }
+      return true;
+    }
 
-      add(key, data) {
-        this.cache.push({ 'key': key, 'data': structuredClone(data) });
-      }
-      // Why is this something i have to write
-      equals(thing1, thing2) {
-        return JSON.stringify(thing1) === JSON.stringify(thing2);
-      }
-    },
+    add(key, data) {
+      this.cache.push({ 'key': key, 'data': structuredClone(data) });
+    }
+    equals(thing1, thing2) {
+      return JSON.stringify(thing1) === JSON.stringify(thing2);
+    }
+  },
 
   Predictor: class {
     /**
@@ -3029,11 +2972,3 @@ const Koviko = {
     this.instance.update(nextActions, container);
   },
 };
-globalThis.Koviko = Koviko;
-
-/**
- * @template {*} K
- * @template {*} R
- * @template {*} T
- * @typedef {InstanceType<typeof Koviko.Cache<K,R,T>>} PredictorCache
- */

@@ -50,6 +50,7 @@ import {
   split,
   driverVals,
 } from '../driver.ts';
+import { Koviko } from '../predictor.ts';
 
 const DarkRitualDescription = [
   `10% faster in Beginnersville per ritual from 1-20<br>`,
@@ -867,7 +868,7 @@ class View {
   updateNextActions() {
     const { scrollTop } = nextActionsDiv; // save the current scroll position
     if (globalThis.saving.vals.options.predictor) {
-      globalThis.Koviko.preUpdateHandler(nextActionsDiv);
+      Koviko.preUpdateHandler(nextActionsDiv);
     }
 
     d3.select(nextActionsDiv)

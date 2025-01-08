@@ -7,8 +7,6 @@ import './views/main.view.ts';
 import './globals.ts';
 import './saving.ts';
 import './challenges.ts';
-import './keyboard.hotkeys.ts';
-import './predictor.ts';
 
 import { renderViews } from './views/register-all.ts';
 

@@ -37,6 +37,7 @@ import {
   decompressFromBase64 as lZStringDecompressFromBase64,
 } from 'lz-string';
 import { loadChallenge } from './challenges.ts';
+import { Koviko } from './predictor.ts';
 
 const defaultSaveName = 'idleLoops1';
 const challengeSaveName = 'idleLoopsChallenge';
@@ -273,7 +274,7 @@ const optionValueHandlers = {
   },
   predictorBackgroundThread(value, init) {
     if (!value && !init) {
-      globalThis.Koviko.instance.terminateWorker();
+      Koviko.instance.terminateWorker();
     }
   },
 };
