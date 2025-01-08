@@ -4,7 +4,6 @@ import './driver.ts';
 import './stats.ts';
 import './actions.ts';
 import './views/main.view.ts';
-import './prestige.ts';
 import './globals.ts';
 import './saving.ts';
 import './challenges.ts';

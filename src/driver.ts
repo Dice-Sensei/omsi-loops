@@ -4,6 +4,7 @@ import { Localization } from './Localization.ts';
 import { beep, clamp, copyArray, inputElement, Mana } from './helpers.ts';
 import { actions, actionStory, getNumOnList, markActionsComplete } from './actions.ts';
 import { resources, resourcesTemplate, towns } from './globals.ts';
+import { prestigeBonus, prestigeValues } from './prestige.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
@@ -33,7 +34,7 @@ export function getSpeedMult(zone = globalThis.saving.vals.curTown) {
   speedMult *= 1 + 0.5 * globalThis.stats.getBuffLevel('Imbuement3');
 
   // Prestige Chronomancy
-  speedMult *= globalThis.prestige.prestigeBonus('PrestigeChronomancy');
+  speedMult *= prestigeBonus('PrestigeChronomancy');
 
   return speedMult;
 }
@@ -418,7 +419,7 @@ export function resetResource(resource) {
 export function resetResources() {
   Object.assign(resources, resourcesTemplate);
 
-  if (globalThis.actionList.getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']) {
+  if (globalThis.actionList.getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige']) {
     addResource('glasses', true);
   }
   globalThis.saving.view.requestUpdate('updateResources', null);

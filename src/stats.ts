@@ -1,5 +1,6 @@
 import { Localizable } from './localizable.ts';
 import { actionLog, buffHardCaps, buffList, buffs, resources, skillList, skills, statList, stats } from './globals.ts';
+import { prestigeBonus } from './prestige.ts';
 
 export class LevelExp {
   level = 0;
@@ -191,7 +192,7 @@ export class Stat extends Localizable {
       this.#tbxSoulstone = this.soulstone;
       this.#tbxTalent = this.talentLevelExp.level;
       this.#tbxPrestige = prestigeLevel;
-      this.#totalBonusXP = this.soulstoneMult * this.talentMult * globalThis.prestige.prestigeBonus(this.prestigeBuff);
+      this.#totalBonusXP = this.soulstoneMult * this.talentMult * prestigeBonus(this.prestigeBuff);
     }
     return this.#totalBonusXP;
   }
@@ -492,7 +493,7 @@ function getSelfCombat() {
   return ((getSkillLevel('Combat') + getSkillLevel('Pyromancy') * 5) *
     getArmorLevel() *
     (1 + getBuffLevel('Feast') * .05)) *
-    globalThis.prestige.prestigeBonus('PrestigeCombat');
+    prestigeBonus('PrestigeCombat');
 }
 
 function getZombieStrength() {
@@ -500,7 +501,7 @@ function getZombieStrength() {
     resources.zombie / 2 *
     Math.max(getBuffLevel('Ritual') / 100, 1) *
     (1 + getBuffLevel('Feast') * .05) *
-    globalThis.prestige.prestigeBonus('PrestigeCombat');
+    prestigeBonus('PrestigeCombat');
 }
 
 function getTeamStrength() {
@@ -508,7 +509,7 @@ function getTeamStrength() {
     (resources.teamMembers / 2) *
     globalThis.actionList.getAdvGuildRank().bonus * getSkillBonus('Leadership') *
     (1 + getBuffLevel('Feast') * .05)) *
-    globalThis.prestige.prestigeBonus('PrestigeCombat');
+    prestigeBonus('PrestigeCombat');
 }
 
 function getTeamCombat() {

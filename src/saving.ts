@@ -1,6 +1,7 @@
 import { Town } from './town.ts';
 import { Data } from './data.ts';
 import { copyArray, inputElement, removeClassFromDiv, textAreaElement, valueElement } from './helpers.ts';
+import { prestigeValues } from './prestige.ts';
 import {
   actionLog,
   buffCaps,
@@ -449,11 +450,11 @@ function loadDefaults() {
   globalThis.stats.initializeBuffs();
   initializeActions();
   initializeTowns();
-  globalThis.prestige.prestigeValues['prestigeCurrentPoints'] = 0;
-  globalThis.prestige.prestigeValues['prestigeTotalPoints'] = 0;
-  globalThis.prestige.prestigeValues['prestigeTotalCompletions'] = 0;
-  globalThis.prestige.prestigeValues['completedCurrentPrestige'] = false;
-  globalThis.prestige.prestigeValues['completedAnyPrestige'] = false;
+  prestigeValues['prestigeCurrentPoints'] = 0;
+  prestigeValues['prestigeTotalPoints'] = 0;
+  prestigeValues['prestigeTotalCompletions'] = 0;
+  prestigeValues['completedCurrentPrestige'] = false;
+  prestigeValues['completedAnyPrestige'] = false;
   Data.recordDefaults();
   defaultsRecorded = true;
 }
@@ -549,19 +550,19 @@ function doLoad(toLoad) {
   }
 
   if (toLoad.prestigeValues !== undefined) {
-    globalThis.prestige.prestigeValues['prestigeCurrentPoints'] =
+    prestigeValues['prestigeCurrentPoints'] =
       toLoad.prestigeValues['prestigeCurrentPoints'] === undefined ? 0 : toLoad.prestigeValues['prestigeCurrentPoints'];
-    globalThis.prestige.prestigeValues['prestigeTotalPoints'] =
+    prestigeValues['prestigeTotalPoints'] =
       toLoad.prestigeValues['prestigeTotalPoints'] === undefined ? 0 : toLoad.prestigeValues['prestigeTotalPoints'];
-    globalThis.prestige.prestigeValues['prestigeTotalCompletions'] =
+    prestigeValues['prestigeTotalCompletions'] =
       toLoad.prestigeValues['prestigeTotalCompletions'] === undefined
         ? 0
         : toLoad.prestigeValues['prestigeTotalCompletions'];
-    globalThis.prestige.prestigeValues['completedCurrentPrestige'] =
+    prestigeValues['completedCurrentPrestige'] =
       toLoad.prestigeValues['completedCurrentPrestige'] === undefined
         ? 0
         : toLoad.prestigeValues['completedCurrentPrestige'];
-    globalThis.prestige.prestigeValues['completedAnyPrestige'] =
+    prestigeValues['completedAnyPrestige'] =
       toLoad.prestigeValues['completedAnyPrestige'] === undefined
         ? false
         : toLoad.prestigeValues['completedAnyPrestige'];
@@ -916,7 +917,7 @@ function doSave() {
   toSave.totalTalent = globalThis.saving.vals.totalTalent;
   toSave.skills = skills;
   toSave.buffs = buffs;
-  toSave.prestigeValues = globalThis.prestige.prestigeValues;
+  toSave.prestigeValues = prestigeValues;
   toSave.goldInvested = globalThis.saving.vals.goldInvested;
   toSave.stonesUsed = globalThis.saving.vals.stonesUsed;
   toSave.version75 = true;

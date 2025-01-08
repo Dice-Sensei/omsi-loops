@@ -2,6 +2,7 @@ import $ from 'jquery';
 import { Localization } from '../Localization.ts';
 import { camelize, htmlElement } from '../helpers.ts';
 import { buffHardCaps, buffList } from '../globals.ts';
+import { prestigeUpgrade, resetAllPrestiges } from '../prestige.ts';
 import { borrowTime, manualRestart, pauseGame, returnTime, toggleOffline } from '../driver.ts';
 
 const getDisabledMenus = () => {
@@ -55,6 +56,15 @@ const buffsContainer = {
     return html;
   },
 };
+
+const prestigeUpgradePhysicalId = 'prestigeUpgradePhysical';
+const prestigeUpgradeMentalId = 'prestigeUpgradeMental';
+const prestigeUpgradeCombatId = 'prestigeUpgradeCombat';
+const prestigeUpgradeSpatiomancyId = 'prestigeUpgradeSpatiomancy';
+const prestigeUpgradeChronomancyId = 'prestigeUpgradeChronomancy';
+const prestigeUpgradeBarteringId = 'prestigeUpgradeBartering';
+const prestigeUpgradeExpOverflowId = 'prestigeUpgradeExpOverflow';
+const prestigeResetAllId = 'prestigeResetAll';
 
 const menu = {
   selector: '#menu',
@@ -435,9 +445,10 @@ const menu = {
         <br>
 
         `;
+
     html += `
         <br>
-        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigePhysical")'>Prestige Physical
+        <button class='button showthat control' style='margin-top: -50px;' id='${prestigeUpgradePhysicalId}'>Prestige Physical
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       Localization.txt('menu>prestige_bonus>PrestigePhysical')
     }
@@ -447,7 +458,7 @@ const menu = {
             </div>
         </button><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeMental")'>Prestige Mental
+        <button class='button showthat control' style='margin-top: -50px;' id='${prestigeUpgradeMentalId}'>Prestige Mental
         <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       Localization.txt('menu>prestige_bonus>PrestigeMental')
     }
@@ -457,8 +468,7 @@ const menu = {
         </div>
         </button><br>
 
-
-        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeCombat")'>Prestige Combat
+        <button class='button showthat control' style='margin-top: -50px;' id='${prestigeUpgradeCombatId}'>Prestige Combat
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       Localization.txt('menu>prestige_bonus>PrestigeCombat')
     }
@@ -468,7 +478,7 @@ const menu = {
             </div>
         </button><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeSpatiomancy")'>Prestige Spatiomancy
+        <button class='button showthat control' style='margin-top: -50px;' id='${prestigeUpgradeSpatiomancyId}'>Prestige Spatiomancy
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       Localization.txt('menu>prestige_bonus>PrestigeSpatiomancy')
     }
@@ -478,7 +488,7 @@ const menu = {
             </div>
         </button><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeChronomancy")'>Prestige Chronomancy
+        <button class='button showthat control' style='margin-top: -50px;' id='${prestigeUpgradeChronomancyId}'>Prestige Chronomancy
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       Localization.txt('menu>prestige_bonus>PrestigeChronomancy')
     }
@@ -488,7 +498,7 @@ const menu = {
             </div>
         </button><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeBartering")'>Prestige Bartering
+        <button class='button showthat control' style='margin-top: -50px;' id='${prestigeUpgradeBarteringId}'>Prestige Bartering
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       Localization.txt('menu>prestige_bonus>PrestigeBartering')
     }
@@ -498,7 +508,7 @@ const menu = {
             </div>
         </button><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.prestigeUpgrade("PrestigeExpOverflow")'>Prestige Experience Overflow
+        <button class='button showthat control' style='margin-top: -50px;' id='${prestigeUpgradeExpOverflowId}'>Prestige Experience Overflow
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       Localization.txt('menu>prestige_bonus>PrestigeExpOverflow')
     }
@@ -510,7 +520,7 @@ const menu = {
 
         <br><br>
 
-        <button class='button showthat control' style='margin-top: -50px;' onclick='globalThis.prestige.resetAllPrestiges()'>Reset All Prestiges
+        <button class='button showthat control' style='margin-top: -50px;' id='${prestigeResetAllId}'>Reset All Prestiges
             <div class='showthis' style='color:var(--default-color);width:230px;margin-left:200px;'>${
       Localization.txt('menu>prestige_bonus>PrestigeResetAll')
     }
@@ -667,6 +677,24 @@ export const renderViews = () => {
 
       const offlineButton = document.getElementById(offlineButtonId)!;
       offlineButton.onclick = () => toggleOffline();
+
+      const prestigeUpgradePhysical = document.getElementById(prestigeUpgradePhysicalId)!;
+      const prestigeUpgradeMental = document.getElementById(prestigeUpgradeMentalId)!;
+      const prestigeUpgradeCombat = document.getElementById(prestigeUpgradeCombatId)!;
+      const prestigeUpgradeSpatiomancy = document.getElementById(prestigeUpgradeSpatiomancyId)!;
+      const prestigeUpgradeChronomancy = document.getElementById(prestigeUpgradeChronomancyId)!;
+      const prestigeUpgradeBartering = document.getElementById(prestigeUpgradeBarteringId)!;
+      const prestigeUpgradeExpOverflow = document.getElementById(prestigeUpgradeExpOverflowId)!;
+      const prestigeResetAll = document.getElementById(prestigeResetAllId)!;
+
+      prestigeUpgradePhysical.onclick = () => prestigeUpgrade('PrestigePhysical');
+      prestigeUpgradeMental.onclick = () => prestigeUpgrade('PrestigeMental');
+      prestigeUpgradeCombat.onclick = () => prestigeUpgrade('PrestigeCombat');
+      prestigeUpgradeSpatiomancy.onclick = () => prestigeUpgrade('PrestigeSpatiomancy');
+      prestigeUpgradeChronomancy.onclick = () => prestigeUpgrade('PrestigeChronomancy');
+      prestigeUpgradeBartering.onclick = () => prestigeUpgrade('PrestigeBartering');
+      prestigeUpgradeExpOverflow.onclick = () => prestigeUpgrade('PrestigeExpOverflow');
+      prestigeResetAll.onclick = () => resetAllPrestiges();
     });
   }
 };

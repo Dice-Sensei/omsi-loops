@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import { StatGraph } from '../stats-graph.ts';
 import { Localization } from '../Localization.ts';
 import { KeyboardKey } from '../keyboard.hotkeys.ts';
+import { getPrestigeCost, getPrestigeCurrentBonus, prestigeValues } from '../prestige.ts';
 import {
   addClassToDiv,
   camelize,
@@ -1356,7 +1357,7 @@ class View {
       globalThis.saving.vals.totalActionList.filter((action) => action.finish.toString().includes('updateBuff')).filter(
           (action) => action.unlocked(),
         ).length > 0 ||
-      globalThis.prestige.prestigeValues['completedAnyPrestige']
+      prestigeValues['completedAnyPrestige']
     ) {
       document.getElementById('buffList').style.display = '';
     } else {
@@ -2205,61 +2206,61 @@ class View {
 
   updatePrestigeValues() {
     document.getElementById('currentPrestigePoints').textContent = `${
-      formatNumber(globalThis.prestige.prestigeValues['prestigeCurrentPoints'])
+      formatNumber(prestigeValues['prestigeCurrentPoints'])
     }`;
     document.getElementById('currentPrestigesCompleted').textContent = `${
-      formatNumber(globalThis.prestige.prestigeValues['prestigeTotalCompletions'])
+      formatNumber(prestigeValues['prestigeTotalCompletions'])
     }`;
     document.getElementById('maxTotalImbueSoulLevels').textContent = `${
-      formatNumber(Math.min(globalThis.prestige.prestigeValues['prestigeTotalCompletions'], 7))
+      formatNumber(Math.min(prestigeValues['prestigeTotalCompletions'], 7))
     }`;
 
     document.getElementById('totalPrestigePoints').textContent = `${
-      formatNumber(globalThis.prestige.prestigeValues['prestigeTotalPoints'])
+      formatNumber(prestigeValues['prestigeTotalPoints'])
     }`;
 
     document.getElementById('prestigePhysicalCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigePhysical'))
+      formatNumber(getPrestigeCurrentBonus('PrestigePhysical'))
     }`;
     document.getElementById('prestigeMentalCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeMental'))
+      formatNumber(getPrestigeCurrentBonus('PrestigeMental'))
     }`;
     document.getElementById('prestigeCombatCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeCombat'))
+      formatNumber(getPrestigeCurrentBonus('PrestigeCombat'))
     }`;
     document.getElementById('prestigeSpatiomancyCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeSpatiomancy'))
+      formatNumber(getPrestigeCurrentBonus('PrestigeSpatiomancy'))
     }`;
     document.getElementById('prestigeChronomancyCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeChronomancy'))
+      formatNumber(getPrestigeCurrentBonus('PrestigeChronomancy'))
     }`;
     document.getElementById('prestigeBarteringCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeBartering'))
+      formatNumber(getPrestigeCurrentBonus('PrestigeBartering'))
     }`;
     document.getElementById('prestigeExpOverflowCurrentBonus').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCurrentBonus('PrestigeExpOverflow') * 10)
+      formatNumber(getPrestigeCurrentBonus('PrestigeExpOverflow') * 10)
     }`;
 
     document.getElementById('prestigePhysicalNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigePhysical'))
+      formatNumber(getPrestigeCost('PrestigePhysical'))
     }`;
     document.getElementById('prestigeMentalNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeMental'))
+      formatNumber(getPrestigeCost('PrestigeMental'))
     }`;
     document.getElementById('prestigeCombatNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeCombat'))
+      formatNumber(getPrestigeCost('PrestigeCombat'))
     }`;
     document.getElementById('prestigeSpatiomancyNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeSpatiomancy'))
+      formatNumber(getPrestigeCost('PrestigeSpatiomancy'))
     }`;
     document.getElementById('prestigeChronomancyNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeChronomancy'))
+      formatNumber(getPrestigeCost('PrestigeChronomancy'))
     }`;
     document.getElementById('prestigeBarteringNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeBartering'))
+      formatNumber(getPrestigeCost('PrestigeBartering'))
     }`;
     document.getElementById('prestigeExpOverflowNextCost').textContent = `${
-      formatNumber(globalThis.prestige.getPrestigeCost('PrestigeExpOverflow'))
+      formatNumber(getPrestigeCost('PrestigeExpOverflow'))
     }`;
   }
 }

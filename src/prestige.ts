@@ -1,9 +1,9 @@
 import { towns } from './globals.ts';
 import { clearList, pauseGame, restart } from './driver.ts';
 
-const prestigeValues: Record<string, number> = {};
+export const prestigeValues: Record<string, number> = {};
 
-function completedCurrentGame() {
+export function completedCurrentGame() {
   console.log('completed current prestige');
 
   if (!prestigeValues['completedCurrentPrestige']) {
@@ -17,7 +17,7 @@ function completedCurrentGame() {
   }
 }
 
-function prestigeUpgrade(prestigeSelected: PrestigeBuffName) {
+export function prestigeUpgrade(prestigeSelected: PrestigeBuffName) {
   // Update prestige value
   const costOfPrestige = getPrestigeCost(prestigeSelected);
   if (costOfPrestige > prestigeValues['prestigeCurrentPoints']) {
@@ -57,7 +57,7 @@ function prestigeUpgrade(prestigeSelected: PrestigeBuffName) {
   prestigeWithNewValues(nextPrestigeValues, nextPrestigeBuffs);
 }
 
-function resetAllPrestiges() {
+export function resetAllPrestiges() {
   // Retain certain values between prestiges
   const nextPrestigeBuffs = {
     PrestigePhysical: 0,
@@ -83,7 +83,7 @@ function resetAllPrestiges() {
   prestigeWithNewValues(nextPrestigeValues, nextPrestigeBuffs);
 }
 
-function prestigeWithNewValues(
+export function prestigeWithNewValues(
   nextPrestigeValues: typeof prestigeValues,
   nextPrestigeBuffs: { [K in PrestigeBuffName | 'Imbuement3']: number },
 ) {
@@ -114,7 +114,7 @@ function prestigeWithNewValues(
   globalThis.saving.save();
 }
 
-function prestigeConfirmation() {
+export function prestigeConfirmation() {
   globalThis.saving.save();
   if (
     globalThis.localStorage[globalThis.saving.defaultSaveName] &&
@@ -134,7 +134,7 @@ function prestigeConfirmation() {
   return true;
 }
 
-function getPrestigeCost(prestigeSelected: PrestigeBuffName) {
+export function getPrestigeCost(prestigeSelected: PrestigeBuffName) {
   var currentCost = 30;
 
   for (var i = 0; i < globalThis.stats.getBuffLevel(prestigeSelected); i++) {
@@ -144,14 +144,14 @@ function getPrestigeCost(prestigeSelected: PrestigeBuffName) {
   return currentCost;
 }
 
-function getPrestigeCurrentBonus(prestigeSelected: PrestigeBuffName) {
+export function getPrestigeCurrentBonus(prestigeSelected: PrestigeBuffName) {
   return prestigeBonus(prestigeSelected) > 1
     // *100 - 100 is to get percent values, otherwise 1.02 will just round to 1, rather than 2%.
     ? prestigeBonus(prestigeSelected) * 100 - 100
     : 0;
 }
 
-type PrestigeBuffName =
+export type PrestigeBuffName =
   | 'PrestigeBartering'
   | 'PrestigeChronomancy'
   | 'PrestigeCombat'
@@ -159,9 +159,9 @@ type PrestigeBuffName =
   | 'PrestigeMental'
   | 'PrestigePhysical'
   | 'PrestigeSpatiomancy';
-type Cache = { calc: number; bonus: number };
+export type Cache = { calc: number; bonus: number };
 
-const prestigeCache: Record<PrestigeBuffName, Cache> = {
+export const prestigeCache: Record<PrestigeBuffName, Cache> = {
   PrestigeBartering: { calc: -1, bonus: -1 },
   PrestigeChronomancy: { calc: -1, bonus: -1 },
   PrestigeCombat: { calc: -1, bonus: -1 },
@@ -171,7 +171,7 @@ const prestigeCache: Record<PrestigeBuffName, Cache> = {
   PrestigeSpatiomancy: { calc: -1, bonus: -1 },
 };
 
-const prestigeBases: Record<PrestigeBuffName, number> = {
+export const prestigeBases: Record<PrestigeBuffName, number> = {
   PrestigeBartering: 1.1,
   PrestigeChronomancy: 1.05,
   PrestigeCombat: 1.2,
@@ -181,7 +181,7 @@ const prestigeBases: Record<PrestigeBuffName, number> = {
   PrestigeSpatiomancy: 1.1,
 };
 
-function prestigeBonus(buff) {
+export function prestigeBonus(buff) {
   const cache = prestigeCache[buff];
 
   const level = globalThis.stats.getBuffLevel(buff);
@@ -194,6 +194,14 @@ function prestigeBonus(buff) {
   return cache.bonus;
 }
 
+export function adjustContentFromPrestige() {
+  return prestigeBonus('PrestigeSpatiomancy');
+}
+
+export function adjustGoldCostFromPrestige() {
+  return prestigeBonus('PrestigeBartering');
+}
+
 const _prestige = {
   completedCurrentGame,
   prestigeUpgrade,
@@ -202,8 +210,8 @@ const _prestige = {
   prestigeConfirmation,
   getPrestigeCost,
   getPrestigeCurrentBonus,
-  adjustContentFromPrestige: () => prestigeBonus('PrestigeSpatiomancy'),
-  adjustGoldCostFromPrestige: () => prestigeBonus('PrestigeBartering'),
+  adjustContentFromPrestige,
+  adjustGoldCostFromPrestige,
   prestigeBonus,
   prestigeCache,
   prestigeBases,

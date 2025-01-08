@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { Data } from './data.ts';
 import { Localization } from './Localization.ts';
+import { prestigeBonus, prestigeValues } from './prestige.ts';
 import {
   capitalizeFirst,
   delay,
@@ -186,7 +187,7 @@ const Koviko = {
       statList.forEach((i) => {
         if (i in s) {
           var expToAdd = 0;
-          const overFlow = globalThis.prestige.prestigeBonus('PrestigeExpOverflow') - 1;
+          const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
           expToAdd = ((a.stats[i] ?? 0) + overFlow) * a.expMult * (this.baseManaCost(a) / this.ticks()) *
             this.getTotalBonusXP(i, t, ss);
 
@@ -204,10 +205,10 @@ const Koviko = {
 
       var statBonus = 1;
       if (['Dex', 'Str', 'Con', 'Spd', 'Per'].includes(statName)) {
-        statBonus *= globalThis.prestige.prestigeBonus('PrestigePhysical');
+        statBonus *= prestigeBonus('PrestigePhysical');
       }
       if (['Cha', 'Int', 'Luck', 'Soul'].includes(statName)) {
-        statBonus *= globalThis.prestige.prestigeBonus('PrestigeMental');
+        statBonus *= prestigeBonus('PrestigeMental');
       }
 
       return statBonus * soulstoneBonus * (1 + Math.pow(globalThis.stats.getLevelFromTalent(t[statName]), 0.4) / 3);
@@ -658,19 +659,19 @@ const Koviko = {
         getSelfCombat: (r, k) =>
           (globalThis.stats.getSkillLevelFromExp(k.combat) + globalThis.stats.getSkillLevelFromExp(k.pyromancy) * 5) *
           h.getArmorLevel(r, k) *
-          (1 + globalThis.stats.getBuffLevel('Feast') * 0.05) * globalThis.prestige.prestigeBonus('PrestigeCombat'),
+          (1 + globalThis.stats.getBuffLevel('Feast') * 0.05) * prestigeBonus('PrestigeCombat'),
 
         getZombieStrength: (r, k) =>
           ((globalThis.stats.getSkillLevelFromExp(k.dark) * (r.zombie || 0) / 2 *
             Math.max(globalThis.stats.getBuffLevel('Ritual') / 100, 1)) *
-            (1 + globalThis.stats.getBuffLevel('Feast') * 0.05)) * globalThis.prestige.prestigeBonus('PrestigeCombat'),
+            (1 + globalThis.stats.getBuffLevel('Feast') * 0.05)) * prestigeBonus('PrestigeCombat'),
 
         getTeamStrength: (r, k) =>
           ((globalThis.stats.getSkillLevelFromExp(k.combat) +
             globalThis.stats.getSkillLevelFromExp(k.restoration) * 4) *
             ((r.team || 0) / 2) *
             (r.adventures ? h.getGuildRankBonus(r.adventures) : 1) * h.getSkillBonusInc(k.leadership)) *
-          (1 + globalThis.stats.getBuffLevel('Feast') * 0.05) * globalThis.prestige.prestigeBonus('PrestigeCombat'),
+          (1 + globalThis.stats.getBuffLevel('Feast') * 0.05) * prestigeBonus('PrestigeCombat'),
 
         getTeamCombat: (r, k) => (h.getSelfCombat(r, k) + h.getZombieStrength(r, k) + h.getTeamStrength(r, k)),
 
@@ -2072,7 +2073,7 @@ const Koviko = {
       }
       //Once you Surveyed everything you get free Glasses [Found Glasses]
       if (
-        globalThis.actionList.getExploreProgress() >= 100 || globalThis.prestige.prestigeValues['completedAnyPrestige']
+        globalThis.actionList.getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige']
       ) {
         state.resources.glasses = true;
       }
