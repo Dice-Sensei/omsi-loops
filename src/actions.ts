@@ -1,3 +1,4 @@
+import { Action, getActionPrototype, getPossibleTravel, translateClassNames, withoutSpaces } from './actionList.ts';
 import { clamp, Mana } from './helpers.ts';
 import { hearts, resources, statList, stats, towns } from './globals.ts';
 import { driverVals, getSpeedMult, pauseGame } from './driver.ts';
@@ -308,7 +309,7 @@ export class Actions {
         if (action.loops === 0 || action.disabled) {
           continue;
         }
-        const toAdd = globalThis.actionList.translateClassNames(action.name);
+        const toAdd = translateClassNames(action.name);
 
         toAdd.loopsType = action.loopsType ?? (isMultipartAction(toAdd) ? 'maxEffort' : 'actions');
         if (isMultipartAction(toAdd) && action.loopsType === 'actions') action.loopsType = 'maxEffort';
@@ -354,11 +355,11 @@ export class Actions {
       let currentStartIndex = 0;
       this.#zoneSpans = [];
       for (const [index, action] of this.next.entries()) {
-        const actionProto = globalThis.actionList.getActionPrototype(action.name);
+        const actionProto = getActionPrototype(action.name);
         if (action.disabled || !action.loops || !actionProto) {
           continue;
         }
-        const travelDeltas = globalThis.actionList.getPossibleTravel(action.name);
+        const travelDeltas = getPossibleTravel(action.name);
         if (!travelDeltas.length) continue;
         if (currentZones.length > 1 && currentZones.includes(actionProto.townNum)) {
           currentZones = [actionProto.townNum];
@@ -400,7 +401,7 @@ export class Actions {
   }
 
   static isValidAndEnabled(action, additionalTest) {
-    const actionProto = globalThis.actionList.getActionPrototype(action?.name);
+    const actionProto = getActionPrototype(action?.name);
     return actionProto && !action.disabled && action.loops > 0 &&
       (!additionalTest || additionalTest(action, actionProto));
   }
@@ -441,7 +442,7 @@ export class Actions {
     if (initialOrder < 0) initialOrder += this.next.length + 1;
     initialOrder = clamp(initialOrder, 0, this.next.length);
     if (addAtClosestValidIndex) {
-      const actionProto = globalThis.actionList.getActionPrototype(toAdd.name);
+      const actionProto = getActionPrototype(toAdd.name);
       initialOrder = this.closestValidIndexForAction(actionProto?.townNum, initialOrder);
     }
     // Number.isFinite(), unlike isFinite(), doesn't coerce its argument so it also functions as a typecheck
@@ -476,7 +477,7 @@ export class Actions {
 
     resultingIndex = clamp(resultingIndex, 0, this.next.length - 1);
     if (moveToClosestValidIndex) {
-      const townNum = (globalThis.actionList.getActionPrototype(this.next[initialIndex].name))?.townNum;
+      const townNum = (getActionPrototype(this.next[initialIndex].name))?.townNum;
       if (townNum != null) {
         resultingIndex = this.closestValidIndexForAction(townNum, resultingIndex, initialIndex);
       }
@@ -521,7 +522,7 @@ export class Actions {
     targetIndex ??= index;
 
     if (splitToClosestValidIndex) {
-      const townNum = globalThis.actionList.getActionPrototype(action.name)?.townNum;
+      const townNum = getActionPrototype(action.name)?.townNum;
       if (townNum != null) {
         targetIndex = this.closestValidIndexForAction(townNum, targetIndex);
       }
@@ -597,7 +598,7 @@ export function calcSoulstoneMult(soulstones) {
 
 export function markActionsComplete(loopCompletedActions) {
   loopCompletedActions.forEach((action) => {
-    let varName = globalThis.actionList.Action[globalThis.actionList.withoutSpaces(action.name)].varName;
+    let varName = Action[withoutSpaces(action.name)].varName;
     if (!globalThis.saving.vals.completedActions.includes(varName)) {
       globalThis.saving.vals.completedActions.push(varName);
     }
@@ -680,11 +681,11 @@ class ZoneSpan {
   }
 }
 
-function isMultipartAction(action) {
+export function isMultipartAction(action) {
   return 'loopStats' in action;
 }
 
-function setAdjustedTicks(action) {
+export function setAdjustedTicks(action) {
   let newCost = 0;
   for (const actionStatName in action.stats) {
     newCost += action.stats[actionStatName] * stats[actionStatName].manaMultiplier;
@@ -696,7 +697,7 @@ function setAdjustedTicks(action) {
   );
 }
 
-function getMaxTicksForAction(action, talentOnly = false) {
+export function getMaxTicksForAction(action, talentOnly = false) {
   let maxTicks = Number.MAX_SAFE_INTEGER;
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
@@ -709,7 +710,7 @@ function getMaxTicksForAction(action, talentOnly = false) {
   return maxTicks;
 }
 
-function getMaxTicksForStat(action, stat, talentOnly = false) {
+export function getMaxTicksForStat(action, stat, talentOnly = false) {
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
   const expToNext = globalThis.stats.getExpToLevel(stat, talentOnly);
@@ -718,7 +719,7 @@ function getMaxTicksForStat(action, stat, talentOnly = false) {
   return Mana.ceil(expToNext / statMultiplier);
 }
 
-function addExpFromAction(action, manaCount) {
+export function addExpFromAction(action, manaCount) {
   const adjustedExp = manaCount * action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
   for (const stat of statList) {

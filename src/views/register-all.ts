@@ -4,7 +4,7 @@ import { camelize, htmlElement } from '../helpers.ts';
 import { buffHardCaps, buffList } from '../globals.ts';
 import { prestigeUpgrade, resetAllPrestiges } from '../prestige.ts';
 import { borrowTime, manualRestart, pauseGame, returnTime, toggleOffline } from '../driver.ts';
-
+import { getXMLName } from '../actionList.ts';
 const getDisabledMenus = () => {
   let disabledMenus = [];
 
@@ -22,7 +22,7 @@ const buffsContainer = {
 
     for (const name of buffList) {
       const fullName = globalThis.stats.Buff.fullNames[name];
-      const XMLName = globalThis.actionList.getXMLName(fullName);
+      const XMLName = getXMLName(fullName);
       const desc2 = Localization.txtsObj(`buffs>${XMLName}`)[0].innerHTML.includes('desc2');
 
       html += `

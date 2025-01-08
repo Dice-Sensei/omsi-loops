@@ -31,7 +31,7 @@ import {
   showNotification,
   toggleOffline,
 } from './driver.ts';
-
+import { Action, ClassNameNotFoundError, getActionPrototype, getExploreProgress } from './actionList.ts';
 import {
   compressToBase64 as lZStringCompressToBase64,
   decompressFromBase64 as lZStringDecompressFromBase64,
@@ -299,63 +299,63 @@ if (selfIsGame) {
   Object.assign(vals.options, importPredictorSettings()); // override hardcoded defaults if not in worker
 }
 
-function decompressFromBase64(item) {
+export function decompressFromBase64(item) {
   return lZStringDecompressFromBase64(item);
 }
 
-function compressToBase64(item) {
+export function compressToBase64(item) {
   return lZStringCompressToBase64(item);
 }
 
-function startGame() {
+export function startGame() {
   // load calls recalcInterval, which will start the callbacks
   load();
   globalThis.view.setScreenSize();
 }
 
-function _town(townNum) {
+export function _town(townNum) {
   return towns[townNum];
 }
 
-function initializeTowns() {
+export function initializeTowns() {
   for (let i = 0; i <= 8; i++) {
     towns[i] = new Town(i);
   }
 }
 
-function isStatName(name) {
+export function isStatName(name) {
   return statList.includes(name);
 }
 
-function isSkillName(name) {
+export function isSkillName(name) {
   return skillList.includes(name);
 }
 
-function isBuffName(name) {
+export function isBuffName(name) {
   return buffList.includes(name);
 }
 
-function initializeActions() {
+export function initializeActions() {
   globalThis.saving.vals.totalActionList.length = 0;
-  for (const prop in globalThis.actionList.Action) {
-    const action = globalThis.actionList.Action[prop];
+  for (const prop in Action) {
+    const action = Action[prop];
     globalThis.saving.vals.totalActionList.push(action);
   }
 }
 
-function isNumericOption(option) {
+export function isNumericOption(option) {
   return numericOptions.includes(option);
 }
 
-function isStringOption(option) {
+export function isStringOption(option) {
   return stringOptions.includes(option);
 }
 
-function isBooleanOption(option) {
+export function isBooleanOption(option) {
   return !numericOptions.includes(option) && !stringOptions.includes(option);
 }
 
-function importPredictorSettings() {
+export function importPredictorSettings() {
   const settingsMap = {
     __proto__: null,
     timePrecision: 'predictorTimePrecision',
@@ -386,7 +386,7 @@ function importPredictorSettings() {
   return newOptions;
 }
 
-function handleOption(option, value, init, getInput) {
+export function handleOption(option, value, init, getInput) {
   optionValueHandlers[option]?.(value, init, getInput);
   // The handler can change the value of the option. Recheck when setting or clearing the indicator class.
   if (option in optionIndicatorClasses) {
@@ -394,7 +394,7 @@ function handleOption(option, value, init, getInput) {
   }
 }
 
-function setOption(option, value, updateUI = false) {
+export function setOption(option, value, updateUI = false) {
   const oldValue = globalThis.saving.vals.options[option];
   globalThis.saving.vals.options[option] = value;
   handleOption(option, value, false, () => valueElement(`${option}Input`));
@@ -409,7 +409,7 @@ function setOption(option, value, updateUI = false) {
   }
 }
 
-function loadOption(option, value, callHandler = true) {
+export function loadOption(option, value, callHandler = true) {
   const input = valueElement(`${option}Input`, false); // this is allowed to have errors
   if (!input) return;
   if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = !!value;
@@ -419,7 +419,7 @@ function loadOption(option, value, callHandler = true) {
   handleOption(option, value, true, () => input);
 }
 
-function showPauseNotification(message) {
+export function showPauseNotification(message) {
   pauseNotification = new Notification('Idle Loops', {
     icon: 'favicon-32x32.png',
     body: message,
@@ -428,21 +428,21 @@ function showPauseNotification(message) {
   });
 }
 
-function clearPauseNotification() {
+export function clearPauseNotification() {
   if (pauseNotification) {
     pauseNotification.close();
     pauseNotification = null;
   }
 }
 
-function clearSave() {
+export function clearSave() {
   globalThis.localStorage[globalThis.saving.defaultSaveName] = '';
   globalThis.localStorage[challengeSaveName] = '';
   location.reload();
 }
 
 let defaultsRecorded = false;
-function loadDefaults() {
+export function loadDefaults() {
   if (defaultsRecorded) {
     Data.resetToDefaults();
   }
@@ -460,21 +460,21 @@ function loadDefaults() {
   defaultsRecorded = true;
 }
 
-function loadUISettings() {
+export function loadUISettings() {
   const height = localStorage.getItem('actionListHeight');
   if (height !== '') document.documentElement.style.setProperty('--action-list-height', height);
 }
 
-function saveUISettings() {
+export function saveUISettings() {
   const height = document.documentElement.style.getPropertyValue('--action-list-height');
   if (height !== '') localStorage.setItem('actionListHeight', height);
 }
 
-function needsDataSnapshots() {
+export function needsDataSnapshots() {
   return globalThis.saving.vals.options.predictor && globalThis.saving.vals.options.predictorBackgroundThread;
 }
 
-function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
+export function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
   loadDefaults();
   loadUISettings();
 
@@ -518,7 +518,7 @@ function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
   doLoad(toLoad);
 }
 
-function doLoad(toLoad) {
+export function doLoad(toLoad) {
   for (const property of Object.getOwnPropertyNames(toLoad.stats ?? {})) {
     if (property in stats) {
       stats[property].load(toLoad.stats[property]);
@@ -551,22 +551,21 @@ function doLoad(toLoad) {
   }
 
   if (toLoad.prestigeValues !== undefined) {
-    prestigeValues['prestigeCurrentPoints'] =
-      toLoad.prestigeValues['prestigeCurrentPoints'] === undefined ? 0 : toLoad.prestigeValues['prestigeCurrentPoints'];
-    prestigeValues['prestigeTotalPoints'] =
-      toLoad.prestigeValues['prestigeTotalPoints'] === undefined ? 0 : toLoad.prestigeValues['prestigeTotalPoints'];
-    prestigeValues['prestigeTotalCompletions'] =
-      toLoad.prestigeValues['prestigeTotalCompletions'] === undefined
-        ? 0
-        : toLoad.prestigeValues['prestigeTotalCompletions'];
-    prestigeValues['completedCurrentPrestige'] =
-      toLoad.prestigeValues['completedCurrentPrestige'] === undefined
-        ? 0
-        : toLoad.prestigeValues['completedCurrentPrestige'];
-    prestigeValues['completedAnyPrestige'] =
-      toLoad.prestigeValues['completedAnyPrestige'] === undefined
-        ? false
-        : toLoad.prestigeValues['completedAnyPrestige'];
+    prestigeValues['prestigeCurrentPoints'] = toLoad.prestigeValues['prestigeCurrentPoints'] === undefined
+      ? 0
+      : toLoad.prestigeValues['prestigeCurrentPoints'];
+    prestigeValues['prestigeTotalPoints'] = toLoad.prestigeValues['prestigeTotalPoints'] === undefined
+      ? 0
+      : toLoad.prestigeValues['prestigeTotalPoints'];
+    prestigeValues['prestigeTotalCompletions'] = toLoad.prestigeValues['prestigeTotalCompletions'] === undefined
+      ? 0
+      : toLoad.prestigeValues['prestigeTotalCompletions'];
+    prestigeValues['completedCurrentPrestige'] = toLoad.prestigeValues['completedCurrentPrestige'] === undefined
+      ? 0
+      : toLoad.prestigeValues['completedCurrentPrestige'];
+    prestigeValues['completedAnyPrestige'] = toLoad.prestigeValues['completedAnyPrestige'] === undefined
+      ? false
+      : toLoad.prestigeValues['completedAnyPrestige'];
   }
 
   for (const property in storyFlags) {
@@ -890,7 +889,7 @@ function doLoad(toLoad) {
     location.reload();
   }
 
-  if (globalThis.actionList.getExploreProgress() >= 100) addResource('glasses', true);
+  if (getExploreProgress() >= 100) addResource('glasses', true);
 
   adjustAll();
 
@@ -906,7 +905,7 @@ function doLoad(toLoad) {
   pauseGame();
 }
 
-function doSave() {
+export function doSave() {
   const toSave = {};
   toSave.curLoadout = globalThis.saving.vals.curLoadout;
   toSave.dungeons = globalThis.saving.vals.dungeons;
@@ -977,7 +976,7 @@ function doSave() {
   return toSave;
 }
 
-function save() {
+export function save() {
   const toSave = doSave();
   const saveJson = JSON.stringify(toSave);
   storeSaveJson(saveJson);
@@ -985,7 +984,7 @@ function save() {
   return saveJson;
 }
 
-function exportSave() {
+export function exportSave() {
   const saveJson = save();
   // idle loops save version 01. patch v0.94, moved from old save system to lzstring base 64
   inputElement('exportImport').value = `ILSV01${compressToBase64(saveJson)}`;
@@ -995,12 +994,12 @@ function exportSave() {
   }
 }
 
-function importSave() {
+export function importSave() {
   const saveData = inputElement('exportImport').value;
   processSave(saveData);
 }
 
-function processSave(saveData) {
+export function processSave(saveData) {
   if (saveData === '') {
     if (confirm('Importing nothing will delete your save. Are you sure you want to delete your save?')) {
       globalThis.saving.vals.challengeSave = {};
@@ -1023,7 +1022,7 @@ function processSave(saveData) {
 }
 
 let overquotaWarned = false;
-function storeSaveJson(saveJson) {
+export function storeSaveJson(saveJson) {
   try {
     globalThis.localStorage[saveName] = saveJson;
   } catch (e) {
@@ -1040,13 +1039,13 @@ function storeSaveJson(saveJson) {
   }
 }
 
-function saveFileName() {
+export function saveFileName() {
   const gameName = document.title.replace('*PAUSED* ', '');
   const version = document.querySelector('#changelog > li[data-verNum]').firstChild.textContent.trim();
   return `${gameName} ${version} - Loop ${globalThis.saving.vals.totals.loops}.txt`;
 }
 
-function exportSaveFile() {
+export function exportSaveFile() {
   const saveJson = save();
   const saveData = `ILSV01${compressToBase64(saveJson)}`;
   const a = document.createElement('a');
@@ -1058,11 +1057,11 @@ function exportSaveFile() {
   document.body.removeChild(a);
 }
 
-function openSaveFile() {
+export function openSaveFile() {
   document.getElementById('SaveFileInput').click();
 }
 
-function importSaveFile(e) {
+export function importSaveFile(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
@@ -1073,7 +1072,7 @@ function importSaveFile(e) {
   reader.readAsText(file);
 }
 
-function exportCurrentList() {
+export function exportCurrentList() {
   let toReturn = '';
   for (const action of actions.next) {
     toReturn += `${action.loops}x ${action.name}`;
@@ -1084,7 +1083,7 @@ function exportCurrentList() {
   document.execCommand('copy');
 }
 
-function importCurrentList() {
+export function importCurrentList() {
   const toImport = textAreaElement('exportImportList').value.split('\n');
   actions.clearActions();
   for (let i = 0; i < toImport.length; i++) {
@@ -1094,12 +1093,12 @@ function importCurrentList() {
     const name = toImport[i].substr(toImport[i].indexOf('x') + 1).trim();
     const loops = toImport[i].substr(0, toImport[i].indexOf('x'));
     try {
-      const action = globalThis.actionList.getActionPrototype(name);
+      const action = getActionPrototype(name);
       if (action.unlocked()) {
         actions.addActionRecord({ name, loops: Number(loops), disabled: false }, -1, false);
       }
     } catch (e) {
-      if (e instanceof globalThis.actionList.ClassNameNotFoundError) {
+      if (e instanceof ClassNameNotFoundError) {
         console.log(e.message);
       } else {
         throw e;
@@ -1109,7 +1108,7 @@ function importCurrentList() {
   view.updateNextActions();
 }
 
-function beginChallenge(challengeNum) {
+export function beginChallenge(challengeNum) {
   console.log('Beginning Challenge');
   if (globalThis.localStorage[challengeSaveName] && globalThis.localStorage[challengeSaveName] !== '') {
     if (confirm('Beginning a new challenge will delete your current challenge save. Are you sure you want to begin?')) {
@@ -1132,7 +1131,7 @@ function beginChallenge(challengeNum) {
   restart();
 }
 
-function exitChallenge() {
+export function exitChallenge() {
   if (globalThis.saving.vals.challengeSave.challengeMode !== 0) {
     saveName = defaultSaveName;
     load(false);
@@ -1141,7 +1140,7 @@ function exitChallenge() {
   }
 }
 
-function resumeChallenge() {
+export function resumeChallenge() {
   if (
     globalThis.saving.vals.challengeSave.challengeMode === 0 && globalThis.localStorage[challengeSaveName] &&
     globalThis.localStorage[challengeSaveName] !== ''

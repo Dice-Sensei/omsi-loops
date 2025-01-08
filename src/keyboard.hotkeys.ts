@@ -14,7 +14,7 @@ import {
   toggleOffline,
 } from './driver.ts';
 
-function setShiftKey(value: boolean): void {
+export function setShiftKey(value: boolean): void {
   if (KeyboardKey.shift === value) return;
   KeyboardKey.shift = value;
 
@@ -22,7 +22,7 @@ function setShiftKey(value: boolean): void {
   globalThis.dispatchEvent(new Event('modifierkeychange'));
 }
 
-function setControlKey(value: boolean): void {
+export function setControlKey(value: boolean): void {
   if (KeyboardKey.control === value) return;
   KeyboardKey.control = value;
 
@@ -30,7 +30,7 @@ function setControlKey(value: boolean): void {
   globalThis.dispatchEvent(new Event('modifierkeychange'));
 }
 
-function moveToTown(townNum: number | undefined): void {
+export function moveToTown(townNum: number | undefined): void {
   if (townNum === undefined) return;
   if (!globalThis.saving.vals.townsUnlocked.includes(townNum)) return;
 

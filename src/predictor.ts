@@ -18,6 +18,7 @@ import {
 import { calcSoulstoneMult, getNumOnCurList, getNumOnList } from './actions.ts';
 import { buffs, skillList, skills, statList, stats, towns } from './globals.ts';
 import { getSpeedMult } from './driver.ts';
+import { Action, getExploreSkill, getExploreProgress, translateClassNames } from './actionList.ts';
 
 export const Koviko = {
   Prediction: class {
@@ -59,7 +60,7 @@ export const Koviko = {
        * Action being estimated
        * @type {Mutable<AnyAction> & {segments?: number}}
        */
-      this.action = globalThis.actionList.translateClassNames(name);
+      this.action = translateClassNames(name);
 
       /**
        * The pre-calculated amount of ticks needed for the action to complete.
@@ -484,7 +485,7 @@ export const Koviko = {
           type: 'R',
           name: 'survey',
           display_name: 'Surveys',
-          hidden: () => (globalThis.actionList.getExploreSkill() == 0),
+          hidden: () => (getExploreSkill() == 0),
         },
         {
           type: 'R',
@@ -777,14 +778,14 @@ export const Koviko = {
           affected: ['mana'],
           effect: (r) => {
             r.temp1 = (r.temp1 || 0) + 1;
-            r.mana += r.temp1 <= towns[0].goodPots ? globalThis.actionList.Action.SmashPots.goldCost() : 0;
+            r.mana += r.temp1 <= towns[0].goodPots ? Action.SmashPots.goldCost() : 0;
           },
         },
         'Pick Locks': {
           affected: ['gold'],
           effect: (r) => {
             r.temp2 = (r.temp2 || 0) + 1;
-            r.gold += r.temp2 <= towns[0].goodLocks ? globalThis.actionList.Action.PickLocks.goldCost() : 0;
+            r.gold += r.temp2 <= towns[0].goodLocks ? Action.PickLocks.goldCost() : 0;
           },
         },
         'Buy Glasses': {
@@ -798,12 +799,12 @@ export const Koviko = {
           effect: (r) => {
             if (r.isManaDrought) {
               let spendGold = Math.min(r.gold, 300);
-              let buyMana = Math.min(spendGold * globalThis.actionList.Action.BuyManaZ1.goldCost(), r.manaBought);
+              let buyMana = Math.min(spendGold * Action.BuyManaZ1.goldCost(), r.manaBought);
               r.mana += buyMana;
               r.manaBought -= buyMana;
               r.gold -= spendGold;
             } else {
-              r.mana += r.gold * globalThis.actionList.Action.BuyManaZ1.goldCost();
+              r.mana += r.gold * Action.BuyManaZ1.goldCost();
               r.gold = 0;
             }
           },
@@ -814,7 +815,7 @@ export const Koviko = {
           affected: ['gold'],
           effect: (r) => {
             r.temp3 = (r.temp3 || 0) + 1;
-            r.gold += r.temp3 <= towns[0].goodSQuests ? globalThis.actionList.Action.ShortQuest.goldCost() : 0;
+            r.gold += r.temp3 <= towns[0].goodSQuests ? Action.ShortQuest.goldCost() : 0;
           },
         },
         'Investigate': { affected: [''] },
@@ -822,7 +823,7 @@ export const Koviko = {
           affected: ['gold', 'rep'],
           effect: (r) => {
             r.temp4 = (r.temp4 || 0) + 1;
-            r.gold += r.temp4 <= towns[0].goodLQuests ? globalThis.actionList.Action.LongQuest.goldCost() : 0;
+            r.gold += r.temp4 <= towns[0].goodLQuests ? Action.LongQuest.goldCost() : 0;
             r.rep += r.temp4 <= towns[0].goodLQuests ? 1 : 0;
           },
         },
@@ -918,7 +919,7 @@ export const Koviko = {
           affected: ['mana'],
           effect: (r) => {
             r.temp5 = (r.temp5 || 0) + 1;
-            r.mana += r.temp5 <= towns[1].goodWildMana ? globalThis.actionList.Action.WildMana.goldCost() : 0;
+            r.mana += r.temp5 <= towns[1].goodWildMana ? Action.WildMana.goldCost() : 0;
           },
         },
         'Gather Herbs': {
@@ -977,7 +978,7 @@ export const Koviko = {
             effect: {
               loop: (r, k, ss) => {
                 r.ritual++;
-                let ssCost = globalThis.actionList.Action.DarkRitual.goldCost();
+                let ssCost = Action.DarkRitual.goldCost();
                 r.nonDungeonSS -= ssCost;
                 r.soul -= ssCost;
 
@@ -1019,7 +1020,7 @@ export const Koviko = {
         'Buy Mana Z3': {
           affected: ['mana', 'gold'],
           canStart: true,
-          effect: (r) => (r.mana += r.gold * globalThis.actionList.Action.BuyManaZ3.goldCost(), r.gold = 0),
+          effect: (r) => (r.mana += r.gold * Action.BuyManaZ3.goldCost(), r.gold = 0),
         },
         'Sell Potions': {
           affected: ['gold', 'potions'],
@@ -1233,7 +1234,7 @@ export const Koviko = {
             effect: {
               loop: (r, k, ss) => {
                 r.mind++;
-                let ssCost = globalThis.actionList.Action.ImbueMind.goldCost();
+                let ssCost = Action.ImbueMind.goldCost();
                 r.nonDungeonSS -= ssCost;
                 r.soul -= ssCost;
 
@@ -1340,7 +1341,7 @@ export const Koviko = {
         'Buy Mana Z5': {
           affected: ['mana', 'gold'],
           canStart: true,
-          effect: (r) => (r.mana += r.gold * globalThis.actionList.Action.BuyManaZ5.goldCost(), r.gold = 0),
+          effect: (r) => (r.mana += r.gold * Action.BuyManaZ5.goldCost(), r.gold = 0),
         },
         'Sell Artifact': {
           affected: ['gold', 'artifacts'],
@@ -1462,7 +1463,7 @@ export const Koviko = {
             effect: {
               loop: (r, k, ss) => {
                 r.feast++;
-                let ssCost = globalThis.actionList.Action.GreatFeast.goldCost();
+                let ssCost = Action.GreatFeast.goldCost();
                 r.nonDungeonSS -= ssCost;
                 r.soul -= ssCost;
 
@@ -2016,7 +2017,7 @@ export const Koviko = {
       }
       //Once you Surveyed everything you get free Glasses [Found Glasses]
       if (
-        globalThis.actionList.getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige']
+        getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige']
       ) {
         state.resources.glasses = true;
       }
@@ -2547,7 +2548,7 @@ export const Koviko = {
             newStatisticValue = loop / totalMinutes;
             legend = actions[finalIndex].name;
           } else if (trackedStat.name == 'survey') {
-            newStatisticValue = globalThis.actionList.getExploreSkill() *
+            newStatisticValue = getExploreSkill() *
               (state.resources.completedMap + 3 * state.resources.submittedMap) /
               totalMinutes;
             legend = 'Survey';

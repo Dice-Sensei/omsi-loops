@@ -1,3 +1,22 @@
+import {
+  Action,
+  actionsWithGoldCost,
+  actionTypes,
+  getActionPrototype,
+  getExploreExpSinceLastProgress,
+  getExploreExpToNextProgress,
+  getExploreProgress,
+  getExploreSkill,
+  getPossibleTravel,
+  getTravelNum,
+  getXMLName,
+  hasLimit,
+  isActionOfType,
+  isTraining,
+  townNames,
+  translateClassNames,
+} from '../actionList.ts';
+
 import $ from 'jquery';
 import * as d3 from 'd3';
 import { StatGraph } from '../stats-graph.ts';
@@ -36,6 +55,7 @@ import {
   capAction,
   collapse,
   disableAction,
+  driverVals,
   getActualGameSpeed,
   handleDragDrop,
   handleDragOver,
@@ -48,7 +68,6 @@ import {
   showActionIcons,
   showNotification,
   split,
-  driverVals,
 } from '../driver.ts';
 import { Koviko } from '../predictor.ts';
 
@@ -65,7 +84,7 @@ const DarkRitualDescription = [
   `0.1% faster globally per ritual from 301-666`,
 ];
 
-function formatTime(seconds) {
+export function formatTime(seconds) {
   if (seconds > 300) {
     let second = Math.floor(seconds % 60);
     let minute = Math.floor(seconds / 60 % 60);
@@ -700,7 +719,7 @@ class View {
         true,
       )
     } | ${formatTime((globalThis.saving.timeNeeded - globalThis.saving.timer) / 50 / getActualGameSpeed())}`;
-    this.adjustGoldCost({ varName: 'Wells', cost: globalThis.actionList.Action.ManaWell.goldCost() });
+    this.adjustGoldCost({ varName: 'Wells', cost: Action.ManaWell.goldCost() });
   }
   updateOffline() {
     document.getElementById('bonusSeconds').textContent = formatTime(globalThis.saving.vals.totalOfflineMs / 1000);
@@ -819,9 +838,9 @@ class View {
     document.getElementById('actionAllowedInsurance').textContent = intToStringRound(
       towns[7].totalInsurance,
     );
-    document.getElementById('totalSurveyProgress').textContent = `${globalThis.actionList.getExploreProgress()}`;
+    document.getElementById('totalSurveyProgress').textContent = `${getExploreProgress()}`;
     Array.from(document.getElementsByClassName('surveySkill')).forEach((div) => {
-      div.textContent = `${globalThis.actionList.getExploreSkill()}`;
+      div.textContent = `${getExploreSkill()}`;
     });
     for (const town of towns) {
       const varName = town.progressVars.find((v) => v.startsWith('Survey'));
@@ -878,7 +897,7 @@ class View {
           ...a,
           actionId: a.actionId,
           index,
-          action: globalThis.actionList.getActionPrototype(a.name),
+          action: getActionPrototype(a.name),
         })),
         (a) => a.actionId,
       )
@@ -987,14 +1006,14 @@ class View {
         for (const { index } of towns) {
           container.classed(`zone-${index + 1}`, (a) => a.action.townNum === index);
         }
-        for (const type of globalThis.actionList.actionTypes) {
+        for (const type of actionTypes) {
           container.classed(`action-type-${type}`, (a) => a.action.type === type);
         }
       })
-      .classed('action-has-limit', (a) => globalThis.actionList.hasLimit(a.name))
-      .classed('action-is-training', (a) => globalThis.actionList.isTraining(a.name))
+      .classed('action-has-limit', (a) => hasLimit(a.name))
+      .classed('action-is-training', (a) => isTraining(a.name))
       .classed('action-is-singular', (a) => a.action.allowed?.() === 1)
-      .classed('action-is-travel', (a) => globalThis.actionList.getPossibleTravel(a.name).length > 0)
+      .classed('action-is-travel', (a) => getPossibleTravel(a.name).length > 0)
       .classed('action-disabled', (a) => !actions.isValidAndEnabled(a))
       .classed('user-disabled', (a) => !!a.disabled)
       .classed('user-collapsed', (a) => !!a.collapsed)
@@ -1005,7 +1024,7 @@ class View {
       })
       .style('background', ({ action }) => {
         const { townNum } = action;
-        const travelNums = globalThis.actionList.getPossibleTravel(action.name);
+        const travelNums = getPossibleTravel(action.name);
         let color = this.zoneTints[townNum];
         if (travelNums.length === 1) {
           color = `linear-gradient(${color} 49%, ${this.zoneTints[townNum + travelNums[0]]} 51%)`;
@@ -1282,11 +1301,11 @@ class View {
   }
 
   updateGlobalSurvey(varName, town) {
-    const expToNext = globalThis.actionList.getExploreExpToNextProgress();
-    const expSinceLast = globalThis.actionList.getExploreExpSinceLastProgress();
+    const expToNext = getExploreExpToNextProgress();
+    const expSinceLast = getExploreExpSinceLastProgress();
     this.updateProgressAction(
       { name: `${varName}Global`, town },
-      globalThis.actionList.getExploreProgress(),
+      getExploreProgress(),
       `${expSinceLast * 100 / (expSinceLast + expToNext)}%`,
     );
   }
@@ -1541,12 +1560,12 @@ class View {
     }
     for (const varName of towns.flatMap((t) => t.allVarNames)) {
       const action = globalThis.saving.vals.totalActionList.find((a) => a.varName === varName);
-      if (globalThis.actionList.isActionOfType(action, 'limited')) this.createTownInfo(action);
-      if (globalThis.actionList.isActionOfType(action, 'progress')) {
+      if (isActionOfType(action, 'limited')) this.createTownInfo(action);
+      if (isActionOfType(action, 'progress')) {
         if (action.name.startsWith('Survey')) this.createGlobalSurveyProgress(action);
         this.createActionProgress(action);
       }
-      if (globalThis.actionList.isActionOfType(action, 'multipart')) this.createMultiPartPBar(action);
+      if (isActionOfType(action, 'multipart')) this.createMultiPartPBar(action);
     }
     if (globalThis.saving.vals.options.highlightNew) this.highlightIncompleteActions();
   }
@@ -1668,7 +1687,7 @@ class View {
       for (let i = 0; i < l; i++) {
         for (const skill of skillKeyNames) {
           if (skillList[i] === skill) {
-            const xmlName = globalThis.actionList.getXMLName(skill);
+            const xmlName = getXMLName(skill);
             const skillLabel = `${Localization.txt(`skills>${xmlName}>label`)} ${
               Localization.txt('stats>tooltip>exp')
             }`;
@@ -1693,7 +1712,7 @@ class View {
       }
     }
     if (globalThis.saving.isBuffName(action.grantsBuff)) {
-      const xmlName = globalThis.actionList.getXMLName(globalThis.stats.Buff.fullNames[action.grantsBuff]);
+      const xmlName = getXMLName(globalThis.stats.Buff.fullNames[action.grantsBuff]);
       const grantsBuff = `<div class='bold'>${Localization.txt('actions>tooltip>grants_buff')}:</div>`;
       lockedSkills += `${grantsBuff} <span>${Localization.txt(`buffs>${xmlName}>label`)}</span><br>`;
       skillDetails += `<hr>
@@ -1714,11 +1733,9 @@ class View {
         }.svg' class='smallIcon' draggable='false' style='position:absolute;${extraImagePositions[i]}'>`;
       }
     }
-    const isTravel = globalThis.actionList.getTravelNum(action.name) != 0;
+    const isTravel = getTravelNum(action.name) != 0;
     const divClass = `${isTravel ? 'travelContainer' : 'actionContainer'} ${
-      globalThis.actionList.isTraining(action.name) || globalThis.actionList.hasLimit(action.name)
-        ? 'cappableActionContainer'
-        : ''
+      isTraining(action.name) || hasLimit(action.name) ? 'cappableActionContainer' : ''
     }`;
     const imageName = action.name.startsWith('Assassin') ? 'assassin' : camelize(action.name);
     const unlockConditions = /<br>\s*Unlocked (.*?)(?:<br>|$)/is.exec(
@@ -1814,14 +1831,14 @@ class View {
   }
 
   adjustManaCost(actionName) {
-    const action = globalThis.actionList.translateClassNames(actionName);
+    const action = translateClassNames(actionName);
     document.getElementById(`manaCost${action.varName}`).textContent = formatNumber(
       action.manaCost(),
     );
   }
 
   adjustExpMult(actionName) {
-    const action = globalThis.actionList.translateClassNames(actionName);
+    const action = translateClassNames(actionName);
     document.getElementById(`expMult${action.varName}`).textContent = formatNumber(
       action.expMult * 100,
     );
@@ -1839,7 +1856,7 @@ class View {
     }
   }
   adjustGoldCosts() {
-    for (const action of globalThis.actionList.actionsWithGoldCost) {
+    for (const action of actionsWithGoldCost) {
       this.adjustGoldCost({ varName: action.varName, cost: action.goldCost() });
     }
   }
@@ -2148,7 +2165,7 @@ class View {
   createTravelMenu() {
     let travelMenu = $('#TownSelect');
     travelMenu.empty();
-    globalThis.actionList.townNames.forEach((town, index) => {
+    townNames.forEach((town, index) => {
       travelMenu.append(`"<option value=${index} class='zone-${index + 1}' hidden=''>${town}</option>`);
     });
     travelMenu.change(function () {
@@ -2266,7 +2283,7 @@ class View {
   }
 }
 
-function unlockGlobalStory(num) {
+export function unlockGlobalStory(num) {
   if (num > globalThis.saving.vals.storyMax) {
     document.getElementById('newStory').style.display = 'inline-block';
     globalThis.saving.vals.storyMax = num;
@@ -2274,7 +2291,7 @@ function unlockGlobalStory(num) {
   }
 }
 
-function setStoryFlag(name) {
+export function setStoryFlag(name) {
   if (!storyFlags[name]) {
     storyFlags[name] = true;
     if (globalThis.saving.vals.options.actionLog) globalThis.saving.view.requestUpdate('updateStories', false);
@@ -2282,14 +2299,14 @@ function setStoryFlag(name) {
 }
 const unlockStory = setStoryFlag; // compatibility alias
 
-function increaseStoryVarTo(name, value) {
+export function increaseStoryVarTo(name, value) {
   if (storyVars[name] < value) {
     storyVars[name] = value;
     if (globalThis.saving.vals.options.actionLog) globalThis.saving.view.requestUpdate('updateStories', false);
   }
 }
 
-function scrollToPanel(event, target) {
+export function scrollToPanel(event, target) {
   event.preventDefault();
   const element = document.getElementById(target);
   const main = document.getElementById('main');
@@ -2333,7 +2350,7 @@ for (let i = 0; i <= 8; i++) {
   townInfos[i] = document.getElementById(`townInfo${i}`);
 }
 
-function addStatColors(theDiv, stat, forceColors = false) {
+export function addStatColors(theDiv, stat, forceColors = false) {
   for (const className of Array.from(theDiv.classList)) {
     if (className.startsWith('stat-') && className.slice(5) in stats) {
       theDiv.classList.remove(className);
@@ -2345,32 +2362,32 @@ function addStatColors(theDiv, stat, forceColors = false) {
   }
 }
 
-function dragOverDecorate(i) {
+export function dragOverDecorate(i) {
   if (document.getElementById(`nextActionContainer${i}`)) {
     document.getElementById(`nextActionContainer${i}`).classList.add('draggedOverAction');
   }
 }
 
-function dragExitUndecorate(i) {
+export function dragExitUndecorate(i) {
   if (document.getElementById(`nextActionContainer${i}`)) {
     document.getElementById(`nextActionContainer${i}`).classList.remove('draggedOverAction');
   }
 }
 
-function draggedDecorate(i) {
+export function draggedDecorate(i) {
   if (document.getElementById(`nextActionContainer${i}`)) {
     document.getElementById(`nextActionContainer${i}`).classList.add('draggedAction');
   }
 }
 
-function draggedUndecorate(i) {
+export function draggedUndecorate(i) {
   if (document.getElementById(`nextActionContainer${i}`)) {
     document.getElementById(`nextActionContainer${i}`).classList.remove('draggedAction');
   }
   showActionIcons();
 }
 
-function adjustActionListSize(amt) {
+export function adjustActionListSize(amt) {
   let height = document.documentElement.style.getPropertyValue('--action-list-height');
   if (height === '' && amt > 0) {
     height = `${500 + amt}px`;
@@ -2384,7 +2401,7 @@ function adjustActionListSize(amt) {
   globalThis.saving.saveUISettings();
 }
 
-function updateBuffCaps() {
+export function updateBuffCaps() {
   for (const buff of buffList) {
     inputElement(`buff${buff}Cap`).value = String(
       Math.min(
@@ -2396,7 +2413,7 @@ function updateBuffCaps() {
   }
 }
 
-function setScreenSize() {
+export function setScreenSize() {
   _view.screenSize = document.body.scrollHeight;
 }
 

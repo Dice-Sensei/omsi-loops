@@ -50,7 +50,7 @@ let queuedUpdate: MessageToPredictor | undefined;
 
 onmessage = ({ data }) => handleMessage(data);
 
-function handleMessage(data) {
+export function handleMessage(data) {
   const postMessage = self.postMessage;
 
   if (!data?.type) {

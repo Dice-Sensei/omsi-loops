@@ -1,7 +1,7 @@
 import { Localizable } from './localizable.ts';
 import { actionLog, buffHardCaps, buffList, buffs, resources, skillList, skills, statList, stats } from './globals.ts';
 import { prestigeBonus } from './prestige.ts';
-
+import { getAdvGuildRank, getCraftGuildRank, getXMLName } from './actionList.ts';
 export class LevelExp {
   level = 0;
   exp = 0;
@@ -330,109 +330,109 @@ export class Buff extends Localizable {
   }
 
   constructor(name) {
-    super(`buffs>${globalThis.actionList.getXMLName(globalThis.stats.Buff.fullNames[name])}`);
+    super(`buffs>${getXMLName(globalThis.stats.Buff.fullNames[name])}`);
 
     Object.defineProperty(this, 'name', { value: name });
   }
 }
 
-function initializeStats() {
+export function initializeStats() {
   for (let i = 0; i < statList.length; i++) {
     addNewStat(statList[i]);
   }
 }
 
-function addNewStat(name) {
+export function addNewStat(name) {
   stats[name] = new Stat(name);
 }
 
-function initializeSkills() {
+export function initializeSkills() {
   for (let i = 0; i < skillList.length; i++) {
     addNewSkill(skillList[i]);
   }
 }
 
-function addNewSkill(name) {
+export function addNewSkill(name) {
   skills[name] = new Skill(name);
   setSkillBonusType(name);
 }
 
-function initializeBuffs() {
+export function initializeBuffs() {
   for (let i = 0; i < buffList.length; i++) {
     addNewBuff(buffList[i]);
   }
 }
 
-function addNewBuff(name) {
+export function addNewBuff(name) {
   buffs[name] = new Buff(name);
 }
 
-function getLevel(stat) {
+export function getLevel(stat) {
   return stats[stat].statLevelExp.level;
 }
 
-function getTotalTalentLevel() {
+export function getTotalTalentLevel() {
   return Math.floor(Math.pow(globalThis.saving.vals.totalTalent, 0.2));
 }
 
-function getTotalTalentPrc() {
+export function getTotalTalentPrc() {
   return (Math.pow(globalThis.saving.vals.totalTalent, 0.2) -
     Math.floor(Math.pow(globalThis.saving.vals.totalTalent, 0.2))) * 100;
 }
 
-function getLevelFromExp(exp) {
+export function getLevelFromExp(exp) {
   return Math.floor((Math.sqrt(8 * exp / 100 + 1) - 1) / 2);
 }
 
-function getExpOfLevel(level) {
+export function getExpOfLevel(level) {
   return level * (level + 1) * 50;
 }
 
-function getExpOfSingleLevel(level) {
+export function getExpOfSingleLevel(level) {
   return level * 100;
 }
 
-function getTalent(stat) {
+export function getTalent(stat) {
   return stats[stat].talentLevelExp.level;
 }
 
-function getLevelFromTalent(exp) {
+export function getLevelFromTalent(exp) {
   return Math.floor((Math.sqrt(8 * exp / 100 + 1) - 1) / 2);
 }
 
-function getExpOfTalent(level) {
+export function getExpOfTalent(level) {
   return level * (level + 1) * 50;
 }
 
-function getExpOfSingleTalent(level) {
+export function getExpOfSingleTalent(level) {
   return level * 100;
 }
 
-function getPrcToNextLevel(stat) {
+export function getPrcToNextLevel(stat) {
   const curLevelProgress = stats[stat].statLevelExp.exp;
   const nextLevelNeeds = stats[stat].statLevelExp.expRequiredForNextLevel;
   return Math.floor(curLevelProgress / nextLevelNeeds * 100 * 10) / 10;
 }
 
-function getPrcToNextTalent(stat) {
+export function getPrcToNextTalent(stat) {
   const curLevelProgress = stats[stat].talentLevelExp.exp;
   const nextLevelNeeds = stats[stat].talentLevelExp.expRequiredForNextLevel;
   return Math.floor(curLevelProgress / nextLevelNeeds * 100 * 10) / 10;
 }
 
-function getSkillLevelFromExp(exp) {
+export function getSkillLevelFromExp(exp) {
   return Math.floor((Math.sqrt(8 * exp / 100 + 1) - 1) / 2);
 }
 
-function getExpOfSkillLevel(level) {
+export function getExpOfSkillLevel(level) {
   return level * (level + 1) * 50;
 }
 
-function getSkillLevel(skill) {
+export function getSkillLevel(skill) {
   return skills[skill].levelExp.level;
 }
 
-function getSkillBonus(skill) {
+export function getSkillBonus(skill) {
   const bonus = skills[skill].getBonus();
   if (bonus === 0) {
     console.warn('Skill does not have curve set:', skill);
@@ -440,7 +440,7 @@ function getSkillBonus(skill) {
   return bonus;
 }
 
-function setSkillBonusType(skill) {
+export function setSkillBonusType(skill) {
   let change;
   if (
     skill === 'Dark' || skill === 'Chronomancy' || skill === 'Mercantilism' || skill === 'Divine' ||
@@ -456,16 +456,16 @@ function setSkillBonusType(skill) {
   else return skills[skill].change = 0;
 }
 
-function getSkillMod(name, min, max, percentChange) {
+export function getSkillMod(name, min, max, percentChange) {
   if (getSkillLevel(name) < min) return 1;
   else return 1 + Math.min(getSkillLevel(name) - min, max - min) * percentChange / 100;
 }
 
-function getBuffLevel(buff) {
+export function getBuffLevel(buff) {
   return buffs[buff].amt;
 }
 
-function getBuffCap(buff) {
+export function getBuffCap(buff) {
   // Fixme please! I need to have a storage in data space
   const input = document.getElementById(`buff${buff}Cap`);
   if (input instanceof HTMLInputElement) {
@@ -474,29 +474,29 @@ function getBuffCap(buff) {
   throw Error(`buff${buff}Cap not HTMLInputElement?`);
 }
 
-function getRitualBonus(min, max, speed) {
+export function getRitualBonus(min, max, speed) {
   if (getBuffLevel('Ritual') < min) return 1;
   else return 1 + Math.min(getBuffLevel('Ritual') - min, max - min) * speed / 100;
 }
 
-function getSurveyBonus(town) {
+export function getSurveyBonus(town) {
   return town.getLevel('Survey') * .005;
 }
 
-function getArmorLevel() {
+export function getArmorLevel() {
   return 1 +
     ((resources.armor + 3 * resources.enchantments) *
-        globalThis.actionList.getCraftGuildRank().bonus) / 5;
+        getCraftGuildRank().bonus) / 5;
 }
 
-function getSelfCombat() {
+export function getSelfCombat() {
   return ((getSkillLevel('Combat') + getSkillLevel('Pyromancy') * 5) *
     getArmorLevel() *
     (1 + getBuffLevel('Feast') * .05)) *
     prestigeBonus('PrestigeCombat');
 }
 
-function getZombieStrength() {
+export function getZombieStrength() {
   return getSkillLevel('Dark') *
     resources.zombie / 2 *
     Math.max(getBuffLevel('Ritual') / 100, 1) *
@@ -504,25 +504,25 @@ function getZombieStrength() {
     prestigeBonus('PrestigeCombat');
 }
 
-function getTeamStrength() {
+export function getTeamStrength() {
   return ((getSkillLevel('Combat') + getSkillLevel('Restoration') * 4) *
     (resources.teamMembers / 2) *
-    globalThis.actionList.getAdvGuildRank().bonus * getSkillBonus('Leadership') *
+    getAdvGuildRank().bonus * getSkillBonus('Leadership') *
     (1 + getBuffLevel('Feast') * .05)) *
     prestigeBonus('PrestigeCombat');
 }
 
-function getTeamCombat() {
+export function getTeamCombat() {
   return getSelfCombat() + getZombieStrength() + getTeamStrength();
 }
 
-function getPrcToNextSkillLevel(skill) {
+export function getPrcToNextSkillLevel(skill) {
   const curLevelProgress = skills[skill].levelExp.exp;
   const nextLevelNeeds = skills[skill].levelExp.expRequiredForNextLevel;
   return Math.floor(curLevelProgress / nextLevelNeeds * 100 * 10) / 10;
 }
 
-function addSkillExp(name, amount) {
+export function addSkillExp(name, amount) {
   if (name === 'Combat' || name === 'Pyromancy' || name === 'Restoration') amount *= 1 + getBuffLevel('Heroism') * 0.02;
   const oldLevel = getSkillLevel(name);
   skills[name].levelExp.addExp(amount);
@@ -533,7 +533,7 @@ function addSkillExp(name, amount) {
   globalThis.saving.view.requestUpdate('updateSkill', name);
 }
 
-function handleSkillExp(list) {
+export function handleSkillExp(list) {
   for (const skill in list) {
     if (!isSkillName(skill)) {
       console.warn(`Unknown skill in handleSkillExp:`, skill);
@@ -557,7 +557,7 @@ function handleSkillExp(list) {
  * @param {BuffEntry["statSpendType"]} [spendType]
  * @param {SoulstoneEntry["stones"]} [statsSpent]
  */
-function addBuffAmt(name, amount, action, spendType, statsSpent) {
+export function addBuffAmt(name, amount, action, spendType, statsSpent) {
   const oldBuffLevel = getBuffLevel(name);
   if (oldBuffLevel === buffHardCaps[name]) return;
   buffs[name].amt += amount;
@@ -580,7 +580,7 @@ const talentMultiplierCache = {
   wunderkind: -1,
   talentMultiplier: -1,
 };
-function getTalentMultiplier() {
+export function getTalentMultiplier() {
   if (
     talentMultiplierCache.aspirant !== getBuffLevel('Aspirant') ||
     talentMultiplierCache.wunderkind !== getSkillBonus('Wunderkind')
@@ -595,14 +595,14 @@ function getTalentMultiplier() {
 
 // how much "addExp" would you have to do to get this stat to the next exp or talent level
 
-function getExpToLevel(name, talentOnly = false) {
+export function getExpToLevel(name, talentOnly = false) {
   const expToNext = stats[name].statLevelExp.expToNextLevel;
   const talentToNext = stats[name].talentLevelExp.expToNextLevel;
   const talentMultiplier = getTalentMultiplier();
   return Math.ceil(Math.min(talentOnly ? Infinity : expToNext, talentToNext / talentMultiplier));
 }
 
-function addExp(name, amount) {
+export function addExp(name, amount) {
   stats[name].statLevelExp.addExp(amount);
   stats[name].soullessLevelExp.addExp(amount / stats[name].soulstoneMult);
   let talentGain = amount * getTalentMultiplier();
@@ -611,7 +611,7 @@ function addExp(name, amount) {
   globalThis.saving.view.requestUpdate('updateStat', name);
 }
 
-function restartStats() {
+export function restartStats() {
   for (let i = 0; i < statList.length; i++) {
     if (getSkillLevel('Wunderkind') > 0) {
       stats[statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2') * 2);
@@ -620,7 +620,7 @@ function restartStats() {
   globalThis.saving.view.requestUpdate('updateStats', true);
 }
 
-function getTotalBonusXP(statName) {
+export function getTotalBonusXP(statName) {
   return stats[statName].totalBonusXP;
 }
 

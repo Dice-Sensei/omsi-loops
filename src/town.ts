@@ -1,6 +1,7 @@
 import { inputElement } from './helpers.ts';
 import { towns } from './globals.ts';
 import { adjustAll, pauseGame } from './driver.ts';
+import { isTravel, lateGameActions } from './actionList.ts';
 
 'use strict';
 /**
@@ -188,13 +189,13 @@ export class Town<TN extends number> {
     for (const action of globalThis.saving.vals.totalActionList) {
       if (this.index === action.townNum) {
         if (inLateGameActions) {
-          if (globalThis.actionList.lateGameActions.includes(action.name)) {
+          if (lateGameActions.includes(action.name)) {
             lateGameActionCount++;
           } else {
             inLateGameActions = false;
           }
         }
-        if (!inLateGameActions && lateGameActionCount > 0 && globalThis.actionList.isTravel(action.name)) {
+        if (!inLateGameActions && lateGameActionCount > 0 && isTravel(action.name)) {
           // shift late-game actions to end of action button list
           this.totalActionList.push(...this.totalActionList.splice(0, lateGameActionCount));
           lateGameActionCount = 0;

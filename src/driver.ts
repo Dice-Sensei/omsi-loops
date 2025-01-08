@@ -1,3 +1,31 @@
+import {
+  adjustAllRocks,
+  adjustArtifacts,
+  adjustDonations,
+  adjustGeysers,
+  adjustHerbs,
+  adjustHunt,
+  adjustInsurance,
+  adjustLocks,
+  adjustLQuests,
+  adjustMineSoulstones,
+  adjustPockets,
+  adjustPots,
+  adjustPylons,
+  adjustRocks,
+  adjustSQuests,
+  adjustSuckers,
+  adjustTrainingExpMult,
+  adjustWarehouses,
+  adjustWells,
+  adjustWildMana,
+  getActionPrototype,
+  getExploreProgress,
+  hasLimit,
+  isTraining,
+  trainingActions,
+} from './actionList.ts';
+
 import { Data } from './data.ts';
 import { KeyboardKey } from './keyboard.hotkeys.ts';
 import { Localization } from './Localization.ts';
@@ -382,9 +410,9 @@ export function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
         } else {
           const index = actions.addAction(name, addAmount, insertAtIndex);
           globalThis.saving.view.requestUpdate('highlightAction', index);
-          if (KeyboardKey.shift && globalThis.actionList.hasLimit(name)) {
+          if (KeyboardKey.shift && hasLimit(name)) {
             capAmount(index, townNum);
-          } else if (KeyboardKey.shift && globalThis.actionList.isTraining(name)) {
+          } else if (KeyboardKey.shift && isTraining(name)) {
             capTraining(index);
           }
         }
@@ -419,7 +447,7 @@ export function resetResource(resource) {
 export function resetResources() {
   Object.assign(resources, resourcesTemplate);
 
-  if (globalThis.actionList.getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige']) {
+  if (getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige']) {
     addResource('glasses', true);
   }
   globalThis.saving.view.requestUpdate('updateResources', null);
@@ -529,39 +557,39 @@ export function unlockTown(townNum) {
   globalThis.saving.vals.curTown = townNum;
 }
 export function adjustAll() {
-  globalThis.actionList.adjustPots();
-  globalThis.actionList.adjustLocks();
-  globalThis.actionList.adjustSQuests();
-  globalThis.actionList.adjustLQuests();
-  globalThis.actionList.adjustWildMana();
-  globalThis.actionList.adjustHerbs();
-  globalThis.actionList.adjustHunt();
-  globalThis.actionList.adjustSuckers();
-  globalThis.actionList.adjustGeysers();
-  globalThis.actionList.adjustMineSoulstones();
-  globalThis.actionList.adjustArtifacts();
-  globalThis.actionList.adjustDonations();
-  globalThis.actionList.adjustWells();
-  globalThis.actionList.adjustPylons();
-  globalThis.actionList.adjustPockets();
-  globalThis.actionList.adjustWarehouses();
-  globalThis.actionList.adjustInsurance();
-  globalThis.actionList.adjustAllRocks();
-  globalThis.actionList.adjustTrainingExpMult();
+  adjustPots();
+  adjustLocks();
+  adjustSQuests();
+  adjustLQuests();
+  adjustWildMana();
+  adjustHerbs();
+  adjustHunt();
+  adjustSuckers();
+  adjustGeysers();
+  adjustMineSoulstones();
+  adjustArtifacts();
+  adjustDonations();
+  adjustWells();
+  adjustPylons();
+  adjustPockets();
+  adjustWarehouses();
+  adjustInsurance();
+  adjustAllRocks();
+  adjustTrainingExpMult();
   globalThis.saving.view.requestUpdate('adjustManaCost', 'Continue On');
 }
 export function capAction(actionId) {
   const action = actions.findActionWithId(actionId);
   if (!action) return;
-  if (globalThis.actionList.hasLimit(action.name)) {
-    return capAmount(action.index, globalThis.actionList.getActionPrototype(action.name).townNum);
-  } else if (globalThis.actionList.isTraining(action.name)) {
+  if (hasLimit(action.name)) {
+    return capAmount(action.index, getActionPrototype(action.name).townNum);
+  } else if (isTraining(action.name)) {
     return capTraining(action.index);
   }
 }
 export function capAmount(index, townNum) {
   const action = actions.next[index];
-  const varName = `good${globalThis.actionList.getActionPrototype(action.name)?.varName}`;
+  const varName = `good${getActionPrototype(action.name)?.varName}`;
   let alreadyExisting;
   alreadyExisting = getNumOnList(action.name) +
     (action.disabled ? action.loops : 0);
@@ -585,7 +613,7 @@ export function capTraining(index) {
 export function capAllTraining() {
   for (const [index, action] of actions.next.entries()) {
     // @ts-ignore
-    if (globalThis.actionList.trainingActions.includes(action.name)) {
+    if (trainingActions.includes(action.name)) {
       //console.log("Training Action on list: " + action.name);
       capTraining(index);
     }
@@ -593,7 +621,7 @@ export function capAllTraining() {
 }
 export function addLoop(actionId) {
   const action = actions.findActionWithId(actionId);
-  const theClass = globalThis.actionList.getActionPrototype(action.name);
+  const theClass = getActionPrototype(action.name);
   let addAmount = actions.addAmount;
   if (theClass.allowed) {
     const numMax = theClass.allowed();
@@ -714,7 +742,7 @@ export function moveDown(actionId) {
 export function disableAction(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
   const action = actions.next[index];
-  const translated = globalThis.actionList.getActionPrototype(action.name);
+  const translated = getActionPrototype(action.name);
   if (action.disabled) {
     if (!translated.allowed || getNumOnList(action.name) + action.loops <= translated.allowed()) {
       actions.updateAction(index, { disabled: false });

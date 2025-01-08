@@ -33,7 +33,7 @@ import {
 } from './driver.ts';
 import {} from './stats.ts';
 
-class ClassNameNotFoundError extends TypeError {}
+export class ClassNameNotFoundError extends TypeError {}
 
 /**
  * @template {string} S
@@ -44,7 +44,7 @@ class ClassNameNotFoundError extends TypeError {}
  * @template {string} S
  * @param {S} name @returns {WithoutSpaces<S>}
  */
-function withoutSpaces(name) {
+export function withoutSpaces(name) {
   // @ts-ignore
   return name.replace(/ /gu, '');
 }
@@ -106,7 +106,7 @@ function withoutSpaces(name) {
  * @template {ActionId|ActionName} N
  * @param {N} name @returns {TryLookupAction<N>}
  */
-function getActionPrototype(name) {
+export function getActionPrototype(name) {
   if (!name) return undefined;
   const nameWithoutSpaces = withoutSpaces(name);
   if (nameWithoutSpaces in Action && Action[nameWithoutSpaces] instanceof Action) {
@@ -117,7 +117,7 @@ function getActionPrototype(name) {
   return undefined;
 }
 
-function translateClassNames(name) {
+export function translateClassNames(name) {
   // construct a new action object with appropriate prototype
   const nameWithoutSpaces = withoutSpaces(name);
   if (nameWithoutSpaces in Action) {
@@ -126,7 +126,7 @@ function translateClassNames(name) {
   throw new ClassNameNotFoundError(`error trying to create ${name}`);
 }
 
-const limitedActions = [
+export const limitedActions = [
   'Smash Pots',
   'Pick Locks',
   'Short Quest',
@@ -144,7 +144,7 @@ const limitedActions = [
   'Destroy Pylons',
 ];
 
-const trainingActions = [
+export const trainingActions = [
   'Train Speed',
   'Train Strength',
   'Train Dexterity',
@@ -155,22 +155,22 @@ const trainingActions = [
   'Charm School',
 ];
 
-function hasLimit(name) {
+export function hasLimit(name) {
   // @ts-ignore
   return limitedActions.includes(name);
 }
 
-function isTravel(name) {
+export function isTravel(name) {
   return getTravelNum(name) !== 0;
 }
 
-function getPossibleTravel(name) {
+export function getPossibleTravel(name) {
   if (name === 'Face Judgement') return [1, 2];
   const travelNum = getTravelNum(name);
   return travelNum ? [travelNum] : [];
 }
 
-function getTravelNum(name) {
+export function getTravelNum(name) {
   if (name === 'Face Judgement' && resources.reputation <= 50) return 2;
   if (name === 'Face Judgement' && resources.reputation >= 50) return 1;
   if (
@@ -183,20 +183,20 @@ function getTravelNum(name) {
   return 0;
 }
 
-function isTraining(name) {
+export function isTraining(name) {
   // @ts-ignore
   return trainingActions.includes(name);
 }
 
-function isActionOfType(action, type) {
+export function isActionOfType(action, type) {
   return action.type === type;
 }
 
-function getXMLName(name) {
+export function getXMLName(name) {
   return name.toLowerCase().replace(/ /gu, '_');
 }
 
-const townNames = [
+export const townNames = [
   'Beginnersville',
   'Forest Path',
   'Merchanton',
@@ -217,7 +217,7 @@ const townNames = [
 // type names are "normal", "progress", "limited", and "multipart".
 // define one of these in the action, and they will create any additional UI elements that are needed
 
-const actionTypes = ['normal', 'progress', 'limited', 'multipart'];
+export const actionTypes = ['normal', 'progress', 'limited', 'multipart'];
 /**
  * @typedef {{
  *     type: ActionType,
@@ -252,7 +252,7 @@ const actionTypes = ['normal', 'progress', 'limited', 'multipart'];
  * @template {ActionExtras} [E=ActionExtras] The extras parameter passed to the constructor
  */
 
-class Action extends Localizable {
+export class Action extends Localizable {
   name;
 
   varName;
@@ -671,7 +671,7 @@ class AssassinAction extends MultipartAction {
 //Survery Actions (All Zones)
 //====================================================================================================
 
-function SurveyAction(townNum) {
+export function SurveyAction(townNum) {
   return ({
     type: 'progress',
     expMult: 1,
@@ -717,7 +717,7 @@ Action.SurveyZ6 = new Action('SurveyZ6', SurveyAction(6));
 Action.SurveyZ7 = new Action('SurveyZ7', SurveyAction(7));
 Action.SurveyZ8 = new Action('SurveyZ8', SurveyAction(8));
 
-function RuinsAction(townNum) {
+export function RuinsAction(townNum) {
   return ({
     type: 'progress',
     expMult: 1,
@@ -761,7 +761,7 @@ Action.RuinsZ3 = new Action('RuinsZ3', RuinsAction(3));
 Action.RuinsZ5 = new Action('RuinsZ5', RuinsAction(5));
 Action.RuinsZ6 = new Action('RuinsZ6', RuinsAction(6));
 
-function adjustRocks(townNum) {
+export function adjustRocks(townNum) {
   let town = towns[townNum];
   let baseStones = town.getLevel('RuinsZ' + townNum) * 2500;
   let usedStones = globalThis.saving.vals.stonesUsed[townNum];
@@ -770,14 +770,14 @@ function adjustRocks(townNum) {
   town[`goodTempStonesZ${townNum}`] = Math.floor(town[`checkedStonesZ${townNum}`] / 1000) - usedStones;
   if (usedStones === 250) town[`checkedStonesZ${townNum}`] = 250000;
 }
-function adjustAllRocks() {
+export function adjustAllRocks() {
   adjustRocks(1);
   adjustRocks(3);
   adjustRocks(5);
   adjustRocks(6);
 }
 
-function HaulAction(townNum) {
+export function HaulAction(townNum) {
   return ({
     type: 'limited',
     expMult: 1,
@@ -857,7 +857,7 @@ Action.AssassinZ7 = new AssassinAction('AssassinZ7', {
   townNum: 7,
 });
 
-const lateGameActions = Object.values(Action).filter((a) => a instanceof Action).map((a) => a.name);
+export const lateGameActions = Object.values(Action).filter((a) => a instanceof Action).map((a) => a.name);
 
 //====================================================================================================
 //Zone 1 - Beginnersville
@@ -940,12 +940,12 @@ Action.Wander = new Action('Wander', {
     towns[0].finishProgress(this.varName, 200 * (resources.glasses ? 4 : 1));
   },
 });
-function adjustPots() {
+export function adjustPots() {
   let town = towns[0];
   let basePots = Math.round(town.getLevel('Wander') * 5 * adjustContentFromPrestige());
   town.totalPots = Math.floor(basePots + basePots * globalThis.stats.getSurveyBonus(town));
 }
-function adjustLocks() {
+export function adjustLocks() {
   let town = towns[0];
   let baseLocks = Math.round(town.getLevel('Wander') * adjustContentFromPrestige());
   town.totalLocks = Math.floor(
@@ -1190,7 +1190,7 @@ Action.MeetPeople = new Action('Meet People', {
     towns[0].finishProgress(this.varName, 200);
   },
 });
-function adjustSQuests() {
+export function adjustSQuests() {
   let town = towns[0];
   let baseSQuests = Math.round(town.getLevel('Met') * adjustContentFromPrestige());
   town.totalSQuests = Math.floor(
@@ -1338,7 +1338,7 @@ Action.Investigate = new Action('Investigate', {
     towns[0].finishProgress(this.varName, 500);
   },
 });
-function adjustLQuests() {
+export function adjustLQuests() {
   let town = towns[0];
   let baseLQuests = Math.round(town.getLevel('Secrets') / 2 * adjustContentFromPrestige());
   town.totalLQuests = Math.floor(
@@ -2040,14 +2040,14 @@ Action.ExploreForest = new Action('Explore Forest', {
     towns[1].finishProgress(this.varName, 100 * (resources.glasses ? 2 : 1));
   },
 });
-function adjustWildMana() {
+export function adjustWildMana() {
   let town = towns[1];
   let baseWildMana = Math.round(
     (town.getLevel('Forest') * 5 + town.getLevel('Thicket') * 5) * adjustContentFromPrestige(),
   );
   town.totalWildMana = Math.floor(baseWildMana + baseWildMana * globalThis.stats.getSurveyBonus(town));
 }
-function adjustHunt() {
+export function adjustHunt() {
   let town = towns[1];
   let baseHunt = Math.round(town.getLevel('Forest') * 2 * adjustContentFromPrestige());
   town.totalHunt = Math.floor(
@@ -2055,7 +2055,7 @@ function adjustHunt() {
       baseHunt * globalThis.stats.getSurveyBonus(town),
   );
 }
-function adjustHerbs() {
+export function adjustHerbs() {
   let town = towns[1];
   let baseHerbs = Math.round(
     (town.getLevel('Forest') * 5 + town.getLevel('Shortcut') * 2 + town.getLevel('Flowers') * 13) *
@@ -2836,7 +2836,7 @@ Action.DarkRitual = new MultipartAction('Dark Ritual', {
   },
 });
 
-function checkSoulstoneSac(amount) {
+export function checkSoulstoneSac(amount) {
   let sum = 0;
   for (const stat in stats) {
     sum += stats[stat].soulstone;
@@ -2846,7 +2846,7 @@ function checkSoulstoneSac(amount) {
 
 let sacrificeSoulstones = sacrificeSoulstonesBySegments;
 
-function sacrificeSoulstonesBySegments(
+export function sacrificeSoulstonesBySegments(
   amount,
   segments = 9,
   stonesSpent = {},
@@ -2879,7 +2879,12 @@ function sacrificeSoulstonesBySegments(
   return stonesSpent;
 }
 
-function sacrificeSoulstonesProportional(amount, power = 1, stonesSpent = {}, sortedStats = Object.values(stats)) { //initializer does not sort because we do every loop anyway
+export function sacrificeSoulstonesProportional(
+  amount,
+  power = 1,
+  stonesSpent = {},
+  sortedStats = Object.values(stats),
+) { //initializer does not sort because we do every loop anyway
   // extremely unlikely that we have to use more than one iteration for typical cases, but some powers can cause degenerate behavior
   while (amount > 0) {
     // (re-)sort stats by soulstone count of stats, high to low
@@ -2907,7 +2912,7 @@ function sacrificeSoulstonesProportional(amount, power = 1, stonesSpent = {}, so
   return stonesSpent;
 }
 
-function sacrificeSoulstonesToEquality(
+export function sacrificeSoulstonesToEquality(
   amount,
   allowedDifference = 0,
   stonesSpent = {},
@@ -3033,7 +3038,7 @@ Action.ExploreCity = new Action('Explore City', {
     towns[2].finishProgress(this.varName, 100 * (resources.glasses ? 2 : 1));
   },
 });
-function adjustSuckers() {
+export function adjustSuckers() {
   let town = towns[2];
   let baseGamble = Math.round(town.getLevel('City') * 3 * adjustContentFromPrestige());
   town.totalGamble = Math.floor(
@@ -3312,7 +3317,7 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
     globalThis.view.setStoryFlag('advGuildTestsTaken');
   },
 });
-function getAdvGuildRank(offset) {
+export function getAdvGuildRank(offset) {
   let name = [
     'F',
     'E',
@@ -3550,7 +3555,7 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
     globalThis.view.setStoryFlag('craftGuildTestsTaken');
   },
 });
-function getCraftGuildRank(offset) {
+export function getCraftGuildRank(offset) {
   let name = [
     'F',
     'E',
@@ -4113,7 +4118,7 @@ Action.ManaGeyser = new Action('Mana Geyser', {
     });
   },
 });
-function adjustGeysers() {
+export function adjustGeysers() {
   let town = towns[3];
   let baseGeysers = Math.round(town.getLevel('Mountain') * 10 * adjustContentFromPrestige());
   town.totalGeysers = Math.round(baseGeysers + baseGeysers * globalThis.stats.getSurveyBonus(town));
@@ -4383,7 +4388,7 @@ Action.MineSoulstones = new Action('Mine Soulstones', {
   },
 });
 
-function adjustMineSoulstones() {
+export function adjustMineSoulstones() {
   let town = towns[3];
   let baseMine = Math.round(town.getLevel('Cavern') * 3 * adjustContentFromPrestige());
   town.totalMineSoulstones = Math.floor(
@@ -4533,7 +4538,7 @@ Action.TakeArtifacts = new Action('Take Artifacts', {
     });
   },
 });
-function adjustArtifacts() {
+export function adjustArtifacts() {
   let town = towns[3];
   let baseArtifacts = Math.round(town.getLevel('Illusions') * 5 * adjustContentFromPrestige());
   town.totalArtifacts = Math.floor(
@@ -4970,7 +4975,7 @@ Action.AcceptDonations = new Action('Accept Donations', {
   },
 });
 
-function adjustDonations() {
+export function adjustDonations() {
   let town = towns[4];
   let base = Math.round(town.getLevel('Canvassed') * 5 * adjustContentFromPrestige());
   town.totalDonations = Math.floor(
@@ -5410,7 +5415,7 @@ Action.WizardCollege = new MultipartAction('Wizard College', {
     globalThis.view.increaseStoryVarTo('maxWizardGuildSegmentCleared', 0);
   },
 });
-function getWizCollegeRank(offset) {
+export function getWizCollegeRank(offset) {
   let name = [
     'Initiate',
     'Student',
@@ -5836,7 +5841,7 @@ Action.FightFrostGiants = new MultipartAction('Fight Frost Giants', {
     globalThis.view.setStoryFlag('giantGuildTestTaken');
   },
 });
-function getFrostGiantsRank(offset) {
+export function getFrostGiantsRank(offset) {
   let name = [
     'Private',
     'Corporal', //E
@@ -6068,7 +6073,7 @@ Action.Meander = new Action('Meander', {
     towns[5].finishProgress(this.varName, globalThis.stats.getBuffLevel('Imbuement'));
   },
 });
-function adjustPylons() {
+export function adjustPylons() {
   let town = towns[5];
   let base = Math.round(town.getLevel('Meander') * 10 * adjustContentFromPrestige());
   town.totalPylons = Math.floor(
@@ -6128,7 +6133,7 @@ Action.ManaWell = new Action('Mana Well', {
     if (towns[5].goodWells >= 15) globalThis.view.setStoryFlag('drew15Wells');
   },
 });
-function adjustWells() {
+export function adjustWells() {
   let town = towns[5];
   let base = Math.round(town.getLevel('Meander') * 10 * adjustContentFromPrestige());
   town.totalWells = Math.floor(base + base * globalThis.stats.getSurveyBonus(town));
@@ -6627,7 +6632,7 @@ Action.FightJungleMonsters = new MultipartAction('Fight Jungle Monsters', {
     globalThis.view.setStoryFlag('monsterGuildTestTaken');
   },
 });
-function getFightJungleMonstersRank(offset) {
+export function getFightJungleMonstersRank(offset) {
   let name = [
     'Frog',
     'Toucan',
@@ -6963,7 +6968,7 @@ Action.Excursion = new Action('Excursion', {
     addResource('gold', -1 * this.goldCost());
   },
 });
-function adjustPockets() {
+export function adjustPockets() {
   let town = towns[7];
   let base = Math.round(town.getLevel('Excursion') * adjustContentFromPrestige());
   town.totalPockets = Math.floor(
@@ -6971,7 +6976,7 @@ function adjustPockets() {
   );
   globalThis.saving.view.requestUpdate('updateActionTooltips', null);
 }
-function adjustWarehouses() {
+export function adjustWarehouses() {
   let town = towns[7];
   let base = Math.round(town.getLevel('Excursion') / 2.5 * adjustContentFromPrestige());
   town.totalWarehouses = Math.floor(
@@ -6979,7 +6984,7 @@ function adjustWarehouses() {
   );
   globalThis.saving.view.requestUpdate('updateActionTooltips', null);
 }
-function adjustInsurance() {
+export function adjustInsurance() {
   let town = towns[7];
   let base = Math.round(town.getLevel('Excursion') / 10 * adjustContentFromPrestige());
   town.totalInsurance = Math.floor(
@@ -7041,14 +7046,14 @@ Action.ExplorersGuild = new Action('Explorers Guild', {
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
   },
 });
-function fullyExploredZones() {
+export function fullyExploredZones() {
   let fullyExplored = 0;
   towns.forEach((town, index) => {
     if (town.getLevel(`SurveyZ${index}`) == 100) fullyExplored++;
   });
   return fullyExplored;
 }
-function getTotalExploreProgress() {
+export function getTotalExploreProgress() {
   //TotalExploreProgress == total of all zones' survey progress.
   let totalExploreProgress = 0;
   towns.forEach((town, index) => {
@@ -7056,13 +7061,13 @@ function getTotalExploreProgress() {
   });
   return totalExploreProgress;
 }
-function getExploreProgress() {
+export function getExploreProgress() {
   //ExploreProgress == mean of all zones' survey progress, rounded down.
   const totalExploreProgress = getTotalExploreProgress();
   if (totalExploreProgress == 0) return 0;
   else return Math.max(Math.floor(totalExploreProgress / towns.length), 1);
 }
-function getExploreExp() {
+export function getExploreExp() {
   //ExploreExp == total survey exp across all zones
   let totalExploreExp = 0;
   towns.forEach((town, index) => {
@@ -7070,7 +7075,7 @@ function getExploreExp() {
   });
   return totalExploreExp;
 }
-function getExploreExpSinceLastProgress() {
+export function getExploreExpSinceLastProgress() {
   const totalExploreProgress = getTotalExploreProgress();
   if (totalExploreProgress === 100 * towns.length) return 1;
   let levelsSinceLastProgress = totalExploreProgress <= 1
@@ -7103,7 +7108,7 @@ function getExploreExpSinceLastProgress() {
   }
   return totalExpGained;
 }
-function getExploreExpToNextProgress() {
+export function getExploreExpToNextProgress() {
   const totalExploreProgress = getTotalExploreProgress();
   if (totalExploreProgress === 100 * towns.length) return 0;
   let levelsToNextProgress = totalExploreProgress === 0
@@ -7136,10 +7141,10 @@ function getExploreExpToNextProgress() {
   }
   return totalExpNeeded;
 }
-function getExploreSkill() {
+export function getExploreSkill() {
   return Math.floor(Math.sqrt(getExploreProgress()));
 }
-function exchangeMap() {
+export function exchangeMap() {
   let unfinishedSurveyZones = [];
   towns.forEach((town, index) => {
     if (town.getLevel('Survey') < 100) unfinishedSurveyZones.push(index);
@@ -7256,7 +7261,7 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
     }
   },
 });
-function getThievesGuildRank(offset) {
+export function getThievesGuildRank(offset) {
   let name = [
     'F',
     'E',
@@ -7534,7 +7539,7 @@ Action.GuildAssassin = new Action('Guild Assassin', {
   },
 });
 
-function totalAssassinations() {
+export function totalAssassinations() {
   //Counts all zones with at least one successful assassination.
   let total = 0;
   for (var i = 0; i < towns.length; i++) {
@@ -7921,7 +7926,7 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
   },
 });
 
-function adjustTrainingExpMult() {
+export function adjustTrainingExpMult() {
   for (let actionName of trainingActions) {
     const actionProto = getActionPrototype(actionName);
     // @ts-ignore shh we're pretending it's frozen
@@ -8262,58 +8267,6 @@ Action.RestoreTime = new Action('Restore Time', {
   },
 });
 
-const actionsWithGoldCost = Object.values(Action).filter(
+export const actionsWithGoldCost = Object.values(Action).filter(
   (action) => action.goldCost !== undefined,
 );
-
-const _actionList = {
-  actionsWithGoldCost,
-  adjustTrainingExpMult,
-  adjustPots,
-  adjustLocks,
-  adjustSQuests,
-  adjustLQuests,
-  adjustWildMana,
-  adjustHerbs,
-  adjustHunt,
-  adjustSuckers,
-  adjustGeysers,
-  adjustMineSoulstones,
-  adjustArtifacts,
-  adjustDonations,
-  adjustWells,
-  adjustPylons,
-  adjustPockets,
-  adjustWarehouses,
-  adjustInsurance,
-  adjustAllRocks,
-  exchangeMap,
-  getExploreSkill,
-  getExploreExp,
-  getExploreExpSinceLastProgress,
-  getExploreExpToNextProgress,
-  getExploreProgress,
-  getTotalExploreProgress,
-  fullyExploredZones,
-  Action,
-  getCraftGuildRank,
-  getAdvGuildRank,
-  lateGameActions,
-  actionTypes,
-  townNames,
-  getXMLName,
-  isActionOfType,
-  isTraining,
-  getTravelNum,
-  getPossibleTravel,
-  isTravel,
-  hasLimit,
-  trainingActions,
-  limitedActions,
-  translateClassNames,
-  ClassNameNotFoundError,
-  withoutSpaces,
-  getActionPrototype,
-};
-
-globalThis.actionList = _actionList;

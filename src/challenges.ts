@@ -1,3 +1,5 @@
+import { Action } from './actionList.ts';
+
 import { towns } from './globals.ts';
 import { addMana, addResource, driverVals, resetResources } from './driver.ts';
 
@@ -10,16 +12,16 @@ enum ChallengeMode {
 const setupManaDrought = () => {
   driverVals.gameSpeed = 2;
 
-  globalThis.actionList.Action.BuyManaZ1.canStart = function () {
+  Action.BuyManaZ1.canStart = function () {
     return globalThis.saving.vals.totalMerchantMana > 0;
   };
-  globalThis.actionList.Action.BuyManaZ1.manaCost = function () {
+  Action.BuyManaZ1.manaCost = function () {
     return 1;
   };
-  globalThis.actionList.Action.BuyManaZ1.goldCost = function () {
+  Action.BuyManaZ1.goldCost = function () {
     return 30;
   };
-  globalThis.actionList.Action.BuyManaZ1.finish = function () {
+  Action.BuyManaZ1.finish = function () {
     const spendGold = Math.min(resources.gold, 300);
     const buyMana = Math.min(spendGold * this.goldCost(), globalThis.saving.vals.totalMerchantMana);
 
@@ -28,10 +30,10 @@ const setupManaDrought = () => {
     addResource('gold', -spendGold);
   };
 
-  globalThis.actionList.Action.BuyManaZ3.visible = function () {
+  Action.BuyManaZ3.visible = function () {
     return false;
   };
-  globalThis.actionList.Action.BuyManaZ5.visible = function () {
+  Action.BuyManaZ5.visible = function () {
     return false;
   };
 };

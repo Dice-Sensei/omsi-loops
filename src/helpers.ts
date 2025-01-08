@@ -144,7 +144,7 @@ const si = [
 
 const rx = /\.0+$|(\.[0-9]*[1-9])0+$/u;
 
-function nFormatter(num, digits, fixPrecision = false) {
+export function nFormatter(num, digits, fixPrecision = false) {
   for (let i = 0; i < si.length; i++) {
     // /1.000501 to handle rounding
     if (num >= si[i].value / 1.000501) {

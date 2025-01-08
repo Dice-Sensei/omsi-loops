@@ -1,5 +1,6 @@
 import { Localization } from './Localization.ts';
 import { extractStrings, formatNumber, intToString, restoreStrings } from './helpers.ts';
+import { getActionPrototype, getXMLName, townNames } from './actionList.ts';
 
 export class ActionLog {
   /** @type {ActionLogEntry[]} */
@@ -164,7 +165,7 @@ class ActionLogEntry {
   actionName;
 
   get action() {
-    return globalThis.actionList.getActionPrototype(this.actionName) || null;
+    return getActionPrototype(this.actionName) || null;
   }
 
   get repeatable() {
@@ -237,7 +238,7 @@ class ActionLogEntry {
     if (key === 'loop') return formatNumber(this.loop);
     if (key === 'loopStart') return formatNumber(this.loop);
     if (key === 'loopEnd') return formatNumber(this.loop);
-    if (key === 'town') return globalThis.actionList.townNames[this.action?.townNum];
+    if (key === 'town') return townNames[this.action?.townNum];
     if (key === 'action') return this.action?.label;
     if (key === 'header') return Localization.txt('actions>log>header');
     throw new Error(`Bad key ${key}`);
@@ -339,7 +340,7 @@ class ActionStoryEntry extends UniqueLogEntry {
 
   getReplacement(key) {
     if (key === 'condition' || key === 'story') {
-      const storyInfo = globalThis.actionList.getActionPrototype(this.actionName)?.getStoryTexts()?.find(({ num }) =>
+      const storyInfo = getActionPrototype(this.actionName)?.getStoryTexts()?.find(({ num }) =>
         num === this.storyIndex
       );
 
@@ -552,7 +553,7 @@ class SkillEntry extends LeveledLogEntry {
 
   getReplacement(key) {
     if (key === 'skill') {
-      return Localization.txt(`skills>${globalThis.actionList.getXMLName(this.name)}>label`);
+      return Localization.txt(`skills>${getXMLName(this.name)}>label`);
     }
     return super.getReplacement(key);
   }
@@ -606,7 +607,7 @@ class BuffEntry extends LeveledLogEntry {
   getReplacement(key) {
     if (key === 'buff') {
       return Localization.txt(
-        `buffs>${globalThis.actionList.getXMLName(globalThis.stats.Buff.fullNames[this.name])}>label`,
+        `buffs>${getXMLName(globalThis.stats.Buff.fullNames[this.name])}>label`,
       );
     }
     if (key === 'buff_cost') {
