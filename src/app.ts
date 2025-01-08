@@ -3,7 +3,6 @@ import './actionList.ts';
 import './stats.ts';
 import './actions.ts';
 import './views/main.view.ts';
-import './globals.ts';
 import './saving.ts';
 
 import { renderViews } from './views/register-all.ts';
