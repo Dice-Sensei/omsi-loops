@@ -1,6 +1,5 @@
 import { Localization } from './localization.ts';
 import './actionList.ts';
-import './interval.ts';
 import './driver.ts';
 import './stats.ts';
 import './actions.ts';
