@@ -3,56 +3,6 @@ import { hearts, resources, statList, stats, towns } from './globals.ts';
 import { driverVals, getSpeedMult, pauseGame } from './driver.ts';
 import { prestigeBonus } from './prestige.ts';
 
-/**
- * ActionLoopType is an enum that describes what the "loops" property means. Actions without
- * a loopsType property default to the classic behavior of "actions" for non-multipart actions
- * or "maxEffort" for multipart actions.
- *
- * The comments here assume X as the number specified in "loops" and M as the manaCost() of the
- * action in question.
- * @typedef {"actions"      // perform X actions and then stop
- *         | "maxMana"      // Multipart actions: Spend no more than X * M adjusted mana, stop before starting an action that would overflow
- *         | "maxEffort"    // Multipart actions: Spend no more than X * M original mana, stop before starting an action that would overflow
- *         | "knownGood"    // Limited actions: perform at most X actions, only targeting known-good items
- *         | "unchecked"    // Limited actions: perform at most X actions, only targeting unknown items
- * } ActionLoopType
- */
-
-/**
- * {@link CurrentActionEntry} is the extra data added to an {@link Action} when it is part of the current loop.
- * {@link AnyActionEntry} is the resulting typedef.
- *
- * @typedef CurrentActionEntry
- * @prop {ActionLoopType} loopsType
- * @prop {number} loops
- * @prop {number} loopsLeft
- * @prop {number} extraLoops
- * @prop {number} ticks
- * @prop {number} [adjustedTicks]
- * @prop {number} [rawTicks]
- * @prop {number} manaUsed
- * @prop {number} lastMana
- * @prop {number} manaRemaining
- * @prop {number} goldRemaining
- * @prop {number} timeSpent
- * @prop {number} effectiveTimeElapsed
- * @prop {string} [errorMessage]
- * }}
- * @typedef {CurrentActionEntry & AnyActionType} AnyActionEntry
- */
-
-/**
- * NextActionEntry is the shorthand object stored in {@link Actions.next} array. It does not have an Action prototype.
- *
- * @typedef NextActionEntry
- * @prop {ActionName} name
- * @prop {number}     loops
- * @prop {boolean}    disabled
- * @prop {boolean}    [collapsed]
- * @prop {ActionLoopType} [loopsType]
- * @prop {number}     [actionId]
- */
-
 export class Actions {
   current = [];
 

@@ -1,7 +1,6 @@
 import { Localization } from './localization.ts';
 import './actionList.ts';
 import './stats.ts';
-import './actions.ts';
 import './views/main.view.ts';
 import './saving.ts';
 
