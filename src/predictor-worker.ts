@@ -1,6 +1,5 @@
 import { Data, SnapshotMissingError } from './data.ts';
 import './actionList.ts';
-import './driver.ts';
 import './stats.ts';
 import './actions.ts';
 import './globals.ts';
