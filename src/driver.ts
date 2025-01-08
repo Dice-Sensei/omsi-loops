@@ -1,3 +1,4 @@
+import { getBuffLevel, getRitualBonus, getSkillBonus, getSkillLevel, restartStats } from './stats.ts';
 import {
   adjustAllRocks,
   adjustArtifacts,
@@ -12,7 +13,6 @@ import {
   adjustPockets,
   adjustPots,
   adjustPylons,
-  adjustRocks,
   adjustSQuests,
   adjustSuckers,
   adjustTrainingExpMult,
@@ -44,22 +44,22 @@ export function getSpeedMult(zone = globalThis.saving.vals.curTown) {
   let speedMult = 1;
 
   // Dark Ritual
-  if (zone === 0) speedMult *= globalThis.stats.getRitualBonus(0, 20, 10);
-  else if (zone === 1) speedMult *= globalThis.stats.getRitualBonus(20, 40, 5);
-  else if (zone === 2) speedMult *= globalThis.stats.getRitualBonus(40, 60, 2.5);
-  else if (zone === 3) speedMult *= globalThis.stats.getRitualBonus(60, 80, 1.5);
-  else if (zone === 4) speedMult *= globalThis.stats.getRitualBonus(80, 100, 1);
-  else if (zone === 5) speedMult *= globalThis.stats.getRitualBonus(100, 150, .5);
-  else if (zone === 6) speedMult *= globalThis.stats.getRitualBonus(150, 200, .5);
-  else if (zone === 7) speedMult *= globalThis.stats.getRitualBonus(200, 250, .5);
-  else if (zone === 8) speedMult *= globalThis.stats.getRitualBonus(250, 300, .5);
-  speedMult *= globalThis.stats.getRitualBonus(300, 666, .1);
+  if (zone === 0) speedMult *= getRitualBonus(0, 20, 10);
+  else if (zone === 1) speedMult *= getRitualBonus(20, 40, 5);
+  else if (zone === 2) speedMult *= getRitualBonus(40, 60, 2.5);
+  else if (zone === 3) speedMult *= getRitualBonus(60, 80, 1.5);
+  else if (zone === 4) speedMult *= getRitualBonus(80, 100, 1);
+  else if (zone === 5) speedMult *= getRitualBonus(100, 150, .5);
+  else if (zone === 6) speedMult *= getRitualBonus(150, 200, .5);
+  else if (zone === 7) speedMult *= getRitualBonus(200, 250, .5);
+  else if (zone === 8) speedMult *= getRitualBonus(250, 300, .5);
+  speedMult *= getRitualBonus(300, 666, .1);
 
   // Chronomancy
-  speedMult *= globalThis.stats.getSkillBonus('Chronomancy');
+  speedMult *= getSkillBonus('Chronomancy');
 
   // Imbue Soul
-  speedMult *= 1 + 0.5 * globalThis.stats.getBuffLevel('Imbuement3');
+  speedMult *= 1 + 0.5 * getBuffLevel('Imbuement3');
 
   // Prestige Chronomancy
   speedMult *= prestigeBonus('PrestigeChronomancy');
@@ -370,7 +370,7 @@ export function restart() {
   document.title = 'Idle Loops';
   globalThis.saving.vals.currentLoop = globalThis.saving.vals.totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
   resetResources();
-  globalThis.stats.restartStats();
+  restartStats();
   for (let i = 0; i < towns.length; i++) {
     towns[i].restart();
   }
@@ -596,7 +596,7 @@ export function capAmount(index, townNum) {
   let newLoops;
   if (action.name.startsWith('Survey')) newLoops = 500 - alreadyExisting;
   if (action.name === 'Gather Team') {
-    newLoops = 5 + Math.floor(globalThis.stats.getSkillLevel('Leadership') / 100) - alreadyExisting;
+    newLoops = 5 + Math.floor(getSkillLevel('Leadership') / 100) - alreadyExisting;
   } else newLoops = towns[townNum][varName] - alreadyExisting;
   actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
   globalThis.saving.view.updateNextActions();

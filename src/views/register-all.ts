@@ -1,3 +1,4 @@
+import { Buff } from '../stats.ts';
 import $ from 'jquery';
 import { Localization } from '../Localization.ts';
 import { camelize, htmlElement } from '../helpers.ts';
@@ -21,7 +22,7 @@ const buffsContainer = {
     let html = '';
 
     for (const name of buffList) {
-      const fullName = globalThis.stats.Buff.fullNames[name];
+      const fullName = Buff.fullNames[name];
       const XMLName = getXMLName(fullName);
       const desc2 = Localization.txtsObj(`buffs>${XMLName}`)[0].innerHTML.includes('desc2');
 

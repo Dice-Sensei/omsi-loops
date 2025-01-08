@@ -1,3 +1,4 @@
+import { Buff, LevelExp, Skill, Stat } from './stats.ts';
 import { Town } from './town.ts';
 
 /**
@@ -70,10 +71,10 @@ export class Data {
       [-1]: Object.prototype,
       [-2]: Array.prototype,
       [-3]: Town.prototype,
-      [-4]: globalThis.stats.Stat.prototype,
-      [-5]: globalThis.stats.LevelExp.prototype,
-      [-6]: globalThis.stats.Skill.prototype,
-      [-7]: globalThis.stats.Buff.prototype,
+      [-4]: Stat.prototype,
+      [-5]: LevelExp.prototype,
+      [-6]: Skill.prototype,
+      [-7]: Buff.prototype,
     });
     Object.defineProperty(this, 'wellKnownObjects', {
       value: wellKnownObjects,
@@ -92,10 +93,10 @@ export class Data {
     [-1]: () => ({}),
     [-2]: () => [],
     [-3]: (t) => new Town(t.index),
-    [-4]: (s) => new globalThis.stats.Stat(s.name),
-    [-5]: () => new globalThis.stats.LevelExp(),
-    [-6]: (s) => new globalThis.stats.Skill(s.name),
-    [-7]: (b) => new globalThis.stats.Buff(b.name),
+    [-4]: (s) => new Stat(s.name),
+    [-5]: () => new LevelExp(),
+    [-6]: (s) => new Skill(s.name),
+    [-7]: (b) => new Buff(b.name),
   };
   static #nextObjectId = 1;
 

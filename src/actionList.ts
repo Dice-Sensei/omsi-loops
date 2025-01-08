@@ -1,4 +1,20 @@
 import {
+  addBuffAmt,
+  getBuffCap,
+  getBuffLevel,
+  getExpOfLevel,
+  getExpOfSingleLevel,
+  getSelfCombat,
+  getSkillBonus,
+  getSkillLevel,
+  getSkillMod,
+  getSurveyBonus,
+  getTalent,
+  getZombieStrength,
+  handleSkillExp,
+  Stat,
+} from './stats.ts';
+import {
   adjustContentFromPrestige,
   adjustGoldCostFromPrestige,
   completedCurrentGame,
@@ -536,7 +552,7 @@ class TrialAction extends MultipartAction {
   loopCost(segment, loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
     return precision3(
       Math.pow(this.baseScaling, Math.floor((loopCounter + segment) / this.segments + 0.0000001)) *
-        this.exponentScaling * globalThis.stats.getSkillBonus('Assassin'),
+        this.exponentScaling * getSkillBonus('Assassin'),
     );
   }
 
@@ -632,8 +648,8 @@ class AssassinAction extends MultipartAction {
     _loopCounter,
     totalCompletions = towns[this.townNum]['total' + this.varName],
   ) {
-    let baseSkill = Math.sqrt(globalThis.stats.getSkillLevel('Practical')) +
-      globalThis.stats.getSkillLevel('Thievery') + globalThis.stats.getSkillLevel('Assassin');
+    let baseSkill = Math.sqrt(getSkillLevel('Practical')) +
+      getSkillLevel('Thievery') + getSkillLevel('Assassin');
     let loopStat = 1 / 10;
     let completions = Math.sqrt(1 + totalCompletions / 100);
     let reputationPenalty = resources.reputation != 0 ? Math.abs(resources.reputation) : 1;
@@ -648,14 +664,14 @@ class AssassinAction extends MultipartAction {
     hearts.push(this.varName);
   }
   finish() {
-    let rep = Math.min((this.townNum + 1) * -250 + globalThis.stats.getSkillLevel('Assassin'), 0);
+    let rep = Math.min((this.townNum + 1) * -250 + getSkillLevel('Assassin'), 0);
     addResource('reputation', rep);
   }
   visible() {
-    return globalThis.stats.getSkillLevel('Assassin') > 0;
+    return getSkillLevel('Assassin') > 0;
   }
   unlocked() {
-    return globalThis.stats.getSkillLevel('Assassin') > 0;
+    return getSkillLevel('Assassin') > 0;
   }
   // @ts-ignore
   storyReqs(storyNum) {
@@ -943,14 +959,14 @@ Action.Wander = new Action('Wander', {
 export function adjustPots() {
   let town = towns[0];
   let basePots = Math.round(town.getLevel('Wander') * 5 * adjustContentFromPrestige());
-  town.totalPots = Math.floor(basePots + basePots * globalThis.stats.getSurveyBonus(town));
+  town.totalPots = Math.floor(basePots + basePots * getSurveyBonus(town));
 }
 export function adjustLocks() {
   let town = towns[0];
   let baseLocks = Math.round(town.getLevel('Wander') * adjustContentFromPrestige());
   town.totalLocks = Math.floor(
-    baseLocks * globalThis.stats.getSkillMod('Spatiomancy', 100, 300, .5) +
-      baseLocks * globalThis.stats.getSurveyBonus(town),
+    baseLocks * getSkillMod('Spatiomancy', 100, 300, .5) +
+      baseLocks * getSurveyBonus(town),
   );
 }
 
@@ -974,7 +990,7 @@ Action.SmashPots = new Action('Smash Pots', {
     Spd: 0.6,
   },
   manaCost() {
-    return Math.ceil(50 * globalThis.stats.getSkillBonus('Practical'));
+    return Math.ceil(50 * getSkillBonus('Practical'));
   },
   visible() {
     return true;
@@ -984,7 +1000,7 @@ Action.SmashPots = new Action('Smash Pots', {
   },
   // note this name is misleading: it is used for mana and gold gain.
   goldCost() {
-    return Math.floor(100 * globalThis.stats.getSkillBonus('Dark'));
+    return Math.floor(100 * getSkillBonus('Dark'));
   },
   finish() {
     towns[0].finishRegular(this.varName, 10, () => {
@@ -1031,7 +1047,7 @@ Action.PickLocks = new Action('Pick Locks', {
   goldCost() {
     let base = 10;
     return Math.floor(
-      base * globalThis.stats.getSkillMod('Practical', 0, 200, 1) * globalThis.stats.getSkillBonus('Thievery'),
+      base * getSkillMod('Practical', 0, 200, 1) * getSkillBonus('Thievery'),
     );
   },
   finish() {
@@ -1141,7 +1157,7 @@ Action.BuyManaZ1 = new Action('Buy Mana Z1', {
   },
   goldCost() {
     return Math.floor(
-      50 * globalThis.stats.getSkillBonus('Mercantilism') * adjustGoldCostFromPrestige(),
+      50 * getSkillBonus('Mercantilism') * adjustGoldCostFromPrestige(),
     );
   },
   finish() {
@@ -1194,8 +1210,8 @@ export function adjustSQuests() {
   let town = towns[0];
   let baseSQuests = Math.round(town.getLevel('Met') * adjustContentFromPrestige());
   town.totalSQuests = Math.floor(
-    baseSQuests * globalThis.stats.getSkillMod('Spatiomancy', 200, 400, .5) +
-      baseSQuests * globalThis.stats.getSurveyBonus(town),
+    baseSQuests * getSkillMod('Spatiomancy', 200, 400, .5) +
+      baseSQuests * getSurveyBonus(town),
   );
 }
 
@@ -1208,13 +1224,13 @@ Action.TrainStrength = new Action('Train Strength', {
       case 1:
         return storyFlags.strengthTrained;
       case 2:
-        return storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 100;
+        return storyFlags.strengthTrained && getTalent('Str') >= 100;
       case 3:
-        return storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 1000;
+        return storyFlags.strengthTrained && getTalent('Str') >= 1000;
       case 4:
-        return storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 10000;
+        return storyFlags.strengthTrained && getTalent('Str') >= 10000;
       case 5:
-        return storyFlags.strengthTrained && globalThis.stats.getTalent('Str') >= 100000;
+        return storyFlags.strengthTrained && getTalent('Str') >= 100000;
     }
     return false;
   },
@@ -1278,7 +1294,7 @@ Action.ShortQuest = new Action('Short Quest', {
   },
   goldCost() {
     let base = 20;
-    return Math.floor(base * globalThis.stats.getSkillMod('Practical', 100, 300, 1));
+    return Math.floor(base * getSkillMod('Practical', 100, 300, 1));
   },
   finish() {
     towns[0].finishRegular(this.varName, 5, () => {
@@ -1342,8 +1358,8 @@ export function adjustLQuests() {
   let town = towns[0];
   let baseLQuests = Math.round(town.getLevel('Secrets') / 2 * adjustContentFromPrestige());
   town.totalLQuests = Math.floor(
-    baseLQuests * globalThis.stats.getSkillMod('Spatiomancy', 300, 500, .5) +
-      baseLQuests * globalThis.stats.getSurveyBonus(town),
+    baseLQuests * getSkillMod('Spatiomancy', 300, 500, .5) +
+      baseLQuests * getSurveyBonus(town),
   );
 }
 
@@ -1382,7 +1398,7 @@ Action.LongQuest = new Action('Long Quest', {
   },
   goldCost() {
     let base = 30;
-    return Math.floor(base * globalThis.stats.getSkillMod('Practical', 200, 400, 1));
+    return Math.floor(base * getSkillMod('Practical', 200, 400, 1));
   },
   finish() {
     towns[0].finishRegular(this.varName, 5, () => {
@@ -1452,17 +1468,17 @@ Action.WarriorLessons = new Action('Warrior Lessons', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Combat') >= 1;
+        return getSkillLevel('Combat') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Combat') >= 100;
+        return getSkillLevel('Combat') >= 100;
       case 3:
-        return globalThis.stats.getSkillLevel('Combat') >= 200;
+        return getSkillLevel('Combat') >= 200;
       case 4:
-        return globalThis.stats.getSkillLevel('Combat') >= 250;
+        return getSkillLevel('Combat') >= 250;
       case 5:
-        return globalThis.stats.getSkillLevel('Combat') >= 500;
+        return getSkillLevel('Combat') >= 500;
       case 6:
-        return globalThis.stats.getSkillLevel('Combat') >= 1000;
+        return getSkillLevel('Combat') >= 1000;
     }
     return false;
   },
@@ -1487,7 +1503,7 @@ Action.WarriorLessons = new Action('Warrior Lessons', {
     return towns[0].getLevel('Secrets') >= 20;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
 });
 
@@ -1498,19 +1514,19 @@ Action.MageLessons = new Action('Mage Lessons', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Magic') >= 1;
+        return getSkillLevel('Magic') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Magic') >= 100;
+        return getSkillLevel('Magic') >= 100;
       case 3:
-        return globalThis.stats.getSkillLevel('Magic') >= 200;
+        return getSkillLevel('Magic') >= 200;
       case 4:
-        return globalThis.stats.getSkillLevel('Magic') >= 250;
+        return getSkillLevel('Magic') >= 250;
       case 5:
-        return globalThis.stats.getSkillLevel('Alchemy') >= 10;
+        return getSkillLevel('Alchemy') >= 10;
       case 6:
-        return globalThis.stats.getSkillLevel('Alchemy') >= 50;
+        return getSkillLevel('Alchemy') >= 50;
       case 7:
-        return globalThis.stats.getSkillLevel('Alchemy') >= 100;
+        return getSkillLevel('Alchemy') >= 100;
     }
     return false;
   },
@@ -1521,7 +1537,7 @@ Action.MageLessons = new Action('Mage Lessons', {
   },
   skills: {
     Magic() {
-      return 100 * (1 + globalThis.stats.getSkillLevel('Alchemy') / 100);
+      return 100 * (1 + getSkillLevel('Alchemy') / 100);
     },
   },
   manaCost() {
@@ -1537,7 +1553,7 @@ Action.MageLessons = new Action('Mage Lessons', {
     return towns[0].getLevel('Secrets') >= 20;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
 });
 
@@ -1561,7 +1577,7 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
         // fail reputation req
         return storyFlags.failedHeal;
       case 6:
-        return globalThis.stats.getSkillLevel('Restoration') >= 50;
+        return getSkillLevel('Restoration') >= 50;
     }
     return false;
   },
@@ -1585,7 +1601,7 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
     return fibonacci(2 + Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 5000;
   },
   tickProgress(_offset, _loopCounter, totalCompletions = towns[0].totalHeal) {
-    return globalThis.stats.getSkillLevel('Magic') * Math.max(globalThis.stats.getSkillLevel('Restoration') / 50, 1) *
+    return getSkillLevel('Magic') * Math.max(getSkillLevel('Restoration') / 50, 1) *
       Math.sqrt(1 + totalCompletions / 100);
   },
   loopsFinished() {
@@ -1600,10 +1616,10 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
     return towns[0].getLevel('Secrets') >= 20;
   },
   unlocked() {
-    return globalThis.stats.getSkillLevel('Magic') >= 12;
+    return getSkillLevel('Magic') >= 12;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
   story(completed) {
     if (towns[0].HealLoopCounter / 3 + 1 >= 10) {
@@ -1656,7 +1672,7 @@ Action.FightMonsters = new MultipartAction('Fight Monsters', {
     return fibonacci(Math.floor((loopCounter + segment) - loopCounter / 3 + 0.0000001)) * 10000;
   },
   tickProgress(_offset, _loopCounter, totalCompletions = towns[0].totalFight) {
-    return globalThis.stats.getSelfCombat() * Math.sqrt(1 + totalCompletions / 100);
+    return getSelfCombat() * Math.sqrt(1 + totalCompletions / 100);
   },
   loopsFinished() {
     // empty
@@ -1676,10 +1692,10 @@ Action.FightMonsters = new MultipartAction('Fight Monsters', {
     return towns[0].getLevel('Secrets') >= 20;
   },
   unlocked() {
-    return globalThis.stats.getSkillLevel('Combat') >= 10;
+    return getSkillLevel('Combat') >= 10;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
 });
 
@@ -1730,7 +1746,7 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
   },
   tickProgress(offset, loopCounter = towns[this.townNum].SDungeonLoopCounter) {
     const floor = Math.floor(loopCounter / this.segments + 0.0000001);
-    return (globalThis.stats.getSelfCombat() + globalThis.stats.getSkillLevel('Magic')) *
+    return (getSelfCombat() + getSkillLevel('Magic')) *
       Math.sqrt(1 + globalThis.saving.vals.dungeons[this.dungeonNum][floor].completed / 200);
   },
   loopsFinished() {
@@ -1745,13 +1761,13 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
     }
   },
   visible() {
-    return (globalThis.stats.getSkillLevel('Combat') + globalThis.stats.getSkillLevel('Magic')) >= 15;
+    return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 15;
   },
   unlocked() {
-    return (globalThis.stats.getSkillLevel('Combat') + globalThis.stats.getSkillLevel('Magic')) >= 35;
+    return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 35;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
   story(completed) {
     globalThis.view.setStoryFlag('smallDungeonAttempted');
@@ -1771,7 +1787,7 @@ DungeonAction.prototype.finishDungeon = function finishDungeon(floorNum) {
   if (rand <= floor.ssChance) {
     const statToAdd = statList[Math.floor(Math.random() * statList.length)];
     floor.lastStat = statToAdd;
-    const countToAdd = Math.floor(Math.pow(10, dungeonNum) * globalThis.stats.getSkillBonus('Divine'));
+    const countToAdd = Math.floor(Math.pow(10, dungeonNum) * getSkillBonus('Divine'));
     stats[statToAdd].soulstone = (stats[statToAdd].soulstone ?? 0) + countToAdd;
     floor.ssChance *= 0.98;
     globalThis.saving.view.requestUpdate('updateSoulstones', null);
@@ -1813,10 +1829,10 @@ Action.BuySupplies = new Action('Buy Supplies', {
     addResource('gold', -towns[0].suppliesCost);
   },
   visible() {
-    return (globalThis.stats.getSkillLevel('Combat') + globalThis.stats.getSkillLevel('Magic')) >= 15;
+    return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 15;
   },
   unlocked() {
-    return (globalThis.stats.getSkillLevel('Combat') + globalThis.stats.getSkillLevel('Magic')) >= 35;
+    return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 35;
   },
   finish() {
     addResource('supplies', true);
@@ -1857,10 +1873,10 @@ Action.Haggle = new Action('Haggle', {
     addResource('reputation', -1);
   },
   visible() {
-    return (globalThis.stats.getSkillLevel('Combat') + globalThis.stats.getSkillLevel('Magic')) >= 15;
+    return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 15;
   },
   unlocked() {
-    return (globalThis.stats.getSkillLevel('Combat') + globalThis.stats.getSkillLevel('Magic')) >= 35;
+    return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 35;
   },
   finish() {
     towns[0].suppliesCost -= 20;
@@ -1905,10 +1921,10 @@ Action.StartJourney = new Action('Start Journey', {
     addResource('supplies', false);
   },
   visible() {
-    return (globalThis.stats.getSkillLevel('Combat') + globalThis.stats.getSkillLevel('Magic')) >= 15;
+    return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 15;
   },
   unlocked() {
-    return (globalThis.stats.getSkillLevel('Combat') + globalThis.stats.getSkillLevel('Magic')) >= 35;
+    return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 35;
   },
   finish() {
     unlockTown(1);
@@ -1982,10 +1998,10 @@ Action.OpenRift = new Action('Open Rift', {
     return towns[5].getLevel('Meander') >= 1;
   },
   unlocked() {
-    return globalThis.stats.getSkillLevel('Dark') >= 300 && globalThis.stats.getSkillLevel('Spatiomancy') >= 100;
+    return getSkillLevel('Dark') >= 300 && getSkillLevel('Spatiomancy') >= 100;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     addResource('supplies', false);
     unlockTown(5);
   },
@@ -2045,14 +2061,14 @@ export function adjustWildMana() {
   let baseWildMana = Math.round(
     (town.getLevel('Forest') * 5 + town.getLevel('Thicket') * 5) * adjustContentFromPrestige(),
   );
-  town.totalWildMana = Math.floor(baseWildMana + baseWildMana * globalThis.stats.getSurveyBonus(town));
+  town.totalWildMana = Math.floor(baseWildMana + baseWildMana * getSurveyBonus(town));
 }
 export function adjustHunt() {
   let town = towns[1];
   let baseHunt = Math.round(town.getLevel('Forest') * 2 * adjustContentFromPrestige());
   town.totalHunt = Math.floor(
-    baseHunt * globalThis.stats.getSkillMod('Spatiomancy', 400, 600, .5) +
-      baseHunt * globalThis.stats.getSurveyBonus(town),
+    baseHunt * getSkillMod('Spatiomancy', 400, 600, .5) +
+      baseHunt * getSurveyBonus(town),
   );
 }
 export function adjustHerbs() {
@@ -2062,8 +2078,8 @@ export function adjustHerbs() {
       adjustContentFromPrestige(),
   );
   town.totalHerbs = Math.floor(
-    baseHerbs * globalThis.stats.getSkillMod('Spatiomancy', 500, 700, .5) +
-      baseHerbs * globalThis.stats.getSurveyBonus(town),
+    baseHerbs * getSkillMod('Spatiomancy', 500, 700, .5) +
+      baseHerbs * getSurveyBonus(town),
   );
 }
 
@@ -2088,7 +2104,7 @@ Action.WildMana = new Action('Wild Mana', {
     Soul: 0.2,
   },
   manaCost() {
-    return Math.ceil(150 * globalThis.stats.getSkillBonus('Practical'));
+    return Math.ceil(150 * getSkillBonus('Practical'));
   },
   visible() {
     return true;
@@ -2097,7 +2113,7 @@ Action.WildMana = new Action('Wild Mana', {
     return towns[1].getLevel('Forest') >= 2;
   },
   goldCost() {
-    return Math.floor(250 * globalThis.stats.getSkillBonus('Dark'));
+    return Math.floor(250 * getSkillBonus('Dark'));
   },
   finish() {
     towns[1].finishRegular(this.varName, 10, () => {
@@ -2195,13 +2211,13 @@ Action.SitByWaterfall = new Action('Sit By Waterfall', {
       case 1:
         return storyFlags.satByWaterfall;
       case 2:
-        return storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 100;
+        return storyFlags.satByWaterfall && getTalent('Soul') >= 100;
       case 3:
-        return storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 1000;
+        return storyFlags.satByWaterfall && getTalent('Soul') >= 1000;
       case 4:
-        return storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 10000;
+        return storyFlags.satByWaterfall && getTalent('Soul') >= 10000;
       case 5:
-        return storyFlags.satByWaterfall && globalThis.stats.getTalent('Soul') >= 100000;
+        return storyFlags.satByWaterfall && getTalent('Soul') >= 100000;
     }
     return false;
   },
@@ -2307,7 +2323,7 @@ Action.TalkToHermit = new Action('Talk To Hermit', {
     return true;
   },
   unlocked() {
-    return towns[1].getLevel('Shortcut') >= 20 && globalThis.stats.getSkillLevel('Magic') >= 40;
+    return towns[1].getLevel('Shortcut') >= 20 && getSkillLevel('Magic') >= 40;
   },
   finish() {
     towns[1].finishProgress(
@@ -2327,11 +2343,11 @@ Action.PracticalMagic = new Action('Practical Magic', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Practical') >= 1;
+        return getSkillLevel('Practical') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Practical') >= 100;
+        return getSkillLevel('Practical') >= 100;
       case 3:
-        return globalThis.stats.getSkillLevel('Practical') >= 400;
+        return getSkillLevel('Practical') >= 400;
     }
     return false;
   },
@@ -2350,10 +2366,10 @@ Action.PracticalMagic = new Action('Practical Magic', {
     return towns[1].getLevel('Hermit') >= 10;
   },
   unlocked() {
-    return towns[1].getLevel('Hermit') >= 20 && globalThis.stats.getSkillLevel('Magic') >= 50;
+    return towns[1].getLevel('Hermit') >= 20 && getSkillLevel('Magic') >= 50;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustManaCost', 'Wild Mana');
     globalThis.saving.view.requestUpdate('adjustManaCost', 'Smash Pots');
     globalThis.saving.view.requestUpdate('adjustGoldCosts', null);
@@ -2369,11 +2385,11 @@ Action.LearnAlchemy = new Action('Learn Alchemy', {
       case 1:
         return skills.Alchemy.exp >= 50;
       case 2:
-        return globalThis.stats.getSkillLevel('Alchemy') >= 25;
+        return getSkillLevel('Alchemy') >= 25;
       case 3:
-        return globalThis.stats.getSkillLevel('Alchemy') >= 100;
+        return getSkillLevel('Alchemy') >= 100;
       case 4:
-        return globalThis.stats.getSkillLevel('Alchemy') >= 500;
+        return getSkillLevel('Alchemy') >= 500;
     }
     return false;
   },
@@ -2399,10 +2415,10 @@ Action.LearnAlchemy = new Action('Learn Alchemy', {
     return towns[1].getLevel('Hermit') >= 10;
   },
   unlocked() {
-    return towns[1].getLevel('Hermit') >= 40 && globalThis.stats.getSkillLevel('Magic') >= 60;
+    return towns[1].getLevel('Hermit') >= 40 && getSkillLevel('Magic') >= 60;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustExpGain', Action.MageLessons);
   },
 });
@@ -2443,14 +2459,14 @@ Action.BrewPotions = new Action('Brew Potions', {
     return Math.ceil(4000);
   },
   visible() {
-    return globalThis.stats.getSkillLevel('Alchemy') >= 1;
+    return getSkillLevel('Alchemy') >= 1;
   },
   unlocked() {
-    return globalThis.stats.getSkillLevel('Alchemy') >= 10;
+    return getSkillLevel('Alchemy') >= 10;
   },
   finish() {
     addResource('potions', 1);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('potionBrewed');
     if (resources.potions >= 50) {
       globalThis.view.setStoryFlag('brewed50PotionsInALoop');
@@ -2467,13 +2483,13 @@ Action.TrainDexterity = new Action('Train Dexterity', {
       case 1:
         return storyFlags.dexterityTrained;
       case 2:
-        return storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 100;
+        return storyFlags.dexterityTrained && getTalent('Dex') >= 100;
       case 3:
-        return storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 1000;
+        return storyFlags.dexterityTrained && getTalent('Dex') >= 1000;
       case 4:
-        return storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 10000;
+        return storyFlags.dexterityTrained && getTalent('Dex') >= 10000;
       case 5:
-        return storyFlags.dexterityTrained && globalThis.stats.getTalent('Dex') >= 100000;
+        return storyFlags.dexterityTrained && getTalent('Dex') >= 100000;
     }
     return false;
   },
@@ -2507,13 +2523,13 @@ Action.TrainSpeed = new Action('Train Speed', {
       case 1:
         return storyFlags.speedTrained;
       case 2:
-        return storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 100;
+        return storyFlags.speedTrained && getTalent('Spd') >= 100;
       case 3:
-        return storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 1000;
+        return storyFlags.speedTrained && getTalent('Spd') >= 1000;
       case 4:
-        return storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 10000;
+        return storyFlags.speedTrained && getTalent('Spd') >= 10000;
       case 5:
-        return storyFlags.speedTrained && globalThis.stats.getTalent('Spd') >= 100000;
+        return storyFlags.speedTrained && getTalent('Spd') >= 100000;
     }
     return false;
   },
@@ -2591,13 +2607,13 @@ Action.BirdWatching = new Action('Bird Watching', {
       case 1:
         return storyFlags.birdsWatched;
       case 2:
-        return storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 100;
+        return storyFlags.birdsWatched && getTalent('Per') >= 100;
       case 3:
-        return storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 1000;
+        return storyFlags.birdsWatched && getTalent('Per') >= 1000;
       case 4:
-        return storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 10000;
+        return storyFlags.birdsWatched && getTalent('Per') >= 10000;
       case 5:
-        return storyFlags.birdsWatched && globalThis.stats.getTalent('Per') >= 100000;
+        return storyFlags.birdsWatched && getTalent('Per') >= 100000;
     }
     return false;
   },
@@ -2709,7 +2725,7 @@ Action.TalkToWitch = new Action('Talk To Witch', {
     return towns[1].getLevel('Thicket') >= 20;
   },
   unlocked() {
-    return towns[1].getLevel('Thicket') >= 60 && globalThis.stats.getSkillLevel('Magic') >= 80;
+    return towns[1].getLevel('Thicket') >= 60 && getSkillLevel('Magic') >= 80;
   },
   finish() {
     towns[1].finishProgress(this.varName, 100);
@@ -2725,13 +2741,13 @@ Action.DarkMagic = new Action('Dark Magic', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Dark') >= 1;
+        return getSkillLevel('Dark') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Dark') >= 25;
+        return getSkillLevel('Dark') >= 25;
       case 3:
-        return globalThis.stats.getSkillLevel('Dark') >= 50;
+        return getSkillLevel('Dark') >= 50;
       case 4:
-        return globalThis.stats.getSkillLevel('Dark') >= 300;
+        return getSkillLevel('Dark') >= 300;
     }
     return false;
   },
@@ -2742,7 +2758,7 @@ Action.DarkMagic = new Action('Dark Magic', {
   },
   skills: {
     Dark() {
-      return Math.floor(100 * (1 + globalThis.stats.getBuffLevel('Ritual') / 100));
+      return Math.floor(100 * (1 + getBuffLevel('Ritual') / 100));
     },
   },
   manaCost() {
@@ -2758,10 +2774,10 @@ Action.DarkMagic = new Action('Dark Magic', {
     return towns[1].getLevel('Witch') >= 10;
   },
   unlocked() {
-    return towns[1].getLevel('Witch') >= 20 && globalThis.stats.getSkillLevel('Magic') >= 100;
+    return towns[1].getLevel('Witch') >= 20 && getSkillLevel('Magic') >= 100;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'Pots', cost: Action.SmashPots.goldCost() });
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'WildMana', cost: Action.WildMana.goldCost() });
   },
@@ -2776,13 +2792,13 @@ Action.DarkRitual = new MultipartAction('Dark Ritual', {
       case 1:
         return storyFlags.darkRitualThirdSegmentReached;
       case 2:
-        return globalThis.stats.getBuffLevel('Ritual') >= 1;
+        return getBuffLevel('Ritual') >= 1;
       case 3:
-        return globalThis.stats.getBuffLevel('Ritual') >= 50;
+        return getBuffLevel('Ritual') >= 50;
       case 4:
-        return globalThis.stats.getBuffLevel('Ritual') >= 300;
+        return getBuffLevel('Ritual') >= 300;
       case 5:
-        return globalThis.stats.getBuffLevel('Ritual') >= 666;
+        return getBuffLevel('Ritual') >= 666;
     }
     return false;
   },
@@ -2800,18 +2816,18 @@ Action.DarkRitual = new MultipartAction('Dark Ritual', {
   },
   canStart(loopCounter = towns[this.townNum].DarkRitualLoopCounter) {
     return resources.reputation <= -5 && loopCounter === 0 && checkSoulstoneSac(this.goldCost()) &&
-      globalThis.stats.getBuffLevel('Ritual') < globalThis.stats.getBuffCap('Ritual');
+      getBuffLevel('Ritual') < getBuffCap('Ritual');
   },
   loopCost(segment) {
     return 1000000 * (segment * 2 + 1);
   },
   tickProgress(offset) {
-    return globalThis.stats.getSkillLevel('Dark') / (1 - towns[1].getLevel('Witch') * 0.005);
+    return getSkillLevel('Dark') / (1 - towns[1].getLevel('Witch') * 0.005);
   },
   grantsBuff: 'Ritual',
   loopsFinished() {
     const spent = sacrificeSoulstones(this.goldCost());
-    globalThis.stats.addBuffAmt('Ritual', 1, this, 'soulstone', spent);
+    addBuffAmt('Ritual', 1, this, 'soulstone', spent);
     globalThis.saving.view.requestUpdate('updateSoulstones', null);
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'DarkRitual', cost: this.goldCost() });
   },
@@ -2822,10 +2838,10 @@ Action.DarkRitual = new MultipartAction('Dark Ritual', {
     return towns[1].getLevel('Witch') >= 20;
   },
   unlocked() {
-    return towns[1].getLevel('Witch') >= 50 && globalThis.stats.getSkillLevel('Dark') >= 50;
+    return towns[1].getLevel('Witch') >= 50 && getSkillLevel('Dark') >= 50;
   },
   goldCost() {
-    return Math.ceil(50 * (globalThis.stats.getBuffLevel('Ritual') + 1) * globalThis.stats.getSkillBonus('Commune'));
+    return Math.ceil(50 * (getBuffLevel('Ritual') + 1) * getSkillBonus('Commune'));
   },
   finish() {
     globalThis.saving.view.requestUpdate('updateBuff', 'Ritual');
@@ -2850,7 +2866,7 @@ export function sacrificeSoulstonesBySegments(
   amount,
   segments = 9,
   stonesSpent = {},
-  sortedStats = Object.values(stats).sort(globalThis.stats.Stat.compareSoulstoneDescending),
+  sortedStats = Object.values(stats).sort(Stat.compareSoulstoneDescending),
 ) {
   // console.log(`Sacrificing ${amount} soulstones in ${segments} segments from stats: ${sortedStats.map(s=>`${s.name} ${s.soulstone}`).join(", ")}`, sortedStats);
   while (amount > 0) {
@@ -2888,7 +2904,7 @@ export function sacrificeSoulstonesProportional(
   // extremely unlikely that we have to use more than one iteration for typical cases, but some powers can cause degenerate behavior
   while (amount > 0) {
     // (re-)sort stats by soulstone count of stats, high to low
-    sortedStats.sort(globalThis.stats.Stat.compareSoulstoneDescending);
+    sortedStats.sort(Stat.compareSoulstoneDescending);
     // edge case: only handle stats with soulstones, remove those with 0
     while (sortedStats.at(-1).soulstone === 0) sortedStats.pop();
     // make parallel array of ss raised to specified power (negative powers would cause problems without the above filter)
@@ -2916,7 +2932,7 @@ export function sacrificeSoulstonesToEquality(
   amount,
   allowedDifference = 0,
   stonesSpent = {},
-  sortedStats = Object.values(stats).sort(globalThis.stats.Stat.compareSoulstoneDescending),
+  sortedStats = Object.values(stats).sort(Stat.compareSoulstoneDescending),
 ) {
   let maxSoulstone = sortedStats[0].soulstone; // what's the highest number of soulstones among stats?
   let minSoulstone = sortedStats.at(-1).soulstone; // and the lowest?
@@ -3042,8 +3058,8 @@ export function adjustSuckers() {
   let town = towns[2];
   let baseGamble = Math.round(town.getLevel('City') * 3 * adjustContentFromPrestige());
   town.totalGamble = Math.floor(
-    baseGamble * globalThis.stats.getSkillMod('Spatiomancy', 600, 800, .5) +
-      baseGamble * globalThis.stats.getSurveyBonus(town),
+    baseGamble * getSkillMod('Spatiomancy', 600, 800, .5) +
+      baseGamble * getSurveyBonus(town),
   );
 }
 
@@ -3090,7 +3106,7 @@ Action.Gamble = new Action('Gamble', {
   },
   finish() {
     towns[2].finishRegular(this.varName, 10, () => {
-      let goldGain = Math.floor(60 * globalThis.stats.getSkillBonus('Thievery'));
+      let goldGain = Math.floor(60 * getSkillBonus('Thievery'));
       addResource('gold', goldGain);
       return 60;
     });
@@ -3178,7 +3194,7 @@ Action.BuyManaZ3 = new Action('Buy Mana Z3', {
   },
   goldCost() {
     return Math.floor(
-      50 * globalThis.stats.getSkillBonus('Mercantilism') * adjustGoldCostFromPrestige(),
+      50 * getSkillBonus('Mercantilism') * adjustGoldCostFromPrestige(),
     );
   },
   finish() {
@@ -3223,12 +3239,12 @@ Action.SellPotions = new Action('Sell Potions', {
     if (resources.potions >= 20) globalThis.view.setStoryFlag('sell20PotionsInALoop');
     addResource(
       'gold',
-      resources.potions * globalThis.stats.getSkillLevel('Alchemy'),
+      resources.potions * getSkillLevel('Alchemy'),
     );
     resetResource('potions');
     globalThis.view.setStoryFlag('potionSold');
-    if (globalThis.stats.getSkillLevel('Alchemy') >= 100) globalThis.view.setStoryFlag('sellPotionFor100Gold');
-    if (globalThis.stats.getSkillLevel('Alchemy') >= 1000) globalThis.view.setStoryFlag('sellPotionFor1kGold');
+    if (getSkillLevel('Alchemy') >= 100) globalThis.view.setStoryFlag('sellPotionFor100Gold');
+    if (getSkillLevel('Alchemy') >= 1000) globalThis.view.setStoryFlag('sellPotionFor1kGold');
   },
 });
 
@@ -3282,8 +3298,8 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
     return precision3(Math.pow(1.2, loopCounter + segment)) * 5e6;
   },
   tickProgress(offset, loopCounter, totalCompletions = towns[2][`total${this.varName}`]) {
-    return (globalThis.stats.getSkillLevel('Magic') / 2 +
-      globalThis.stats.getSelfCombat()) *
+    return (getSkillLevel('Magic') / 2 +
+      getSelfCombat()) *
       Math.sqrt(1 + totalCompletions / 1000);
   },
   loopsFinished() {
@@ -3375,7 +3391,7 @@ Action.GatherTeam = new Action('Gather Team', {
   },
   affectedBy: ['Adventure Guild'],
   allowed() {
-    return 5 + Math.floor(globalThis.stats.getSkillLevel('Leadership') / 100);
+    return 5 + Math.floor(getSkillLevel('Leadership') / 100);
   },
   canStart() {
     return globalThis.saving.vals.guild === 'Adventure' &&
@@ -3449,7 +3465,7 @@ Action.LargeDungeon = new DungeonAction('Large Dungeon', 1, {
   },
   tickProgress(offset, loopCounter = towns[this.townNum].LDungeonLoopCounter) {
     const floor = Math.floor(loopCounter / this.segments + 0.0000001);
-    return (globalThis.stats.getTeamCombat() + globalThis.stats.getSkillLevel('Magic')) *
+    return (getTeamCombat() + getSkillLevel('Magic')) *
       Math.sqrt(1 + globalThis.saving.vals.dungeons[this.dungeonNum][floor].completed / 200);
   },
   loopsFinished(loopCounter = towns[this.townNum].LDungeonLoopCounter) {
@@ -3463,7 +3479,7 @@ Action.LargeDungeon = new DungeonAction('Large Dungeon', 1, {
     return towns[2].getLevel('Drunk') >= 20;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('largeDungeonAttempted');
     if (towns[2].LDungeonLoopCounter >= 63) globalThis.view.setStoryFlag('clearLDungeon');
   },
@@ -3519,8 +3535,8 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
     return precision3(Math.pow(1.2, loopCounter + segment)) * 2e6;
   },
   tickProgress(_offset, _loopCounter, totalCompletions = towns[2][`total${this.varName}`]) {
-    return (globalThis.stats.getSkillLevel('Magic') / 2 +
-      globalThis.stats.getSkillLevel('Crafting')) *
+    return (getSkillLevel('Magic') / 2 +
+      getSkillLevel('Crafting')) *
       Math.sqrt(1 + totalCompletions / 1000);
   },
   loopsFinished() {
@@ -3535,7 +3551,7 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
   },
   segmentFinished() {
     globalThis.saving.vals.curCraftGuildSegment++;
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     addResource('gold', 10);
   },
   getPartName() {
@@ -3685,7 +3701,7 @@ Action.Apprentice = new Action('Apprentice', {
   },
   finish() {
     towns[2].finishProgress(this.varName, 30 * getCraftGuildRank().bonus);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustExpGain', Action.Apprentice);
   },
 });
@@ -3739,7 +3755,7 @@ Action.Mason = new Action('Mason', {
   },
   finish() {
     towns[2].finishProgress(this.varName, 20 * getCraftGuildRank().bonus);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustExpGain', Action.Mason);
   },
 });
@@ -3792,7 +3808,7 @@ Action.Architect = new Action('Architect', {
   },
   finish() {
     towns[2].finishProgress(this.varName, 10 * getCraftGuildRank().bonus);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustExpGain', Action.Architect);
   },
 });
@@ -3806,13 +3822,13 @@ Action.ReadBooks = new Action('Read Books', {
       case 1:
         return storyFlags.booksRead;
       case 2:
-        return storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 100;
+        return storyFlags.booksRead && getTalent('Int') >= 100;
       case 3:
-        return storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 1000;
+        return storyFlags.booksRead && getTalent('Int') >= 1000;
       case 4:
-        return storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 10000;
+        return storyFlags.booksRead && getTalent('Int') >= 10000;
       case 5:
-        return storyFlags.booksRead && globalThis.stats.getTalent('Int') >= 100000;
+        return storyFlags.booksRead && getTalent('Int') >= 100000;
     }
     return false;
   },
@@ -3926,12 +3942,12 @@ Action.HeroesTrial = new TrialAction('Heroes Trial', 0, {
     return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
   },
   baseProgress() {
-    return globalThis.stats.getTeamCombat();
+    return getTeamCombat();
   },
   grantsBuff: 'Heroism',
   floorReward() {
-    if (this.currentFloor() >= globalThis.stats.getBuffLevel('Heroism')) {
-      globalThis.stats.addBuffAmt('Heroism', 1, this);
+    if (this.currentFloor() >= getBuffLevel('Heroism')) {
+      addBuffAmt('Heroism', 1, this);
     }
     if (this.currentFloor() >= 1) globalThis.view.setStoryFlag('heroTrial1Done');
     if (this.currentFloor() >= 10) globalThis.view.setStoryFlag('heroTrial10Done');
@@ -3945,7 +3961,7 @@ Action.HeroesTrial = new TrialAction('Heroes Trial', 0, {
     return towns[this.townNum].getLevel('Survey') >= 100;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('updateBuff', 'Heroism');
   },
 });
@@ -4100,7 +4116,7 @@ Action.ManaGeyser = new Action('Mana Geyser', {
   },
   affectedBy: ['Buy Pickaxe'],
   manaCost() {
-    return Math.ceil(2000 * globalThis.stats.getSkillBonus('Spatiomancy'));
+    return Math.ceil(2000 * getSkillBonus('Spatiomancy'));
   },
   canStart() {
     return resources.pickaxe;
@@ -4121,7 +4137,7 @@ Action.ManaGeyser = new Action('Mana Geyser', {
 export function adjustGeysers() {
   let town = towns[3];
   let baseGeysers = Math.round(town.getLevel('Mountain') * 10 * adjustContentFromPrestige());
-  town.totalGeysers = Math.round(baseGeysers + baseGeysers * globalThis.stats.getSurveyBonus(town));
+  town.totalGeysers = Math.round(baseGeysers + baseGeysers * getSurveyBonus(town));
 }
 
 Action.DecipherRunes = new Action('Decipher Runes', {
@@ -4178,13 +4194,13 @@ Action.Chronomancy = new Action('Chronomancy', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Chronomancy') >= 1;
+        return getSkillLevel('Chronomancy') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Chronomancy') >= 50;
+        return getSkillLevel('Chronomancy') >= 50;
       case 3:
-        return globalThis.stats.getSkillLevel('Chronomancy') >= 100;
+        return getSkillLevel('Chronomancy') >= 100;
       case 4:
-        return globalThis.stats.getSkillLevel('Chronomancy') >= 1000;
+        return getSkillLevel('Chronomancy') >= 1000;
     }
     return false;
   },
@@ -4203,10 +4219,10 @@ Action.Chronomancy = new Action('Chronomancy', {
     return towns[3].getLevel('Runes') >= 8;
   },
   unlocked() {
-    return towns[3].getLevel('Runes') >= 30 && globalThis.stats.getSkillLevel('Magic') >= 150;
+    return towns[3].getLevel('Runes') >= 30 && getSkillLevel('Magic') >= 150;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
 });
 
@@ -4239,14 +4255,14 @@ Action.LoopingPotion = new Action('Looping Potion', {
     return Math.ceil(30000);
   },
   visible() {
-    return globalThis.stats.getSkillLevel('Spatiomancy') >= 1;
+    return getSkillLevel('Spatiomancy') >= 1;
   },
   unlocked() {
-    return globalThis.stats.getSkillLevel('Alchemy') >= 200;
+    return getSkillLevel('Alchemy') >= 200;
   },
   finish() {
     addResource('loopingPotion', true);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
   story(completed) {
     globalThis.view.setStoryFlag('loopingPotionMade');
@@ -4261,15 +4277,15 @@ Action.Pyromancy = new Action('Pyromancy', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Pyromancy') >= 1;
+        return getSkillLevel('Pyromancy') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Pyromancy') >= 50;
+        return getSkillLevel('Pyromancy') >= 50;
       case 3:
-        return globalThis.stats.getSkillLevel('Pyromancy') >= 100;
+        return getSkillLevel('Pyromancy') >= 100;
       case 4:
-        return globalThis.stats.getSkillLevel('Pyromancy') >= 500;
+        return getSkillLevel('Pyromancy') >= 500;
       case 5:
-        return globalThis.stats.getSkillLevel('Pyromancy') >= 1000;
+        return getSkillLevel('Pyromancy') >= 1000;
     }
     return false;
   },
@@ -4288,10 +4304,10 @@ Action.Pyromancy = new Action('Pyromancy', {
     return towns[3].getLevel('Runes') >= 16;
   },
   unlocked() {
-    return towns[3].getLevel('Runes') >= 60 && globalThis.stats.getSkillLevel('Magic') >= 200;
+    return towns[3].getLevel('Runes') >= 60 && getSkillLevel('Magic') >= 200;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
 });
 
@@ -4380,7 +4396,7 @@ Action.MineSoulstones = new Action('Mine Soulstones', {
   finish() {
     towns[3].finishRegular(this.varName, 10, () => {
       const statToAdd = statList[Math.floor(Math.random() * statList.length)];
-      const countToAdd = Math.floor(globalThis.stats.getSkillBonus('Divine'));
+      const countToAdd = Math.floor(getSkillBonus('Divine'));
       stats[statToAdd].soulstone += countToAdd;
       actionLog.addSoulstones(this, statToAdd, countToAdd);
       globalThis.saving.view.requestUpdate('updateSoulstones', null);
@@ -4392,8 +4408,8 @@ export function adjustMineSoulstones() {
   let town = towns[3];
   let baseMine = Math.round(town.getLevel('Cavern') * 3 * adjustContentFromPrestige());
   town.totalMineSoulstones = Math.floor(
-    baseMine * globalThis.stats.getSkillMod('Spatiomancy', 700, 900, .5) +
-      baseMine * globalThis.stats.getSurveyBonus(town),
+    baseMine * getSkillMod('Spatiomancy', 700, 900, .5) +
+      baseMine * getSurveyBonus(town),
   );
 }
 
@@ -4432,10 +4448,10 @@ Action.HuntTrolls = new MultipartAction('Hunt Trolls', {
     );
   },
   tickProgress(_offset, _loopCounter, totalCompletions = towns[3].totalHuntTrolls) {
-    return (globalThis.stats.getSelfCombat() * Math.sqrt(1 + totalCompletions / 100));
+    return (getSelfCombat() * Math.sqrt(1 + totalCompletions / 100));
   },
   loopsFinished() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     addResource('blood', 1);
     if (resources.blood >= 6) globalThis.view.setStoryFlag('slay6TrollsInALoop');
     if (resources.blood >= 20) globalThis.view.setStoryFlag('slay20TrollsInALoop');
@@ -4452,7 +4468,7 @@ Action.HuntTrolls = new MultipartAction('Hunt Trolls', {
     return towns[3].getLevel('Cavern') >= 50;
   },
   finish() {
-    //globalThis.stats.handleSkillExp(this.skills);
+    //handleSkillExp(this.skills);
   },
 });
 
@@ -4542,8 +4558,8 @@ export function adjustArtifacts() {
   let town = towns[3];
   let baseArtifacts = Math.round(town.getLevel('Illusions') * 5 * adjustContentFromPrestige());
   town.totalArtifacts = Math.floor(
-    baseArtifacts * globalThis.stats.getSkillMod('Spatiomancy', 800, 1000, .5) +
-      baseArtifacts * globalThis.stats.getSurveyBonus(town),
+    baseArtifacts * getSkillMod('Spatiomancy', 800, 1000, .5) +
+      baseArtifacts * getSurveyBonus(town),
   );
 }
 
@@ -4555,13 +4571,13 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
     switch (storyNum) {
       case 1:
         return storyFlags.imbueMindThirdSegmentReached ||
-          globalThis.stats.getBuffLevel('Imbuement') >= 1;
+          getBuffLevel('Imbuement') >= 1;
       case 2:
-        return globalThis.stats.getBuffLevel('Imbuement') >= 1;
+        return getBuffLevel('Imbuement') >= 1;
       case 3:
-        return globalThis.stats.getBuffLevel('Imbuement') >= 50;
+        return getBuffLevel('Imbuement') >= 50;
       case 4:
-        return globalThis.stats.getBuffLevel('Imbuement') >= 500;
+        return getBuffLevel('Imbuement') >= 500;
     }
     return false;
   },
@@ -4579,19 +4595,19 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
   },
   canStart(loopCounter = towns[3].ImbueMindLoopCounter) {
     return loopCounter === 0 && checkSoulstoneSac(this.goldCost()) &&
-      globalThis.stats.getBuffLevel('Imbuement') < globalThis.stats.getBuffCap('Imbuement');
+      getBuffLevel('Imbuement') < getBuffCap('Imbuement');
   },
   loopCost(segment) {
     return 100000000 * (segment * 5 + 1);
   },
   tickProgress(offset) {
-    return globalThis.stats.getSkillLevel('Magic');
+    return getSkillLevel('Magic');
   },
   grantsBuff: 'Imbuement',
   loopsFinished() {
     const spent = sacrificeSoulstones(this.goldCost());
     globalThis.saving.vals.trainingLimits++;
-    globalThis.stats.addBuffAmt('Imbuement', 1, this, 'soulstone', spent);
+    addBuffAmt('Imbuement', 1, this, 'soulstone', spent);
     globalThis.saving.view.requestUpdate('updateSoulstones', null);
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'ImbueMind', cost: this.goldCost() });
   },
@@ -4602,10 +4618,10 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
     return towns[3].getLevel('Illusions') >= 50;
   },
   unlocked() {
-    return towns[3].getLevel('Illusions') >= 70 && globalThis.stats.getSkillLevel('Magic') >= 300;
+    return towns[3].getLevel('Illusions') >= 70 && getSkillLevel('Magic') >= 300;
   },
   goldCost() {
-    return 20 * (globalThis.stats.getBuffLevel('Imbuement') + 1);
+    return 20 * (getBuffLevel('Imbuement') + 1);
   },
   finish() {
     globalThis.saving.view.requestUpdate('updateBuff', 'Imbuement');
@@ -4624,17 +4640,17 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
     switch (storyNum) {
       case 1:
         return storyFlags.imbueBodyThirdSegmentReached ||
-          globalThis.stats.getBuffLevel('Imbuement2') >= 1;
+          getBuffLevel('Imbuement2') >= 1;
       case 2:
-        return globalThis.stats.getBuffLevel('Imbuement2') >= 1;
+        return getBuffLevel('Imbuement2') >= 1;
       case 3:
-        return globalThis.stats.getBuffLevel('Imbuement2') >= 50;
+        return getBuffLevel('Imbuement2') >= 50;
       case 4:
-        return globalThis.stats.getBuffLevel('Imbuement2') >= 500;
+        return getBuffLevel('Imbuement2') >= 500;
       case 5:
         //Since the action cannot be performed once you hit level 500, give the
         //action story here so you don't end up unable to 100% the action stories.
-        return storyFlags.failedImbueBody || globalThis.stats.getBuffLevel('Imbuement2') >= 500;
+        return storyFlags.failedImbueBody || getBuffLevel('Imbuement2') >= 500;
     }
     return false;
   },
@@ -4653,48 +4669,48 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
   canStart(loopCounter = towns[3].ImbueBodyLoopCounter) {
     let tempCanStart = true;
     for (const stat of statList) {
-      if (globalThis.stats.getTalent(stat) < globalThis.stats.getBuffLevel('Imbuement2') + 1) {
+      if (getTalent(stat) < getBuffLevel('Imbuement2') + 1) {
         tempCanStart = false;
       }
     }
     return loopCounter === 0 &&
-      (globalThis.stats.getBuffLevel('Imbuement') >
-        globalThis.stats.getBuffLevel('Imbuement2')) &&
+      (getBuffLevel('Imbuement') >
+        getBuffLevel('Imbuement2')) &&
       tempCanStart;
   },
   loopCost(segment) {
     return 100000000 * (segment * 5 + 1);
   },
   tickProgress(offset) {
-    return globalThis.stats.globalThis.stats.getSkillLevel('Magic');
+    return getSkillLevel('Magic');
   },
   grantsBuff: 'Imbuement2',
   loopsFinished() {
     const spent = {};
     for (const stat of statList) {
-      const currentTalentLevel = globalThis.stats.getTalent(stat);
+      const currentTalentLevel = getTalent(stat);
       const targetTalentLevel = Math.max(
-        currentTalentLevel - globalThis.stats.getBuffLevel('Imbuement2') - 1,
+        currentTalentLevel - getBuffLevel('Imbuement2') - 1,
         0,
       );
       stats[stat].talentLevelExp.setLevel(targetTalentLevel);
       spent[stat] = currentTalentLevel - targetTalentLevel;
     }
     globalThis.saving.view.updateStats();
-    globalThis.stats.addBuffAmt('Imbuement2', 1, this, 'talent', spent);
+    addBuffAmt('Imbuement2', 1, this, 'talent', spent);
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'ImbueBody', cost: this.goldCost() });
   },
   getPartName() {
     return 'Imbue Body';
   },
   visible() {
-    return globalThis.stats.getBuffLevel('Imbuement') >= 1;
+    return getBuffLevel('Imbuement') >= 1;
   },
   unlocked() {
-    return globalThis.stats.getBuffLevel('Imbuement') >= 1;
+    return getBuffLevel('Imbuement') >= 1;
   },
   goldCost() {
-    return globalThis.stats.getBuffLevel('Imbuement2') + 1;
+    return getBuffLevel('Imbuement2') + 1;
   },
   finish() {
     globalThis.saving.view.requestUpdate('updateBuff', 'Imbuement2');
@@ -4979,7 +4995,7 @@ export function adjustDonations() {
   let town = towns[4];
   let base = Math.round(town.getLevel('Canvassed') * 5 * adjustContentFromPrestige());
   town.totalDonations = Math.floor(
-    base * globalThis.stats.getSkillMod('Spatiomancy', 900, 1100, .5) + base * globalThis.stats.getSurveyBonus(town),
+    base * getSkillMod('Spatiomancy', 900, 1100, .5) + base * getSurveyBonus(town),
   );
 }
 
@@ -5014,7 +5030,7 @@ Action.TidyUp = new MultipartAction('Tidy Up', {
     return fibonacci(Math.floor((loopCounter + segment) - loopCounter / 3 + 0.0000001)) * 1000000; // Temp.
   },
   tickProgress(offset, _loopCounter, totalCompletions = towns[4].totalTidy) {
-    return globalThis.stats.getSkillLevel('Practical') * Math.sqrt(1 + totalCompletions / 100);
+    return getSkillLevel('Practical') * Math.sqrt(1 + totalCompletions / 100);
   },
   loopsFinished(loopCounter = towns[4].TidyLoopCounter) {
     addResource('reputation', 1);
@@ -5069,7 +5085,7 @@ Action.BuyManaZ5 = new Action('Buy Mana Z5', {
   },
   goldCost() {
     return Math.floor(
-      50 * globalThis.stats.getSkillBonus('Mercantilism') * adjustGoldCostFromPrestige(),
+      50 * getSkillBonus('Mercantilism') * adjustGoldCostFromPrestige(),
     );
   },
   finish() {
@@ -5165,13 +5181,13 @@ Action.Mercantilism = new Action('Mercantilism', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Mercantilism') >= 1;
+        return getSkillLevel('Mercantilism') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Mercantilism') >= 30;
+        return getSkillLevel('Mercantilism') >= 30;
       case 3:
-        return globalThis.stats.getSkillLevel('Mercantilism') >= 100;
+        return getSkillLevel('Mercantilism') >= 100;
       case 4:
-        return globalThis.stats.getSkillLevel('Mercantilism') >= 500;
+        return getSkillLevel('Mercantilism') >= 500;
     }
   },
   stats: {
@@ -5198,7 +5214,7 @@ Action.Mercantilism = new Action('Mercantilism', {
     return towns[4].getLevel('Tour') >= 30;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustManaCost', 'Buy Mana Z1');
     globalThis.saving.view.requestUpdate('adjustManaCost', 'Buy Mana Z3');
     globalThis.saving.view.requestUpdate('adjustManaCost', 'Buy Mana Z5');
@@ -5214,13 +5230,13 @@ Action.CharmSchool = new Action('Charm School', {
       case 1:
         return storyFlags.charmSchoolVisited;
       case 2:
-        return storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 100;
+        return storyFlags.charmSchoolVisited && getTalent('Cha') >= 100;
       case 3:
-        return storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 1000;
+        return storyFlags.charmSchoolVisited && getTalent('Cha') >= 1000;
       case 4:
-        return storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 10000;
+        return storyFlags.charmSchoolVisited && getTalent('Cha') >= 10000;
       case 5:
-        return storyFlags.charmSchoolVisited && globalThis.stats.getTalent('Cha') >= 100000;
+        return storyFlags.charmSchoolVisited && getTalent('Cha') >= 100000;
     }
   },
   stats: {
@@ -5253,13 +5269,13 @@ Action.Oracle = new Action('Oracle', {
       case 1:
         return storyFlags.oracleVisited;
       case 2:
-        return storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 100;
+        return storyFlags.oracleVisited && getTalent('Luck') >= 100;
       case 3:
-        return storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 1000;
+        return storyFlags.oracleVisited && getTalent('Luck') >= 1000;
       case 4:
-        return storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 10000;
+        return storyFlags.oracleVisited && getTalent('Luck') >= 10000;
       case 5:
-        return storyFlags.oracleVisited && globalThis.stats.getTalent('Luck') >= 100000;
+        return storyFlags.oracleVisited && getTalent('Luck') >= 100000;
     }
   },
   stats: {
@@ -5322,7 +5338,7 @@ Action.EnchantArmor = new Action('Enchant Armor', {
     return towns[4].getLevel('Tour') >= 40;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     addResource('enchantments', 1);
     globalThis.view.setStoryFlag('armorEnchanted');
     if (resources['enchantments'] >= 10) globalThis.view.setStoryFlag('enchanted10Armor');
@@ -5381,11 +5397,11 @@ Action.WizardCollege = new MultipartAction('Wizard College', {
   },
   tickProgress(offset, _loopCounter, totalCompletions = towns[4][`total${this.varName}`]) {
     return (
-      globalThis.stats.getSkillLevel('Magic') + globalThis.stats.getSkillLevel('Practical') +
-      globalThis.stats.getSkillLevel('Dark') +
-      globalThis.stats.getSkillLevel('Chronomancy') + globalThis.stats.getSkillLevel('Pyromancy') +
-      globalThis.stats.getSkillLevel('Restoration') +
-      globalThis.stats.getSkillLevel('Spatiomancy')
+      getSkillLevel('Magic') + getSkillLevel('Practical') +
+      getSkillLevel('Dark') +
+      getSkillLevel('Chronomancy') + getSkillLevel('Pyromancy') +
+      getSkillLevel('Restoration') +
+      getSkillLevel('Spatiomancy')
     ) *
       Math.sqrt(1 + totalCompletions / 1000);
   },
@@ -5461,13 +5477,13 @@ Action.Restoration = new Action('Restoration', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Restoration') >= 1;
+        return getSkillLevel('Restoration') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Restoration') >= 50;
+        return getSkillLevel('Restoration') >= 50;
       case 3:
-        return globalThis.stats.getSkillLevel('Restoration') >= 200;
+        return getSkillLevel('Restoration') >= 200;
       case 4:
-        return globalThis.stats.getSkillLevel('Restoration') >= 500;
+        return getSkillLevel('Restoration') >= 500;
     }
   },
   stats: {
@@ -5492,7 +5508,7 @@ Action.Restoration = new Action('Restoration', {
     return towns[4].getLevel('Tour') >= 60;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
 });
 
@@ -5503,17 +5519,17 @@ Action.Spatiomancy = new Action('Spatiomancy', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Spatiomancy') >= 1;
+        return getSkillLevel('Spatiomancy') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Spatiomancy') >= 50;
+        return getSkillLevel('Spatiomancy') >= 50;
       case 3:
-        return globalThis.stats.getSkillLevel('Spatiomancy') >= 200;
+        return getSkillLevel('Spatiomancy') >= 200;
       case 4:
-        return globalThis.stats.getSkillLevel('Spatiomancy') >= 600;
+        return getSkillLevel('Spatiomancy') >= 600;
       case 5:
-        return globalThis.stats.getSkillLevel('Spatiomancy') >= 1000;
+        return getSkillLevel('Spatiomancy') >= 1000;
       case 6:
-        return globalThis.stats.getSkillLevel('Spatiomancy') >= 1500;
+        return getSkillLevel('Spatiomancy') >= 1500;
     }
   },
   stats: {
@@ -5539,9 +5555,9 @@ Action.Spatiomancy = new Action('Spatiomancy', {
     return towns[4].getLevel('Tour') >= 60;
   },
   finish() {
-    const oldSpatioSkill = globalThis.stats.getSkillLevel('Spatiomancy');
-    globalThis.stats.handleSkillExp(this.skills);
-    if (globalThis.stats.getSkillLevel('Spatiomancy') !== oldSpatioSkill) {
+    const oldSpatioSkill = getSkillLevel('Spatiomancy');
+    handleSkillExp(this.skills);
+    if (getSkillLevel('Spatiomancy') !== oldSpatioSkill) {
       globalThis.saving.view.requestUpdate('adjustManaCost', 'Mana Geyser');
       globalThis.saving.view.requestUpdate('adjustManaCost', 'Mana Well');
 
@@ -5625,7 +5641,7 @@ Action.BuildHousing = new Action('Build Housing', {
   affectedBy: ['Crafting Guild'],
   canStart() {
     //Maximum crafting guild bonus is 10, maximum spatiomancy mult is 5.
-    let maxHouses = Math.floor(getCraftGuildRank().bonus * globalThis.stats.getSkillMod('Spatiomancy', 0, 500, 1));
+    let maxHouses = Math.floor(getCraftGuildRank().bonus * getSkillMod('Spatiomancy', 0, 500, 1));
     return globalThis.saving.vals.guild === 'Crafting' && towns[4].getLevel('Citizen') >= 100 &&
       resources.houses < maxHouses;
   },
@@ -5640,7 +5656,7 @@ Action.BuildHousing = new Action('Build Housing', {
   },
   finish() {
     addResource('houses', 1);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('houseBuilt');
     if (resources.houses >= 10 && getCraftGuildRank().name == 'Godlike') {
       globalThis.view.setStoryFlag('housesBuiltGodlike');
@@ -5683,11 +5699,11 @@ Action.CollectTaxes = new Action('Collect Taxes', {
     return towns[4].getLevel('Citizen') >= 60;
   },
   unlocked() {
-    return towns[4].getLevel('Citizen') >= 100 && globalThis.stats.getSkillLevel('Mercantilism') > 0;
+    return towns[4].getLevel('Citizen') >= 100 && getSkillLevel('Mercantilism') > 0;
   },
   finish() {
     const goldGain = Math.floor(
-      resources.houses * globalThis.stats.getSkillLevel('Mercantilism') / 10,
+      resources.houses * getSkillLevel('Mercantilism') / 10,
     );
     addResource('gold', goldGain);
     globalThis.view.setStoryFlag('collectedTaxes');
@@ -5800,11 +5816,11 @@ Action.FightFrostGiants = new MultipartAction('Fight Frost Giants', {
     return precision3(Math.pow(1.3, loopCounter + segment)) * 1e7; // Temp
   },
   tickProgress(_offset, _loopCounter, totalCompletions = towns[4][`total${this.varName}`]) {
-    return (globalThis.stats.getSelfCombat() *
+    return (getSelfCombat() *
       Math.sqrt(1 + totalCompletions / 1000));
   },
   loopsFinished() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
   segmentFinished() {
     globalThis.saving.vals.curFightFrostGiantsSegment++;
@@ -5890,7 +5906,7 @@ Action.SeekBlessing = new Action('Seek Blessing', {
       case 1:
         return storyFlags.blessingSought;
       case 2:
-        return globalThis.stats.getSkillLevel('Divine') >= 1;
+        return getSkillLevel('Divine') >= 1;
       case 3:
         return storyFlags.greatBlessingSought;
     }
@@ -5923,7 +5939,7 @@ Action.SeekBlessing = new Action('Seek Blessing', {
     if (getFrostGiantsRank().bonus >= 10) globalThis.view.setStoryFlag('greatBlessingSought');
     // @ts-ignore
     this.skills.Divine = Math.floor(50 * getFrostGiantsRank().bonus);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
 });
 
@@ -5936,7 +5952,7 @@ Action.GreatFeast = new MultipartAction('Great Feast', {
       case 1:
         return storyFlags.feastAttempted;
       case 2:
-        return globalThis.stats.getBuffLevel('Feast') >= 1;
+        return getBuffLevel('Feast') >= 1;
     }
   },
   stats: {
@@ -5953,18 +5969,18 @@ Action.GreatFeast = new MultipartAction('Great Feast', {
   },
   canStart(loopCounter = towns[this.townNum].GreatFeastLoopCounter) {
     return resources.reputation >= 100 && loopCounter === 0 && checkSoulstoneSac(this.goldCost()) &&
-      globalThis.stats.getBuffLevel('Feast') < globalThis.stats.getBuffCap('Feast');
+      getBuffLevel('Feast') < getBuffCap('Feast');
   },
   loopCost(segment) {
     return 1000000000 * (segment * 5 + 1);
   },
   tickProgress(offset) {
-    return globalThis.stats.getSkillLevel('Practical');
+    return getSkillLevel('Practical');
   },
   grantsBuff: 'Feast',
   loopsFinished() {
     const spent = sacrificeSoulstones(this.goldCost());
-    globalThis.stats.addBuffAmt('Feast', 1, this, 'soulstone', spent);
+    addBuffAmt('Feast', 1, this, 'soulstone', spent);
     globalThis.saving.view.requestUpdate('updateSoulstones', null);
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'GreatFeast', cost: this.goldCost() });
   },
@@ -5978,7 +5994,7 @@ Action.GreatFeast = new MultipartAction('Great Feast', {
     return towns[4].getLevel('Tour') >= 100;
   },
   goldCost() {
-    return Math.ceil(5000 * (globalThis.stats.getBuffLevel('Feast') + 1) * globalThis.stats.getSkillBonus('Gluttony'));
+    return Math.ceil(5000 * (getBuffLevel('Feast') + 1) * getSkillBonus('Gluttony'));
   },
   finish() {
     globalThis.saving.view.requestUpdate('updateBuff', 'Feast');
@@ -6012,7 +6028,7 @@ Action.FallFromGrace = new Action('Fall From Grace', {
     return true;
   },
   unlocked() {
-    return globalThis.stats.getSkillLevel('Pyromancy') >= 200;
+    return getSkillLevel('Pyromancy') >= 200;
   },
   finish() {
     if (resources.reputation >= 0) resources.reputation = -1;
@@ -6069,15 +6085,15 @@ Action.Meander = new Action('Meander', {
     return true;
   },
   finish() {
-    if (globalThis.stats.getBuffLevel('Imbuement') >= 100) globalThis.view.setStoryFlag('meanderIM100');
-    towns[5].finishProgress(this.varName, globalThis.stats.getBuffLevel('Imbuement'));
+    if (getBuffLevel('Imbuement') >= 100) globalThis.view.setStoryFlag('meanderIM100');
+    towns[5].finishProgress(this.varName, getBuffLevel('Imbuement'));
   },
 });
 export function adjustPylons() {
   let town = towns[5];
   let base = Math.round(town.getLevel('Meander') * 10 * adjustContentFromPrestige());
   town.totalPylons = Math.floor(
-    base * globalThis.stats.getSkillMod('Spatiomancy', 1000, 1200, .5) + base * globalThis.stats.getSurveyBonus(town),
+    base * getSkillMod('Spatiomancy', 1000, 1200, .5) + base * getSurveyBonus(town),
   );
 }
 
@@ -6104,7 +6120,7 @@ Action.ManaWell = new Action('Mana Well', {
     Int: 0.1,
   },
   manaCost() {
-    return Math.ceil(2500 * globalThis.stats.getSkillBonus('Spatiomancy'));
+    return Math.ceil(2500 * getSkillBonus('Spatiomancy'));
   },
   canStart() {
     return true;
@@ -6136,7 +6152,7 @@ Action.ManaWell = new Action('Mana Well', {
 export function adjustWells() {
   let town = towns[5];
   let base = Math.round(town.getLevel('Meander') * 10 * adjustContentFromPrestige());
-  town.totalWells = Math.floor(base + base * globalThis.stats.getSurveyBonus(town));
+  town.totalWells = Math.floor(base + base * getSurveyBonus(town));
 }
 
 Action.DestroyPylons = new Action('Destroy Pylons', {
@@ -6212,11 +6228,11 @@ Action.RaiseZombie = new Action('Raise Zombie', {
     return towns[5].getLevel('Meander') >= 15;
   },
   unlocked() {
-    return globalThis.stats.getSkillLevel('Dark') >= 1000;
+    return getSkillLevel('Dark') >= 1000;
   },
   finish() {
     globalThis.view.setStoryFlag('attemptedRaiseZombie');
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     addResource('zombie', 1);
     globalThis.view.increaseStoryVarTo('maxZombiesRaised', resources.zombie);
   },
@@ -6229,11 +6245,11 @@ Action.DarkSacrifice = new Action('Dark Sacrifice', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Commune') >= 1;
+        return getSkillLevel('Commune') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Commune') >= 100;
+        return getSkillLevel('Commune') >= 100;
       case 3:
-        return globalThis.stats.getSkillLevel('Commune') >= 1000;
+        return getSkillLevel('Commune') >= 1000;
     }
   },
   stats: {
@@ -6256,10 +6272,10 @@ Action.DarkSacrifice = new Action('Dark Sacrifice', {
     return towns[5].getLevel('Meander') >= 25;
   },
   unlocked() {
-    return globalThis.stats.getBuffLevel('Ritual') >= 60;
+    return getBuffLevel('Ritual') >= 60;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustGoldCost', {
       varName: 'DarkRitual',
       cost: Action.DarkRitual.goldCost(),
@@ -6317,24 +6333,24 @@ Action.TheSpire = new DungeonAction('The Spire', 2, {
   },
   tickProgress(_offset, loopCounter = towns[this.townNum].TheSpireLoopCounter) {
     const floor = Math.floor(loopCounter / this.segments + 0.0000001);
-    return globalThis.stats.getTeamCombat() * (1 + 0.1 * resources.pylons) *
+    return getTeamCombat() * (1 + 0.1 * resources.pylons) *
       Math.sqrt(1 + globalThis.saving.vals.dungeons[this.dungeonNum][floor].completed / 200);
   },
   grantsBuff: 'Aspirant',
   loopsFinished(loopCounter = towns[this.townNum].TheSpireLoopCounter) {
     const curFloor = Math.floor(loopCounter / this.segments + 0.0000001 - 1);
     this.finishDungeon(curFloor);
-    if (curFloor >= globalThis.stats.getBuffLevel('Aspirant')) globalThis.stats.addBuffAmt('Aspirant', 1, this);
+    if (curFloor >= getBuffLevel('Aspirant')) addBuffAmt('Aspirant', 1, this);
     if (curFloor == dungeonFloors[this.dungeonNum] - 1) globalThis.view.setStoryFlag('clearedSpire');
   },
   visible() {
     return towns[5].getLevel('Meander') >= 5;
   },
   unlocked() {
-    return (globalThis.stats.getSkillLevel('Combat') + globalThis.stats.getSkillLevel('Magic')) >= 35;
+    return (getSkillLevel('Combat') + getSkillLevel('Magic')) >= 35;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('updateBuff', 'Aspirant');
     globalThis.view.setStoryFlag('spireAttempted');
     if (resources.pylons >= 10) globalThis.view.setStoryFlag('spire10Pylons');
@@ -6411,7 +6427,7 @@ Action.DeadTrial = new TrialAction('Dead Trial', 4, {
   },
   baseProgress() {
     //Determines what skills give progress to the trial
-    return globalThis.stats.getZombieStrength();
+    return getZombieStrength();
   },
   floorReward() {
     //Rewards given per floor
@@ -6573,11 +6589,11 @@ Action.FightJungleMonsters = new MultipartAction('Fight Jungle Monsters', {
     return precision3(Math.pow(1.3, loopCounter + segment)) * 1e8; // Temp
   },
   tickProgress(_offset, _loopCounter, totalCompletions = towns[6][`total${this.varName}`]) {
-    return (globalThis.stats.getSelfCombat() *
+    return (getSelfCombat() *
       Math.sqrt(1 + totalCompletions / 1000));
   },
   loopsFinished() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
   segmentFinished() {
     globalThis.saving.vals.curFightJungleMonstersSegment++;
@@ -6706,7 +6722,7 @@ Action.RescueSurvivors = new MultipartAction('Rescue Survivors', {
     return fibonacci(2 + Math.floor((loopCounter + segment) / this.segments + 0.0000001)) * 5000;
   },
   tickProgress(offset, loopCounter, totalCompletions = towns[6].totalRescue) {
-    return globalThis.stats.getSkillLevel('Magic') * Math.max(globalThis.stats.getSkillLevel('Restoration') / 100, 1) *
+    return getSkillLevel('Magic') * Math.max(getSkillLevel('Restoration') / 100, 1) *
       Math.sqrt(1 + totalCompletions / 100);
   },
   loopsFinished(loopCounter = towns[6].RescueLoopCounter) {
@@ -6727,7 +6743,7 @@ Action.RescueSurvivors = new MultipartAction('Rescue Survivors', {
     return towns[6].getLevel('ExploreJungle') >= 20;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
 });
 
@@ -6744,9 +6760,9 @@ Action.PrepareBuffet = new Action('Prepare Buffet', {
       case 3:
         return storyFlags.buffetFor6;
       case 4:
-        return globalThis.stats.getSkillLevel('Gluttony') >= 10;
+        return getSkillLevel('Gluttony') >= 10;
       case 5:
-        return globalThis.stats.getSkillLevel('Gluttony') >= 100;
+        return getSkillLevel('Gluttony') >= 100;
     }
   },
   stats: {
@@ -6777,7 +6793,7 @@ Action.PrepareBuffet = new Action('Prepare Buffet', {
   finish() {
     // @ts-ignore
     this.skills.Gluttony = Math.floor(towns[6].RescueLoopCounter * 5);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('buffetHeld');
     if (towns[6].RescueLoopCounter >= 1) globalThis.view.setStoryFlag('buffetFor1');
     if (towns[6].RescueLoopCounter >= 6) globalThis.view.setStoryFlag('buffetFor6');
@@ -6791,13 +6807,13 @@ Action.Totem = new Action('Totem', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Wunderkind') >= 1;
+        return getSkillLevel('Wunderkind') >= 1;
       case 2:
-        return globalThis.stats.getSkillLevel('Wunderkind') >= 5;
+        return getSkillLevel('Wunderkind') >= 5;
       case 3:
-        return globalThis.stats.getSkillLevel('Wunderkind') >= 60;
+        return getSkillLevel('Wunderkind') >= 60;
       case 4:
-        return globalThis.stats.getSkillLevel('Wunderkind') >= 360;
+        return getSkillLevel('Wunderkind') >= 360;
     }
   },
   stats: {
@@ -6824,7 +6840,7 @@ Action.Totem = new Action('Totem', {
     return towns[6].getLevel('ExploreJungle') >= 50;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
 });
 
@@ -6900,12 +6916,12 @@ Action.OpenPortal = new Action('Open Portal', {
     return getExploreProgress() >= 75;
   },
   canStart() {
-    return globalThis.stats.getSkillLevel('Restoration') >= 1000;
+    return getSkillLevel('Restoration') >= 1000;
   },
   finish() {
     globalThis.saving.vals.portalUsed = true;
     globalThis.view.setStoryFlag('portalOpened');
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     unlockTown(1);
   },
 });
@@ -6972,7 +6988,7 @@ export function adjustPockets() {
   let town = towns[7];
   let base = Math.round(town.getLevel('Excursion') * adjustContentFromPrestige());
   town.totalPockets = Math.floor(
-    base * globalThis.stats.getSkillMod('Spatiomancy', 1100, 1300, .5) + base * globalThis.stats.getSurveyBonus(town),
+    base * getSkillMod('Spatiomancy', 1100, 1300, .5) + base * getSurveyBonus(town),
   );
   globalThis.saving.view.requestUpdate('updateActionTooltips', null);
 }
@@ -6980,7 +6996,7 @@ export function adjustWarehouses() {
   let town = towns[7];
   let base = Math.round(town.getLevel('Excursion') / 2.5 * adjustContentFromPrestige());
   town.totalWarehouses = Math.floor(
-    base * globalThis.stats.getSkillMod('Spatiomancy', 1200, 1400, .5) + base * globalThis.stats.getSurveyBonus(town),
+    base * getSkillMod('Spatiomancy', 1200, 1400, .5) + base * getSurveyBonus(town),
   );
   globalThis.saving.view.requestUpdate('updateActionTooltips', null);
 }
@@ -6988,7 +7004,7 @@ export function adjustInsurance() {
   let town = towns[7];
   let base = Math.round(town.getLevel('Excursion') / 10 * adjustContentFromPrestige());
   town.totalInsurance = Math.floor(
-    base * globalThis.stats.getSkillMod('Spatiomancy', 1300, 1500, .5) + base * globalThis.stats.getSurveyBonus(town),
+    base * getSkillMod('Spatiomancy', 1300, 1500, .5) + base * getSurveyBonus(town),
   );
   globalThis.saving.view.requestUpdate('updateActionTooltips', null);
 }
@@ -7091,10 +7107,10 @@ export function getExploreExpSinceLastProgress() {
     const level = town.getLevel(varName) - (levelsPerTown[town.index] ?? 0);
     if (level === 0 || level === 100) return Infinity;
     if (levelsPerTown[town.index]) {
-      return globalThis.stats.getExpOfSingleLevel(level);
+      return getExpOfSingleLevel(level);
     } else {
       const curExp = town[`exp${varName}`];
-      return curExp - globalThis.stats.getExpOfLevel(level) + 1;
+      return curExp - getExpOfLevel(level) + 1;
     }
   }
   const townsByExpOrder = [...towns].sort((a, b) => expSinceLast(a) - expSinceLast(b));
@@ -7125,9 +7141,9 @@ export function getExploreExpToNextProgress() {
     if (level >= 100) return Infinity;
     if (levelsPerTown[town.index]) {
       // we're at a level boundary so we can shortcut
-      return globalThis.stats.getExpOfSingleLevel(level + 1);
+      return getExpOfSingleLevel(level + 1);
     } else {
-      return globalThis.stats.getExpOfLevel(level + 1) - town[`exp${varName}`];
+      return getExpOfLevel(level + 1) - town[`exp${varName}`];
     }
   }
   const townsByExpOrder = [...towns].sort((a, b) => expToNext(a) - expToNext(b));
@@ -7221,15 +7237,15 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
     return precision3(Math.pow(1.2, loopCounter + segment)) * 5e8;
   },
   tickProgress(_offset, _loopCounter, totalCompletions = towns[7][`total${this.varName}`]) {
-    return (globalThis.stats.getSkillLevel('Practical') +
-      globalThis.stats.getSkillLevel('Thievery')) *
+    return (getSkillLevel('Practical') +
+      getSkillLevel('Thievery')) *
       Math.sqrt(1 + totalCompletions / 1000);
   },
   loopsFinished() {
   },
   segmentFinished() {
     globalThis.saving.vals.curThievesGuildSegment++;
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     addResource('gold', 10);
   },
   getPartName() {
@@ -7247,7 +7263,7 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
   finish() {
     globalThis.saving.vals.guild = 'Thieves';
     globalThis.saving.view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('thiefGuildTestsTaken');
     if (globalThis.saving.vals.curThievesGuildSegment >= 3) globalThis.view.setStoryFlag('thiefGuildRankEReached');
     if (globalThis.saving.vals.curThievesGuildSegment >= 6) globalThis.view.setStoryFlag('thiefGuildRankDReached');
@@ -7339,17 +7355,17 @@ Action.PickPockets = new Action('Pick Pockets', {
     return 20000;
   },
   visible() {
-    return globalThis.stats.getSkillLevel('Thievery') > 0;
+    return getSkillLevel('Thievery') > 0;
   },
   unlocked() {
-    return globalThis.stats.getSkillLevel('Thievery') > 0;
+    return getSkillLevel('Thievery') > 0;
   },
   goldCost() {
-    return Math.floor(2 * globalThis.stats.getSkillBonus('Thievery'));
+    return Math.floor(2 * getSkillBonus('Thievery'));
   },
   finish() {
     towns[7].finishProgress(this.varName, 30 * getThievesGuildRank().bonus);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustExpGain', Action.ThievesGuild);
     const goldGain = Math.floor(this.goldCost() * getThievesGuildRank().bonus);
     addResource('gold', goldGain);
@@ -7407,11 +7423,11 @@ Action.RobWarehouse = new Action('Rob Warehouse', {
     return towns[7].getLevel('PickPockets') >= 100;
   },
   goldCost() {
-    return Math.floor(20 * globalThis.stats.getSkillBonus('Thievery'));
+    return Math.floor(20 * getSkillBonus('Thievery'));
   },
   finish() {
     towns[7].finishProgress(this.varName, 20 * getThievesGuildRank().bonus);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustExpGain', Action.ThievesGuild);
     const goldGain = Math.floor(this.goldCost() * getThievesGuildRank().bonus);
     addResource('gold', goldGain);
@@ -7469,11 +7485,11 @@ Action.InsuranceFraud = new Action('Insurance Fraud', {
     return towns[7].getLevel('RobWarehouse') >= 100;
   },
   goldCost() {
-    return Math.floor(200 * globalThis.stats.getSkillBonus('Thievery'));
+    return Math.floor(200 * getSkillBonus('Thievery'));
   },
   finish() {
     towns[7].finishProgress(this.varName, 10 * getThievesGuildRank().bonus);
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.view.requestUpdate('adjustExpGain', Action.ThievesGuild);
     const goldGain = Math.floor(this.goldCost() * getThievesGuildRank().bonus);
     addResource('gold', goldGain);
@@ -7488,7 +7504,7 @@ Action.GuildAssassin = new Action('Guild Assassin', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.stats.getSkillLevel('Assassin') > 0;
+        return getSkillLevel('Assassin') > 0;
       case 2:
         return storyFlags.assassinHeartDelivered;
       case 3:
@@ -7530,10 +7546,10 @@ Action.GuildAssassin = new Action('Guild Assassin', {
     if (resources.heart >= 4) globalThis.view.setStoryFlag('assassin4HeartsDelivered');
     if (resources.heart >= 8) globalThis.view.setStoryFlag('assassin8HeartsDelivered');
     let assassinExp = 0;
-    if (globalThis.stats.getSkillLevel('Assassin') === 0) assassinExp = 100;
+    if (getSkillLevel('Assassin') === 0) assassinExp = 100;
     if (resources.heart > 0) assassinExp = 100 * Math.pow(resources.heart, 2);
     this.skills.Assassin = assassinExp;
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     resources.heart = 0;
     globalThis.saving.vals.guild = 'Assassin';
   },
@@ -7590,7 +7606,7 @@ Action.Invest = new Action('Invest', {
     return true;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     globalThis.saving.vals.goldInvested += resources.gold;
     if (globalThis.saving.vals.goldInvested > 999999999999) globalThis.saving.vals.goldInvested = 999999999999;
     resetResource('gold');
@@ -7640,7 +7656,7 @@ Action.CollectInterest = new Action('Collect Interest', {
     return true;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
     let interestGold = Math.floor(globalThis.saving.vals.goldInvested * .001);
     addResource('gold', interestGold);
     globalThis.view.setStoryFlag('interestCollected');
@@ -7694,8 +7710,8 @@ Action.Seminar = new Action('Seminar', {
     return 1000;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
-    let leadershipLevel = globalThis.stats.getSkillLevel('Leadership');
+    handleSkillExp(this.skills);
+    let leadershipLevel = getSkillLevel('Leadership');
     if (leadershipLevel >= 10) globalThis.view.setStoryFlag('leadership10');
     if (leadershipLevel >= 100) globalThis.view.setStoryFlag('leadership100');
     if (leadershipLevel >= 1000) globalThis.view.setStoryFlag('leadership1k');
@@ -7789,16 +7805,16 @@ Action.SecretTrial = new TrialAction('Secret Trial', 3, {
     return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
   },
   baseProgress() {
-    return globalThis.stats.getTeamCombat();
+    return getTeamCombat();
   },
   floorReward() {
     //None
   },
   visible() {
-    return globalThis.saving.vals.storyMax >= 12 && globalThis.stats.getBuffLevel('Imbuement3') >= 7;
+    return globalThis.saving.vals.storyMax >= 12 && getBuffLevel('Imbuement3') >= 7;
   },
   unlocked() {
-    return globalThis.saving.vals.storyMax >= 12 && globalThis.stats.getBuffLevel('Imbuement3') >= 7;
+    return globalThis.saving.vals.storyMax >= 12 && getBuffLevel('Imbuement3') >= 7;
   },
   finish() {
     globalThis.view.setStoryFlag('trailSecretFaced');
@@ -7884,15 +7900,15 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
     return 1;
   },
   canStart(loopCounter = towns[8].ImbueSoulLoopCounter) {
-    return loopCounter === 0 && globalThis.stats.getBuffLevel('Imbuement') > 499 &&
-      globalThis.stats.getBuffLevel('Imbuement2') > 499 &&
-      globalThis.stats.getBuffLevel('Imbuement3') < 7;
+    return loopCounter === 0 && getBuffLevel('Imbuement') > 499 &&
+      getBuffLevel('Imbuement2') > 499 &&
+      getBuffLevel('Imbuement3') < 7;
   },
   loopCost(segment) {
     return 100000000 * (segment * 5 + 1);
   },
   tickProgress(offset) {
-    return globalThis.stats.getSkillLevel('Magic');
+    return getSkillLevel('Magic');
   },
   grantsBuff: 'Imbuement3',
   loopsFinished() {
@@ -7904,7 +7920,7 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
     buffs['Imbuement'].amt = 0;
     buffs['Imbuement2'].amt = 0;
     globalThis.saving.vals.trainingLimits = 10;
-    globalThis.stats.addBuffAmt('Imbuement3', 1, this, 'imbuement3');
+    addBuffAmt('Imbuement3', 1, this, 'imbuement3');
     globalThis.saving.view.updateBuffs();
     globalThis.saving.view.updateStats();
     globalThis.saving.view.requestUpdate('updateSoulstones', null);
@@ -7916,7 +7932,7 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
     return true;
   },
   unlocked() {
-    return globalThis.stats.getBuffLevel('Imbuement') > 499 && globalThis.stats.getBuffLevel('Imbuement2') > 499;
+    return getBuffLevel('Imbuement') > 499 && getBuffLevel('Imbuement2') > 499;
   },
   finish() {
     globalThis.saving.view.requestUpdate('updateBuff', 'Imbuement3');
@@ -7930,7 +7946,7 @@ export function adjustTrainingExpMult() {
   for (let actionName of trainingActions) {
     const actionProto = getActionPrototype(actionName);
     // @ts-ignore shh we're pretending it's frozen
-    actionProto.expMult = 4 + globalThis.stats.getBuffLevel('Imbuement3');
+    actionProto.expMult = 4 + getBuffLevel('Imbuement3');
     globalThis.saving.view.adjustExpMult(actionName);
   }
 }
@@ -8049,7 +8065,7 @@ Action.GodsTrial = new TrialAction('Gods Trial', 1, {
     return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum] && resources.power < 7;
   },
   baseProgress() {
-    return globalThis.stats.getTeamCombat();
+    return getTeamCombat();
   },
   floorReward() {
     globalThis.view.setStoryFlag('trailGodsFaced');
@@ -8075,7 +8091,7 @@ Action.GodsTrial = new TrialAction('Gods Trial', 1, {
     return towns[this.townNum].getLevel('BuildTower') >= 100;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
 });
 
@@ -8151,7 +8167,7 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
       resources.power < 8;
   },
   baseProgress() {
-    return globalThis.stats.getSelfCombat();
+    return getSelfCombat();
   },
   floorReward() {
     addResource('power', 1);
@@ -8163,7 +8179,7 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
     return towns[this.townNum].getLevel('BuildTower') >= 100;
   },
   finish() {
-    globalThis.stats.handleSkillExp(this.skills);
+    handleSkillExp(this.skills);
   },
   segmentFinished() {
     globalThis.saving.vals.curGodsSegment++;
@@ -8197,31 +8213,31 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
         globalThis.view.setStoryFlag('fightGods17');
         break;
       case 55:
-        if (globalThis.stats.getTalent('Dex') > 500000) globalThis.view.setStoryFlag('fightGods02');
+        if (getTalent('Dex') > 500000) globalThis.view.setStoryFlag('fightGods02');
         break;
       case 56:
-        if (globalThis.stats.getTalent('Str') > 500000) globalThis.view.setStoryFlag('fightGods04');
+        if (getTalent('Str') > 500000) globalThis.view.setStoryFlag('fightGods04');
         break;
       case 57:
-        if (globalThis.stats.getTalent('Con') > 500000) globalThis.view.setStoryFlag('fightGods06');
+        if (getTalent('Con') > 500000) globalThis.view.setStoryFlag('fightGods06');
         break;
       case 58:
-        if (globalThis.stats.getTalent('Spd') > 500000) globalThis.view.setStoryFlag('fightGods08');
+        if (getTalent('Spd') > 500000) globalThis.view.setStoryFlag('fightGods08');
         break;
       case 59:
-        if (globalThis.stats.getTalent('Per') > 500000) globalThis.view.setStoryFlag('fightGods10');
+        if (getTalent('Per') > 500000) globalThis.view.setStoryFlag('fightGods10');
         break;
       case 60:
-        if (globalThis.stats.getTalent('Cha') > 500000) globalThis.view.setStoryFlag('fightGods12');
+        if (getTalent('Cha') > 500000) globalThis.view.setStoryFlag('fightGods12');
         break;
       case 61:
-        if (globalThis.stats.getTalent('Int') > 500000) globalThis.view.setStoryFlag('fightGods14');
+        if (getTalent('Int') > 500000) globalThis.view.setStoryFlag('fightGods14');
         break;
       case 62:
-        if (globalThis.stats.getTalent('Luck') > 500000) globalThis.view.setStoryFlag('fightGods16');
+        if (getTalent('Luck') > 500000) globalThis.view.setStoryFlag('fightGods16');
         break;
       case 63:
-        if (globalThis.stats.getTalent('Soul') > 500000) globalThis.view.setStoryFlag('fightGods18');
+        if (getTalent('Soul') > 500000) globalThis.view.setStoryFlag('fightGods18');
         break;
       default:
         break;

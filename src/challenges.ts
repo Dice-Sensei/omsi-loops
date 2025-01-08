@@ -1,3 +1,4 @@
+import { getTeamStrength, getZombieStrength, restartStats } from './stats.ts';
 import { Action } from './actionList.ts';
 
 import { towns } from './globals.ts';
@@ -40,10 +41,10 @@ const setupManaDrought = () => {
 
 const setupNoodleArms = () => {
   getSelfCombat = function () {
-    return Math.max(globalThis.stats.getZombieStrength(), globalThis.stats.getTeamStrength()) / 2;
+    return Math.max(getZombieStrength(), getTeamStrength()) / 2;
   };
   getTeamCombat = function () {
-    return globalThis.stats.getZombieStrength() + globalThis.stats.getTeamStrength();
+    return getZombieStrength() + getTeamStrength();
   };
 };
 
@@ -56,7 +57,7 @@ const setupManaBurn = () => {
     globalThis.saving.timeNeeded = 4320000 - globalThis.saving.vals.totals.effectiveTime * 50;
     document.title = 'Idle Loops';
     resetResources();
-    globalThis.stats.restartStats();
+    restartStats();
     for (let i = 0; i < towns.length; i++) {
       towns[i].restart();
     }

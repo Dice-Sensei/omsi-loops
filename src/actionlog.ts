@@ -1,6 +1,7 @@
 import { Localization } from './Localization.ts';
 import { extractStrings, formatNumber, intToString, restoreStrings } from './helpers.ts';
 import { getActionPrototype, getXMLName, townNames } from './actionList.ts';
+import { Buff } from './stats.ts';
 
 export class ActionLog {
   /** @type {ActionLogEntry[]} */
@@ -607,7 +608,7 @@ class BuffEntry extends LeveledLogEntry {
   getReplacement(key) {
     if (key === 'buff') {
       return Localization.txt(
-        `buffs>${getXMLName(globalThis.stats.Buff.fullNames[this.name])}>label`,
+        `buffs>${getXMLName(Buff.fullNames[this.name])}>label`,
       );
     }
     if (key === 'buff_cost') {

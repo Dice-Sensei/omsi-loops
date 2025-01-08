@@ -1,3 +1,4 @@
+import { addExp, getExpToLevel, getTotalBonusXP } from './stats.ts';
 import { Action, getActionPrototype, getPossibleTravel, translateClassNames, withoutSpaces } from './actionList.ts';
 import { clamp, Mana } from './helpers.ts';
 import { hearts, resources, statList, stats, towns } from './globals.ts';
@@ -702,9 +703,9 @@ export function getMaxTicksForAction(action, talentOnly = false) {
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
   for (const stat of statList) {
-    const expToNext = globalThis.stats.getExpToLevel(stat, talentOnly);
+    const expToNext = getExpToLevel(stat, talentOnly);
     const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) *
-      globalThis.stats.getTotalBonusXP(stat);
+      getTotalBonusXP(stat);
     maxTicks = Math.min(maxTicks, Mana.ceil(expToNext / statMultiplier));
   }
   return maxTicks;
@@ -713,9 +714,9 @@ export function getMaxTicksForAction(action, talentOnly = false) {
 export function getMaxTicksForStat(action, stat, talentOnly = false) {
   const expMultiplier = action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
-  const expToNext = globalThis.stats.getExpToLevel(stat, talentOnly);
+  const expToNext = getExpToLevel(stat, talentOnly);
   const statMultiplier = expMultiplier * ((action.stats[stat] ?? 0) + overFlow) *
-    globalThis.stats.getTotalBonusXP(stat);
+    getTotalBonusXP(stat);
   return Mana.ceil(expToNext / statMultiplier);
 }
 
@@ -723,7 +724,7 @@ export function addExpFromAction(action, manaCount) {
   const adjustedExp = manaCount * action.expMult * (action.manaCost() / action.adjustedTicks);
   const overFlow = prestigeBonus('PrestigeExpOverflow') - 1;
   for (const stat of statList) {
-    const expToAdd = ((action.stats[stat] ?? 0) + overFlow) * adjustedExp * globalThis.stats.getTotalBonusXP(stat);
+    const expToAdd = ((action.stats[stat] ?? 0) + overFlow) * adjustedExp * getTotalBonusXP(stat);
 
     // Used for updating the menus when hovering over a completed item in the actionList
     const statExp = `statExp${stat}`;
@@ -731,7 +732,7 @@ export function addExpFromAction(action, manaCount) {
       action[statExp] = 0;
     }
     action[statExp] += expToAdd;
-    globalThis.stats.addExp(stat, expToAdd);
+    addExp(stat, expToAdd);
   }
 }
 

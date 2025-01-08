@@ -2,6 +2,7 @@ import { Town } from './town.ts';
 import { Data } from './data.ts';
 import { copyArray, inputElement, removeClassFromDiv, textAreaElement, valueElement } from './helpers.ts';
 import { prestigeValues } from './prestige.ts';
+import { getBuffLevel, initializeBuffs, initializeSkills, initializeStats } from './stats.ts';
 import {
   actionLog,
   buffCaps,
@@ -446,9 +447,9 @@ export function loadDefaults() {
   if (defaultsRecorded) {
     Data.resetToDefaults();
   }
-  globalThis.stats.initializeStats();
-  globalThis.stats.initializeSkills();
-  globalThis.stats.initializeBuffs();
+  initializeStats();
+  initializeSkills();
+  initializeBuffs();
   initializeActions();
   initializeTowns();
   prestigeValues['prestigeCurrentPoints'] = 0;
@@ -623,7 +624,7 @@ export function doLoad(toLoad) {
     });
   }
   globalThis.saving.vals.completedActions.push('FoundGlasses');
-  globalThis.saving.vals.trainingLimits = 10 + globalThis.stats.getBuffLevel('Imbuement');
+  globalThis.saving.vals.trainingLimits = 10 + getBuffLevel('Imbuement');
   globalThis.saving.vals.goldInvested = toLoad.goldInvested === undefined ? 0 : toLoad.goldInvested;
   globalThis.saving.vals.stonesUsed = toLoad.stonesUsed === undefined ? { 1: 0, 3: 0, 5: 0, 6: 0 } : toLoad.stonesUsed;
 

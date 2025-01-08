@@ -1,4 +1,13 @@
 // prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
+import {
+  getBuffLevel,
+  getExpOfLevel,
+  getLevelFromExp,
+  getLevelFromTalent,
+  getSkillBonus,
+  getSkillLevel,
+  getSkillLevelFromExp,
+} from './stats.ts';
 import $ from 'jquery';
 import { Data } from './data.ts';
 import { Localization } from './Localization.ts';
@@ -18,7 +27,7 @@ import {
 import { calcSoulstoneMult, getNumOnCurList, getNumOnList } from './actions.ts';
 import { buffs, skillList, skills, statList, stats, towns } from './globals.ts';
 import { getSpeedMult } from './driver.ts';
-import { Action, getExploreSkill, getExploreProgress, translateClassNames } from './actionList.ts';
+import { Action, getExploreProgress, getExploreSkill, translateClassNames } from './actionList.ts';
 
 export const Koviko = {
   Prediction: class {
@@ -101,8 +110,7 @@ export const Koviko = {
     updateTicks(a, s, state) {
       let baseMana = this.baseManaCost(a, state);
       let cost = statList.reduce(
-        (cost, i) =>
-          cost + (i in a.stats && i in s ? a.stats[i] / (1 + globalThis.stats.getLevelFromExp(s[i]) / 100) : 0),
+        (cost, i) => cost + (i in a.stats && i in s ? a.stats[i] / (1 + getLevelFromExp(s[i]) / 100) : 0),
         0,
       );
       this._baseManaCost = baseMana;
@@ -149,7 +157,7 @@ export const Koviko = {
 
           s[i] += expToAdd;
           let talentGain = expToAdd *
-            (globalThis.stats.getSkillBonus('Wunderkind') + globalThis.stats.getBuffLevel('Aspirant') * 0.01) /
+            (getSkillBonus('Wunderkind') + getBuffLevel('Aspirant') * 0.01) /
             100;
           t[i] += talentGain;
         }
@@ -167,7 +175,7 @@ export const Koviko = {
         statBonus *= prestigeBonus('PrestigeMental');
       }
 
-      return statBonus * soulstoneBonus * (1 + Math.pow(globalThis.stats.getLevelFromTalent(t[statName]), 0.4) / 3);
+      return statBonus * soulstoneBonus * (1 + Math.pow(getLevelFromTalent(t[statName]), 0.4) / 3);
     }
   },
   SacrificeSoulstones(amount, ss) {
@@ -577,9 +585,9 @@ export const Koviko = {
           r,
         ) => ((r.wizard >= 63) ? 5 : precision3(1 + 0.02 * Math.pow(r.wizard || 0, 1.05))),
 
-        getSkillBonusInc: (exp) => (Math.pow(1 + globalThis.stats.getSkillLevelFromExp(exp) / 60, 0.25)),
+        getSkillBonusInc: (exp) => (Math.pow(1 + getSkillLevelFromExp(exp) / 60, 0.25)),
 
-        getSkillBonusDec: (exp) => (1 / (1 + globalThis.stats.getSkillLevelFromExp(exp) / 100)),
+        getSkillBonusDec: (exp) => (1 / (1 + getSkillLevelFromExp(exp) / 100)),
 
         /**
          * Calculate the ArmorLevel specifically affecting the team leader
@@ -601,38 +609,37 @@ export const Koviko = {
          * @memberof Koviko.Predictor#helpers
          */
         getSelfCombat: (r, k) =>
-          (globalThis.stats.getSkillLevelFromExp(k.combat) + globalThis.stats.getSkillLevelFromExp(k.pyromancy) * 5) *
+          (getSkillLevelFromExp(k.combat) + getSkillLevelFromExp(k.pyromancy) * 5) *
           h.getArmorLevel(r, k) *
-          (1 + globalThis.stats.getBuffLevel('Feast') * 0.05) * prestigeBonus('PrestigeCombat'),
+          (1 + getBuffLevel('Feast') * 0.05) * prestigeBonus('PrestigeCombat'),
 
         getZombieStrength: (r, k) =>
-          ((globalThis.stats.getSkillLevelFromExp(k.dark) * (r.zombie || 0) / 2 *
-            Math.max(globalThis.stats.getBuffLevel('Ritual') / 100, 1)) *
-            (1 + globalThis.stats.getBuffLevel('Feast') * 0.05)) * prestigeBonus('PrestigeCombat'),
+          ((getSkillLevelFromExp(k.dark) * (r.zombie || 0) / 2 *
+            Math.max(getBuffLevel('Ritual') / 100, 1)) *
+            (1 + getBuffLevel('Feast') * 0.05)) * prestigeBonus('PrestigeCombat'),
 
         getTeamStrength: (r, k) =>
-          ((globalThis.stats.getSkillLevelFromExp(k.combat) +
-            globalThis.stats.getSkillLevelFromExp(k.restoration) * 4) *
+          ((getSkillLevelFromExp(k.combat) +
+            getSkillLevelFromExp(k.restoration) * 4) *
             ((r.team || 0) / 2) *
             (r.adventures ? h.getGuildRankBonus(r.adventures) : 1) * h.getSkillBonusInc(k.leadership)) *
-          (1 + globalThis.stats.getBuffLevel('Feast') * 0.05) * prestigeBonus('PrestigeCombat'),
+          (1 + getBuffLevel('Feast') * 0.05) * prestigeBonus('PrestigeCombat'),
 
         getTeamCombat: (r, k) => (h.getSelfCombat(r, k) + h.getZombieStrength(r, k) + h.getTeamStrength(r, k)),
 
-        getRewardSS: (dNum) =>
-          Math.floor(Math.pow(10, dNum) * Math.pow(1 + globalThis.stats.getSkillLevel('Divine') / 60, 0.25)),
+        getRewardSS: (dNum) => Math.floor(Math.pow(10, dNum) * Math.pow(1 + getSkillLevel('Divine') / 60, 0.25)),
 
         getStatProgress: (
           p,
           a,
           s,
           offset,
-        ) => (1 + globalThis.stats.getLevelFromExp(s[a.loopStats[(p.completed + offset) % a.loopStats.length]]) / 100),
+        ) => (1 + getLevelFromExp(s[a.loopStats[(p.completed + offset) % a.loopStats.length]]) / 100),
 
         getTrialCost: (p, a) => (segment) =>
           precision3(
             Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) * a.exponentScaling *
-              globalThis.stats.getSkillBonus('Assassin'),
+              getSkillBonus('Assassin'),
           ),
       };
 
@@ -661,11 +668,11 @@ export const Koviko = {
             if ((p.completed / a.segments + .0000001) >= 1) {
               return 0;
             }
-            let baseSkill = Math.sqrt(globalThis.stats.getSkillLevelFromExp(k.practical)) +
-              globalThis.stats.getSkillLevelFromExp(k.thievery) +
-              globalThis.stats.getSkillLevelFromExp(k.assassin);
+            let baseSkill = Math.sqrt(getSkillLevelFromExp(k.practical)) +
+              getSkillLevelFromExp(k.thievery) +
+              getSkillLevelFromExp(k.assassin);
             let loopStat = 1 +
-              globalThis.stats.getLevelFromExp(s[a.loopStats[(p.completed + offset) % a.loopStats.length]]) / 1000;
+              getLevelFromExp(s[a.loopStats[(p.completed + offset) % a.loopStats.length]]) / 1000;
             let completions = Math.sqrt(1 + p.total / 100);
             let reputationPenalty = Math.abs(r.rep) || 1;
             let killStreak = r.heart || 1;
@@ -676,7 +683,7 @@ export const Koviko = {
             end: (
               r,
               k,
-            ) => (r.rep += Math.min((r.town + 1) * -250 + globalThis.stats.getSkillLevelFromExp(k.assassin), 0)),
+            ) => (r.rep += Math.min((r.town + 1) * -250 + getSkillLevelFromExp(k.assassin), 0)),
           },
         },
       };
@@ -831,12 +838,12 @@ export const Koviko = {
         'Warrior Lessons': {
           affected: [''],
           canStart: (input) => input.rep >= 2,
-          effect: (r, k) => k.combat += 100 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02),
+          effect: (r, k) => k.combat += 100 * (1 + getBuffLevel('Heroism') * 0.02),
         },
         'Mage Lessons': {
           affected: [''],
           canStart: (input) => input.rep >= 2,
-          effect: (r, k) => k.magic += 100 * (1 + globalThis.stats.getSkillLevelFromExp(k.alchemy) / 100),
+          effect: (r, k) => k.magic += 100 * (1 + getSkillLevelFromExp(k.alchemy) / 100),
         },
         'Heal The Sick': {
           affected: ['rep'],
@@ -845,8 +852,8 @@ export const Koviko = {
             cost: (p, a) => (segment) =>
               fibonacci(2 + Math.floor((p.completed + segment) / a.segments + .0000001)) * 5000,
             tick: (p, a, s, k) => (offset) =>
-              globalThis.stats.getSkillLevelFromExp(k.magic) *
-              Math.max(globalThis.stats.getSkillLevelFromExp(k.restoration) / 50, 1) *
+              getSkillLevelFromExp(k.magic) *
+              Math.max(getSkillLevelFromExp(k.restoration) / 50, 1) *
               h.getStatProgress(p, a, s, offset) * Math.sqrt(1 + p.total / 100),
             effect: { end: (r, k) => k.magic += 10, loop: (r) => r.rep += 3 },
           },
@@ -861,7 +868,7 @@ export const Koviko = {
             tick: (p, a, s, k, r) => (offset) =>
               h.getSelfCombat(r, k) * Math.sqrt(1 + p.total / 100) * h.getStatProgress(p, a, s, offset),
             effect: {
-              end: (r, k) => k.combat += 10 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02),
+              end: (r, k) => k.combat += 10 * (1 + getBuffLevel('Heroism') * 0.02),
               segment: (r) => r.gold += 20,
             },
           },
@@ -879,13 +886,13 @@ export const Koviko = {
               let floor = Math.floor(p.completed / a.segments + .0000001);
 
               return floor in globalThis.saving.vals.dungeons[a.dungeonNum]
-                ? (h.getSelfCombat(r, k) + globalThis.stats.getSkillLevelFromExp(k.magic)) *
+                ? (h.getSelfCombat(r, k) + getSkillLevelFromExp(k.magic)) *
                   h.getStatProgress(p, a, s, offset) *
                   Math.sqrt(1 + globalThis.saving.vals.dungeons[a.dungeonNum][floor].completed / 200)
                 : 0;
             },
             effect: {
-              end: (r, k) => (k.combat += 5 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02), k.magic += 5),
+              end: (r, k) => (k.combat += 5 * (1 + getBuffLevel('Heroism') * 0.02), k.magic += 5),
               loop: (r) => {
                 let ssGained = h.getRewardSS(0);
                 r.completionsSmallDungeon = (r.completionsSmallDungeon || 0) + 1;
@@ -971,7 +978,7 @@ export const Koviko = {
               let attempt = Math.floor(p.completed / a.segments + .0000001);
 
               return attempt < 1
-                ? (globalThis.stats.getSkillLevelFromExp(k.dark) * h.getStatProgress(p, a, s, offset)) /
+                ? (getSkillLevelFromExp(k.dark) * h.getStatProgress(p, a, s, offset)) /
                   (1 - towns[1].getLevel('Witch') * .005)
                 : 0;
             },
@@ -1011,7 +1018,7 @@ export const Koviko = {
             r.temp8 = (r.temp8 || 0) + 1;
             r.gold +=
               (r.temp8 <= towns[2].goodGamble
-                ? Math.floor(60 * Math.pow(1 + globalThis.stats.getSkillLevel('Thievery') / 60, 0.25))
+                ? Math.floor(60 * Math.pow(1 + getSkillLevel('Thievery') / 60, 0.25))
                 : 0) - 20;
             r.rep--;
           },
@@ -1024,7 +1031,7 @@ export const Koviko = {
         },
         'Sell Potions': {
           affected: ['gold', 'potions'],
-          effect: (r, k) => (r.gold += r.potions * globalThis.stats.getSkillLevelFromExp(k.alchemy), r.potions = 0),
+          effect: (r, k) => (r.gold += r.potions * getSkillLevelFromExp(k.alchemy), r.potions = 0),
         },
         'Adventure Guild': {
           affected: ['gold', 'adventures'],
@@ -1032,7 +1039,7 @@ export const Koviko = {
           loop: {
             cost: (p) => (segment) => precision3(Math.pow(1.2, p.completed + segment)) * 5e6,
             tick: (p, a, s, k, r) => (offset) =>
-              (h.getSelfCombat(r, k) + globalThis.stats.getSkillLevelFromExp(k.magic) / 2) *
+              (h.getSelfCombat(r, k) + getSkillLevelFromExp(k.magic) / 2) *
               h.getStatProgress(p, a, s, offset) *
               Math.sqrt(1 + p.total / 1000),
             effect: { end: (r) => (r.guild = 'adventure'), segment: (r) => (r.mana += 200, r.adventures++) },
@@ -1055,13 +1062,13 @@ export const Koviko = {
             tick: (p, a, s, k, r) => (offset) => {
               let floor = Math.floor(p.completed / a.segments + .0000001);
               return floor in globalThis.saving.vals.dungeons[a.dungeonNum]
-                ? (h.getTeamCombat(r, k) + globalThis.stats.getSkillLevelFromExp(k.magic)) *
+                ? (h.getTeamCombat(r, k) + getSkillLevelFromExp(k.magic)) *
                   h.getStatProgress(p, a, s, offset) *
                   Math.sqrt(1 + globalThis.saving.vals.dungeons[a.dungeonNum][floor].completed / 200)
                 : 0;
             },
             effect: {
-              end: (r, k) => (k.combat += 15 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02), k.magic += 15),
+              end: (r, k) => (k.combat += 15 * (1 + getBuffLevel('Heroism') * 0.02), k.magic += 15),
               loop: (r) => {
                 let ssGained = h.getRewardSS(1);
                 r.completionsLargeDungeon = (r.completionsLargeDungeon || 0) + 1;
@@ -1077,7 +1084,7 @@ export const Koviko = {
           loop: {
             cost: (p) => (segment) => precision3(Math.pow(1.2, p.completed + segment)) * 2e6,
             tick: (p, a, s, k) => (offset) =>
-              (globalThis.stats.getSkillLevelFromExp(k.magic) / 2 + globalThis.stats.getSkillLevelFromExp(k.crafting)) *
+              (getSkillLevelFromExp(k.magic) / 2 + getSkillLevelFromExp(k.crafting)) *
               h.getStatProgress(p, a, s, offset) * Math.sqrt(1 + p.total / 1000),
             effect: {
               end: (r) => (r.guild = 'crafting'),
@@ -1138,7 +1145,7 @@ export const Koviko = {
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
-                  a.exponentScaling * globalThis.stats.getSkillBonus('Assassin'),
+                  a.exponentScaling * getSkillBonus('Assassin'),
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
@@ -1151,9 +1158,9 @@ export const Koviko = {
               end: (
                 r,
                 k,
-              ) => (k.combat += 500 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02),
-                k.pyromancy += 100 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02),
-                k.restoration += 100 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02)),
+              ) => (k.combat += 500 * (1 + getBuffLevel('Heroism') * 0.02),
+                k.pyromancy += 100 * (1 + getBuffLevel('Heroism') * 0.02),
+                k.restoration += 100 * (1 + getBuffLevel('Heroism') * 0.02)),
               loop: (r) => (r.heroism = (r.heroism || 0) + 1),
             },
           },
@@ -1182,7 +1189,7 @@ export const Koviko = {
         },
         'Pyromancy': {
           affected: [''],
-          effect: (r, k) => k.pyromancy += 100 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02),
+          effect: (r, k) => k.pyromancy += 100 * (1 + getBuffLevel('Heroism') * 0.02),
         },
         'Explore Cavern': { affected: [''] },
         'Mine Soulstones': {
@@ -1204,9 +1211,9 @@ export const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => (h.getSelfCombat(r, k) * Math.sqrt(1 + p.total / 100) *
               (1 +
-                globalThis.stats.getLevelFromExp(s[a.loopStats[(p.completed + offset) % a.loopStats.length]]) / 100)),
+                getLevelFromExp(s[a.loopStats[(p.completed + offset) % a.loopStats.length]]) / 100)),
             effect: {
-              loop: (r, k) => (r.blood++, k.combat += 1000 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02)),
+              loop: (r, k) => (r.blood++, k.combat += 1000 * (1 + getBuffLevel('Heroism') * 0.02)),
             },
           },
         },
@@ -1227,9 +1234,7 @@ export const Koviko = {
             tick: (p, a, s, k) => (offset) => {
               let attempt = Math.floor(p.completed / a.segments + .0000001);
 
-              return attempt < 1
-                ? (globalThis.stats.getSkillLevelFromExp(k.magic) * h.getStatProgress(p, a, s, offset))
-                : 0;
+              return attempt < 1 ? (getSkillLevelFromExp(k.magic) * h.getStatProgress(p, a, s, offset)) : 0;
             },
             effect: {
               loop: (r, k, ss) => {
@@ -1267,18 +1272,16 @@ export const Koviko = {
             tick: (p, a, s, k) => (offset) => {
               let attempt = Math.floor(p.completed / a.segments + .0000001);
 
-              return attempt < 1
-                ? (globalThis.stats.getSkillLevelFromExp(k.magic) * h.getStatProgress(p, a, s, offset))
-                : 0;
+              return attempt < 1 ? (getSkillLevelFromExp(k.magic) * h.getStatProgress(p, a, s, offset)) : 0;
             },
             effect: {
               loop: (r, k, ss, t) => {
                 r.body++;
 
                 for (const stat in stats) {
-                  t[stat] = globalThis.stats.getExpOfLevel(
-                    globalThis.stats.getLevelFromExp(t[stat]) -
-                      globalThis.stats.getBuffLevel('Imbuement2') - 1,
+                  t[stat] = getExpOfLevel(
+                    getLevelFromExp(t[stat]) -
+                      getBuffLevel('Imbuement2') - 1,
                   );
                 }
               },
@@ -1328,7 +1331,7 @@ export const Koviko = {
             cost: (p, a) => (segment) =>
               fibonacci(Math.floor((p.completed + segment) - p.completed / 3 + .0000001)) * 1000000,
             tick: (p, a, s, k) => (offset) =>
-              globalThis.stats.getSkillLevelFromExp(k.practical) * h.getStatProgress(p, a, s, offset) *
+              getSkillLevelFromExp(k.practical) * h.getStatProgress(p, a, s, offset) *
               Math.sqrt(1 + p.total / 100),
             effect: {
               loop: (r) => {
@@ -1392,12 +1395,12 @@ export const Koviko = {
           loop: {
             cost: (p) => (segment) => precision3(Math.pow(1.3, p.completed + segment)) * 1e7,
             tick: (p, a, s, k) => (offset) =>
-              (globalThis.stats.getSkillLevelFromExp(k.magic) + globalThis.stats.getSkillLevelFromExp(k.practical) +
-                globalThis.stats.getSkillLevelFromExp(k.dark) +
-                globalThis.stats.getSkillLevelFromExp(k.chronomancy) +
-                globalThis.stats.getSkillLevelFromExp(k.pyromancy) +
-                globalThis.stats.getSkillLevelFromExp(k.restoration) +
-                globalThis.stats.getSkillLevelFromExp(k.spatiomancy)) *
+              (getSkillLevelFromExp(k.magic) + getSkillLevelFromExp(k.practical) +
+                getSkillLevelFromExp(k.dark) +
+                getSkillLevelFromExp(k.chronomancy) +
+                getSkillLevelFromExp(k.pyromancy) +
+                getSkillLevelFromExp(k.restoration) +
+                getSkillLevelFromExp(k.spatiomancy)) *
               h.getStatProgress(p, a, s, offset) * Math.sqrt(1 + p.total / 1000),
             effect: {
               end: (r) => {
@@ -1411,7 +1414,7 @@ export const Koviko = {
         'Restoration': {
           affected: [''],
           manaCost: (r, k) => (15000 / h.getWizardRankBonus(r)),
-          effect: (r, k) => k.restoration += 100 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02),
+          effect: (r, k) => k.restoration += 100 * (1 + getBuffLevel('Heroism') * 0.02),
         },
         'Spatiomancy': {
           affected: [''],
@@ -1427,7 +1430,7 @@ export const Koviko = {
                 Math.floor(
                   h.getGuildRankBonus(input.crafts || 0) *
                     (1 +
-                      Math.min(globalThis.stats.getSkillLevelFromExp(skills.Spatiomancy.exp), 500) *
+                      Math.min(getSkillLevelFromExp(skills.Spatiomancy.exp), 500) *
                         .01),
                 )));
           },
@@ -1437,7 +1440,7 @@ export const Koviko = {
           affected: [''],
           canStart: (input) => (input.houses > 0),
           effect: (r, k) => {
-            r.gold += Math.floor(r.houses * globalThis.stats.getSkillLevelFromExp(k.mercantilism) / 10);
+            r.gold += Math.floor(r.houses * getSkillLevelFromExp(k.mercantilism) / 10);
           },
         },
         'Pegasus': {
@@ -1458,7 +1461,7 @@ export const Koviko = {
             max: () => 1,
             cost: (p) => (segment) => 1000000000 * (segment * 5 + 1),
             tick: (p, a, s, k) => (offset) => {
-              return globalThis.stats.getSkillLevelFromExp(k.practical) * h.getStatProgress(p, a, s, offset);
+              return getSkillLevelFromExp(k.practical) * h.getStatProgress(p, a, s, offset);
             },
             effect: {
               loop: (r, k, ss) => {
@@ -1497,7 +1500,7 @@ export const Koviko = {
             effect: {
               segment: (r) => r.giants = (r.giants || 0) + 1,
               loop: (r, k) => {
-                k.combat += 1500 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02);
+                k.combat += 1500 * (1 + getBuffLevel('Heroism') * 0.02);
               },
             },
           },
@@ -1574,7 +1577,7 @@ export const Koviko = {
             },
             effect: {
               end: (r, k) => {
-                k.combat += 100 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02);
+                k.combat += 100 * (1 + getBuffLevel('Heroism') * 0.02);
               },
               loop: (r) => {
                 let ssGained = h.getRewardSS(2);
@@ -1601,7 +1604,7 @@ export const Koviko = {
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
-                  a.exponentScaling * globalThis.stats.getSkillBonus('Assassin'),
+                  a.exponentScaling * getSkillBonus('Assassin'),
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
@@ -1632,7 +1635,7 @@ export const Koviko = {
               Math.sqrt(1 + p.total / 1000),
             effect: {
               segment: (r) => r.blood = (r.blood || 0) + 1,
-              loop: (r, k) => (k.combat += 2000 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02)),
+              loop: (r, k) => (k.combat += 2000 * (1 + getBuffLevel('Heroism') * 0.02)),
             },
           },
         },
@@ -1643,12 +1646,12 @@ export const Koviko = {
             cost: (p, a) => (segment) =>
               fibonacci(2 + Math.floor((p.completed + segment) / a.segments + .0000001)) * 5000,
             tick: (p, a, s, k) => (offset) =>
-              globalThis.stats.getSkillLevelFromExp(k.magic) *
-              Math.max(globalThis.stats.getSkillLevelFromExp(k.restoration) / 100, 1) *
+              getSkillLevelFromExp(k.magic) *
+              Math.max(getSkillLevelFromExp(k.restoration) / 100, 1) *
               h.getStatProgress(p, a, s, offset) * Math.sqrt(1 + p.total / 100),
             effect: {
               end: (r, k) => {
-                k.restoration += 25 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02);
+                k.restoration += 25 * (1 + getBuffLevel('Heroism') * 0.02);
               },
               segment: (r, k) => (r.survivor = (r.survivor || 0) + 1),
               loop: (r) => (r.rep += 4),
@@ -1672,7 +1675,7 @@ export const Koviko = {
         'Escape': { affected: [''], canStart: (input) => (input.totalTicks <= 50 * 60), effect: (r) => (r.town = 7) },
         'Open Portal': {
           affected: [''],
-          effect: (r, k) => (r.town = 1, k.restoration += 2500 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02)),
+          effect: (r, k) => (r.town = 1, k.restoration += 2500 * (1 + getBuffLevel('Heroism') * 0.02)),
         },
         'Excursion': {
           affected: ['gold'],
@@ -1703,7 +1706,7 @@ export const Koviko = {
           loop: {
             cost: (p) => (segment) => precision3(Math.pow(1.2, p.completed + segment)) * 5e8,
             tick: (p, a, s, k, r) => (offset) =>
-              (globalThis.stats.getSkillLevelFromExp(k.practical) + globalThis.stats.getSkillLevelFromExp(k.thievery)) *
+              (getSkillLevelFromExp(k.practical) + getSkillLevelFromExp(k.thievery)) *
               h.getStatProgress(p, a, s, offset) * Math.sqrt(1 + p.total / 1000),
             effect: {
               end: (r, k) => (r.guild = 'thieves', k.practical += 50, k.thievery += 50),
@@ -1785,7 +1788,7 @@ export const Koviko = {
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
-                  a.exponentScaling * globalThis.stats.getSkillBonus('Assassin'),
+                  a.exponentScaling * getSkillBonus('Assassin'),
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
@@ -1815,9 +1818,7 @@ export const Koviko = {
             tick: (p, a, s, k) => (offset) => {
               let attempt = Math.floor(p.completed / a.segments + .0000001);
 
-              return attempt < 1
-                ? (globalThis.stats.getSkillLevelFromExp(k.magic) * h.getStatProgress(p, a, s, offset))
-                : 0;
+              return attempt < 1 ? (getSkillLevelFromExp(k.magic) * h.getStatProgress(p, a, s, offset)) : 0;
             },
             effect: { loop: (r) => r.body++ },
           },
@@ -1835,7 +1836,7 @@ export const Koviko = {
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
-                  a.exponentScaling * globalThis.stats.getSkillBonus('Assassin'),
+                  a.exponentScaling * getSkillBonus('Assassin'),
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
@@ -1848,9 +1849,9 @@ export const Koviko = {
               end: (
                 r,
                 k,
-              ) => (k.combat += 250 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02),
-                k.pyromancy += 50 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02),
-                k.restoration += 50 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02)),
+              ) => (k.combat += 250 * (1 + getBuffLevel('Heroism') * 0.02),
+                k.pyromancy += 50 * (1 + getBuffLevel('Heroism') * 0.02),
+                k.restoration += 50 * (1 + getBuffLevel('Heroism') * 0.02)),
               loop: (r) => {
                 r.godFloor = (r.godFloor || 0) + 1;
                 if (r.godFloor == 99) {
@@ -1868,7 +1869,7 @@ export const Koviko = {
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
-                  a.exponentScaling * globalThis.stats.getSkillBonus('Assassin'),
+                  a.exponentScaling * getSkillBonus('Assassin'),
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
@@ -1878,7 +1879,7 @@ export const Koviko = {
                 : 0;
             },
             effect: {
-              end: (r, k) => (k.combat += 500 * (1 + globalThis.stats.getBuffLevel('Heroism') * 0.02)),
+              end: (r, k) => (k.combat += 500 * (1 + getBuffLevel('Heroism') * 0.02)),
               loop: (r) => (r.power++),
             },
           },
@@ -1989,7 +1990,7 @@ export const Koviko = {
             (
               stats,
               name,
-            ) => (stats[name] = globalThis.stats.getExpOfLevel(
+            ) => (stats[name] = getExpOfLevel(
               buffs.Imbuement2.amt * (skills.Wunderkind.exp >= 100 ? 2 : 1),
             ),
               stats),
@@ -2706,8 +2707,8 @@ export const Koviko = {
       for (let i in stats) {
         if (stats[i].delta) {
           let level = {
-            start: globalThis.stats.getLevelFromExp(stats[i].value - stats[i].delta),
-            end: globalThis.stats.getLevelFromExp(stats[i].value),
+            start: getLevelFromExp(stats[i].value - stats[i].delta),
+            end: getLevelFromExp(stats[i].value),
           };
 
           tooltip += '<tr><td><b>' + Localization.txt(`stats>${i}>short_form`).toUpperCase() +
@@ -2720,8 +2721,8 @@ export const Koviko = {
       for (let i in skills) {
         if (skills[i].delta) {
           let level = {
-            start: globalThis.stats.getSkillLevelFromExp(skills[i].value - skills[i].delta),
-            end: globalThis.stats.getSkillLevelFromExp(skills[i].value),
+            start: getSkillLevelFromExp(skills[i].value - skills[i].delta),
+            end: getSkillLevelFromExp(skills[i].value),
           };
 
           tooltip += '<tr><td><b>';

@@ -1,3 +1,4 @@
+import { Buff } from './stats.ts';
 import { Localizable } from './localizable.ts';
 import { actionLog, buffHardCaps, buffList, buffs, resources, skillList, skills, statList, stats } from './globals.ts';
 import { prestigeBonus } from './prestige.ts';
@@ -330,7 +331,7 @@ export class Buff extends Localizable {
   }
 
   constructor(name) {
-    super(`buffs>${getXMLName(globalThis.stats.Buff.fullNames[name])}`);
+    super(`buffs>${getXMLName(Buff.fullNames[name])}`);
 
     Object.defineProperty(this, 'name', { value: name });
   }
@@ -623,58 +624,3 @@ export function restartStats() {
 export function getTotalBonusXP(statName) {
   return stats[statName].totalBonusXP;
 }
-
-const _stats = {
-  LevelExp,
-  Stat,
-  Skill,
-  Buff,
-  initializeStats,
-  addNewStat,
-  initializeSkills,
-  addNewSkill,
-  initializeBuffs,
-  addNewBuff,
-  getLevel,
-  getTotalTalentLevel,
-  getTotalTalentPrc,
-  getLevelFromExp,
-  getExpOfLevel,
-  getExpOfSingleLevel,
-  getTalent,
-  getLevelFromTalent,
-  getExpOfTalent,
-  getExpOfSingleTalent,
-  getPrcToNextLevel,
-  getPrcToNextTalent,
-  getSkillLevelFromExp,
-  getExpOfSkillLevel,
-  getSkillLevel,
-  getSkillBonus,
-  setSkillBonusType,
-  getSkillMod,
-  getBuffLevel,
-  getBuffCap,
-  getRitualBonus,
-  getSurveyBonus,
-  getArmorLevel,
-  getSelfCombat,
-  getZombieStrength,
-  getTeamStrength,
-  getTeamCombat,
-  getPrcToNextSkillLevel,
-  addSkillExp,
-  handleSkillExp,
-  addBuffAmt,
-  getTalentMultiplier,
-  getExpToLevel,
-  addExp,
-  restartStats,
-  getTotalBonusXP,
-};
-
-declare global {
-  var stats: typeof _stats;
-}
-
-globalThis.stats = _stats;
