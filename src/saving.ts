@@ -1,3 +1,4 @@
+import { View } from './views/main.view.ts';
 import { Town } from './town.ts';
 import { Data } from './data.ts';
 import { copyArray, inputElement, removeClassFromDiv, textAreaElement, valueElement } from './helpers.ts';
@@ -45,9 +46,9 @@ const challengeSaveName = 'idleLoopsChallenge';
 let saveName = defaultSaveName;
 
 const timeNeededInitial = 5 * 50;
-const view = selfIsGame ? new globalThis.view.View() : null;
+const view = selfIsGame ? new View() : null;
 
-const vals = {
+export const vals = {
   trainingLimits: 10,
 };
 vals.curTown = 0;

@@ -134,8 +134,42 @@ let buffShowing;
 let curActionShowing;
 let dungeonShowing;
 
-class View {
+let curActionsDiv;
+let nextActionsDiv;
+let actionOptionsTown;
+let actionStoriesTown;
+let townInfos;
+
+export class View {
   initalize() {
+    curActionsDiv = document.getElementById('curActionsList');
+    nextActionsDiv = document.getElementById('nextActionsList');
+    actionOptionsTown = [];
+    for (let i = 0; i <= 8; i++) {
+      const element = document.getElementById(`actionOptionsTown${i}`);
+      if (!element) continue;
+
+      const actionDiv = document.createElement('div');
+      actionDiv.classList.add('actionDiv');
+      element.append(actionDiv);
+
+      const travelDiv = document.createElement('div');
+      travelDiv.classList.add('travelDiv');
+      element.append(travelDiv);
+
+      actionOptionsTown[i] = element;
+    }
+
+    actionStoriesTown = [];
+    for (let i = 0; i <= 8; i++) {
+      actionStoriesTown[i] = document.getElementById(`actionStoriesTown${i}`);
+    }
+
+    townInfos = [];
+    for (let i = 0; i <= 8; i++) {
+      townInfos[i] = document.getElementById(`townInfo${i}`);
+    }
+
     this.statGraph = new StatGraph();
 
     this.createTravelMenu();
@@ -2333,35 +2367,6 @@ export function scrollToPanel(event, target) {
   }
 
   return false;
-}
-
-const curActionsDiv = document.getElementById('curActionsList');
-const nextActionsDiv = document.getElementById('nextActionsList');
-
-const actionOptionsTown = [];
-for (let i = 0; i <= 8; i++) {
-  const element = document.getElementById(`actionOptionsTown${i}`);
-  if (!element) continue;
-
-  const actionDiv = document.createElement('div');
-  actionDiv.classList.add('actionDiv');
-  element.append(actionDiv);
-
-  const travelDiv = document.createElement('div');
-  travelDiv.classList.add('travelDiv');
-  element.append(travelDiv);
-
-  actionOptionsTown[i] = element;
-}
-
-const actionStoriesTown = [];
-for (let i = 0; i <= 8; i++) {
-  actionStoriesTown[i] = document.getElementById(`actionStoriesTown${i}`);
-}
-
-const townInfos = [];
-for (let i = 0; i <= 8; i++) {
-  townInfos[i] = document.getElementById(`townInfo${i}`);
 }
 
 export function addStatColors(theDiv, stat, forceColors = false) {
