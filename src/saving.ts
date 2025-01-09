@@ -116,8 +116,8 @@ export const vals = {
     challengeMode: 0,
     inChallenge: false,
   },
+  trials: [[], [], [], [], []],
 };
-let trials = [[], [], [], [], []];
 const trialFloors = [50, 100, 7, 1000, 25];
 
 Object.assign(vals, {
@@ -725,10 +725,10 @@ export function doLoad(toLoad) {
   if (toLoad.trials === undefined) toLoad.trials = copyArray(globalThis.saving.vals.trials);
   for (let i = 0; i < globalThis.saving.trials.length; i++) {
     floors = trialFloors[i];
-    trials[i].highestFloor = 0;
+    globalThis.saving.vals.trials[i].highestFloor = 0;
     for (let j = 0; j < floors; j++) {
       if (toLoad.trials[i] != undefined && toLoad.trials && toLoad.trials[i][j]) {
-        trials[i][j] = toLoad.trials[i][j];
+        globalThis.saving.vals.trials[i][j] = toLoad.trials[i][j];
         if (trials[i][j].completed > 0) trials[i].highestFloor = j;
       } else {
         trials[i][j] = copyArray(trialLevel);
