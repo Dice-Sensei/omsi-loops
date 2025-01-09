@@ -50,75 +50,72 @@ const view = selfIsGame ? new View() : null;
 
 export const vals = {
   trainingLimits: 10,
-};
-vals.curTown = 0;
-vals.shouldRestart = true;
-vals.totalTalent = 0;
-vals.stoneLoc = 0;
-vals.guild = '';
-vals.escapeStarted = false;
-vals.portalUsed = false;
-vals.curLoadout = 0;
-vals.loadouts = undefined;
-vals.loadoutnames = undefined;
-vals.storyShowing = 0;
-vals.storyMax = 0;
-vals.unreadActionStories = undefined;
-vals.goldInvested = 0;
-vals.stonesUsed = undefined;
-vals.townShowing = 0;
-vals.actionStoriesShowing = false;
-vals.townsUnlocked = [];
-vals.completedActions = [];
-vals.totalActionList = [];
-vals.dungeons = [[], [], []];
-
-vals.options = {
-  responsiveUI: true,
-  actionLog: true,
-  fractionalMana: false,
-  keepCurrentList: false,
-  repeatLastAction: false,
-  addActionsToTop: false,
-  pauseBeforeRestart: false,
-  pauseOnFailedLoop: false,
-  pauseOnComplete: false,
-  speedIncrease10x: false,
-  speedIncrease20x: false,
-  speedIncreaseCustom: 5,
-  speedIncreaseBackground: -1,
-  bonusIsActive: false,
-  highlightNew: true,
-  statColors: true,
-  statHints: false,
-  pingOnPause: false,
-  notifyOnPause: false,
-  autoMaxTraining: false,
-  hotkeys: true,
-  predictor: false,
-  updateRate: 50,
-  autosaveRate: 30,
-  predictorTimePrecision: 1,
-  predictorNextPrecision: 2,
-  predictorActionWidth: 500,
-  predictorRepeatPrediction: true,
-  predictorSlowMode: false,
-  predictorSlowTimer: 1,
-  predictorTrackedStat: 'Rsoul',
-  predictorBackgroundThread: true,
-};
-
-vals.totals = {
-  time: 0,
-  effectiveTime: 0,
-  borrowedTime: 0,
-  loops: 0,
-  actions: 0,
-};
-
-vals.challengeSave = {
-  challengeMode: 0,
-  inChallenge: false,
+  curTown: 0,
+  shouldRestart: true,
+  totalTalent: 0,
+  stoneLoc: 0,
+  guild: '',
+  escapeStarted: false,
+  portalUsed: false,
+  curLoadout: 0,
+  loadouts: undefined,
+  loadoutnames: undefined,
+  storyShowing: 0,
+  storyMax: 0,
+  unreadActionStories: undefined,
+  goldInvested: 0,
+  stonesUsed: undefined,
+  townShowing: 0,
+  actionStoriesShowing: false,
+  townsUnlocked: [],
+  completedActions: [],
+  totalActionList: [],
+  dungeons: [[], [], []],
+  options: {
+    responsiveUI: true,
+    actionLog: true,
+    fractionalMana: false,
+    keepCurrentList: false,
+    repeatLastAction: false,
+    addActionsToTop: false,
+    pauseBeforeRestart: false,
+    pauseOnFailedLoop: false,
+    pauseOnComplete: false,
+    speedIncrease10x: false,
+    speedIncrease20x: false,
+    speedIncreaseCustom: 5,
+    speedIncreaseBackground: -1,
+    bonusIsActive: false,
+    highlightNew: true,
+    statColors: true,
+    statHints: false,
+    pingOnPause: false,
+    notifyOnPause: false,
+    autoMaxTraining: false,
+    hotkeys: true,
+    predictor: false,
+    updateRate: 50,
+    autosaveRate: 30,
+    predictorTimePrecision: 1,
+    predictorNextPrecision: 2,
+    predictorActionWidth: 500,
+    predictorRepeatPrediction: true,
+    predictorSlowMode: false,
+    predictorSlowTimer: 1,
+    predictorTrackedStat: 'Rsoul',
+    predictorBackgroundThread: true,
+  },
+  totals: {
+    time: 0,
+    effectiveTime: 0,
+    borrowedTime: 0,
+    loops: 0,
+    actions: 0,
+  },
+  challengeSave: {
+    challengeMode: 0,
+    inChallenge: false,
+  },
 };
 let trials = [[], [], [], [], []];
 const trialFloors = [50, 100, 7, 1000, 25];
