@@ -26,7 +26,7 @@ import {
   isTraining,
   trainingActions,
 } from './actionList.ts';
-import { vals } from './saving.ts';
+import { clearPauseNotification, needsDataSnapshots, save, setOption, showPauseNotification, vals } from './saving.ts';
 import { Data } from './data.ts';
 import { KeyboardKey } from './keyboard.hotkeys.ts';
 import { Localization } from './Localization.ts';
@@ -124,7 +124,7 @@ export function tick() {
   // save even when paused
   if (curTime - lastSave > vals.options.autosaveRate * 1000) {
     lastSave = curTime;
-    globalThis.saving.save();
+    save();
   }
 
   // don't do any updates until we've got enough time built up to match the refresh rate setting
@@ -274,7 +274,7 @@ export function stopGame() {
   view.update();
   document.title = '*PAUSED* Idle Loops';
   document.getElementById('pausePlay').textContent = Localization.txt('time_controls>play_button');
-  if (globalThis.saving.needsDataSnapshots()) {
+  if (needsDataSnapshots()) {
     Data.updateSnapshot('stop', 'base');
   }
   if (vals.options.predictor) {
@@ -284,7 +284,7 @@ export function stopGame() {
 
 export function pauseGame(ping, message) {
   gameIsStopped = !gameIsStopped;
-  if (globalThis.saving.needsDataSnapshots()) {
+  if (needsDataSnapshots()) {
     Data.discardToSnapshot('base', 1);
     Data.recordSnapshot('pause');
   }
@@ -292,7 +292,7 @@ export function pauseGame(ping, message) {
   view.requestUpdate('updateCurrentActionBar', actions.currentPos);
   view.update();
   if (!gameIsStopped && vals.options.notifyOnPause) {
-    globalThis.saving.clearPauseNotification();
+    clearPauseNotification();
   }
   document.title = gameIsStopped ? '*PAUSED* Idle Loops' : 'Idle Loops';
   document.getElementById('pausePlay').textContent = Localization.txt(
@@ -308,7 +308,7 @@ export function pauseGame(ping, message) {
       setTimeout(() => beep(250), 500);
     }
     if (vals.options.notifyOnPause) {
-      globalThis.saving.showPauseNotification(message || 'Game paused!');
+      showPauseNotification(message || 'Game paused!');
     }
   }
 }
@@ -348,7 +348,7 @@ export function prepareRestart() {
       setTimeout(() => beep(250), 500);
     }
     if (vals.options.notifyOnPause) {
-      globalThis.saving.showPauseNotification('Game paused!');
+      showPauseNotification('Game paused!');
     }
     if (curAction) {
       actions.completedTicks += actions.getNextValidAction().ticks;
@@ -380,7 +380,7 @@ export function restart() {
   actions.restart();
   view.requestUpdate('updateCurrentActionsDivs');
   view.requestUpdate('updateTrials', null);
-  if (globalThis.saving.needsDataSnapshots()) {
+  if (needsDataSnapshots()) {
     Data.updateSnapshot('restart', 'base');
   }
 }
@@ -490,12 +490,12 @@ export function loadLoadout(num) {
 let globalCustomInput = '';
 export function saveList() {
   if (vals.curLoadout === 0) {
-    globalThis.saving.save();
+    save();
     return;
   }
   nameList(false);
   vals.loadouts[vals.curLoadout] = copyArray(actions.next);
-  globalThis.saving.save();
+  save();
   if ((inputElement('renameLoadout').value !== 'Saved!')) {
     globalCustomInput = inputElement('renameLoadout').value;
   }
@@ -520,7 +520,7 @@ export function nameList(saveGame) {
     inputElement('renameLoadout').value = 'Enter a name!';
   }
   document.getElementById(`load${vals.curLoadout}`).textContent = vals.loadoutnames[vals.curLoadout - 1];
-  if (saveGame) globalThis.saving.save();
+  if (saveGame) save();
 }
 
 export function loadList() {
@@ -829,7 +829,7 @@ export function toggleOffline() {
       'time_controls>bonus_seconds>state>off',
     );
   }
-  globalThis.saving.setOption('bonusIsActive', bonusActive, true);
+  setOption('bonusIsActive', bonusActive, true);
   view.requestUpdate('updateTime', null);
 }
 

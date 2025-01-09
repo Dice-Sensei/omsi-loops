@@ -1,5 +1,5 @@
 import { Data, SnapshotMissingError } from './data.ts';
-import './saving.ts';
+import { loadDefaults } from './saving.ts';
 import { Koviko } from './predictor.ts';
 
 /**
@@ -40,7 +40,7 @@ import { Koviko } from './predictor.ts';
 
 console.log('starting predictor worker');
 
-globalThis.saving.loadDefaults();
+loadDefaults();
 
 const predictor = Koviko.initWorkerPredictor();
 

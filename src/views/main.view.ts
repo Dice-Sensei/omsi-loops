@@ -30,7 +30,7 @@ import {
   townNames,
   translateClassNames,
 } from '../actionList.ts';
-import { vals } from '../saving.ts';
+import { vals, isBuffName, saveUISettings } from '../saving.ts';
 
 import $ from 'jquery';
 import * as d3 from 'd3';
@@ -1756,7 +1756,7 @@ export class View {
         }
       }
     }
-    if (globalThis.saving.isBuffName(action.grantsBuff)) {
+    if (isBuffName(action.grantsBuff)) {
       const xmlName = getXMLName(Buff.fullNames[action.grantsBuff]);
       const grantsBuff = `<div class='bold'>${Localization.txt('actions>tooltip>grants_buff')}:</div>`;
       lockedSkills += `${grantsBuff} <span>${Localization.txt(`buffs>${xmlName}>label`)}</span><br>`;
@@ -2411,7 +2411,7 @@ export function adjustActionListSize(amt) {
     height = `${Math.min(Math.max(parseInt(height) + amt, 500), 2000)}px`;
   }
   document.documentElement.style.setProperty('--action-list-height', height);
-  globalThis.saving.saveUISettings();
+  saveUISettings();
 }
 
 export function updateBuffCaps() {

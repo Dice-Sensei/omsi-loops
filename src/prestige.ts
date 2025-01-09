@@ -3,6 +3,7 @@ import { clearList, pauseGame, restart } from './driver.ts';
 import { addBuffAmt, getBuffLevel } from './stats.ts';
 import { view } from './views/main.view.ts';
 import { vals } from './saving.ts';
+import { load, save } from './saving.ts';
 
 export const prestigeValues: Record<string, number> = {};
 
@@ -94,7 +95,7 @@ export function prestigeWithNewValues(
   const nextOfflineMs = vals.totalOfflineMs;
 
   // Remove all progress and save totals
-  globalThis.saving.load(false);
+  load(false);
   clearList();
   restart();
   pauseGame();
@@ -114,11 +115,11 @@ export function prestigeWithNewValues(
   vals.totals = nextTotals;
   vals.totalOfflineMs = nextOfflineMs;
   view.updatePrestigeValues();
-  globalThis.saving.save();
+  save();
 }
 
 export function prestigeConfirmation() {
-  globalThis.saving.save();
+  save();
   if (
     globalThis.localStorage[vals.defaultSaveName] &&
     globalThis.localStorage[vals.defaultSaveName] !== ''

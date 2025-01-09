@@ -10,7 +10,7 @@ import {
   selectLoadout,
   setCustomActionAmount,
 } from './driver.ts';
-import { vals } from './saving.ts';
+import { setOption, vals } from './saving.ts';
 import { createKeyboardHotkeys } from './keyboard.hotkeys.ts';
 import { adjustActionListSize, view } from './views/main.view.ts';
 
@@ -118,7 +118,7 @@ const Actions = () => {
               type='checkbox'
               id='keepCurrentListInput'
               class='checkbox'
-              onchange="globalThis.saving.setOption('keepCurrentList', this.checked)"
+              onchange={({ target: { checked } }) => setOption('keepCurrentList', checked)}
             >
             </input>
             <label
@@ -132,7 +132,7 @@ const Actions = () => {
               type='checkbox'
               id='repeatLastActionInput'
               class='checkbox'
-              onchange="globalThis.saving.setOption('repeatLastAction', this.checked)"
+              onchange={({ target: { checked } }) => setOption('repeatLastAction', checked)}
             >
             </input>
             <label
@@ -146,7 +146,7 @@ const Actions = () => {
               type='checkbox'
               id='addActionsToTopInput'
               class='checkbox'
-              onchange="globalThis.saving.setOption('addActionsToTop', this.checked)"
+              onchange={({ target: { checked } }) => setOption('addActionsToTop', checked)}
             >
             </input>
             <label for='addActionsToTopInput' class='localized' data-locale='actions>tooltip>add_action_top'></label>
@@ -339,7 +339,7 @@ const Actions = () => {
             <select
               id='predictorTrackedStatInput'
               class='button'
-              onchange="globalThis.saving.setOption('predictorTrackedStat', this.value)"
+              onchange={({ target: { value } }) => setOption('predictorTrackedStat', value)}
             >
             </select>
           </div>

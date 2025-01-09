@@ -1,13 +1,13 @@
 import { Localization } from './localization.ts';
-import './saving.ts';
+import { loadDefaults, startGame } from './saving.ts';
 
 import { renderViews } from './views/register-all.ts';
 
-globalThis.saving.loadDefaults();
+loadDefaults();
 
 await Localization.init();
 
 renderViews();
 Localization.populate();
 
-globalThis.saving.startGame();
+startGame();
