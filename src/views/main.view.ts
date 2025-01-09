@@ -274,9 +274,9 @@ export class View {
       const axisTip = this.statGraph.getAxisTip(stat);
       totalContainer.insertAdjacentHTML(
         'beforebegin',
-        `<div class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${
+        `<div id='stat${stat}' class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${
           axisTip[1] + 3
-        }%;' onmouseover='view.showStat("${stat}")' onmouseout='view.showStat(undefined)'>
+        }%;'>
                 <div class='statLabelContainer'>
                     <div class='medium bold stat-name long-form' style='margin-left:18px;margin-top:5px;'>${
           Localization.txt(`stats>${stat}>long_form`)
@@ -1102,7 +1102,8 @@ export class View {
     if (globalThis.saving.vals.options.predictor) {
       Koviko.postUpdateHandler(actions.next, nextActionsDiv);
     }
-    nextActionsDiv.scrollTop = Math.max(nextActionsDiv.scrollTop, scrollTop); // scrolling down to see the new thing added is okay, scrolling up when you click an action button is not
+    // scrolling down to see the new thing added is okay, scrolling up when you click an action button is not
+    nextActionsDiv.scrollTop = Math.max(nextActionsDiv.scrollTop, scrollTop); 
   }
 
   updateCurrentActionsDivs() {
@@ -1116,8 +1117,7 @@ export class View {
         ? toSuffix(action.loops - action.loopsLeft)
         : formatNumber(action.loops - action.loopsLeft);
       const imageName = action.name.startsWith('Assassin') ? 'assassin' : camelize(action.name);
-      totalDivText +=
-        `<div class='curActionContainer small' onmouseover='view.mouseoverAction(${i}, truviewonmouseleave='view.mouseoverAction(${i}, false)'>
+      totalDivText += `<div id='action${i}Container' class='curActionContainer small'>
                     <div class='curActionBar' id='action${i}Bar'></div>
                     <div class='actionSelectedIndicator' id='action${i}Selected'></div>
                     <img src='icons/${imageName}.svg' class='smallIcon'>
@@ -1967,7 +1967,7 @@ export class View {
     const completedTooltip = action.completedTooltip ? action.completedTooltip() : '';
     let mouseOver = '';
     if (varName === 'SDungeon') {
-      mouseOver = "onmouseover='.showDungeon(0)' onmouseout='viewwDungeon(undefined)'";
+      mouseOver = "onmouseover='view.showDungeon(0)' onmouseout='view.showDungeon(undefined)'";
     } else if (varName === 'LDungeon') {
       mouseOver = "onmouseover='view.showDungeon(1)' onmouseout='view.showDungeon(undefined)'";
     } else if (varName === 'TheSpire') {
@@ -1978,7 +1978,7 @@ export class View {
                 <div class='multipartLabel'>
                     <div class='flexMargin'></div>
                     <div class='bold townLabel' id='multiPartName${varName}'></div>
-                    <div class='completedInfo showthat' ${mouseOver}>
+                    <div id='completedInfo${varName}' class='completedInfo showthat' ${mouseOver}>
                         <div class='bold'>${action.labelDone}</div>
                         <div id='completed${varName}'></div>
                         ${

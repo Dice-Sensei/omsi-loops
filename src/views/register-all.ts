@@ -2,10 +2,11 @@ import { Buff } from '../stats.ts';
 import $ from 'jquery';
 import { Localization } from '../Localization.ts';
 import { camelize, htmlElement } from '../helpers.ts';
-import { buffHardCaps, buffList } from '../globals.ts';
+import { buffHardCaps, buffList, statList } from '../globals.ts';
 import { prestigeUpgrade, resetAllPrestiges } from '../prestige.ts';
 import { borrowTime, manualRestart, pauseGame, returnTime, toggleOffline } from '../driver.ts';
 import { getXMLName } from '../actionList.ts';
+import { actions } from '../actions.ts';
 import { updateBuffCaps, view } from './main.view.ts';
 import { vals } from '../saving.ts';
 
@@ -44,12 +45,7 @@ const buffsContainer = {
           </div>
           <div class="buffNumContainer">
             <div id="buff${name}Level">0/</div>
-            <input 
-              type="number" 
-              id="buff${name}Cap" 
-              class="buffmaxinput" 
-              value="${buffHardCaps[name]}" 
-              onchange="globalThis.view.updateBuffCaps()"></input>
+            <input type="number" id="buff${name}Cap" class="buffmaxinput" value="${buffHardCaps[name]}"></input>
           </div>
         </div>
       `;
@@ -715,6 +711,22 @@ export const renderViews = () => {
       storyLeft.onclick = () => view.updateStory(vals.storyShowing - 1);
       const storyRight = document.getElementById('storyRight')!;
       storyRight.onclick = () => view.updateStory(vals.storyShowing + 1);
+
+      for (const stat of statList) {
+        const id = `stat${stat}`;
+        const statElement = document.getElementById(id)!;
+
+        statElement.onmouseover = () => view.showStat(stat);
+        statElement.onmouseout = () => view.showStat(undefined);
+      }
+
+      for (let i = 0; i < actions.current.length; i++) {
+        const id = `action${i}Container`;
+        const actionElement = document.getElementById(id)!;
+
+        actionElement.onmouseover = () => view.mouseoverAction(i, true);
+        actionElement.onmouseleave = () => view.mouseoverAction(i, false);
+      }
     });
   }
 };

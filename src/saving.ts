@@ -11,7 +11,6 @@ import {
   buffList,
   buffs,
   dungeonFloors,
-  selfIsGame,
   skillList,
   skills,
   statList,
@@ -119,9 +118,6 @@ export const vals = {
   trialFloors: [50, 100, 7, 1000, 25],
   defaultSaveName: 'idleLoops1',
   challengeSaveName: 'idleLoopsChallenge',
-};
-
-Object.assign(vals, {
   currentLoop: 0,
   totalMerchantMana: 7500,
   curAdvGuildSegment: 0,
@@ -132,7 +128,12 @@ Object.assign(vals, {
   curThievesGuildSegment: 0,
   curGodsSegment: 0,
   totalOfflineMs: 0,
-});
+};
+
+export const selfIsGame = !(typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope);
+if (selfIsGame) {
+  Object.assign(vals.options, importPredictorSettings());
+}
 
 let pauseNotification = null;
 
@@ -294,10 +295,6 @@ const storyInitializers = {
     },
   },
 };
-
-if (selfIsGame) {
-  Object.assign(vals.options, importPredictorSettings()); // override hardcoded defaults if not in worker
-}
 
 export function decompressFromBase64(item) {
   return lZStringDecompressFromBase64(item);
@@ -1153,7 +1150,6 @@ const _saving = {
   beginChallenge,
   exitChallenge,
   resumeChallenge,
-  view,
   loadDefaults,
   needsDataSnapshots,
   startGame,

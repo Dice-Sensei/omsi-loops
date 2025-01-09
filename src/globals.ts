@@ -1,7 +1,6 @@
 import { copyObject } from './helpers.ts';
 import { ActionLog } from './actionlog.ts';
 
-export const selfIsGame = !(typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope);
 export const skillList = /** @type {const} */ ([
   'Combat',
   'Magic',
@@ -119,7 +118,7 @@ export type Stat = {
 };
 
 export const stats: Record<StatName, Stat> = {};
-export const actionLog = selfIsGame ? new ActionLog() : null;
+export const actionLog = new ActionLog();
 
 export const storyFlags = {
   maxSQuestsInALoop: false,

@@ -48,7 +48,7 @@ import {
   resetResource,
   unlockTown,
 } from './driver.ts';
-import {} from './stats.ts';
+import { vals } from './saving.ts';
 
 export class ClassNameNotFoundError extends TypeError {}
 
@@ -475,7 +475,7 @@ class DungeonAction extends MultipartAction {
   completedTooltip() {
     let ssDivContainer = '';
     if (this.dungeonNum < 3) {
-      for (let i = 0; i < globalThis.saving.vals.dungeons[this.dungeonNum].length; i++) {
+      for (let i = 0; i < vals.dungeons[this.dungeonNum].length; i++) {
         ssDivContainer += `Floor ${i + 1} |
                                     <div class='bold'>${
           Localization.txt(`actions>${getXMLName(this.name)}>chance_label`)
@@ -493,7 +493,7 @@ class DungeonAction extends MultipartAction {
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`] + 0.0001) {
     const floor = Math.floor(loopCounter / this.segments + 1);
     return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
-      floor <= globalThis.saving.vals.dungeons[this.dungeonNum].length
+      floor <= vals.dungeons[this.dungeonNum].length
         ? numberToWords(floor)
         : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
@@ -541,7 +541,7 @@ class TrialAction extends MultipartAction {
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
     const floor = Math.floor((loopCounter + 0.0001) / this.segments + 1);
     return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
-      floor <= globalThis.saving.vals.trials[this.trialNum].length
+      floor <= vals.trials[this.trialNum].length
         ? numberToWords(floor)
         : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
@@ -559,17 +559,17 @@ class TrialAction extends MultipartAction {
 
   tickProgress(offset, loopCounter) {
     return this.baseProgress() *
-      Math.sqrt(1 + globalThis.saving.vals.trials[this.trialNum][this.currentFloor(loopCounter)].completed / 200);
+      Math.sqrt(1 + vals.trials[this.trialNum][this.currentFloor(loopCounter)].completed / 200);
   }
   loopsFinished(loopCounter) {
     const finishedFloor = this.currentFloor(loopCounter) - 1;
     //console.log("Finished floor: " + finishedFloor + " Current Floor: " + this.currentFloor());
-    globalThis.saving.vals.trials[this.trialNum][finishedFloor].completed++;
+    vals.trials[this.trialNum][finishedFloor].completed++;
     if (
-      finishedFloor > globalThis.saving.vals.trials[this.trialNum].highestFloor ||
-      globalThis.saving.vals.trials[this.trialNum].highestFloor === undefined
+      finishedFloor > vals.trials[this.trialNum].highestFloor ||
+      vals.trials[this.trialNum].highestFloor === undefined
     ) {
-      globalThis.saving.vals.trials[this.trialNum].highestFloor = finishedFloor;
+      vals.trials[this.trialNum].highestFloor = finishedFloor;
     }
     view.requestUpdate('updateTrialInfo', {
       trialNum: this.trialNum,
@@ -717,7 +717,7 @@ export function SurveyAction(townNum) {
         addResource('completedMap', 1);
         towns[this.townNum].finishProgress(this.varName, getExploreSkill());
         view.requestUpdate('updateActionTooltips', null);
-      } else if (globalThis.saving.vals.options.pauseOnComplete) {
+      } else if (vals.options.pauseOnComplete) {
         pauseGame(true, 'Survey complete! (Game paused)');
       }
     },
@@ -781,7 +781,7 @@ Action.RuinsZ6 = new Action('RuinsZ6', RuinsAction(6));
 export function adjustRocks(townNum) {
   let town = towns[townNum];
   let baseStones = town.getLevel('RuinsZ' + townNum) * 2500;
-  let usedStones = globalThis.saving.vals.stonesUsed[townNum];
+  let usedStones = vals.stonesUsed[townNum];
   town[`totalStonesZ${townNum}`] = baseStones;
   town[`goodStonesZ${townNum}`] = Math.floor(town[`checkedStonesZ${townNum}`] / 1000) - usedStones;
   town[`goodTempStonesZ${townNum}`] = Math.floor(town[`checkedStonesZ${townNum}`] / 1000) - usedStones;
@@ -806,7 +806,7 @@ export function HaulAction(townNum) {
     },
     affectedBy: ['SurveyZ1'],
     canStart() {
-      return !resources.stone && globalThis.saving.vals.stonesUsed[this.townNum] < 250;
+      return !resources.stone && vals.stonesUsed[this.townNum] < 250;
     },
     manaCost() {
       return 50000;
@@ -818,7 +818,7 @@ export function HaulAction(townNum) {
       return towns[this.townNum].getLevel('RuinsZ' + townNum) > 0;
     },
     finish() {
-      globalThis.saving.vals.stoneLoc = this.townNum;
+      vals.stoneLoc = this.townNum;
       towns[this.townNum].finishRegular(this.varName, 1000, () => {
         addResource('stone', true);
       });
@@ -827,13 +827,13 @@ export function HaulAction(townNum) {
       switch (storyNum) {
         case 1:
           return towns[this.townNum][`good${this.varName}`] +
-              globalThis.saving.vals.stonesUsed[this.townNum] >= 1;
+              vals.stonesUsed[this.townNum] >= 1;
         case 2:
           return towns[this.townNum][`good${this.varName}`] +
-              globalThis.saving.vals.stonesUsed[this.townNum] >= 100;
+              vals.stonesUsed[this.townNum] >= 100;
         case 3:
           return towns[this.townNum][`good${this.varName}`] +
-              globalThis.saving.vals.stonesUsed[this.townNum] >= 250;
+              vals.stonesUsed[this.townNum] >= 250;
       }
       return false;
     },
@@ -1240,7 +1240,7 @@ Action.TrainStrength = new Action('Train Strength', {
     Con: 0.2,
   },
   allowed() {
-    return globalThis.saving.vals.trainingLimits;
+    return vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -1738,7 +1738,7 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
   canStart(loopCounter = towns[this.townNum].SDungeonLoopCounter) {
     const curFloor = Math.floor(loopCounter / this.segments + 0.0000001);
     return resources.reputation >= 2 &&
-      curFloor < globalThis.saving.vals.dungeons[this.dungeonNum].length;
+      curFloor < vals.dungeons[this.dungeonNum].length;
   },
   loopCost(segment, loopCounter = towns[this.townNum].SDungeonLoopCounter) {
     return precision3(
@@ -1748,16 +1748,16 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
   tickProgress(offset, loopCounter = towns[this.townNum].SDungeonLoopCounter) {
     const floor = Math.floor(loopCounter / this.segments + 0.0000001);
     return (getSelfCombat() + getSkillLevel('Magic')) *
-      Math.sqrt(1 + globalThis.saving.vals.dungeons[this.dungeonNum][floor].completed / 200);
+      Math.sqrt(1 + vals.dungeons[this.dungeonNum][floor].completed / 200);
   },
   loopsFinished() {
     const curFloor = Math.floor(
       (towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001 - 1,
     );
     const success = this.finishDungeon(curFloor);
-    if (success === true && globalThis.saving.vals.storyMax <= 1) {
+    if (success === true && vals.storyMax <= 1) {
       globalThis.view.unlockGlobalStory(1);
-    } else if (success === false && globalThis.saving.vals.storyMax <= 2) {
+    } else if (success === false && vals.storyMax <= 2) {
       globalThis.view.unlockGlobalStory(2);
     }
   },
@@ -1779,7 +1779,7 @@ Action.SmallDungeon = new DungeonAction('Small Dungeon', 0, {
 });
 DungeonAction.prototype.finishDungeon = function finishDungeon(floorNum) {
   const dungeonNum = this.dungeonNum;
-  const floor = globalThis.saving.vals.dungeons[dungeonNum][floorNum];
+  const floor = vals.dungeons[dungeonNum][floorNum];
   if (!floor) {
     return false;
   }
@@ -1900,7 +1900,7 @@ Action.StartJourney = new Action('Start Journey', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(1);
+        return vals.townsUnlocked.includes(1);
     }
     return false;
   },
@@ -2227,7 +2227,7 @@ Action.SitByWaterfall = new Action('Sit By Waterfall', {
     Soul: 0.8,
   },
   allowed() {
-    return globalThis.saving.vals.trainingLimits;
+    return vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -2499,7 +2499,7 @@ Action.TrainDexterity = new Action('Train Dexterity', {
     Con: 0.2,
   },
   allowed() {
-    return globalThis.saving.vals.trainingLimits;
+    return vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -2539,7 +2539,7 @@ Action.TrainSpeed = new Action('Train Speed', {
     Con: 0.2,
   },
   allowed() {
-    return globalThis.saving.vals.trainingLimits;
+    return vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -2624,7 +2624,7 @@ Action.BirdWatching = new Action('Bird Watching', {
   },
   affectedBy: ['Buy Glasses'],
   allowed() {
-    return globalThis.saving.vals.trainingLimits;
+    return vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -2974,7 +2974,7 @@ Action.ContinueOn = new Action('Continue On', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(2);
+        return vals.townsUnlocked.includes(2);
     }
     return false;
   },
@@ -3185,7 +3185,7 @@ Action.BuyManaZ3 = new Action('Buy Mana Z3', {
     return 100;
   },
   canStart() {
-    return !globalThis.saving.vals.portalUsed;
+    return !vals.portalUsed;
   },
   visible() {
     return true;
@@ -3293,7 +3293,7 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
     return 1;
   },
   canStart() {
-    return globalThis.saving.vals.guild === '';
+    return vals.guild === '';
   },
   loopCost(segment, loopCounter = towns[2][`${this.varName}LoopCounter`]) {
     return precision3(Math.pow(1.2, loopCounter + segment)) * 5e6;
@@ -3304,17 +3304,17 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
       Math.sqrt(1 + totalCompletions / 1000);
   },
   loopsFinished() {
-    if (globalThis.saving.vals.curAdvGuildSegment >= 0) globalThis.view.setStoryFlag('advGuildRankEReached');
-    if (globalThis.saving.vals.curAdvGuildSegment >= 3) globalThis.view.setStoryFlag('advGuildRankDReached');
-    if (globalThis.saving.vals.curAdvGuildSegment >= 6) globalThis.view.setStoryFlag('advGuildRankCReached');
-    if (globalThis.saving.vals.curAdvGuildSegment >= 9) globalThis.view.setStoryFlag('advGuildRankBReached');
-    if (globalThis.saving.vals.curAdvGuildSegment >= 12) globalThis.view.setStoryFlag('advGuildRankAReached');
-    if (globalThis.saving.vals.curAdvGuildSegment >= 15) globalThis.view.setStoryFlag('advGuildRankSReached');
-    if (globalThis.saving.vals.curAdvGuildSegment >= 27) globalThis.view.setStoryFlag('advGuildRankUReached');
-    if (globalThis.saving.vals.curAdvGuildSegment >= 39) globalThis.view.setStoryFlag('advGuildRankGodlikeReached');
+    if (vals.curAdvGuildSegment >= 0) globalThis.view.setStoryFlag('advGuildRankEReached');
+    if (vals.curAdvGuildSegment >= 3) globalThis.view.setStoryFlag('advGuildRankDReached');
+    if (vals.curAdvGuildSegment >= 6) globalThis.view.setStoryFlag('advGuildRankCReached');
+    if (vals.curAdvGuildSegment >= 9) globalThis.view.setStoryFlag('advGuildRankBReached');
+    if (vals.curAdvGuildSegment >= 12) globalThis.view.setStoryFlag('advGuildRankAReached');
+    if (vals.curAdvGuildSegment >= 15) globalThis.view.setStoryFlag('advGuildRankSReached');
+    if (vals.curAdvGuildSegment >= 27) globalThis.view.setStoryFlag('advGuildRankUReached');
+    if (vals.curAdvGuildSegment >= 39) globalThis.view.setStoryFlag('advGuildRankGodlikeReached');
   },
   segmentFinished() {
-    globalThis.saving.vals.curAdvGuildSegment++;
+    vals.curAdvGuildSegment++;
     addMana(200);
   },
   getPartName() {
@@ -3330,7 +3330,7 @@ Action.AdventureGuild = new MultipartAction('Adventure Guild', {
     return towns[2].getLevel('Drunk') >= 20;
   },
   finish() {
-    globalThis.saving.vals.guild = 'Adventure';
+    vals.guild = 'Adventure';
     globalThis.view.setStoryFlag('advGuildTestsTaken');
   },
 });
@@ -3350,14 +3350,14 @@ export function getAdvGuildRank(offset) {
     'UU',
     'UUU',
     'UUUU',
-  ][Math.floor(globalThis.saving.vals.curAdvGuildSegment / 3 + 0.00001)];
+  ][Math.floor(vals.curAdvGuildSegment / 3 + 0.00001)];
 
-  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curAdvGuildSegment % 3)) +
-    globalThis.saving.vals.curAdvGuildSegment;
+  const segment = (offset === undefined ? 0 : offset - (vals.curAdvGuildSegment % 3)) +
+    vals.curAdvGuildSegment;
   let bonus = precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][globalThis.saving.vals.curAdvGuildSegment % 3];
+      name += ['-', '', '+'][vals.curAdvGuildSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -3395,7 +3395,7 @@ Action.GatherTeam = new Action('Gather Team', {
     return 5 + Math.floor(getSkillLevel('Leadership') / 100);
   },
   canStart() {
-    return globalThis.saving.vals.guild === 'Adventure' &&
+    return vals.guild === 'Adventure' &&
       resources.gold >= (resources.teamMembers + 1) * 100;
   },
   cost() {
@@ -3457,7 +3457,7 @@ Action.LargeDungeon = new DungeonAction('Large Dungeon', 1, {
   canStart(loopCounter = towns[this.townNum].LDungeonLoopCounter) {
     const curFloor = Math.floor(loopCounter / this.segments + 0.0000001);
     return resources.teamMembers >= 1 &&
-      curFloor < globalThis.saving.vals.dungeons[this.dungeonNum].length;
+      curFloor < vals.dungeons[this.dungeonNum].length;
   },
   loopCost(segment, loopCounter = towns[this.townNum].LDungeonLoopCounter) {
     return precision3(
@@ -3467,7 +3467,7 @@ Action.LargeDungeon = new DungeonAction('Large Dungeon', 1, {
   tickProgress(offset, loopCounter = towns[this.townNum].LDungeonLoopCounter) {
     const floor = Math.floor(loopCounter / this.segments + 0.0000001);
     return (getTeamCombat() + getSkillLevel('Magic')) *
-      Math.sqrt(1 + globalThis.saving.vals.dungeons[this.dungeonNum][floor].completed / 200);
+      Math.sqrt(1 + vals.dungeons[this.dungeonNum][floor].completed / 200);
   },
   loopsFinished(loopCounter = towns[this.townNum].LDungeonLoopCounter) {
     const curFloor = Math.floor(loopCounter / this.segments + 0.0000001 - 1);
@@ -3530,7 +3530,7 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
     return 1;
   },
   canStart() {
-    return globalThis.saving.vals.guild === '';
+    return vals.guild === '';
   },
   loopCost(segment, loopCounter = towns[2][`${this.varName}LoopCounter`]) {
     return precision3(Math.pow(1.2, loopCounter + segment)) * 2e6;
@@ -3541,17 +3541,17 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
       Math.sqrt(1 + totalCompletions / 1000);
   },
   loopsFinished() {
-    if (globalThis.saving.vals.curCraftGuildSegment >= 0) globalThis.view.setStoryFlag('craftGuildRankEReached');
-    if (globalThis.saving.vals.curCraftGuildSegment >= 3) globalThis.view.setStoryFlag('craftGuildRankDReached');
-    if (globalThis.saving.vals.curCraftGuildSegment >= 6) globalThis.view.setStoryFlag('craftGuildRankCReached');
-    if (globalThis.saving.vals.curCraftGuildSegment >= 9) globalThis.view.setStoryFlag('craftGuildRankBReached');
-    if (globalThis.saving.vals.curCraftGuildSegment >= 12) globalThis.view.setStoryFlag('craftGuildRankAReached');
-    if (globalThis.saving.vals.curCraftGuildSegment >= 15) globalThis.view.setStoryFlag('craftGuildRankSReached');
-    if (globalThis.saving.vals.curCraftGuildSegment >= 27) globalThis.view.setStoryFlag('craftGuildRankUReached');
-    if (globalThis.saving.vals.curCraftGuildSegment >= 39) globalThis.view.setStoryFlag('craftGuildRankGodlikeReached');
+    if (vals.curCraftGuildSegment >= 0) globalThis.view.setStoryFlag('craftGuildRankEReached');
+    if (vals.curCraftGuildSegment >= 3) globalThis.view.setStoryFlag('craftGuildRankDReached');
+    if (vals.curCraftGuildSegment >= 6) globalThis.view.setStoryFlag('craftGuildRankCReached');
+    if (vals.curCraftGuildSegment >= 9) globalThis.view.setStoryFlag('craftGuildRankBReached');
+    if (vals.curCraftGuildSegment >= 12) globalThis.view.setStoryFlag('craftGuildRankAReached');
+    if (vals.curCraftGuildSegment >= 15) globalThis.view.setStoryFlag('craftGuildRankSReached');
+    if (vals.curCraftGuildSegment >= 27) globalThis.view.setStoryFlag('craftGuildRankUReached');
+    if (vals.curCraftGuildSegment >= 39) globalThis.view.setStoryFlag('craftGuildRankGodlikeReached');
   },
   segmentFinished() {
-    globalThis.saving.vals.curCraftGuildSegment++;
+    vals.curCraftGuildSegment++;
     handleSkillExp(this.skills);
     addResource('gold', 10);
   },
@@ -3568,7 +3568,7 @@ Action.CraftingGuild = new MultipartAction('Crafting Guild', {
     return towns[2].getLevel('Drunk') >= 30;
   },
   finish() {
-    globalThis.saving.vals.guild = 'Crafting';
+    vals.guild = 'Crafting';
     globalThis.view.setStoryFlag('craftGuildTestsTaken');
   },
 });
@@ -3588,14 +3588,14 @@ export function getCraftGuildRank(offset) {
     'UU',
     'UUU',
     'UUUU',
-  ][Math.floor(globalThis.saving.vals.curCraftGuildSegment / 3 + 0.00001)];
+  ][Math.floor(vals.curCraftGuildSegment / 3 + 0.00001)];
 
-  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curCraftGuildSegment % 3)) +
-    globalThis.saving.vals.curCraftGuildSegment;
+  const segment = (offset === undefined ? 0 : offset - (vals.curCraftGuildSegment % 3)) +
+    vals.curCraftGuildSegment;
   let bonus = precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][globalThis.saving.vals.curCraftGuildSegment % 3];
+      name += ['-', '', '+'][vals.curCraftGuildSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -3689,7 +3689,7 @@ Action.Apprentice = new Action('Apprentice', {
   },
   affectedBy: ['Crafting Guild'],
   canStart() {
-    return globalThis.saving.vals.guild === 'Crafting';
+    return vals.guild === 'Crafting';
   },
   manaCost() {
     return 2000;
@@ -3742,7 +3742,7 @@ Action.Mason = new Action('Mason', {
   },
   affectedBy: ['Crafting Guild'],
   canStart() {
-    return globalThis.saving.vals.guild === 'Crafting';
+    return vals.guild === 'Crafting';
   },
   manaCost() {
     return 2000;
@@ -3796,7 +3796,7 @@ Action.Architect = new Action('Architect', {
   },
   affectedBy: ['Crafting Guild'],
   canStart() {
-    return globalThis.saving.vals.guild === 'Crafting';
+    return vals.guild === 'Crafting';
   },
   manaCost() {
     return 2000;
@@ -3839,7 +3839,7 @@ Action.ReadBooks = new Action('Read Books', {
   },
   affectedBy: ['Buy Glasses'],
   allowed() {
-    return globalThis.saving.vals.trainingLimits;
+    return vals.trainingLimits;
   },
   canStart() {
     return resources.glasses;
@@ -3974,7 +3974,7 @@ Action.StartTrek = new Action('Start Trek', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(3);
+        return vals.townsUnlocked.includes(3);
     }
     return false;
   },
@@ -4607,7 +4607,7 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
   grantsBuff: 'Imbuement',
   loopsFinished() {
     const spent = sacrificeSoulstones(this.goldCost());
-    globalThis.saving.vals.trainingLimits++;
+    vals.trainingLimits++;
     addBuffAmt('Imbuement', 1, this, 'soulstone', spent);
     view.requestUpdate('updateSoulstones', null);
     view.requestUpdate('adjustGoldCost', { varName: 'ImbueMind', cost: this.goldCost() });
@@ -4626,7 +4626,7 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
   },
   finish() {
     view.requestUpdate('updateBuff', 'Imbuement');
-    if (globalThis.saving.vals.options.autoMaxTraining) capAllTraining();
+    if (vals.options.autoMaxTraining) capAllTraining();
     if (towns[3].ImbueMindLoopCounter >= 0) {
       globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
     }
@@ -5076,7 +5076,7 @@ Action.BuyManaZ5 = new Action('Buy Mana Z5', {
     return 100;
   },
   canStart() {
-    return !globalThis.saving.vals.portalUsed;
+    return !vals.portalUsed;
   },
   visible() {
     return true;
@@ -5245,7 +5245,7 @@ Action.CharmSchool = new Action('Charm School', {
     Int: 0.2,
   },
   allowed() {
-    return globalThis.saving.vals.trainingLimits;
+    return vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -5284,7 +5284,7 @@ Action.Oracle = new Action('Oracle', {
     Soul: 0.2,
   },
   allowed() {
-    return globalThis.saving.vals.trainingLimits;
+    return vals.trainingLimits;
   },
   manaCost() {
     return 2000;
@@ -5410,10 +5410,10 @@ Action.WizardCollege = new MultipartAction('Wizard College', {
     // empty.
   },
   segmentFinished() {
-    globalThis.saving.vals.curWizCollegeSegment++;
+    vals.curWizCollegeSegment++;
     view.requestUpdate('adjustManaCost', 'Restoration');
     view.requestUpdate('adjustManaCost', 'Spatiomancy');
-    globalThis.view.increaseStoryVarTo('maxWizardGuildSegmentCleared', globalThis.saving.vals.curWizCollegeSegment);
+    globalThis.view.increaseStoryVarTo('maxWizardGuildSegmentCleared', vals.curWizCollegeSegment);
   },
   getPartName() {
     return `${getWizCollegeRank().name}`;
@@ -5453,13 +5453,13 @@ export function getWizCollegeRank(offset) {
     'Grand Magus',
     'Archmagus',
     'Member of The Council of the Seven',
-  ][Math.floor(globalThis.saving.vals.curWizCollegeSegment / 3 + 0.00001)];
-  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curWizCollegeSegment % 3)) +
-    globalThis.saving.vals.curWizCollegeSegment;
+  ][Math.floor(vals.curWizCollegeSegment / 3 + 0.00001)];
+  const segment = (offset === undefined ? 0 : offset - (vals.curWizCollegeSegment % 3)) +
+    vals.curWizCollegeSegment;
   let bonus = precision3(1 + 0.02 * Math.pow(segment, 1.05));
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][globalThis.saving.vals.curWizCollegeSegment % 3];
+      name += ['-', '', '+'][vals.curWizCollegeSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -5563,7 +5563,7 @@ Action.Spatiomancy = new Action('Spatiomancy', {
       view.requestUpdate('adjustManaCost', 'Mana Well');
 
       adjustAll();
-      for (const action of globalThis.saving.vals.totalActionList) {
+      for (const action of vals.totalActionList) {
         if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
           view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
         }
@@ -5643,7 +5643,7 @@ Action.BuildHousing = new Action('Build Housing', {
   canStart() {
     //Maximum crafting guild bonus is 10, maximum spatiomancy mult is 5.
     let maxHouses = Math.floor(getCraftGuildRank().bonus * getSkillMod('Spatiomancy', 0, 500, 1));
-    return globalThis.saving.vals.guild === 'Crafting' && towns[4].getLevel('Citizen') >= 100 &&
+    return vals.guild === 'Crafting' && towns[4].getLevel('Citizen') >= 100 &&
       resources.houses < maxHouses;
   },
   manaCost() {
@@ -5824,21 +5824,21 @@ Action.FightFrostGiants = new MultipartAction('Fight Frost Giants', {
     handleSkillExp(this.skills);
   },
   segmentFinished() {
-    globalThis.saving.vals.curFightFrostGiantsSegment++;
-    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 6) globalThis.view.setStoryFlag('giantGuildRankEReached');
-    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 12) globalThis.view.setStoryFlag('giantGuildRankDReached');
-    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 18) globalThis.view.setStoryFlag('giantGuildRankCReached');
-    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 24) globalThis.view.setStoryFlag('giantGuildRankBReached');
-    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 30) globalThis.view.setStoryFlag('giantGuildRankAReached');
-    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 36) globalThis.view.setStoryFlag('giantGuildRankSReached');
-    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 42) {
+    vals.curFightFrostGiantsSegment++;
+    if (vals.curFightFrostGiantsSegment >= 6) globalThis.view.setStoryFlag('giantGuildRankEReached');
+    if (vals.curFightFrostGiantsSegment >= 12) globalThis.view.setStoryFlag('giantGuildRankDReached');
+    if (vals.curFightFrostGiantsSegment >= 18) globalThis.view.setStoryFlag('giantGuildRankCReached');
+    if (vals.curFightFrostGiantsSegment >= 24) globalThis.view.setStoryFlag('giantGuildRankBReached');
+    if (vals.curFightFrostGiantsSegment >= 30) globalThis.view.setStoryFlag('giantGuildRankAReached');
+    if (vals.curFightFrostGiantsSegment >= 36) globalThis.view.setStoryFlag('giantGuildRankSReached');
+    if (vals.curFightFrostGiantsSegment >= 42) {
       globalThis.view.setStoryFlag('giantGuildRankSSReached');
     }
-    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 48) {
+    if (vals.curFightFrostGiantsSegment >= 48) {
       globalThis.view.setStoryFlag('giantGuildRankSSSReached');
     }
-    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 54) globalThis.view.setStoryFlag('giantGuildRankUReached');
-    if (globalThis.saving.vals.curFightFrostGiantsSegment >= 60) {
+    if (vals.curFightFrostGiantsSegment >= 54) globalThis.view.setStoryFlag('giantGuildRankUReached');
+    if (vals.curFightFrostGiantsSegment >= 60) {
       globalThis.view.setStoryFlag('giantGuildRankGodlikeReached');
     }
   },
@@ -5880,13 +5880,13 @@ export function getFrostGiantsRank(offset) {
     'Captain', //U
     'Rear Admiral',
     'Vice Admiral', //godlike
-  ][Math.floor(globalThis.saving.vals.curFightFrostGiantsSegment / 3 + 0.00001)];
-  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curFightFrostGiantsSegment % 3)) +
-    globalThis.saving.vals.curFightFrostGiantsSegment;
+  ][Math.floor(vals.curFightFrostGiantsSegment / 3 + 0.00001)];
+  const segment = (offset === undefined ? 0 : offset - (vals.curFightFrostGiantsSegment % 3)) +
+    vals.curFightFrostGiantsSegment;
   let bonus = precision3(1 + 0.05 * Math.pow(segment, 1.05));
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][globalThis.saving.vals.curFightFrostGiantsSegment % 3];
+      name += ['-', '', '+'][vals.curFightFrostGiantsSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -6325,7 +6325,7 @@ Action.TheSpire = new DungeonAction('The Spire', 2, {
   },
   canStart(loopCounter = towns[this.townNum].TheSpireLoopCounter) {
     const curFloor = Math.floor(loopCounter / this.segments + 0.0000001);
-    return curFloor < globalThis.saving.vals.dungeons[this.dungeonNum].length;
+    return curFloor < vals.dungeons[this.dungeonNum].length;
   },
   loopCost(segment, loopCounter = towns[this.townNum].TheSpireLoopCounter) {
     return precision3(
@@ -6335,7 +6335,7 @@ Action.TheSpire = new DungeonAction('The Spire', 2, {
   tickProgress(_offset, loopCounter = towns[this.townNum].TheSpireLoopCounter) {
     const floor = Math.floor(loopCounter / this.segments + 0.0000001);
     return getTeamCombat() * (1 + 0.1 * resources.pylons) *
-      Math.sqrt(1 + globalThis.saving.vals.dungeons[this.dungeonNum][floor].completed / 200);
+      Math.sqrt(1 + vals.dungeons[this.dungeonNum][floor].completed / 200);
   },
   grantsBuff: 'Aspirant',
   loopsFinished(loopCounter = towns[this.townNum].TheSpireLoopCounter) {
@@ -6457,7 +6457,7 @@ Action.JourneyForth = new Action('Journey Forth', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(6);
+        return vals.townsUnlocked.includes(6);
     }
   },
   stats: {
@@ -6597,38 +6597,38 @@ Action.FightJungleMonsters = new MultipartAction('Fight Jungle Monsters', {
     handleSkillExp(this.skills);
   },
   segmentFinished() {
-    globalThis.saving.vals.curFightJungleMonstersSegment++;
+    vals.curFightJungleMonstersSegment++;
     addResource('blood', 1);
     //Since the action stories are for having *slain* the beast,
     //unlock *after* the last segment of the beast in question.
     //I.e., the sloth fight is segments 6, 7 and 8, so the unlock
     //happens when the 8th segment is done and the current segment
     //is 9 or more.
-    if (globalThis.saving.vals.curFightJungleMonstersSegment > 8) {
+    if (vals.curFightJungleMonstersSegment > 8) {
       globalThis.view.setStoryFlag('monsterGuildRankDReached');
     }
-    if (globalThis.saving.vals.curFightJungleMonstersSegment > 14) {
+    if (vals.curFightJungleMonstersSegment > 14) {
       globalThis.view.setStoryFlag('monsterGuildRankCReached');
     }
-    if (globalThis.saving.vals.curFightJungleMonstersSegment > 20) {
+    if (vals.curFightJungleMonstersSegment > 20) {
       globalThis.view.setStoryFlag('monsterGuildRankBReached');
     }
-    if (globalThis.saving.vals.curFightJungleMonstersSegment > 26) {
+    if (vals.curFightJungleMonstersSegment > 26) {
       globalThis.view.setStoryFlag('monsterGuildRankAReached');
     }
-    if (globalThis.saving.vals.curFightJungleMonstersSegment > 32) {
+    if (vals.curFightJungleMonstersSegment > 32) {
       globalThis.view.setStoryFlag('monsterGuildRankSReached');
     }
-    if (globalThis.saving.vals.curFightJungleMonstersSegment > 38) {
+    if (vals.curFightJungleMonstersSegment > 38) {
       globalThis.view.setStoryFlag('monsterGuildRankSSReached');
     }
-    if (globalThis.saving.vals.curFightJungleMonstersSegment > 44) {
+    if (vals.curFightJungleMonstersSegment > 44) {
       globalThis.view.setStoryFlag('monsterGuildRankSSSReached');
     }
-    if (globalThis.saving.vals.curFightJungleMonstersSegment > 50) {
+    if (vals.curFightJungleMonstersSegment > 50) {
       globalThis.view.setStoryFlag('monsterGuildRankUReached');
     }
-    if (globalThis.saving.vals.curFightJungleMonstersSegment > 56) {
+    if (vals.curFightJungleMonstersSegment > 56) {
       globalThis.view.setStoryFlag('monsterGuildRankGodlikeReached');
     }
     // Additional thing?
@@ -6670,13 +6670,13 @@ export function getFightJungleMonstersRank(offset) {
     'Gorilla', //U
     'Hippo',
     'Elephant', //godlike
-  ][Math.floor(globalThis.saving.vals.curFightJungleMonstersSegment / 3 + 0.00001)];
-  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curFightJungleMonstersSegment % 3)) +
-    globalThis.saving.vals.curFightJungleMonstersSegment;
+  ][Math.floor(vals.curFightJungleMonstersSegment / 3 + 0.00001)];
+  const segment = (offset === undefined ? 0 : offset - (vals.curFightJungleMonstersSegment % 3)) +
+    vals.curFightJungleMonstersSegment;
   let bonus = precision3(1 + 0.05 * Math.pow(segment, 1.05));
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][globalThis.saving.vals.curFightJungleMonstersSegment % 3];
+      name += ['-', '', '+'][vals.curFightJungleMonstersSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -6852,7 +6852,7 @@ Action.Escape = new Action('Escape', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(7);
+        return vals.townsUnlocked.includes(7);
     }
   },
   stats: {
@@ -6863,9 +6863,9 @@ Action.Escape = new Action('Escape', {
     return 1;
   },
   canStart() {
-    if (globalThis.saving.vals.escapeStarted) return true;
+    if (vals.escapeStarted) return true;
     else if (driverVals.effectiveTime < 60) {
-      globalThis.saving.vals.escapeStarted = true;
+      vals.escapeStarted = true;
       return true;
     } else return false;
   },
@@ -6920,7 +6920,7 @@ Action.OpenPortal = new Action('Open Portal', {
     return getSkillLevel('Restoration') >= 1000;
   },
   finish() {
-    globalThis.saving.vals.portalUsed = true;
+    vals.portalUsed = true;
     globalThis.view.setStoryFlag('portalOpened');
     handleSkillExp(this.skills);
     unlockTown(1);
@@ -6975,10 +6975,10 @@ Action.Excursion = new Action('Excursion', {
     return true;
   },
   goldCost() {
-    return (globalThis.saving.vals.guild === 'Thieves' || globalThis.saving.vals.guild === 'Explorer') ? 2 : 10;
+    return (vals.guild === 'Thieves' || vals.guild === 'Explorer') ? 2 : 10;
   },
   finish() {
-    if (globalThis.saving.vals.guild === 'Thieves' || globalThis.saving.vals.guild === 'Explorer') {
+    if (vals.guild === 'Thieves' || vals.guild === 'Explorer') {
       globalThis.view.setStoryFlag('excursionAsGuildmember');
     }
     towns[7].finishProgress(this.varName, 50 * (resources.glasses ? 2 : 1));
@@ -7043,7 +7043,7 @@ Action.ExplorersGuild = new Action('Explorers Guild', {
     return 1;
   },
   canStart() {
-    return globalThis.saving.vals.guild === '';
+    return vals.guild === '';
   },
   visible() {
     return towns[7].getLevel('Excursion') >= 5;
@@ -7059,7 +7059,7 @@ Action.ExplorersGuild = new Action('Explorers Guild', {
       exchangeMap();
       globalThis.view.setStoryFlag('mapTurnedIn');
     }
-    globalThis.saving.vals.guild = 'Explorer';
+    vals.guild = 'Explorer';
     view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
   },
 });
@@ -7232,7 +7232,7 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
     return 1;
   },
   canStart() {
-    return globalThis.saving.vals.guild === '' && resources.reputation < 0;
+    return vals.guild === '' && resources.reputation < 0;
   },
   loopCost(segment, loopCounter = towns[7][`${this.varName}LoopCounter`]) {
     return precision3(Math.pow(1.2, loopCounter + segment)) * 5e8;
@@ -7245,7 +7245,7 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
   loopsFinished() {
   },
   segmentFinished() {
-    globalThis.saving.vals.curThievesGuildSegment++;
+    vals.curThievesGuildSegment++;
     handleSkillExp(this.skills);
     addResource('gold', 10);
   },
@@ -7262,18 +7262,18 @@ Action.ThievesGuild = new MultipartAction('Thieves Guild', {
     return towns[7].getLevel('Excursion') >= 25;
   },
   finish() {
-    globalThis.saving.vals.guild = 'Thieves';
+    vals.guild = 'Thieves';
     view.requestUpdate('adjustGoldCost', { varName: 'Excursion', cost: Action.Excursion.goldCost() });
     handleSkillExp(this.skills);
     globalThis.view.setStoryFlag('thiefGuildTestsTaken');
-    if (globalThis.saving.vals.curThievesGuildSegment >= 3) globalThis.view.setStoryFlag('thiefGuildRankEReached');
-    if (globalThis.saving.vals.curThievesGuildSegment >= 6) globalThis.view.setStoryFlag('thiefGuildRankDReached');
-    if (globalThis.saving.vals.curThievesGuildSegment >= 9) globalThis.view.setStoryFlag('thiefGuildRankCReached');
-    if (globalThis.saving.vals.curThievesGuildSegment >= 12) globalThis.view.setStoryFlag('thiefGuildRankBReached');
-    if (globalThis.saving.vals.curThievesGuildSegment >= 15) globalThis.view.setStoryFlag('thiefGuildRankAReached');
-    if (globalThis.saving.vals.curThievesGuildSegment >= 18) globalThis.view.setStoryFlag('thiefGuildRankSReached');
-    if (globalThis.saving.vals.curThievesGuildSegment >= 30) globalThis.view.setStoryFlag('thiefGuildRankUReached');
-    if (globalThis.saving.vals.curThievesGuildSegment >= 42) {
+    if (vals.curThievesGuildSegment >= 3) globalThis.view.setStoryFlag('thiefGuildRankEReached');
+    if (vals.curThievesGuildSegment >= 6) globalThis.view.setStoryFlag('thiefGuildRankDReached');
+    if (vals.curThievesGuildSegment >= 9) globalThis.view.setStoryFlag('thiefGuildRankCReached');
+    if (vals.curThievesGuildSegment >= 12) globalThis.view.setStoryFlag('thiefGuildRankBReached');
+    if (vals.curThievesGuildSegment >= 15) globalThis.view.setStoryFlag('thiefGuildRankAReached');
+    if (vals.curThievesGuildSegment >= 18) globalThis.view.setStoryFlag('thiefGuildRankSReached');
+    if (vals.curThievesGuildSegment >= 30) globalThis.view.setStoryFlag('thiefGuildRankUReached');
+    if (vals.curThievesGuildSegment >= 42) {
       globalThis.view.setStoryFlag('thiefGuildRankGodlikeReached');
     }
   },
@@ -7294,14 +7294,14 @@ export function getThievesGuildRank(offset) {
     'UU',
     'UUU',
     'UUUU',
-  ][Math.floor(globalThis.saving.vals.curThievesGuildSegment / 3 + 0.00001)];
+  ][Math.floor(vals.curThievesGuildSegment / 3 + 0.00001)];
 
-  const segment = (offset === undefined ? 0 : offset - (globalThis.saving.vals.curThievesGuildSegment % 3)) +
-    globalThis.saving.vals.curThievesGuildSegment;
+  const segment = (offset === undefined ? 0 : offset - (vals.curThievesGuildSegment % 3)) +
+    vals.curThievesGuildSegment;
   let bonus = precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
   if (name) {
     if (offset === undefined) {
-      name += ['-', '', '+'][globalThis.saving.vals.curThievesGuildSegment % 3];
+      name += ['-', '', '+'][vals.curThievesGuildSegment % 3];
     } else {
       name += ['-', '', '+'][offset % 3];
     }
@@ -7350,7 +7350,7 @@ Action.PickPockets = new Action('Pick Pockets', {
     return towns[7].totalPockets;
   },
   canStart() {
-    return globalThis.saving.vals.guild === 'Thieves';
+    return vals.guild === 'Thieves';
   },
   manaCost() {
     return 20000;
@@ -7412,7 +7412,7 @@ Action.RobWarehouse = new Action('Rob Warehouse', {
     return towns[7].totalWarehouses;
   },
   canStart() {
-    return globalThis.saving.vals.guild === 'Thieves';
+    return vals.guild === 'Thieves';
   },
   manaCost() {
     return 50000;
@@ -7474,7 +7474,7 @@ Action.InsuranceFraud = new Action('Insurance Fraud', {
     return towns[7].totalInsurance;
   },
   canStart() {
-    return globalThis.saving.vals.guild === 'Thieves';
+    return vals.guild === 'Thieves';
   },
   manaCost() {
     return 100000;
@@ -7534,7 +7534,7 @@ Action.GuildAssassin = new Action('Guild Assassin', {
     return 1;
   },
   canStart() {
-    return globalThis.saving.vals.guild === '';
+    return vals.guild === '';
   },
   visible() {
     return towns[this.townNum].getLevel('InsuranceFraud') >= 75;
@@ -7552,7 +7552,7 @@ Action.GuildAssassin = new Action('Guild Assassin', {
     this.skills.Assassin = assassinExp;
     handleSkillExp(this.skills);
     resources.heart = 0;
-    globalThis.saving.vals.guild = 'Assassin';
+    vals.guild = 'Assassin';
   },
 });
 
@@ -7576,11 +7576,11 @@ Action.Invest = new Action('Invest', {
       case 2:
         return storyFlags.investedTwo;
       case 3:
-        return globalThis.saving.vals.goldInvested >= 1000000;
+        return vals.goldInvested >= 1000000;
       case 4:
-        return globalThis.saving.vals.goldInvested >= 1000000000;
+        return vals.goldInvested >= 1000000000;
       case 5:
-        return globalThis.saving.vals.goldInvested == 999999999999;
+        return vals.goldInvested == 999999999999;
     }
   },
   stats: {
@@ -7608,8 +7608,8 @@ Action.Invest = new Action('Invest', {
   },
   finish() {
     handleSkillExp(this.skills);
-    globalThis.saving.vals.goldInvested += resources.gold;
-    if (globalThis.saving.vals.goldInvested > 999999999999) globalThis.saving.vals.goldInvested = 999999999999;
+    vals.goldInvested += resources.gold;
+    if (vals.goldInvested > 999999999999) vals.goldInvested = 999999999999;
     resetResource('gold');
     if (storyFlags.investedOne) globalThis.view.setStoryFlag('investedTwo');
     globalThis.view.setStoryFlag('investedOne');
@@ -7658,7 +7658,7 @@ Action.CollectInterest = new Action('Collect Interest', {
   },
   finish() {
     handleSkillExp(this.skills);
-    let interestGold = Math.floor(globalThis.saving.vals.goldInvested * .001);
+    let interestGold = Math.floor(vals.goldInvested * .001);
     addResource('gold', interestGold);
     globalThis.view.setStoryFlag('interestCollected');
     if (interestGold >= 1000) globalThis.view.setStoryFlag('collected1KInterest');
@@ -7812,10 +7812,10 @@ Action.SecretTrial = new TrialAction('Secret Trial', 3, {
     //None
   },
   visible() {
-    return globalThis.saving.vals.storyMax >= 12 && getBuffLevel('Imbuement3') >= 7;
+    return vals.storyMax >= 12 && getBuffLevel('Imbuement3') >= 7;
   },
   unlocked() {
-    return globalThis.saving.vals.storyMax >= 12 && getBuffLevel('Imbuement3') >= 7;
+    return vals.storyMax >= 12 && getBuffLevel('Imbuement3') >= 7;
   },
   finish() {
     globalThis.view.setStoryFlag('trailSecretFaced');
@@ -7835,7 +7835,7 @@ Action.LeaveCity = new Action('Leave City', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.townsUnlocked.includes(8);
+        return vals.townsUnlocked.includes(8);
     }
   },
   stats: {
@@ -7920,7 +7920,7 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
     }
     buffs['Imbuement'].amt = 0;
     buffs['Imbuement2'].amt = 0;
-    globalThis.saving.vals.trainingLimits = 10;
+    vals.trainingLimits = 10;
     addBuffAmt('Imbuement3', 1, this, 'imbuement3');
     view.updateBuffs();
     view.updateStats();
@@ -7997,13 +7997,13 @@ Action.BuildTower = new Action('Build Tower', {
     return true;
   },
   finish() {
-    globalThis.saving.vals.stonesUsed[globalThis.saving.vals.stoneLoc]++;
+    vals.stonesUsed[vals.stoneLoc]++;
     towns[this.townNum].finishProgress(this.varName, 505);
     addResource('stone', false);
     if (towns[this.townNum].getLevel(this.varName) >= 100) {
-      globalThis.saving.vals.stonesUsed = { 1: 250, 3: 250, 5: 250, 6: 250 };
+      vals.stonesUsed = { 1: 250, 3: 250, 5: 250, 6: 250 };
     }
-    adjustRocks(globalThis.saving.vals.stoneLoc);
+    adjustRocks(vals.stoneLoc);
   },
 });
 
@@ -8183,9 +8183,9 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
     handleSkillExp(this.skills);
   },
   segmentFinished() {
-    globalThis.saving.vals.curGodsSegment++;
+    vals.curGodsSegment++;
     //Round 7 is segments 55 through 63
-    switch (globalThis.saving.vals.curGodsSegment) {
+    switch (vals.curGodsSegment) {
       case 1:
         globalThis.view.setStoryFlag('fightGods01');
         break;
@@ -8253,7 +8253,7 @@ Action.RestoreTime = new Action('Restore Time', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return globalThis.saving.vals.storyMax >= 12;
+        return vals.storyMax >= 12;
     }
   },
   stats: {
