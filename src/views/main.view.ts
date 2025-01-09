@@ -1,4 +1,3 @@
-import { view } from './views/main.view.ts';
 import {
   Buff,
   getBuffLevel,
@@ -2431,6 +2430,5 @@ export function updateBuffCaps() {
     buffCaps[buff] = parseInt(inputElement(`buff${buff}Cap`).value);
   }
 }
-
 
 export const view = new View();

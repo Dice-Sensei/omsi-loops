@@ -1,5 +1,4 @@
 import { Localization } from './localization.ts';
-import './views/main.view.ts';
 import './saving.ts';
 
 import { renderViews } from './views/register-all.ts';
