@@ -3,6 +3,7 @@ import { towns } from './globals.ts';
 import { adjustAll, pauseGame } from './driver.ts';
 import { isTravel, lateGameActions } from './actionList.ts';
 import { view } from './views/main.view.ts';
+import { vals } from './saving.ts';
 
 'use strict';
 /**
@@ -50,7 +51,7 @@ export class Town<TN extends number> {
   hiddenVars: Set<string> = new Set();
 
   unlocked() {
-    return globalThis.saving.vals.townsUnlocked.includes(this.index);
+    return vals.townsUnlocked.includes(this.index);
   }
 
   expFromLevel(level) {
@@ -75,7 +76,7 @@ export class Town<TN extends number> {
   finishProgress(varName, expGain) {
     // return if capped, for performance
     if (this[`exp${varName}`] === 505000) {
-      if (globalThis.saving.vals.options.pauseOnComplete) {
+      if (vals.options.pauseOnComplete) {
         pauseGame(true, 'Progress complete! (Game paused)');
       } else return;
     }
@@ -90,7 +91,7 @@ export class Town<TN extends number> {
     if (level !== prevLevel) {
       view.requestUpdate('updateLockedHidden', null);
       adjustAll();
-      for (const action of globalThis.saving.vals.totalActionList) {
+      for (const action of vals.totalActionList) {
         if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
           view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
         }
@@ -98,7 +99,7 @@ export class Town<TN extends number> {
     }
     view.requestUpdate('updateProgressAction', {
       name: varName,
-      town: towns[globalThis.saving.vals.curTown],
+      town: towns[vals.curTown],
     });
   }
 
@@ -187,7 +188,7 @@ export class Town<TN extends number> {
     this.index = index;
     let lateGameActionCount = 0;
     let inLateGameActions = true;
-    for (const action of globalThis.saving.vals.totalActionList) {
+    for (const action of vals.totalActionList) {
       if (this.index === action.townNum) {
         if (inLateGameActions) {
           if (lateGameActions.includes(action.name)) {

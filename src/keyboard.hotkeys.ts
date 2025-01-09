@@ -3,6 +3,7 @@ import { Listeners } from './logic/listeners.ts';
 import { t } from './locales/translations.utils.ts';
 import { actions } from './actions.ts';
 import { view } from './views/main.view.ts';
+import { vals } from './saving.ts';
 import {
   changeActionAmount,
   checkExtraSpeed,
@@ -33,7 +34,7 @@ export function setControlKey(value: boolean): void {
 
 export function moveToTown(townNum: number | undefined): void {
   if (townNum === undefined) return;
-  if (!globalThis.saving.vals.townsUnlocked.includes(townNum)) return;
+  if (!vals.townsUnlocked.includes(townNum)) return;
 
   view.showTown(townNum);
 }
@@ -201,8 +202,8 @@ export const createKeyboardHotkeys = () => {
       onDown: {
         fn: () =>
           moveToTown(
-            globalThis.saving.vals
-              .townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.saving.vals.townshowing) + 1],
+            vals
+              .townsUnlocked[vals.townsUnlocked.indexOf(vals.townshowing) + 1],
           ),
         description: t('shortcuts.moveToNextTown'),
       },
@@ -211,8 +212,8 @@ export const createKeyboardHotkeys = () => {
       onDown: {
         fn: () =>
           moveToTown(
-            globalThis.saving.vals
-              .townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.saving.vals.townshowing) - 1],
+            vals
+              .townsUnlocked[vals.townsUnlocked.indexOf(vals.townshowing) - 1],
           ),
         description: t('shortcuts.moveToPreviousTown'),
       },

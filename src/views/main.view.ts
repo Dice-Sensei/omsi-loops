@@ -30,6 +30,7 @@ import {
   townNames,
   translateClassNames,
 } from '../actionList.ts';
+import { vals } from '../saving.ts';
 
 import $ from 'jquery';
 import * as d3 from 'd3';
@@ -196,7 +197,7 @@ export class View {
     this.updateLoadoutNames();
     this.updateResources();
     this.updateTrials();
-    if (globalThis.saving.vals.storyMax >= 12) {
+    if (vals.storyMax >= 12) {
       setInterval(() => {
         view.updateStories();
         view.updateLockedHidden();
@@ -763,17 +764,17 @@ export class View {
     document.getElementById('timer').textContent = `${
       intToString(
         globalThis.saving.timeNeeded - globalThis.saving.timer,
-        globalThis.saving.vals.options.fractionalMana ? 2 : 1,
+        vals.options.fractionalMana ? 2 : 1,
         true,
       )
     } | ${formatTime((globalThis.saving.timeNeeded - globalThis.saving.timer) / 50 / getActualGameSpeed())}`;
     this.adjustGoldCost({ varName: 'Wells', cost: Action.ManaWell.goldCost() });
   }
   updateOffline() {
-    document.getElementById('bonusSeconds').textContent = formatTime(globalThis.saving.vals.totalOfflineMs / 1000);
+    document.getElementById('bonusSeconds').textContent = formatTime(vals.totalOfflineMs / 1000);
     const returnTimeButton = document.getElementById('returnTimeButton');
     if (returnTimeButton instanceof HTMLButtonElement) {
-      returnTimeButton.disabled = globalThis.saving.vals.totalOfflineMs < 86400_000;
+      returnTimeButton.disabled = vals.totalOfflineMs < 86400_000;
     }
   }
   updateBonusText() {
@@ -796,13 +797,11 @@ export class View {
     // generic operation on Localization; I think I'm beginning to figure out what will be needed for it
     const fgSpeed = Math.max(
       5,
-      globalThis.saving.vals.options.speedIncrease10x ? 10 : 0,
-      globalThis.saving.vals.options.speedIncrease20x ? 20 : 0,
-      globalThis.saving.vals.options.speedIncreaseCustom,
+      vals.options.speedIncrease10x ? 10 : 0,
+      vals.options.speedIncrease20x ? 20 : 0,
+      vals.options.speedIncreaseCustom,
     );
-    const bgSpeed = !isFinite(globalThis.saving.vals.options.speedIncreaseBackground)
-      ? -1
-      : globalThis.saving.vals.options.speedIncreaseBackground ?? -1;
+    const bgSpeed = !isFinite(vals.options.speedIncreaseBackground) ? -1 : vals.options.speedIncreaseBackground ?? -1;
     const variables = {
       __proto__: null, // toString is not a valid replacement name
       get background_info() {
@@ -831,7 +830,7 @@ export class View {
         return `<span class='bold'>${Localization.txt('time_controls>bonus_seconds>counter_text')}</span>`;
       },
       get bonusSeconds() {
-        return `<span id='bonusSeconds'>${formatTime(globalThis.saving.vals.totalOfflineMs / 1000)}</span>`;
+        return `<span id='bonusSeconds'>${formatTime(vals.totalOfflineMs / 1000)}</span>`;
       },
       get lag_warning() {
         return driverVals.lagSpeed > 0 ? Localization.txt('time_controls>bonus_seconds>lag_warning') : '';
@@ -872,10 +871,10 @@ export class View {
   }
   updateActionTooltips() {
     document.getElementById('goldInvested').textContent = intToStringRound(
-      globalThis.saving.vals.goldInvested,
+      vals.goldInvested,
     );
     document.getElementById('bankInterest').textContent = intToStringRound(
-      globalThis.saving.vals.goldInvested * .001,
+      vals.goldInvested * .001,
     );
     document.getElementById('actionAllowedPockets').textContent = intToStringRound(
       towns[7].totalPockets,
@@ -934,7 +933,7 @@ export class View {
   }
   updateNextActions() {
     const { scrollTop } = nextActionsDiv; // save the current scroll position
-    if (globalThis.saving.vals.options.predictor) {
+    if (vals.options.predictor) {
       Koviko.preUpdateHandler(nextActionsDiv);
     }
 
@@ -1098,7 +1097,7 @@ export class View {
           .text((action) => action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops))
       );
 
-    if (globalThis.saving.vals.options.predictor) {
+    if (vals.options.predictor) {
       Koviko.postUpdateHandler(actions.next, nextActionsDiv);
     }
     // scrolling down to see the new thing added is okay, scrolling up when you click an action button is not
@@ -1210,11 +1209,11 @@ export class View {
     if (curActionShowing === index) {
       document.getElementById(`action${index}ManaOrig`).textContent = intToString(
         action.manaCost() * action.loops,
-        globalThis.saving.vals.options.fractionalMana ? 3 : 1,
+        vals.options.fractionalMana ? 3 : 1,
       );
       document.getElementById(`action${index}ManaUsed`).textContent = intToString(
         action.manaUsed,
-        globalThis.saving.vals.options.fractionalMana ? 3 : 1,
+        vals.options.fractionalMana ? 3 : 1,
       );
       document.getElementById(`action${index}LastMana`).textContent = intToString(
         action.lastMana,
@@ -1222,7 +1221,7 @@ export class View {
       );
       document.getElementById(`action${index}Remaining`).textContent = intToString(
         action.manaRemaining,
-        globalThis.saving.vals.options.fractionalMana ? 3 : 1,
+        vals.options.fractionalMana ? 3 : 1,
       );
       document.getElementById(`action${index}GoldRemaining`).textContent = formatNumber(
         action.goldRemaining,
@@ -1368,7 +1367,7 @@ export class View {
   }
 
   updateLockedHidden() {
-    for (const action of globalThis.saving.vals.totalActionList) {
+    for (const action of vals.totalActionList) {
       const actionDiv = document.getElementById(`container${action.varName}`);
       const infoDiv = document.getElementById(`infoContainer${action.varName}`);
       const storyDiv = document.getElementById(`storyContainer${action.varName}`);
@@ -1414,7 +1413,7 @@ export class View {
       }
     }
     if (
-      globalThis.saving.vals.totalActionList.filter((action) => action.finish.toString().includes('handleSkillExp'))
+      vals.totalActionList.filter((action) => action.finish.toString().includes('handleSkillExp'))
         .filter((action) => action.unlocked()).length > 0
     ) {
       document.getElementById('skillList').style.display = '';
@@ -1422,7 +1421,7 @@ export class View {
       document.getElementById('skillList').style.display = 'none';
     }
     if (
-      globalThis.saving.vals.totalActionList.filter((action) => action.finish.toString().includes('updateBuff')).filter(
+      vals.totalActionList.filter((action) => action.finish.toString().includes('updateBuff')).filter(
           (action) => action.unlocked(),
         ).length > 0 ||
       prestigeValues['completedAnyPrestige']
@@ -1439,7 +1438,7 @@ export class View {
 
   updateStories(init) {
     // several ms cost per run. run once every 2000ms on an interval
-    for (const action of globalThis.saving.vals.totalActionList) {
+    for (const action of vals.totalActionList) {
       if (action.storyReqs !== undefined) {
         // greatly reduces/nullifies the cost of checking actions with all stories unlocked, which is nice,
         // since you're likely to have more stories unlocked at end game, which is when performance is worse
@@ -1456,7 +1455,7 @@ export class View {
               lastInBranch = false;
               if (
                 action.visible() && action.unlocked() &&
-                globalThis.saving.vals.completedActions.includes(action.varName)
+                vals.completedActions.includes(action.varName)
               ) {
                 actionLog.addActionStory(action, storyId, init);
               }
@@ -1477,8 +1476,8 @@ export class View {
             document.getElementById(divName).children[2].innerHTML = storyTooltipText;
             if (!init) {
               showNotification(divName);
-              if (!globalThis.saving.vals.unreadActionStories.includes(divName)) {
-                globalThis.saving.vals.unreadActionStories.push(divName);
+              if (!vals.unreadActionStories.includes(divName)) {
+                vals.unreadActionStories.push(divName);
               }
             }
             if (allStoriesForActionUnlocked) {
@@ -1501,7 +1500,7 @@ export class View {
       document.getElementById('townViewLeft').style.visibility = '';
     }
 
-    if (townNum === Math.max(...globalThis.saving.vals.townsUnlocked)) {
+    if (townNum === Math.max(...vals.townsUnlocked)) {
       document.getElementById('townViewRight').style.visibility = 'hidden';
     } else {
       document.getElementById('townViewRight').style.visibility = '';
@@ -1512,17 +1511,17 @@ export class View {
       actionStoriesTown[i].style.display = 'none';
       townInfos[i].style.display = 'none';
     }
-    if (globalThis.saving.vals.actionStoriesShowing) actionStoriesTown[townNum].style.display = '';
+    if (vals.actionStoriesShowing) actionStoriesTown[townNum].style.display = '';
     else actionOptionsTown[townNum].style.display = '';
     townInfos[townNum].style.display = '';
     $('#TownSelect').val(townNum);
 
     htmlElement('shortTownColumn').classList.remove(
-      `zone-${globalThis.saving.vals.townshowing + 1}`,
+      `zone-${vals.townshowing + 1}`,
     );
     htmlElement('shortTownColumn').classList.add(`zone-${townNum + 1}`);
     document.getElementById('townDesc').textContent = Localization.txt(`towns>town${townNum}>desc`);
-    globalThis.saving.vals.townshowing = townNum;
+    vals.townshowing = townNum;
   }
 
   showActions(stories) {
@@ -1534,17 +1533,17 @@ export class View {
     if (stories) {
       document.getElementById('actionsViewLeft').style.visibility = '';
       document.getElementById('actionsViewRight').style.visibility = 'hidden';
-      actionStoriesTown[globalThis.saving.vals.townshowing].style.display = '';
+      actionStoriesTown[vals.townshowing].style.display = '';
     } else {
       document.getElementById('actionsViewLeft').style.visibility = 'hidden';
       document.getElementById('actionsViewRight').style.visibility = '';
-      actionOptionsTown[globalThis.saving.vals.townshowing].style.display = '';
+      actionOptionsTown[vals.townshowing].style.display = '';
     }
 
     document.getElementById('actionsTitle').textContent = Localization.txt(
       `actions>title${stories ? '_stories' : ''}`,
     );
-    globalThis.saving.vals.actionStoriesShowing = stories;
+    vals.actionStoriesShowing = stories;
   }
 
   toggleHiding() {
@@ -1552,12 +1551,12 @@ export class View {
   }
 
   toggleHidden(varName, force) {
-    const isHidden = towns[globalThis.saving.vals.townshowing].hiddenVars.has(varName);
+    const isHidden = towns[vals.townshowing].hiddenVars.has(varName);
     if ((isHidden && force !== true) || force === false) {
-      towns[globalThis.saving.vals.townshowing].hiddenVars.delete(varName);
+      towns[vals.townshowing].hiddenVars.delete(varName);
       htmlElement(`infoContainer${varName}`).classList.remove('user-hidden');
     } else if (!isHidden || force === true) {
-      towns[globalThis.saving.vals.townshowing].hiddenVars.add(varName);
+      towns[vals.townshowing].hiddenVars.add(varName);
       htmlElement(`infoContainer${varName}`).classList.add('user-hidden');
     }
   }
@@ -1595,10 +1594,10 @@ export class View {
   }
 
   updateLoadoutNames() {
-    for (let i = 0; i < globalThis.saving.vals.loadoutnames.length; i++) {
-      document.getElementById(`load${i + 1}`).textContent = globalThis.saving.vals.loadoutnames[i];
+    for (let i = 0; i < vals.loadoutnames.length; i++) {
+      document.getElementById(`load${i + 1}`).textContent = vals.loadoutnames[i];
     }
-    inputElement('renameLoadout').value = globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1];
+    inputElement('renameLoadout').value = vals.loadoutnames[vals.curLoadout - 1];
   }
 
   createTownActions() {
@@ -1607,7 +1606,7 @@ export class View {
       this.createTownAction(action);
     }
     for (const varName of towns.flatMap((t) => t.allVarNames)) {
-      const action = globalThis.saving.vals.totalActionList.find((a) => a.varName === varName);
+      const action = vals.totalActionList.find((a) => a.varName === varName);
       if (isActionOfType(action, 'limited')) this.createTownInfo(action);
       if (isActionOfType(action, 'progress')) {
         if (action.name.startsWith('Survey')) this.createGlobalSurveyProgress(action);
@@ -1615,7 +1614,7 @@ export class View {
       }
       if (isActionOfType(action, 'multipart')) this.createMultiPartPBar(action);
     }
-    if (globalThis.saving.vals.options.highlightNew) this.highlightIncompleteActions();
+    if (vals.options.highlightNew) this.highlightIncompleteActions();
   }
 
   createGlobalSurveyProgress(action) {
@@ -1918,7 +1917,7 @@ export class View {
     }
   }
   adjustExpGains() {
-    for (const action of globalThis.saving.vals.totalActionList) {
+    for (const action of vals.totalActionList) {
       if (action.skills) this.adjustExpGain(action);
     }
   }
@@ -2005,7 +2004,7 @@ export class View {
   }
 
   updateMultiPartActions() {
-    for (const action of globalThis.saving.vals.totalActionList) {
+    for (const action of vals.totalActionList) {
       if (action.type === 'multipart') {
         this.updateMultiPart(action);
         this.updateMultiPartSegments(action);
@@ -2060,7 +2059,7 @@ export class View {
   }
 
   updateSoulstoneChance(index) {
-    const dungeon = globalThis.saving.vals.dungeons[index];
+    const dungeon = vals.dungeons[index];
     for (let i = 0; i < dungeon.length; i++) {
       const level = dungeon[i];
       document.getElementById(`soulstoneChance${index}_${i}`).textContent = intToString(
@@ -2075,7 +2074,7 @@ export class View {
   }
 
   updateTrials() {
-    for (let i = 0; i < globalThis.saving.vals.trials.length; i++) {
+    for (let i = 0; i < vals.trials.length; i++) {
       this.updateTrialInfo({ trialNum: i, curFloor: 0 });
     }
   }
@@ -2083,7 +2082,7 @@ export class View {
   updateTrialInfo(updateInfo) {
     const curFloor = updateInfo.curFloor;
     const trialNum = updateInfo.trialNum;
-    const trial = globalThis.saving.vals.trials[trialNum];
+    const trial = vals.trials[trialNum];
     document.getElementById(`trial${trialNum}HighestFloor`).textContent = String(trial.highestFloor + 1);
     if (curFloor >= trial.length) {
       document.getElementById(`trial${trialNum}CurFloor`).textContent = '';
@@ -2164,7 +2163,7 @@ export class View {
     for (let i = 0; i < statList.length; i++) {
       const trainingDiv = document.getElementById(`trainingLimit${statList[i]}`);
       if (trainingDiv) {
-        trainingDiv.textContent = String(globalThis.saving.vals.trainingLimits);
+        trainingDiv.textContent = String(vals.trainingLimits);
       }
     }
     if (getBuffLevel('Imbuement') > 0 || getBuffLevel('Imbuement3') > 0) {
@@ -2182,8 +2181,8 @@ export class View {
       document.getElementById('storyLeft').style.visibility = '';
     }
 
-    if (num >= globalThis.saving.vals.storyMax) {
-      num = globalThis.saving.vals.storyMax;
+    if (num >= vals.storyMax) {
+      num = vals.storyMax;
       document.getElementById('storyRight').style.visibility = 'hidden';
     } else {
       document.getElementById('storyRight').style.visibility = '';
@@ -2195,8 +2194,8 @@ export class View {
         storyDiv.style.display = 'none';
       }
     }
-    globalThis.saving.vals.storyShowing = num;
-    document.getElementById('storyPage').textContent = String(globalThis.saving.vals.storyShowing + 1);
+    vals.storyShowing = num;
+    document.getElementById('storyPage').textContent = String(vals.storyShowing + 1);
     document.getElementById(`story${num}`).style.display = 'inline-block';
   }
 
@@ -2225,14 +2224,14 @@ export class View {
   updateTravelMenu() {
     let travelOptions = $('#TownSelect').children();
     for (let i = 0; i < travelOptions.length; i++) {
-      travelOptions[i].hidden = !globalThis.saving.vals.townsUnlocked.includes(i);
+      travelOptions[i].hidden = !vals.townsUnlocked.includes(i);
     }
   }
 
   adjustDarkRitualText() {
     let DRdesc = document.getElementById('DRText');
     DRdesc.innerHTML = `Actions are:<br>`;
-    globalThis.saving.vals.townsUnlocked.forEach((townNum) => {
+    vals.townsUnlocked.forEach((townNum) => {
       DRdesc.innerHTML += DarkRitualDescription[townNum];
     });
     if (getBuffLevel('Ritual') > 200) DRdesc.innerHTML += DarkRitualDescription[9];
@@ -2242,7 +2241,7 @@ export class View {
     let actionDivs = Array.from(document.getElementsByClassName('actionContainer'));
     actionDivs.forEach((div) => {
       let actionName = div.id.replace('container', '');
-      if (!globalThis.saving.vals.completedActions.includes(actionName)) {
+      if (!vals.completedActions.includes(actionName)) {
         div.classList.add('actionHighlight');
       }
     });
@@ -2256,17 +2255,15 @@ export class View {
   }
 
   updateTotals() {
-    document.getElementById('totalPlaytime').textContent = `${formatTime(globalThis.saving.vals.totals.time)}`;
-    document.getElementById('totalEffectiveTime').textContent = `${
-      formatTime(globalThis.saving.vals.totals.effectiveTime)
-    }`;
-    document.getElementById('borrowedTimeBalance').textContent = formatTime(globalThis.saving.vals.totals.borrowedTime);
+    document.getElementById('totalPlaytime').textContent = `${formatTime(vals.totals.time)}`;
+    document.getElementById('totalEffectiveTime').textContent = `${formatTime(vals.totals.effectiveTime)}`;
+    document.getElementById('borrowedTimeBalance').textContent = formatTime(vals.totals.borrowedTime);
     document.getElementById('borrowedTimeDays').textContent = `${
-      formatNumber(Math.floor(globalThis.saving.vals.totals.borrowedTime / 86400))
+      formatNumber(Math.floor(vals.totals.borrowedTime / 86400))
     }${Localization.txt('time_controls>days')}`;
-    document.getElementById('totalLoops').textContent = `${formatNumber(globalThis.saving.vals.totals.loops)}`;
-    document.getElementById('totalActions').textContent = `${formatNumber(globalThis.saving.vals.totals.actions)}`;
-    if (globalThis.saving.vals.totals.borrowedTime > 0) document.documentElement.classList.add('time-borrowed');
+    document.getElementById('totalLoops').textContent = `${formatNumber(vals.totals.loops)}`;
+    document.getElementById('totalActions').textContent = `${formatNumber(vals.totals.actions)}`;
+    if (vals.totals.borrowedTime > 0) document.documentElement.classList.add('time-borrowed');
     else document.documentElement.classList.remove('time-borrowed');
   }
 
@@ -2332,9 +2329,9 @@ export class View {
 }
 
 export function unlockGlobalStory(num) {
-  if (num > globalThis.saving.vals.storyMax) {
+  if (num > vals.storyMax) {
     document.getElementById('newStory').style.display = 'inline-block';
-    globalThis.saving.vals.storyMax = num;
+    vals.storyMax = num;
     view.requestUpdate('updateGlobalStory', num);
   }
 }
@@ -2342,7 +2339,7 @@ export function unlockGlobalStory(num) {
 export function setStoryFlag(name) {
   if (!storyFlags[name]) {
     storyFlags[name] = true;
-    if (globalThis.saving.vals.options.actionLog) view.requestUpdate('updateStories', false);
+    if (vals.options.actionLog) view.requestUpdate('updateStories', false);
   }
 }
 const unlockStory = setStoryFlag; // compatibility alias
@@ -2350,7 +2347,7 @@ const unlockStory = setStoryFlag; // compatibility alias
 export function increaseStoryVarTo(name, value) {
   if (storyVars[name] < value) {
     storyVars[name] = value;
-    if (globalThis.saving.vals.options.actionLog) view.requestUpdate('updateStories', false);
+    if (vals.options.actionLog) view.requestUpdate('updateStories', false);
   }
 }
 

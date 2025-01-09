@@ -1,3 +1,4 @@
+import { vals } from './saving.ts';
 import { view } from './views/main.view.ts';
 import { Localization } from './Localization.ts';
 import { extractStrings, formatNumber, intToString, restoreStrings } from './helpers.ts';
@@ -29,7 +30,7 @@ export class ActionLog {
       entry.entryIndex = this.entries.length;
       this.entries.push(entry);
     }
-    if (!init && globalThis.saving.vals.options.actionLog) {
+    if (!init && vals.options.actionLog) {
       this.firstNewOrUpdatedEntry = Math.min(this.firstNewOrUpdatedEntry ?? Infinity, entry.entryIndex);
       this.earliestShownEntry ??= entry.entryIndex;
       if (this.earliestShownEntry > entry.entryIndex + 1) {
@@ -200,7 +201,7 @@ class ActionLogEntry {
    */
   constructor(type, action, loop) {
     this.type = type;
-    this.loop = typeof loop === 'number' && loop >= 0 ? loop : globalThis.saving.vals.currentLoop;
+    this.loop = typeof loop === 'number' && loop >= 0 ? loop : vals.currentLoop;
     this.actionName = typeof action === 'string' ? action : action?.name ?? null;
   }
   /** @returns {any[]} */
@@ -210,7 +211,7 @@ class ActionLogEntry {
   load(data) {
     const [_type, actionName, loop, ...rest] = data;
     this.actionName = typeof actionName === 'string' ? /** @type {ActionName|ActionId} */ (actionName) : null;
-    this.loop = typeof loop === 'number' && loop >= 0 ? loop : globalThis.saving.vals.currentLoop;
+    this.loop = typeof loop === 'number' && loop >= 0 ? loop : vals.currentLoop;
     return rest;
   }
   createElement() {

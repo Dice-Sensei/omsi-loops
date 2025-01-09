@@ -1,5 +1,6 @@
 // prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
 import { view } from './views/main.view.ts';
+import { vals } from './saving.ts';
 import {
   getBuffLevel,
   getExpOfLevel,
@@ -366,11 +367,11 @@ export const Koviko = {
       if (this.isWorker) {
         throw new Error("Can't get worker from inside worker!");
       }
-      if (!this.#worker && globalThis.saving.vals.options.predictorBackgroundThread && !this.#workerDisabled) {
+      if (!this.#worker && vals.options.predictorBackgroundThread && !this.#workerDisabled) {
         this.#worker = new Worker('./src/predictor-worker.ts', { name: 'predictor', type: 'module' });
 
         this.#worker.onmessage = this.handleWorkerMessage.bind(this);
-        this.#worker.postMessage({ type: 'setOptions', options: globalThis.saving.vals.options });
+        this.#worker.postMessage({ type: 'setOptions', options: vals.options });
         this.#worker.postMessage({ type: 'verifyDefaultIds', idRefs: Data.exportDefaultIds() });
       }
       return this.#worker;
@@ -448,7 +449,7 @@ export const Koviko = {
       this.isWorker = isWorker;
       if (!isWorker) {
         this.initElements();
-        this.setOptions(globalThis.saving.vals.options);
+        this.setOptions(vals.options);
       }
       this.initPredictions();
       this.state;
@@ -500,13 +501,13 @@ export const Koviko = {
           type: 'R',
           name: 'invest',
           display_name: 'Investment',
-          hidden: () => (globalThis.saving.vals.goldInvested == 0),
+          hidden: () => (vals.goldInvested == 0),
         },
         {
           type: 'TIME',
           name: 'tillKey',
           display_name: 'Till Key',
-          hidden: () => (globalThis.saving.vals.goldInvested == 0),
+          hidden: () => (vals.goldInvested == 0),
         },
       ].reduce(
         (dict, el, index) => (dict[el.type + el.name] = el, dict),
@@ -545,7 +546,7 @@ export const Koviko = {
           statistic.hidden = false;
         }
       }
-      selectElement('predictorTrackedStatInput').value = globalThis.saving.vals.options.predictorTrackedStat;
+      selectElement('predictorTrackedStatInput').value = vals.options.predictorTrackedStat;
     }
 
     /**
@@ -706,7 +707,7 @@ export const Koviko = {
         'RuinsZ6': { affected: [''] },
         'HaulZ1': {
           affected: ['stone'],
-          canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[1] < 250),
+          canStart: (input) => ((input.stone || 0) < 1 && vals.stonesUsed[1] < 250),
           effect: (r) => {
             let t = towns[1]; //Area of the Action
             if (t.goodStonesZ1 > 0) {
@@ -724,7 +725,7 @@ export const Koviko = {
         },
         'HaulZ3': {
           affected: ['stone'],
-          canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[3] < 250),
+          canStart: (input) => ((input.stone || 0) < 1 && vals.stonesUsed[3] < 250),
           effect: (r) => {
             let t = towns[3]; //Area of the Action
             if (t.goodStonesZ3 > 0) {
@@ -742,7 +743,7 @@ export const Koviko = {
         },
         'HaulZ5': {
           affected: ['stone'],
-          canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[5] < 250),
+          canStart: (input) => ((input.stone || 0) < 1 && vals.stonesUsed[5] < 250),
           effect: (r) => {
             let t = towns[5]; //Area of the Action
             if (t.goodStonesZ5 > 0) {
@@ -760,7 +761,7 @@ export const Koviko = {
         },
         'HaulZ6': {
           affected: ['stone'],
-          canStart: (input) => ((input.stone || 0) < 1 && globalThis.saving.vals.stonesUsed[6] < 250),
+          canStart: (input) => ((input.stone || 0) < 1 && vals.stonesUsed[6] < 250),
           effect: (r) => {
             let t = towns[6]; //Area of the Action
             if (t.goodStonesZ6 > 0) {
@@ -878,7 +879,7 @@ export const Koviko = {
           affected: ['soul'],
           canStart: (input) => input.rep >= 2,
           loop: {
-            max: (a) => globalThis.saving.vals.dungeons[a.dungeonNum].length,
+            max: (a) => vals.dungeons[a.dungeonNum].length,
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(2, Math.floor((p.completed + segment) / a.segments + .0000001)) * 15000,
@@ -886,10 +887,10 @@ export const Koviko = {
             tick: (p, a, s, k, r) => (offset) => {
               let floor = Math.floor(p.completed / a.segments + .0000001);
 
-              return floor in globalThis.saving.vals.dungeons[a.dungeonNum]
+              return floor in vals.dungeons[a.dungeonNum]
                 ? (h.getSelfCombat(r, k) + getSkillLevelFromExp(k.magic)) *
                   h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.vals.dungeons[a.dungeonNum][floor].completed / 200)
+                  Math.sqrt(1 + vals.dungeons[a.dungeonNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -898,7 +899,7 @@ export const Koviko = {
                 let ssGained = h.getRewardSS(0);
                 r.completionsSmallDungeon = (r.completionsSmallDungeon || 0) + 1;
                 r.soul += ssGained;
-                r.expectedSS += ssGained * globalThis.saving.vals.dungeons[0][r.completionsSmallDungeon - 1].ssChance;
+                r.expectedSS += ssGained * vals.dungeons[0][r.completionsSmallDungeon - 1].ssChance;
               },
             },
           },
@@ -1055,17 +1056,17 @@ export const Koviko = {
           affected: ['team', 'soul'],
           canStart: (input) => (input.team > 0),
           loop: {
-            max: (a) => globalThis.saving.vals.dungeons[a.dungeonNum].length,
+            max: (a) => vals.dungeons[a.dungeonNum].length,
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(3, Math.floor((p.completed + segment) / a.segments + .0000001)) * 5e5,
               ),
             tick: (p, a, s, k, r) => (offset) => {
               let floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in globalThis.saving.vals.dungeons[a.dungeonNum]
+              return floor in vals.dungeons[a.dungeonNum]
                 ? (h.getTeamCombat(r, k) + getSkillLevelFromExp(k.magic)) *
                   h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.vals.dungeons[a.dungeonNum][floor].completed / 200)
+                  Math.sqrt(1 + vals.dungeons[a.dungeonNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1074,7 +1075,7 @@ export const Koviko = {
                 let ssGained = h.getRewardSS(1);
                 r.completionsLargeDungeon = (r.completionsLargeDungeon || 0) + 1;
                 r.soul += ssGained;
-                r.expectedSS += ssGained * globalThis.saving.vals.dungeons[1][r.completionsLargeDungeon - 1].ssChance;
+                r.expectedSS += ssGained * vals.dungeons[1][r.completionsLargeDungeon - 1].ssChance;
               },
             },
           },
@@ -1142,7 +1143,7 @@ export const Koviko = {
           affected: ['heroism'],
           canStart: true,
           loop: {
-            max: (a) => globalThis.saving.vals.trialFloors[a.trialNum],
+            max: (a) => vals.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1150,9 +1151,9 @@ export const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in globalThis.saving.vals.trials[a.trialNum]
+              return floor in vals.trials[a.trialNum]
                 ? h.getTeamCombat(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.vals.trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + vals.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1561,7 +1562,7 @@ export const Koviko = {
           affected: ['soul'],
           canStart: true,
           loop: {
-            max: (a) => globalThis.saving.vals.dungeons[a.dungeonNum].length,
+            max: (a) => vals.dungeons[a.dungeonNum].length,
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(2, Math.floor((p.completed + segment) / a.segments + .0000001)) * 10000000,
@@ -1569,11 +1570,11 @@ export const Koviko = {
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
 
-              return floor in globalThis.saving.vals.dungeons[a.dungeonNum]
+              return floor in vals.dungeons[a.dungeonNum]
                 ? h.getTeamCombat(r, k) *
                   (1 + 0.1 * (r.pylons || 0)) *
                   h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.vals.dungeons[a.dungeonNum][floor].completed / 200)
+                  Math.sqrt(1 + vals.dungeons[a.dungeonNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1584,7 +1585,7 @@ export const Koviko = {
                 let ssGained = h.getRewardSS(2);
                 r.completionsTheSpire = (r.completionsTheSpire || 0) + 1;
                 r.soul += ssGained;
-                r.expectedSS += ssGained * globalThis.saving.vals.dungeons[2][r.completionsTheSpire - 1].ssChance;
+                r.expectedSS += ssGained * vals.dungeons[2][r.completionsTheSpire - 1].ssChance;
               },
             },
           },
@@ -1601,7 +1602,7 @@ export const Koviko = {
           affected: ['zombie'],
           canStart: true,
           loop: {
-            max: (a) => globalThis.saving.vals.trialFloors[a.trialNum],
+            max: (a) => vals.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1609,9 +1610,9 @@ export const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in globalThis.saving.vals.trials[a.trialNum]
+              return floor in vals.trials[a.trialNum]
                 ? h.getZombieStrength(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.vals.trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + vals.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: { loop: (r) => (r.zombie++) },
@@ -1762,7 +1763,7 @@ export const Koviko = {
           canStart: true,
           effect: (r, k) => {
             k.mercantilism += 50;
-            r.gold += Math.floor(globalThis.saving.vals.goldInvested * .001);
+            r.gold += Math.floor(vals.goldInvested * .001);
           },
         },
         'Seminar': {
@@ -1785,7 +1786,7 @@ export const Koviko = {
           affected: ['zombie'],
           canStart: true,
           loop: {
-            max: (a) => globalThis.saving.vals.trialFloors[a.trialNum],
+            max: (a) => vals.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1794,9 +1795,9 @@ export const Koviko = {
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
               if (!p.progress) p.teamCombat = h.getTeamCombat(r, k);
-              return floor in globalThis.saving.vals.trials[a.trialNum]
+              return floor in vals.trials[a.trialNum]
                 ? p.teamCombat * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.vals.trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + vals.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {},
@@ -1833,7 +1834,7 @@ export const Koviko = {
           affected: ['power'],
           canStart: true,
           loop: {
-            max: (a) => globalThis.saving.vals.trialFloors[a.trialNum],
+            max: (a) => vals.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1841,9 +1842,9 @@ export const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in globalThis.saving.vals.trials[a.trialNum]
+              return floor in vals.trials[a.trialNum]
                 ? h.getTeamCombat(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.vals.trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + vals.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1866,7 +1867,7 @@ export const Koviko = {
           affected: ['power'],
           canStart: (input) => (input.power > 0),
           loop: {
-            max: (a) => globalThis.saving.vals.trialFloors[a.trialNum],
+            max: (a) => vals.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1874,9 +1875,9 @@ export const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in globalThis.saving.vals.trials[a.trialNum]
+              return floor in vals.trials[a.trialNum]
                 ? h.getSelfCombat(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.vals.trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + vals.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1973,12 +1974,12 @@ export const Koviko = {
       let state;
 
       //"Slowmode means only update the initial state every X Minutes
-      if (globalThis.saving.vals.options.predictorSlowMode) {
+      if (vals.options.predictorSlowMode) {
         if (this.initState && (new Date() < this.nextUpdate)) {
           state = structuredClone(this.initState);
           //console.log("Slowmode - Redraw");
         } else {
-          this.nextUpdate = new Date(Date.now() + globalThis.saving.vals.options.predictorSlowTimer * 1000 * 60);
+          this.nextUpdate = new Date(Date.now() + vals.options.predictorSlowTimer * 1000 * 60);
           //console.log("Slowmode - Update Data");
         }
       }
@@ -2013,7 +2014,7 @@ export const Koviko = {
             {},
           ),
         };
-        if (globalThis.saving.vals.options.predictorSlowMode) {
+        if (vals.options.predictorSlowMode) {
           this.initState = structuredClone(state);
         }
       }
@@ -2026,8 +2027,8 @@ export const Koviko = {
 
       //Challenge Mode
       if (
-        (typeof globalThis.saving.vals.challengeSave != 'undefined') &&
-        (globalThis.saving.vals.challengeSave.challengeMode == 1)
+        (typeof vals.challengeSave != 'undefined') &&
+        (vals.challengeSave.challengeMode == 1)
       ) {
         state.resources.isManaDrought = true;
         state.resources.manaBought = 7500;
@@ -2108,7 +2109,7 @@ export const Koviko = {
       //Statistik parammeters
       let statisticStart = 0;
       let newStatisticValue = 0;
-      const trackedStat = Koviko.trackedStats[globalThis.saving.vals.options.predictorTrackedStat];
+      const trackedStat = Koviko.trackedStats[vals.options.predictorTrackedStat];
       switch (trackedStat.type) {
         case 'R':
           break;
@@ -2147,7 +2148,7 @@ export const Koviko = {
       this.update.id = id;
       const runData = {
         id,
-        options: globalThis.saving.vals.options,
+        options: vals.options,
         actions,
         isDebug,
         snapshots,
@@ -2162,7 +2163,7 @@ export const Koviko = {
         finalIndex,
       };
       for await (
-        const [i, state, isValid] of globalThis.saving.vals.options.predictorBackgroundThread && this.worker
+        const [i, state, isValid] of vals.options.predictorBackgroundThread && this.worker
           ? this.doBackgroundUpdate(runData)
           : this.doUpdate(runData)
       ) {
@@ -2223,7 +2224,7 @@ export const Koviko = {
       Data.recordSnapshot('predictor-worker');
       this.backgroundSnapshot = Data.getSnapshot(-1);
       const snapshotHeritage = this.backgroundSnapshot.getHeritage().map((s) => s.id);
-      this.worker.postMessage({ type: 'setOptions', options: globalThis.saving.vals.options });
+      this.worker.postMessage({ type: 'setOptions', options: vals.options });
       this.worker.postMessage({
         type: 'startUpdate',
         runData,
@@ -2530,7 +2531,7 @@ export const Koviko = {
         newStatisticValue,
       } = runData;
 
-      const trackedStat = Koviko.trackedStats[globalThis.saving.vals.options.predictorTrackedStat];
+      const trackedStat = Koviko.trackedStats[vals.options.predictorTrackedStat];
 
       let totalMinutes = state.resources.totalTicks / 50 / 60;
 
@@ -2568,7 +2569,7 @@ export const Koviko = {
             // The actual implementation rounds your interest each loop, so this is slightly innacurate.
             let loopsNeeded = Math.log(
               (goldTillKey + state.resources.invested) /
-                (globalThis.saving.vals.goldInvested * i_rate + state.resources.invested),
+                (vals.goldInvested * i_rate + state.resources.invested),
             ) /
               Math.log(i_rate + 1);
             newStatisticValue = loopsNeeded * state.resources.totalTicks; // Estimate of total ticks until we can buy the key
@@ -2638,8 +2639,8 @@ export const Koviko = {
       let h = Math.floor(seconds / 3600);
       let m = Math.floor(seconds % 3600 / 60);
       let s = Math.floor(seconds % 3600 % 60);
-      let ms = Math.floor(seconds % 1 * Math.pow(10, globalThis.saving.vals.options.predictorTimePrecision)).toString();
-      while (ms.length < globalThis.saving.vals.options.predictorTimePrecision) ms = '0' + ms;
+      let ms = Math.floor(seconds % 1 * Math.pow(10, vals.options.predictorTimePrecision)).toString();
+      while (ms.length < vals.options.predictorTimePrecision) ms = '0' + ms;
 
       return ('0' + h).slice(-2) + ':' + ('0' + m).slice(-2) + ':' + ('0' + s).slice(-2) + '.' + ms;
     }
@@ -2802,9 +2803,9 @@ export const Koviko = {
       if (toNextLoop[currname] && toNextLoop[currname].value > 0) {
         tooltip += '<tr><td><b>NEXT</b><td>' +
           Math.floor(
-              toNextLoop[currname].value * 100 * Math.pow(10, globalThis.saving.vals.options.predictorNextPrecision),
+              toNextLoop[currname].value * 100 * Math.pow(10, vals.options.predictorNextPrecision),
             ) /
-            Math.pow(10, globalThis.saving.vals.options.predictorNextPrecision) +
+            Math.pow(10, vals.options.predictorNextPrecision) +
           '%</td><td></td></tr>';
       }
       //Timer

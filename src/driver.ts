@@ -26,7 +26,7 @@ import {
   isTraining,
   trainingActions,
 } from './actionList.ts';
-
+import { vals } from './saving.ts';
 import { Data } from './data.ts';
 import { KeyboardKey } from './keyboard.hotkeys.ts';
 import { Localization } from './Localization.ts';
@@ -42,7 +42,7 @@ let refund = false;
 let radarUpdateTime = 0;
 let lastSave = Date.now();
 
-export function getSpeedMult(zone = globalThis.saving.vals.curTown) {
+export function getSpeedMult(zone = vals.curTown) {
   let speedMult = 1;
 
   // Dark Ritual
@@ -74,7 +74,7 @@ export function getActualGameSpeed() {
 }
 
 export function refreshDungeons(manaSpent) {
-  for (const dungeon of globalThis.saving.vals.dungeons) {
+  for (const dungeon of vals.dungeons) {
     for (const level of dungeon) {
       const chance = level.ssChance;
       if (chance < 1) level.ssChance = Math.min(chance + 0.0000001 * manaSpent, 1);
@@ -91,7 +91,7 @@ export function singleTick() {
 
   refreshDungeons(1);
 
-  if (globalThis.saving.vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
+  if (vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
     loopEnd();
     prepareRestart();
   }
@@ -122,7 +122,7 @@ export function tick() {
   curTime = newTime;
 
   // save even when paused
-  if (curTime - lastSave > globalThis.saving.vals.options.autosaveRate * 1000) {
+  if (curTime - lastSave > vals.options.autosaveRate * 1000) {
     lastSave = curTime;
     globalThis.saving.save();
   }
@@ -156,7 +156,7 @@ export function executeGameTicks(deadline) {
   let cleanExit = false;
 
   while (
-    baseManaToBurn * bonusSpeed >= (globalThis.saving.vals.options.fractionalMana ? 0.01 : 1) &&
+    baseManaToBurn * bonusSpeed >= (vals.options.fractionalMana ? 0.01 : 1) &&
     performance.now() < deadline
   ) {
     if (gameIsStopped) {
@@ -179,7 +179,7 @@ export function executeGameTicks(deadline) {
       manaAvailable = Math.min(
         manaAvailable,
         Mana.ceil(
-          globalThis.saving.vals.totalOfflineMs * driverVals.baseManaPerSecond * driverVals.gameSpeed *
+          vals.totalOfflineMs * driverVals.baseManaPerSecond * driverVals.gameSpeed *
             bonusSpeed / 1000,
         ),
       );
@@ -194,7 +194,7 @@ export function executeGameTicks(deadline) {
     manaAvailable = Math.min(manaAvailable, globalThis.saving.timeNeeded - globalThis.saving.timer);
 
     // don't run more than 1 tick
-    if (globalThis.saving.vals.shouldRestart) {
+    if (vals.shouldRestart) {
       manaAvailable = Math.min(manaAvailable, 1);
     }
 
@@ -224,7 +224,7 @@ export function executeGameTicks(deadline) {
 
     refreshDungeons(manaSpent);
 
-    if (globalThis.saving.vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
+    if (vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
       cleanExit = true;
       loopEnd();
       prepareRestart();
@@ -277,7 +277,7 @@ export function stopGame() {
   if (globalThis.saving.needsDataSnapshots()) {
     Data.updateSnapshot('stop', 'base');
   }
-  if (globalThis.saving.vals.options.predictor) {
+  if (vals.options.predictor) {
     view.requestUpdate('updateNextActions');
   }
 }
@@ -291,7 +291,7 @@ export function pauseGame(ping, message) {
   view.requestUpdate('updateTime', null);
   view.requestUpdate('updateCurrentActionBar', actions.currentPos);
   view.update();
-  if (!gameIsStopped && globalThis.saving.vals.options.notifyOnPause) {
+  if (!gameIsStopped && vals.options.notifyOnPause) {
     globalThis.saving.clearPauseNotification();
   }
   document.title = gameIsStopped ? '*PAUSED* Idle Loops' : 'Idle Loops';
@@ -299,15 +299,15 @@ export function pauseGame(ping, message) {
     `time_controls>${gameIsStopped ? 'play_button' : 'pause_button'}`,
   );
   if (
-    !gameIsStopped && (globalThis.saving.vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded)
+    !gameIsStopped && (vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded)
   ) {
     restart();
   } else if (ping) {
-    if (globalThis.saving.vals.options.pingOnPause) {
+    if (vals.options.pingOnPause) {
       beep(250);
       setTimeout(() => beep(250), 500);
     }
-    if (globalThis.saving.vals.options.notifyOnPause) {
+    if (vals.options.notifyOnPause) {
       globalThis.saving.showPauseNotification(message || 'Game paused!');
     }
   }
@@ -315,9 +315,9 @@ export function pauseGame(ping, message) {
 
 export function loopEnd() {
   if (driverVals.effectiveTime > 0) {
-    globalThis.saving.vals.totals.time += driverVals.timeCounter;
-    globalThis.saving.vals.totals.effectiveTime += driverVals.effectiveTime;
-    globalThis.saving.vals.totals.loops++;
+    vals.totals.time += driverVals.timeCounter;
+    vals.totals.effectiveTime += driverVals.effectiveTime;
+    vals.totals.loops++;
     view.requestUpdate('updateTotals', null);
     const loopCompletedActions = actions.current.slice(0, actions.currentPos);
     if (
@@ -329,7 +329,7 @@ export function loopEnd() {
     }
     markActionsComplete(loopCompletedActions);
     actionStory(loopCompletedActions);
-    if (globalThis.saving.vals.options.highlightNew) {
+    if (vals.options.highlightNew) {
       view.requestUpdate('removeAllHighlights', null);
       view.requestUpdate('highlightIncompleteActions', null);
     }
@@ -339,15 +339,15 @@ export function loopEnd() {
 export function prepareRestart() {
   const curAction = actions.getNextValidAction();
   if (
-    globalThis.saving.vals.options.pauseBeforeRestart ||
-    (globalThis.saving.vals.options.pauseOnFailedLoop &&
+    vals.options.pauseBeforeRestart ||
+    (vals.options.pauseOnFailedLoop &&
       (actions.current.filter((action) => action.loopsLeft - action.extraLoops > 0).length > 0))
   ) {
-    if (globalThis.saving.vals.options.pingOnPause) {
+    if (vals.options.pingOnPause) {
       beep(250);
       setTimeout(() => beep(250), 500);
     }
-    if (globalThis.saving.vals.options.notifyOnPause) {
+    if (vals.options.notifyOnPause) {
       globalThis.saving.showPauseNotification('Game paused!');
     }
     if (curAction) {
@@ -364,13 +364,13 @@ export function prepareRestart() {
 }
 
 export function restart() {
-  globalThis.saving.vals.shouldRestart = false;
+  vals.shouldRestart = false;
   globalThis.saving.timer = 0;
   driverVals.timeCounter = 0;
   driverVals.effectiveTime = 0;
   globalThis.saving.timeNeeded = globalThis.saving.timeNeededInitial;
   document.title = 'Idle Loops';
-  globalThis.saving.vals.currentLoop = globalThis.saving.vals.totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
+  vals.currentLoop = vals.totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
   resetResources();
   restartStats();
   for (let i = 0; i < towns.length; i++) {
@@ -472,29 +472,29 @@ export function setCustomActionAmount() {
 }
 
 export function selectLoadout(num) {
-  if (globalThis.saving.vals.curLoadout === num) {
-    globalThis.saving.vals.curLoadout = 0;
+  if (vals.curLoadout === num) {
+    vals.curLoadout = 0;
   } else {
-    globalThis.saving.vals.curLoadout = num;
+    vals.curLoadout = num;
   }
-  inputElement('renameLoadout').value = globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1];
-  view.updateLoadout(globalThis.saving.vals.curLoadout);
+  inputElement('renameLoadout').value = vals.loadoutnames[vals.curLoadout - 1];
+  view.updateLoadout(vals.curLoadout);
 }
 
 export function loadLoadout(num) {
-  globalThis.saving.vals.curLoadout = num;
-  view.updateLoadout(globalThis.saving.vals.curLoadout);
+  vals.curLoadout = num;
+  view.updateLoadout(vals.curLoadout);
   loadList();
 }
 
 let globalCustomInput = '';
 export function saveList() {
-  if (globalThis.saving.vals.curLoadout === 0) {
+  if (vals.curLoadout === 0) {
     globalThis.saving.save();
     return;
   }
   nameList(false);
-  globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout] = copyArray(actions.next);
+  vals.loadouts[vals.curLoadout] = copyArray(actions.next);
   globalThis.saving.save();
   if ((inputElement('renameLoadout').value !== 'Saved!')) {
     globalCustomInput = inputElement('renameLoadout').value;
@@ -514,24 +514,23 @@ export function nameList(saveGame) {
     if (inputElement('renameLoadout').value.length > 30) {
       inputElement('renameLoadout').value = '30 Letter Max';
     } else if (inputElement('renameLoadout').value !== 'Saved!') {
-      globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1] = inputElement('renameLoadout').value;
+      vals.loadoutnames[vals.curLoadout - 1] = inputElement('renameLoadout').value;
     }
-  } else if (!isNaN(parseFloat(globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1]))) {
+  } else if (!isNaN(parseFloat(vals.loadoutnames[vals.curLoadout - 1]))) {
     inputElement('renameLoadout').value = 'Enter a name!';
   }
-  document.getElementById(`load${globalThis.saving.vals.curLoadout}`).textContent =
-    globalThis.saving.vals.loadoutnames[globalThis.saving.vals.curLoadout - 1];
+  document.getElementById(`load${vals.curLoadout}`).textContent = vals.loadoutnames[vals.curLoadout - 1];
   if (saveGame) globalThis.saving.save();
 }
 
 export function loadList() {
-  if (globalThis.saving.vals.curLoadout === 0) {
+  if (vals.curLoadout === 0) {
     return;
   }
   inputElement('amountCustom').value = actions.addAmount.toString();
   actions.clearActions();
-  if (globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout]) {
-    actions.appendActionRecords(globalThis.saving.vals.loadouts[globalThis.saving.vals.curLoadout]);
+  if (vals.loadouts[vals.curLoadout]) {
+    actions.appendActionRecords(vals.loadouts[vals.curLoadout]);
   }
   view.updateNextActions();
   view.adjustDarkRitualText();
@@ -542,21 +541,21 @@ export function clearList() {
 }
 export function unlockTown(townNum) {
   if (!towns[townNum].unlocked()) {
-    globalThis.saving.vals.townsUnlocked.push(townNum);
-    globalThis.saving.vals.townsUnlocked.sort();
+    vals.townsUnlocked.push(townNum);
+    vals.townsUnlocked.sort();
     // refresh current
     view.showTown(townNum);
     view.requestUpdate('updateTravelMenu', null);
   }
-  let cNum = globalThis.saving.vals.challengeSave.challengeMode;
+  let cNum = vals.challengeSave.challengeMode;
   if (cNum !== 0) {
-    if (globalThis.saving.vals.challengeSave['c' + cNum] < townNum) {
-      globalThis.saving.vals.challengeSave['c' + cNum] = townNum;
-    } else if (globalThis.saving.vals.challengeSave['c' + cNum] === undefined) {
-      globalThis.saving.vals.challengeSave['c' + cNum] = townNum;
+    if (vals.challengeSave['c' + cNum] < townNum) {
+      vals.challengeSave['c' + cNum] = townNum;
+    } else if (vals.challengeSave['c' + cNum] === undefined) {
+      vals.challengeSave['c' + cNum] = townNum;
     }
   }
-  globalThis.saving.vals.curTown = townNum;
+  vals.curTown = townNum;
 }
 export function adjustAll() {
   adjustPots();
@@ -607,7 +606,7 @@ export function capAmount(index, townNum) {
 export function capTraining(index) {
   const action = actions.next[index];
   const alreadyExisting = getNumOnList(action.name) + (action.disabled ? action.loops : 0);
-  const newLoops = globalThis.saving.vals.trainingLimits - alreadyExisting;
+  const newLoops = vals.trainingLimits - alreadyExisting;
   actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
   view.updateNextActions();
   view.updateLockedHidden();
@@ -660,9 +659,7 @@ export function showNotification(name) {
   document.getElementById(`${name}Notification`).style.display = 'block';
 }
 export function hideNotification(name) {
-  globalThis.saving.vals.unreadActionStories = globalThis.saving.vals.unreadActionStories.filter((toRead) =>
-    toRead !== name
-  );
+  vals.unreadActionStories = vals.unreadActionStories.filter((toRead) => toRead !== name);
   document.getElementById(`${name}Notification`).style.display = 'none';
 }
 export function hideActionIcons() {
@@ -764,15 +761,15 @@ export function removeAction(actionId) {
 
 export function borrowTime() {
   addOffline(86400_000);
-  globalThis.saving.vals.totals.borrowedTime += 86400;
+  vals.totals.borrowedTime += 86400;
   view.requestUpdate('updateOffline', null);
   view.requestUpdate('updateTotals', null);
 }
 
 export function returnTime() {
-  if (globalThis.saving.vals.totalOfflineMs >= 86400_000) {
+  if (vals.totalOfflineMs >= 86400_000) {
     addOffline(-86400_000);
-    globalThis.saving.vals.totals.borrowedTime -= 86400;
+    vals.totals.borrowedTime -= 86400;
     view.requestUpdate('updateOffline', null);
     view.requestUpdate('updateTotals', null);
   }
@@ -805,19 +802,19 @@ export function updateLag(manaSpent) {
 
 export function addOffline(num) {
   if (num) {
-    if (globalThis.saving.vals.totalOfflineMs + num < 0 && bonusSpeed > 1) {
+    if (vals.totalOfflineMs + num < 0 && bonusSpeed > 1) {
       toggleOffline();
     }
-    globalThis.saving.vals.totalOfflineMs += num;
-    if (globalThis.saving.vals.totalOfflineMs < 0) {
-      globalThis.saving.vals.totalOfflineMs = 0;
+    vals.totalOfflineMs += num;
+    if (vals.totalOfflineMs < 0) {
+      vals.totalOfflineMs = 0;
     }
     view.requestUpdate('updateOffline', null);
   }
 }
 
 export function toggleOffline() {
-  if (globalThis.saving.vals.totalOfflineMs === 0) return;
+  if (vals.totalOfflineMs === 0) return;
   if (!isBonusActive()) {
     bonusSpeed = 5;
     bonusActive = true;
@@ -845,17 +842,17 @@ export function isBonusActive() {
 export function checkExtraSpeed() {
   view.requestUpdate('updateBonusText', null);
   if (
-    typeof globalThis.saving.vals.options.speedIncreaseBackground === 'number' &&
-    !isNaN(globalThis.saving.vals.options.speedIncreaseBackground) &&
-    globalThis.saving.vals.options.speedIncreaseBackground >= 0 && !document.hasFocus() &&
-    (globalThis.saving.vals.options.speedIncreaseBackground < 1 || isBonusActive())
+    typeof vals.options.speedIncreaseBackground === 'number' &&
+    !isNaN(vals.options.speedIncreaseBackground) &&
+    vals.options.speedIncreaseBackground >= 0 && !document.hasFocus() &&
+    (vals.options.speedIncreaseBackground < 1 || isBonusActive())
   ) {
-    if (globalThis.saving.vals.options.speedIncreaseBackground === 1) {
+    if (vals.options.speedIncreaseBackground === 1) {
       bonusSpeed = 1.00001;
-    } else if (globalThis.saving.vals.options.speedIncreaseBackground === 0) {
+    } else if (vals.options.speedIncreaseBackground === 0) {
       bonusSpeed = 0.0000001; // let's avoid any divide by zero errors shall we
     } else {
-      bonusSpeed = globalThis.saving.vals.options.speedIncreaseBackground;
+      bonusSpeed = vals.options.speedIncreaseBackground;
     }
     return;
   }
@@ -863,10 +860,10 @@ export function checkExtraSpeed() {
     bonusSpeed = 1;
     return;
   }
-  if (globalThis.saving.vals.options.speedIncrease10x === true) bonusSpeed = 10;
-  if (globalThis.saving.vals.options.speedIncrease20x === true) bonusSpeed = 20;
-  if (bonusSpeed < globalThis.saving.vals.options.speedIncreaseCustom) {
-    bonusSpeed = globalThis.saving.vals.options.speedIncreaseCustom;
+  if (vals.options.speedIncrease10x === true) bonusSpeed = 10;
+  if (vals.options.speedIncrease20x === true) bonusSpeed = 20;
+  if (bonusSpeed < vals.options.speedIncreaseCustom) {
+    bonusSpeed = vals.options.speedIncreaseCustom;
   }
 }
 

@@ -6,6 +6,7 @@ import { driverVals, getSpeedMult, pauseGame } from './driver.ts';
 import { prestigeBonus } from './prestige.ts';
 import { setStoryFlag } from './views/main.view.ts';
 import { actions } from './actions.ts';
+import { vals } from './saving.ts';
 
 export class Actions {
   current = [];
@@ -37,7 +38,7 @@ export class Actions {
     const curAction = this.getNextValidAction();
     // out of actions
     if (!curAction) {
-      globalThis.saving.vals.shouldRestart = true;
+      vals.shouldRestart = true;
       return 0;
     }
     this.currentAction = curAction;
@@ -136,7 +137,7 @@ export class Actions {
               curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
               curAction.goldRemaining = resources.gold;
               curAction.finish();
-              globalThis.saving.vals.totals.actions++;
+              vals.totals.actions++;
               break manaLoop;
             }
             towns[curAction.townNum][curAction.varName] = curProgress;
@@ -169,7 +170,7 @@ export class Actions {
     addExpFromAction(curAction, manaToSpend);
 
     if (
-      this.currentPos === this.current.length - 1 && globalThis.saving.vals.options.fractionalMana &&
+      this.currentPos === this.current.length - 1 && vals.options.fractionalMana &&
       curAction.ticks < curAction.adjustedTicks && curAction.ticks >= curAction.adjustedTicks - 0.005
     ) {
       // this is close enough to finished that it shows as e.g. 250.00/250.00 mana used for action
@@ -183,7 +184,7 @@ export class Actions {
       curAction.lastMana = curAction.rawTicks;
       this.completedTicks += curAction.adjustedTicks;
       curAction.finish();
-      globalThis.saving.vals.totals.actions++;
+      vals.totals.actions++;
       curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
 
       if (curAction.cost) {
@@ -197,8 +198,8 @@ export class Actions {
     view.requestUpdate('updateCurrentActionBar', this.currentPos);
     if (curAction.loopsLeft === 0) {
       if (
-        !this.current[this.currentPos + 1] && globalThis.saving.vals.options.repeatLastAction &&
-        (!curAction.canStart || curAction.canStart()) && curAction.townNum === globalThis.saving.vals.curTown
+        !this.current[this.currentPos + 1] && vals.options.repeatLastAction &&
+        (!curAction.canStart || curAction.canStart()) && curAction.townNum === vals.curTown
       ) {
         curAction.loopsLeft++;
         curAction.loops++;
@@ -224,7 +225,7 @@ export class Actions {
       return undefined;
     }
     while (
-      curAction.townNum !== globalThis.saving.vals.curTown ||
+      curAction.townNum !== vals.curTown ||
       (curAction.canStart && !curAction.canStart()) ||
       (isMultipartAction(curAction) && !curAction.canMakeProgress(0))
     ) {
@@ -246,10 +247,10 @@ export class Actions {
   }
 
   getErrorMessage(action) {
-    if (action.townNum !== globalThis.saving.vals.curTown) {
-      return `You were in zone ${
-        globalThis.saving.vals.curTown + 1
-      } when you tried this action, and needed to be in zone ${action.townNum + 1}`;
+    if (action.townNum !== vals.curTown) {
+      return `You were in zone ${vals.curTown + 1} when you tried this action, and needed to be in zone ${
+        action.townNum + 1
+      }`;
     }
     if (action.canStart && !action.canStart()) {
       return 'You could not make the cost for this action.';
@@ -265,16 +266,16 @@ export class Actions {
     this.currentPos = 0;
     this.completedTicks = 0;
     this.currentAction = null;
-    globalThis.saving.vals.curTown = 0;
+    vals.curTown = 0;
     towns[0].suppliesCost = 300;
     view.requestUpdate('updateResource', 'supplies');
-    globalThis.saving.vals.curAdvGuildSegment = 0;
-    globalThis.saving.vals.curCraftGuildSegment = 0;
-    globalThis.saving.vals.curWizCollegeSegment = 0;
-    globalThis.saving.vals.curFightFrostGiantsSegment = 0;
-    globalThis.saving.vals.curFightJungleMonstersSegment = 0;
-    globalThis.saving.vals.curThievesGuildSegment = 0;
-    globalThis.saving.vals.curGodsSegment = 0;
+    vals.curAdvGuildSegment = 0;
+    vals.curCraftGuildSegment = 0;
+    vals.curWizCollegeSegment = 0;
+    vals.curFightFrostGiantsSegment = 0;
+    vals.curFightJungleMonstersSegment = 0;
+    vals.curThievesGuildSegment = 0;
+    vals.curGodsSegment = 0;
     for (const town of towns) {
       for (const action of town.totalActionList) {
         if (action.type === 'multipart') {
@@ -283,13 +284,13 @@ export class Actions {
         }
       }
     }
-    globalThis.saving.vals.guild = '';
+    vals.guild = '';
     hearts.length = [];
-    globalThis.saving.vals.escapeStarted = false;
-    globalThis.saving.vals.portalUsed = false;
-    globalThis.saving.vals.stoneLoc = 0;
-    globalThis.saving.vals.totalMerchantMana = 7500;
-    if (globalThis.saving.vals.options.keepCurrentList && this.current?.length > 0) {
+    vals.escapeStarted = false;
+    vals.portalUsed = false;
+    vals.stoneLoc = 0;
+    vals.totalMerchantMana = 7500;
+    if (vals.options.keepCurrentList && this.current?.length > 0) {
       this.currentPos = 0;
       this.completedTicks = 0;
 
@@ -420,7 +421,7 @@ export class Actions {
   addAction(
     action,
     loops = this.addAmount,
-    initialOrder = globalThis.saving.vals.options.addActionsToTop ? 0 : -1,
+    initialOrder = vals.options.addActionsToTop ? 0 : -1,
     disabled = false,
     loopsType = 'actions',
     addAtClosestValidIndex = true,
@@ -439,7 +440,7 @@ export class Actions {
 
   addActionRecord(
     toAdd,
-    initialOrder = globalThis.saving.vals.options.addActionsToTop ? 0 : -1,
+    initialOrder = vals.options.addActionsToTop ? 0 : -1,
     addAtClosestValidIndex = true,
   ) {
     if (initialOrder < 0) initialOrder += this.next.length + 1;
@@ -602,8 +603,8 @@ export function calcSoulstoneMult(soulstones) {
 export function markActionsComplete(loopCompletedActions) {
   loopCompletedActions.forEach((action) => {
     let varName = Action[withoutSpaces(action.name)].varName;
-    if (!globalThis.saving.vals.completedActions.includes(varName)) {
-      globalThis.saving.vals.completedActions.push(varName);
+    if (!vals.completedActions.includes(varName)) {
+      vals.completedActions.push(varName);
     }
   });
 }
@@ -693,9 +694,9 @@ export function setAdjustedTicks(action) {
   for (const actionStatName in action.stats) {
     newCost += action.stats[actionStatName] * stats[actionStatName].manaMultiplier;
   }
-  action.rawTicks = action.manaCost() * newCost - (globalThis.saving.vals.options.fractionalMana ? 0 : 0.000001);
+  action.rawTicks = action.manaCost() * newCost - (vals.options.fractionalMana ? 0 : 0.000001);
   action.adjustedTicks = Math.max(
-    globalThis.saving.vals.options.fractionalMana ? 0 : 1,
+    vals.options.fractionalMana ? 0 : 1,
     Mana.ceil(action.rawTicks),
   );
 }

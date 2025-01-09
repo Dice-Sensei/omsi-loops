@@ -2,6 +2,7 @@ import { towns } from './globals.ts';
 import { clearList, pauseGame, restart } from './driver.ts';
 import { addBuffAmt, getBuffLevel } from './stats.ts';
 import { view } from './views/main.view.ts';
+import { vals } from './saving.ts';
 
 export const prestigeValues: Record<string, number> = {};
 
@@ -89,8 +90,8 @@ export function prestigeWithNewValues(
   nextPrestigeValues: typeof prestigeValues,
   nextPrestigeBuffs: { [K in PrestigeBuffName | 'Imbuement3']: number },
 ) {
-  const nextTotals = globalThis.saving.vals.totals;
-  const nextOfflineMs = globalThis.saving.vals.totalOfflineMs;
+  const nextTotals = vals.totals;
+  const nextOfflineMs = vals.totalOfflineMs;
 
   // Remove all progress and save totals
   globalThis.saving.load(false);
@@ -110,8 +111,8 @@ export function prestigeWithNewValues(
   prestigeValues['prestigeTotalCompletions'] = nextPrestigeValues.prestigeTotalCompletions.valueOf();
   prestigeValues['completedCurrentPrestige'] = nextPrestigeValues.completedCurrentPrestige.valueOf();
   prestigeValues['completedAnyPrestige'] = nextPrestigeValues.completedAnyPrestige.valueOf();
-  globalThis.saving.vals.totals = nextTotals;
-  globalThis.saving.vals.totalOfflineMs = nextOfflineMs;
+  vals.totals = nextTotals;
+  vals.totalOfflineMs = nextOfflineMs;
   view.updatePrestigeValues();
   globalThis.saving.save();
 }
@@ -119,16 +120,16 @@ export function prestigeWithNewValues(
 export function prestigeConfirmation() {
   globalThis.saving.save();
   if (
-    globalThis.localStorage[globalThis.saving.vals.defaultSaveName] &&
-    globalThis.localStorage[globalThis.saving.vals.defaultSaveName] !== ''
+    globalThis.localStorage[vals.defaultSaveName] &&
+    globalThis.localStorage[vals.defaultSaveName] !== ''
   ) {
     if (confirm(`Prestiging will reset all of your progress, but retain prestige points. Are you sure?`)) {
       for (const town of towns) {
         // this should be done in a more logical way but for now, just make sure to clear these out
         town?.hiddenVars?.clear();
       }
-      globalThis.localStorage['prestigeBackup'] = globalThis.localStorage[globalThis.saving.vals.defaultSaveName];
-      globalThis.localStorage[globalThis.saving.vals.defaultSaveName] = '';
+      globalThis.localStorage['prestigeBackup'] = globalThis.localStorage[vals.defaultSaveName];
+      globalThis.localStorage[vals.defaultSaveName] = '';
     } else {
       return false;
     }

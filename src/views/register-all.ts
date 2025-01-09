@@ -384,7 +384,7 @@ const menu = {
             Please export and save your data locally before starting.<br>
             <b>Beginning a challenge will permanently delete your current save.</b><br>
             `;
-    if (globalThis.saving.vals.challengeSave.challengeMode !== 0 || 1 === 1) {
+    if (vals.challengeSave.challengeMode !== 0 || 1 === 1) {
       html +=
         `<button class='button showthat control' style='margin-top: 2px;' onclick='globalThis.saving.exitChallenge()'>Exit Challenge 
                 </button>
@@ -564,7 +564,7 @@ const timeControls = {
           </div>
         </button>
         <div class='control'>
-          <div tabindex='0' id='story_control' class='showthatH' onfocus='globalThis.sglobalThis.saving.vals.storyShowingpdateStory(storyShowing)' style='height:30px;'>
+          <div tabindex='0' id='story_control' class='showthatH' style='height:30px;'>
             <div class='large bold'>
               ${t('time_controls.story_title')}
             </div>
@@ -707,6 +707,8 @@ export const renderViews = () => {
 
       const storyControl = document.getElementById('story_control')!;
       storyControl.onmouseover = () => view.updateStory(vals.storyShowing);
+      storyControl.onfocus = () => view.updateStory(vals.storyShowing);
+
       const storyLeft = document.getElementById('storyLeft')!;
       storyLeft.onclick = () => view.updateStory(vals.storyShowing - 1);
       const storyRight = document.getElementById('storyRight')!;

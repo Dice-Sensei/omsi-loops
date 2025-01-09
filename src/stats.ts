@@ -5,6 +5,7 @@ import { prestigeBonus } from './prestige.ts';
 import { actions } from './actions.ts';
 import { getAdvGuildRank, getCraftGuildRank, getXMLName } from './actionList.ts';
 import { view } from './views/main.view.ts';
+import { vals } from './saving.ts';
 export class LevelExp {
   level = 0;
   exp = 0;
@@ -375,12 +376,12 @@ export function getLevel(stat) {
 }
 
 export function getTotalTalentLevel() {
-  return Math.floor(Math.pow(globalThis.saving.vals.totalTalent, 0.2));
+  return Math.floor(Math.pow(vals.totalTalent, 0.2));
 }
 
 export function getTotalTalentPrc() {
-  return (Math.pow(globalThis.saving.vals.totalTalent, 0.2) -
-    Math.floor(Math.pow(globalThis.saving.vals.totalTalent, 0.2))) * 100;
+  return (Math.pow(vals.totalTalent, 0.2) -
+    Math.floor(Math.pow(vals.totalTalent, 0.2))) * 100;
 }
 
 export function getLevelFromExp(exp) {
@@ -610,7 +611,7 @@ export function addExp(name, amount) {
   stats[name].soullessLevelExp.addExp(amount / stats[name].soulstoneMult);
   let talentGain = amount * getTalentMultiplier();
   stats[name].talentLevelExp.addExp(talentGain);
-  globalThis.saving.vals.totalTalent += talentGain;
+  vals.totalTalent += talentGain;
   view.requestUpdate('updateStat', name);
 }
 
