@@ -1638,7 +1638,7 @@ export class View {
       Localization.txt('actions>tooltip>progress_label')
     }</div> <div id='progress${action.varName}${varSuffix}'></div>%
             </div>
-            <div class='hideVarButton far' onclick='view.toggleHidden("${action.varName}${varSuffix}")'></div>
+            <div class='hideVarButton far' onclick='globalThis.view.toggleHidden("${action.varName}${varSuffix}")'></div>
         </div>`;
     const progressDiv = document.createElement('div');
     progressDiv.className = 'townContainer progressType';
@@ -1932,7 +1932,7 @@ export class View {
                 <input type='checkbox' id='searchToggler${action.varName}' style='margin-left:10px;'>
                 <label for='searchToggler${action.varName}'> Lootable first</label>
                 <div class='showthis'>${action.infoText()}</div>
-                <div class='hideVarButton far' onclick='.toggleHidden("${action.varName}")'></div>
+                <div class='hideVarButton far' onclick='globalThis.view.toggleHidden("${action.varName}")'></div>
             </div><br>`;
 
     const infoDiv = document.createElement('div');
@@ -1988,7 +1988,7 @@ export class View {
                 <div class='multipartBars'>
                     ${pbars}
                 </div>
-                <div class='hideVarButton far' onclick='view.toggleHidden("${action.varName}")'></div>
+                <div class='hideVarButton far' onclick='globalThis.view.toggleHidden("${action.varName}")'></div>
             </div>`;
 
     const progressDiv = document.createElement('div');
@@ -2427,3 +2427,5 @@ export function updateBuffCaps() {
 }
 
 export const view = new View();
+
+globalThis.view = view;
