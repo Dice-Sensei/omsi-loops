@@ -3939,7 +3939,7 @@ Action.HeroesTrial = new TrialAction('Heroes Trial', 0, {
     return 100000;
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
+    return this.currentFloor() < globalThis.saving.vals.trialFloors[this.trialNum];
   },
   baseProgress() {
     return getTeamCombat();
@@ -6434,7 +6434,7 @@ Action.DeadTrial = new TrialAction('Dead Trial', 4, {
     addResource('zombie', 1);
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
+    return this.currentFloor() < globalThis.saving.vals.trialFloors[this.trialNum];
   },
   visible() {
     return towns[this.townNum].getLevel('Survey') >= 100;
@@ -7802,7 +7802,7 @@ Action.SecretTrial = new TrialAction('Secret Trial', 3, {
     return 100000;
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
+    return this.currentFloor() < globalThis.saving.vals.trialFloors[this.trialNum];
   },
   baseProgress() {
     return getTeamCombat();
@@ -8062,7 +8062,7 @@ Action.GodsTrial = new TrialAction('Gods Trial', 1, {
     return 50000;
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum] && resources.power < 7;
+    return this.currentFloor() < globalThis.saving.vals.trialFloors[this.trialNum] && resources.power < 7;
   },
   baseProgress() {
     return getTeamCombat();
@@ -8079,7 +8079,7 @@ Action.GodsTrial = new TrialAction('Gods Trial', 1, {
     if (this.currentFloor() >= 80) globalThis.view.setStoryFlag('trailGods80Done');
     if (this.currentFloor() >= 90) globalThis.view.setStoryFlag('trailGods90Done');
 
-    if (this.currentFloor() === globalThis.saving.trialFloors[this.trialNum]) { //warning: the predictor assumes the old behavior, but this is clearly the intended
+    if (this.currentFloor() === globalThis.saving.vals.trialFloors[this.trialNum]) { //warning: the predictor assumes the old behavior, but this is clearly the intended
       globalThis.view.setStoryFlag('trailGodsAllDone');
       addResource('power', 1);
     }
@@ -8162,7 +8162,7 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
     return 50000;
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum] &&
+    return this.currentFloor() < globalThis.saving.vals.trialFloors[this.trialNum] &&
       resources.power > 0 &&
       resources.power < 8;
   },

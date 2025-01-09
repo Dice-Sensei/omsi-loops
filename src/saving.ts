@@ -117,8 +117,8 @@ export const vals = {
     inChallenge: false,
   },
   trials: [[], [], [], [], []],
+  trialFloors: [50, 100, 7, 1000, 25],
 };
-const trialFloors = [50, 100, 7, 1000, 25];
 
 Object.assign(vals, {
   currentLoop: 0,
@@ -722,7 +722,7 @@ export function doLoad(toLoad) {
   const trialLevel = { completed: 0 };
   if (toLoad.trials === undefined) toLoad.trials = copyArray(vals.trials);
   for (let i = 0; i < vals.trials.length; i++) {
-    floors = trialFloors[i];
+    floors = vals.trialFloors[i];
     vals.trials[i].highestFloor = 0;
     for (let j = 0; j < floors; j++) {
       if (toLoad.trials[i] != undefined && toLoad.trials && toLoad.trials[i][j]) {
@@ -1152,7 +1152,6 @@ const _saving = {
   beginChallenge,
   exitChallenge,
   resumeChallenge,
-  trialFloors,
   view,
   loadDefaults,
   needsDataSnapshots,

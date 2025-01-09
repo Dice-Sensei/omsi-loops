@@ -1141,7 +1141,7 @@ export const Koviko = {
           affected: ['heroism'],
           canStart: true,
           loop: {
-            max: (a) => globalThis.saving.trialFloors[a.trialNum],
+            max: (a) => globalThis.saving.vals.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1600,7 +1600,7 @@ export const Koviko = {
           affected: ['zombie'],
           canStart: true,
           loop: {
-            max: (a) => globalThis.saving.trialFloors[a.trialNum],
+            max: (a) => globalThis.saving.vals.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1784,7 +1784,7 @@ export const Koviko = {
           affected: ['zombie'],
           canStart: true,
           loop: {
-            max: (a) => globalThis.saving.trialFloors[a.trialNum],
+            max: (a) => globalThis.saving.vals.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1832,7 +1832,7 @@ export const Koviko = {
           affected: ['power'],
           canStart: true,
           loop: {
-            max: (a) => globalThis.saving.trialFloors[a.trialNum],
+            max: (a) => globalThis.saving.vals.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
@@ -1865,7 +1865,7 @@ export const Koviko = {
           affected: ['power'],
           canStart: (input) => (input.power > 0),
           loop: {
-            max: (a) => globalThis.saving.trialFloors[a.trialNum],
+            max: (a) => globalThis.saving.vals.trialFloors[a.trialNum],
             cost: (p, a) => (segment) =>
               precision3(
                 Math.pow(a.baseScaling, Math.floor((p.completed + segment) / a.segments + .0000001)) *
