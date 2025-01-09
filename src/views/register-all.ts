@@ -6,7 +6,7 @@ import { buffHardCaps, buffList } from '../globals.ts';
 import { prestigeUpgrade, resetAllPrestiges } from '../prestige.ts';
 import { borrowTime, manualRestart, pauseGame, returnTime, toggleOffline } from '../driver.ts';
 import { getXMLName } from '../actionList.ts';
-import { view } from './main.view.ts';
+import { updateBuffCaps, view } from './main.view.ts';
 import { vals } from '../saving.ts';
 
 const getDisabledMenus = () => {
@@ -49,7 +49,7 @@ const buffsContainer = {
               id="buff${name}Cap" 
               class="buffmaxinput" 
               value="${buffHardCaps[name]}" 
-              onchange="globalThis.view.updateBuffCaps()">
+              onchange="globalThis.view.updateBuffCaps()"></input>
           </div>
         </div>
       `;
@@ -701,9 +701,12 @@ export const renderViews = () => {
       for (const name of buffList) {
         const id = `buff${name}Container`;
 
-        const element = document.getElementById(id)!;
-        element.onmouseover = () => view.showBuff(name);
-        element.onmouseout = () => view.showBuff(undefined);
+        const container = document.getElementById(id)!;
+        container.onmouseover = () => view.showBuff(name);
+        container.onmouseout = () => view.showBuff(undefined);
+
+        const cap = document.getElementById(`buff${name}Cap`)!;
+        cap.onchange = () => updateBuffCaps();
       }
 
       const storyControl = document.getElementById('story_control')!;

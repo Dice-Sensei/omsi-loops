@@ -11,6 +11,7 @@ import {
   setCustomActionAmount,
 } from './driver.ts';
 import { createKeyboardHotkeys } from './keyboard.hotkeys.ts';
+import { view } from './views/main.view.ts';
 
 const Header = () => (
   <header id='timeInfo' style='width: 100%; text-align: center'>
