@@ -3,6 +3,7 @@ import { Action } from './actionList.ts';
 import { actions } from './actions.ts';
 import { towns } from './globals.ts';
 import { addMana, addResource, driverVals, resetResources } from './driver.ts';
+import { view } from './views/main.view.ts';
 
 enum ChallengeMode {
   ManaDrought = 1,
@@ -61,10 +62,10 @@ const setupManaBurn = () => {
     for (let i = 0; i < towns.length; i++) {
       towns[i].restart();
     }
-    globalThis.saving.view.requestUpdate('updateSkills');
+    view.requestUpdate('updateSkills');
     actions.restart();
-    globalThis.saving.view.requestUpdate('updateCurrentActionsDivs');
-    globalThis.saving.view.requestUpdate('updateTrials', null);
+    view.requestUpdate('updateCurrentActionsDivs');
+    view.requestUpdate('updateTrials', null);
   };
 };
 

@@ -2,6 +2,7 @@ import { Keyboard } from './logic/keyboard.ts';
 import { Listeners } from './logic/listeners.ts';
 import { t } from './locales/translations.utils.ts';
 import { actions } from './actions.ts';
+import { view } from './views/main.view.ts';
 import {
   changeActionAmount,
   checkExtraSpeed,
@@ -34,7 +35,7 @@ export function moveToTown(townNum: number | undefined): void {
   if (townNum === undefined) return;
   if (!globalThis.saving.vals.townsUnlocked.includes(townNum)) return;
 
-  globalThis.saving.view.showTown(townNum);
+  view.showTown(townNum);
 }
 
 export namespace KeyboardKey {
@@ -218,13 +219,13 @@ export const createKeyboardHotkeys = () => {
       combination: ['left', 'a'],
     }, {
       onDown: {
-        fn: () => globalThis.saving.view.showActions(true),
+        fn: () => view.showActions(true),
         description: t('shortcuts.showActions'),
       },
       combination: ['shift+right', 'shift+d'],
     }, {
       onDown: {
-        fn: () => globalThis.saving.view.showActions(false),
+        fn: () => view.showActions(false),
         description: t('shortcuts.hideActions'),
       },
       combination: ['shift+left', 'shift+a'],
@@ -232,8 +233,8 @@ export const createKeyboardHotkeys = () => {
       onDown: {
         fn: () => {
           actions.undoLast();
-          globalThis.saving.view.updateNextActions();
-          globalThis.saving.view.updateLockedHidden();
+          view.updateNextActions();
+          view.updateLockedHidden();
         },
         description: t('shortcuts.undoLastAction'),
       },

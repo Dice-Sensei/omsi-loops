@@ -1,4 +1,4 @@
-import { View } from './views/main.view.ts';
+import { view } from './views/main.view.ts';
 import { Town } from './town.ts';
 import { Data } from './data.ts';
 import { copyArray, inputElement, removeClassFromDiv, textAreaElement, valueElement } from './helpers.ts';
@@ -46,7 +46,6 @@ const challengeSaveName = 'idleLoopsChallenge';
 let saveName = defaultSaveName;
 
 const timeNeededInitial = 5 * 50;
-const view = selfIsGame ? new View() : null;
 
 export const vals = {
   trainingLimits: 10,
@@ -118,6 +117,8 @@ export const vals = {
   },
   trials: [[], [], [], [], []],
   trialFloors: [50, 100, 7, 1000, 25],
+  defaultSaveName: 'idleLoops1',
+  challengeSaveName: 'idleLoopsChallenge',
 };
 
 Object.assign(vals, {
@@ -435,7 +436,7 @@ export function clearPauseNotification() {
 }
 
 export function clearSave() {
-  globalThis.localStorage[globalThis.saving.defaultSaveName] = '';
+  globalThis.localStorage[vals.defaultSaveName] = '';
   globalThis.localStorage[challengeSaveName] = '';
   location.reload();
 }
@@ -1157,7 +1158,6 @@ const _saving = {
   needsDataSnapshots,
   startGame,
   setOption,
-  defaultSaveName,
   timeNeededInitial,
   timer: timeNeededInitial,
   timeNeeded: timeNeededInitial,

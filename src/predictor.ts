@@ -1,4 +1,5 @@
 // prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
+import { view } from './views/main.view.ts';
 import {
   getBuffLevel,
   getExpOfLevel,
@@ -2204,7 +2205,7 @@ export const Koviko = {
 
         if (this.updateHadNaNs) {
           this.updateHadNaNs = false;
-          globalThis.saving.view.requestUpdate('updateNextActions');
+          view.requestUpdate('updateNextActions');
         }
         // console.debug(`Performed update ${id} in ${updateTime.duration}`, updateTime);
       } else {

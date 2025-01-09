@@ -2,6 +2,7 @@ import { inputElement } from './helpers.ts';
 import { towns } from './globals.ts';
 import { adjustAll, pauseGame } from './driver.ts';
 import { isTravel, lateGameActions } from './actionList.ts';
+import { view } from './views/main.view.ts';
 
 'use strict';
 /**
@@ -67,7 +68,7 @@ export class Town<TN extends number> {
       const varName = this.varNames[i];
       this[`goodTemp${varName}`] = this[`good${varName}`];
       this[`lootFrom${varName}`] = 0;
-      globalThis.saving.view.requestUpdate('updateRegular', { name: varName, index: this.index });
+      view.requestUpdate('updateRegular', { name: varName, index: this.index });
     }
   }
 
@@ -87,15 +88,15 @@ export class Town<TN extends number> {
     }
     const level = this.getLevel(varName);
     if (level !== prevLevel) {
-      globalThis.saving.view.requestUpdate('updateLockedHidden', null);
+      view.requestUpdate('updateLockedHidden', null);
       adjustAll();
       for (const action of globalThis.saving.vals.totalActionList) {
         if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
-          globalThis.saving.view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
+          view.requestUpdate('updateRegular', { name: action.varName, index: action.townNum });
         }
       }
     }
-    globalThis.saving.view.requestUpdate('updateProgressAction', {
+    view.requestUpdate('updateProgressAction', {
       name: varName,
       town: towns[globalThis.saving.vals.curTown],
     });
@@ -137,7 +138,7 @@ export class Town<TN extends number> {
       this[`goodTemp${varName}`]--;
       this[`lootFrom${varName}`] += rewardFunc();
     }
-    globalThis.saving.view.requestUpdate('updateRegular', { name: varName, index: this.index });
+    view.requestUpdate('updateRegular', { name: varName, index: this.index });
   }
 
   createVars(varName) {

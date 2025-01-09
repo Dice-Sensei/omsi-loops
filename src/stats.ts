@@ -2,8 +2,9 @@ import { Buff } from './stats.ts';
 import { Localizable } from './localizable.ts';
 import { actionLog, buffHardCaps, buffList, buffs, resources, skillList, skills, statList, stats } from './globals.ts';
 import { prestigeBonus } from './prestige.ts';
-import {  actions } from './actions.ts';
+import { actions } from './actions.ts';
 import { getAdvGuildRank, getCraftGuildRank, getXMLName } from './actionList.ts';
+import { view } from './views/main.view.ts';
 export class LevelExp {
   level = 0;
   exp = 0;
@@ -532,7 +533,7 @@ export function addSkillExp(name, amount) {
   if (oldLevel !== newLevel) {
     actionLog.addSkillLevel(actions.currentAction, name, newLevel, oldLevel);
   }
-  globalThis.saving.view.requestUpdate('updateSkill', name);
+  view.requestUpdate('updateSkill', name);
 }
 
 export function handleSkillExp(list) {
@@ -574,7 +575,7 @@ export function addBuffAmt(name, amount, action, spendType, statsSpent) {
       statsSpent,
     );
   }
-  globalThis.saving.view.requestUpdate('updateBuff', name);
+  view.requestUpdate('updateBuff', name);
 }
 
 const talentMultiplierCache = {
@@ -610,7 +611,7 @@ export function addExp(name, amount) {
   let talentGain = amount * getTalentMultiplier();
   stats[name].talentLevelExp.addExp(talentGain);
   globalThis.saving.vals.totalTalent += talentGain;
-  globalThis.saving.view.requestUpdate('updateStat', name);
+  view.requestUpdate('updateStat', name);
 }
 
 export function restartStats() {
@@ -619,7 +620,7 @@ export function restartStats() {
       stats[statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2') * 2);
     } else stats[statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2'));
   }
-  globalThis.saving.view.requestUpdate('updateStats', true);
+  view.requestUpdate('updateStats', true);
 }
 
 export function getTotalBonusXP(statName) {

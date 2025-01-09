@@ -1,6 +1,8 @@
 import * as d3 from 'd3';
 import { Localization } from './Localization.ts';
 import { statList, stats } from './globals.ts';
+import { view } from './views/main.view.ts';
+
 type Dataset = {
   name: string;
   label: string;
@@ -293,6 +295,6 @@ export class StatGraph {
           .attr('r', this.graphObject.options.elements.point.radius)
       );
 
-    globalThis.saving.view.updateStatGraphNeeded = false;
+    view.updateStatGraphNeeded = false;
   }
 }

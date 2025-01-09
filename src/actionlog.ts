@@ -1,3 +1,4 @@
+import { view } from './views/main.view.ts';
 import { Localization } from './Localization.ts';
 import { extractStrings, formatNumber, intToString, restoreStrings } from './helpers.ts';
 import { getActionPrototype, getXMLName, townNames } from './actionList.ts';
@@ -34,7 +35,7 @@ export class ActionLog {
       if (this.earliestShownEntry > entry.entryIndex + 1) {
         this.loadHistoryBackTo(entry.entryIndex + 1);
       }
-      globalThis.saving.view.requestUpdate('updateActionLogEntry', entry.entryIndex);
+      view.requestUpdate('updateActionLogEntry', entry.entryIndex);
     }
     return entry;
   }
@@ -64,7 +65,7 @@ export class ActionLog {
     this.#uniqueEntries = {};
     this.firstNewOrUpdatedEntry = null;
     this.earliestShownEntry = null;
-    globalThis.saving.view.requestUpdate('updateActionLogEntry', 'clear');
+    view.requestUpdate('updateActionLogEntry', 'clear');
   }
 
   /** @param {unknown} data  */
@@ -87,7 +88,7 @@ export class ActionLog {
   loadHistoryBackTo(index) {
     this.earliestShownEntry ??= this.entries.length;
     while (this.earliestShownEntry > Math.max(0, index)) {
-      globalThis.saving.view.requestUpdate('updateActionLogEntry', --this.earliestShownEntry);
+      view.requestUpdate('updateActionLogEntry', --this.earliestShownEntry);
     }
   }
 
@@ -97,7 +98,7 @@ export class ActionLog {
       this.earliestShownEntry > 0 &&
       (this.entries[this.earliestShownEntry - 1].repeatable || this.earliestShownEntry > this.entries.length - 3)
     ) {
-      globalThis.saving.view.requestUpdate('updateActionLogEntry', --this.earliestShownEntry);
+      view.requestUpdate('updateActionLogEntry', --this.earliestShownEntry);
     }
   }
 

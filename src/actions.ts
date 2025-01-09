@@ -129,7 +129,7 @@ export class Actions {
             partUpdateRequired = true;
             if (curAction.canStart && !curAction.canStart()) {
               this.completedTicks += curAction.ticks;
-              globalThis.saving.view.requestUpdate('updateTotalTicks', null);
+              view.requestUpdate('updateTotalTicks', null);
               curAction.loopsLeft = 0;
               curAction.ticks = 0;
               curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
@@ -152,9 +152,9 @@ export class Actions {
         }
       }
 
-      globalThis.saving.view.requestUpdate('updateMultiPartSegments', curAction);
+      view.requestUpdate('updateMultiPartSegments', curAction);
       if (partUpdateRequired) {
-        globalThis.saving.view.requestUpdate('updateMultiPart', curAction);
+        view.requestUpdate('updateMultiPart', curAction);
       }
     }
 
@@ -191,9 +191,9 @@ export class Actions {
       curAction.goldRemaining = resources.gold;
 
       this.adjustTicksNeeded();
-      globalThis.saving.view.requestUpdate('updateCurrentActionLoops', this.currentPos);
+      view.requestUpdate('updateCurrentActionLoops', this.currentPos);
     }
-    globalThis.saving.view.requestUpdate('updateCurrentActionBar', this.currentPos);
+    view.requestUpdate('updateCurrentActionBar', this.currentPos);
     if (curAction.loopsLeft === 0) {
       if (
         !this.current[this.currentPos + 1] && globalThis.saving.vals.options.repeatLastAction &&
@@ -219,7 +219,7 @@ export class Actions {
       curAction.ticks = 0;
       curAction.timeSpent = 0;
       curAction.effectiveTimeElapsed = 0;
-      globalThis.saving.view.requestUpdate('updateCurrentActionBar', this.currentPos);
+      view.requestUpdate('updateCurrentActionBar', this.currentPos);
       return undefined;
     }
     while (
@@ -228,7 +228,7 @@ export class Actions {
       (isMultipartAction(curAction) && !curAction.canMakeProgress(0))
     ) {
       curAction.errorMessage = this.getErrorMessage(curAction);
-      globalThis.saving.view.requestUpdate('updateCurrentActionBar', this.currentPos);
+      view.requestUpdate('updateCurrentActionBar', this.currentPos);
       this.currentPos++;
       this.currentAction = null;
       if (this.currentPos >= this.current.length) {
@@ -266,7 +266,7 @@ export class Actions {
     this.currentAction = null;
     globalThis.saving.vals.curTown = 0;
     towns[0].suppliesCost = 300;
-    globalThis.saving.view.requestUpdate('updateResource', 'supplies');
+    view.requestUpdate('updateResource', 'supplies');
     globalThis.saving.vals.curAdvGuildSegment = 0;
     globalThis.saving.vals.curCraftGuildSegment = 0;
     globalThis.saving.vals.curWizCollegeSegment = 0;
@@ -333,10 +333,10 @@ export class Actions {
       pauseGame();
     }
     this.adjustTicksNeeded();
-    globalThis.saving.view.requestUpdate('updateMultiPartActions');
-    globalThis.saving.view.requestUpdate('updateNextActions');
-    globalThis.saving.view.requestUpdate('updateTime');
-    globalThis.saving.view.requestUpdate('updateActionTooltips');
+    view.requestUpdate('updateMultiPartActions');
+    view.requestUpdate('updateNextActions');
+    view.requestUpdate('updateTime');
+    view.requestUpdate('updateActionTooltips');
   }
 
   adjustTicksNeeded() {
@@ -347,7 +347,7 @@ export class Actions {
       remainingTicks += action.loopsLeft * action.adjustedTicks;
     }
     this.totalNeeded = this.completedTicks + remainingTicks;
-    globalThis.saving.view.requestUpdate('updateTotalTicks', null);
+    view.requestUpdate('updateTotalTicks', null);
   }
 
   #zoneSpans;

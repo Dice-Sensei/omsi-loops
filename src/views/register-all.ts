@@ -6,6 +6,9 @@ import { buffHardCaps, buffList } from '../globals.ts';
 import { prestigeUpgrade, resetAllPrestiges } from '../prestige.ts';
 import { borrowTime, manualRestart, pauseGame, returnTime, toggleOffline } from '../driver.ts';
 import { getXMLName } from '../actionList.ts';
+import { view } from './main.view.ts';
+import { vals } from '../saving.ts';
+
 const getDisabledMenus = () => {
   let disabledMenus = [];
 
@@ -30,8 +33,6 @@ const buffsContainer = {
         <div 
           class="buffContainer showthat" 
           id="buff${name}Container" 
-          onmouseover="globalThis.saving.view.showBuff('${name}')" 
-          onmouseout="globalThis.saving.view.showBuff(undefined)">
           <div class="buffNameContainer">
             <img class="buffIcon" src="icons/${camelize(fullName)}.svg">
             <div class="skillLabel medium bold">${Localization.txt(`buffs>${XMLName}>label`)}</div>
@@ -563,19 +564,19 @@ const timeControls = {
         <button id='toggleOfflineButton' class='button showthatO control'>
           ${t('time_controls.bonus_seconds.title')}
           <div class='showthis' id='bonusText' style='max-width:500px;color:var(--default-color);'>
-            ${globalThis.saving.view.getBonusText()}
+            ${view.getBonusText()}
           </div>
         </button>
         <div class='control'>
-          <div tabindex='0' id='story_control' class='showthatH' onmouseover='globalThis.saving.view.updateStory(globalThis.saving.vals.storyShowing)' onfocus='globalThis.sglobalThis.saving.vals.storyShowingpdateStory(storyShowing)' style='height:30px;'>
+          <div tabindex='0' id='story_control' class='showthatH' onfocus='globalThis.sglobalThis.saving.vals.storyShowingpdateStory(storyShowing)' style='height:30px;'>
             <div class='large bold'>
               ${t('time_controls.story_title')}
             </div>
             <div id='newStory' style='color:var(--alert-color);display:none;'>(!)</div>
             <div id='story_tooltip' class='showthisH' style='width:400px;'>
-              <button style='margin-left:175px;' class='actionIcon fa fa-arrow-left control' id='storyLeft' onclick='globalThis.saving.view.updateStory(globalThis.saving.vals.storyShowing-1)'></button>
+              <button style='margin-left:175px;' class='actionIcon fa fa-arrow-left control' id='storyLeft'></button>
               <div style='' id='storyPage' class='bold control'></div>
-              <button style='' class='actionIcon fa fa-arrow-right control' id='storyRight' onclick='globalThis.saving.view.updateStory(globalThis.saving.vals.storyShowing+1)'></button>
+              <button style='' class='actionIcon fa fa-arrow-right control' id='storyRight'></button>
               ${stories()}
             </div>
           </div>
@@ -653,7 +654,7 @@ globalThis.onEnableMenu = (input) => {
 export const renderViews = () => {
   for (const { selector, html } of views) {
     const element = document.querySelector(selector);
-    if (!element) throw Error(`Invalid selector for globalThis.saving.view ${selector}`);
+    if (!element) throw Error(`Invalid selector for view ${selector}`);
 
     element.innerHTML = html();
 
@@ -696,6 +697,21 @@ export const renderViews = () => {
       prestigeUpgradeBartering.onclick = () => prestigeUpgrade('PrestigeBartering');
       prestigeUpgradeExpOverflow.onclick = () => prestigeUpgrade('PrestigeExpOverflow');
       prestigeResetAll.onclick = () => resetAllPrestiges();
+
+      for (const name of buffList) {
+        const id = `buff${name}Container`;
+
+        const element = document.getElementById(id)!;
+        element.onmouseover = () => view.showBuff(name);
+        element.onmouseout = () => view.showBuff(undefined);
+      }
+
+      const storyControl = document.getElementById('story_control')!;
+      storyControl.onmouseover = () => view.updateStory(vals.storyShowing);
+      const storyLeft = document.getElementById('storyLeft')!;
+      storyLeft.onclick = () => view.updateStory(vals.storyShowing - 1);
+      const storyRight = document.getElementById('storyRight')!;
+      storyRight.onclick = () => view.updateStory(vals.storyShowing + 1);
     });
   }
 };

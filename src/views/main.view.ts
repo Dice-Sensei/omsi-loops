@@ -1,3 +1,4 @@
+import { view } from './views/main.view.ts';
 import {
   Buff,
   getBuffLevel,
@@ -198,13 +199,13 @@ export class View {
     this.updateTrials();
     if (globalThis.saving.vals.storyMax >= 12) {
       setInterval(() => {
-        globalThis.saving.view.updateStories();
-        globalThis.saving.view.updateLockedHidden();
+        view.updateStories();
+        view.updateLockedHidden();
       }, 20000);
     } else {
       setInterval(() => {
-        globalThis.saving.view.updateStories();
-        globalThis.saving.view.updateLockedHidden();
+        view.updateStories();
+        view.updateLockedHidden();
       }, 2000);
     }
     adjustAll();
@@ -275,7 +276,7 @@ export class View {
         'beforebegin',
         `<div class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${
           axisTip[1] + 3
-        }%;' onmouseover='globalThis.saving.view.showStat("${stat}")' onmouseout='globalThis.saving.view.showStat(undefined)'>
+        }%;' onmouseover='view.showStat("${stat}")' onmouseout='view.showStat(undefined)'>
                 <div class='statLabelContainer'>
                     <div class='medium bold stat-name long-form' style='margin-left:18px;margin-top:5px;'>${
           Localization.txt(`stats>${stat}>long_form`)
@@ -383,7 +384,7 @@ export class View {
     highlightAction: [],
   };
 
-  // requesting an update will call that update on the next globalThis.saving.view.update tick (based off player set UPS)
+  // requesting an update will call that update on the next view.update tick (based off player set UPS)
   requestUpdate(category, target) {
     if (!this.requests[category].includes(target)) this.requests[category].push(target);
   }
@@ -1116,7 +1117,7 @@ export class View {
         : formatNumber(action.loops - action.loopsLeft);
       const imageName = action.name.startsWith('Assassin') ? 'assassin' : camelize(action.name);
       totalDivText +=
-        `<div class='curActionContainer small' onmouseover='globalThis.saving.view.mouseoverAction(${i}, truglobalThis.saving.viewonmouseleave='view.mouseoverAction(${i}, false)'>
+        `<div class='curActionContainer small' onmouseover='view.mouseoverAction(${i}, truviewonmouseleave='view.mouseoverAction(${i}, false)'>
                     <div class='curActionBar' id='action${i}Bar'></div>
                     <div class='actionSelectedIndicator' id='action${i}Selected'></div>
                     <img src='icons/${imageName}.svg' class='smallIcon'>
@@ -1319,7 +1320,7 @@ export class View {
     }
     nextActionsDiv.style.display = isShowing ? 'none' : '';
     document.getElementById('actionTooltipContainer').style.display = isShowing ? '' : 'none';
-    globalThis.saving.view.updateCurrentActionBar(index);
+    view.updateCurrentActionBar(index);
   }
 
   updateCurrentActionLoops(index) {
@@ -1641,7 +1642,7 @@ export class View {
       Localization.txt('actions>tooltip>progress_label')
     }</div> <div id='progress${action.varName}${varSuffix}'></div>%
             </div>
-            <div class='hideVarButton far' onclick='globalThis.saving.view.toggleHidden("${action.varName}${varSuffix}")'></div>
+            <div class='hideVarButton far' onclick='view.toggleHidden("${action.varName}${varSuffix}")'></div>
         </div>`;
     const progressDiv = document.createElement('div');
     progressDiv.className = 'townContainer progressType';
@@ -2217,7 +2218,7 @@ export class View {
       travelMenu.append(`"<option value=${index} class='zone-${index + 1}' hidden=''>${town}</option>`);
     });
     travelMenu.change(function () {
-      globalThis.saving.view.showTown(Number($(this).val()));
+      view.showTown(Number($(this).val()));
     });
     this.updateTravelMenu();
   }
@@ -2335,14 +2336,14 @@ export function unlockGlobalStory(num) {
   if (num > globalThis.saving.vals.storyMax) {
     document.getElementById('newStory').style.display = 'inline-block';
     globalThis.saving.vals.storyMax = num;
-    globalThis.saving.view.requestUpdate('updateGlobalStory', num);
+    view.requestUpdate('updateGlobalStory', num);
   }
 }
 
 export function setStoryFlag(name) {
   if (!storyFlags[name]) {
     storyFlags[name] = true;
-    if (globalThis.saving.vals.options.actionLog) globalThis.saving.view.requestUpdate('updateStories', false);
+    if (globalThis.saving.vals.options.actionLog) view.requestUpdate('updateStories', false);
   }
 }
 const unlockStory = setStoryFlag; // compatibility alias
@@ -2350,7 +2351,7 @@ const unlockStory = setStoryFlag; // compatibility alias
 export function increaseStoryVarTo(name, value) {
   if (storyVars[name] < value) {
     storyVars[name] = value;
-    if (globalThis.saving.vals.options.actionLog) globalThis.saving.view.requestUpdate('updateStories', false);
+    if (globalThis.saving.vals.options.actionLog) view.requestUpdate('updateStories', false);
   }
 }
 
@@ -2460,3 +2461,5 @@ const _view = {
 };
 
 globalThis.view = _view;
+
+export const view = new View();
