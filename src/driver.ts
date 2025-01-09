@@ -83,7 +83,7 @@ export function refreshDungeons(manaSpent) {
 }
 
 export function singleTick() {
-  globalThis.saving.timer++;
+  vals.timer++;
   driverVals.timeCounter += 1 / driverVals.baseManaPerSecond;
   driverVals.effectiveTime += 1 / driverVals.baseManaPerSecond;
 
@@ -91,7 +91,7 @@ export function singleTick() {
 
   refreshDungeons(1);
 
-  if (vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
+  if (vals.shouldRestart || vals.timer >= vals.timeNeeded) {
     loopEnd();
     prepareRestart();
   }
@@ -191,7 +191,7 @@ export function executeGameTicks(deadline) {
     totalMultiplier *= speedMult;
 
     // limit to only how much time we have available
-    manaAvailable = Math.min(manaAvailable, globalThis.saving.timeNeeded - globalThis.saving.timer);
+    manaAvailable = Math.min(manaAvailable, vals.timeNeeded - vals.timer);
 
     // don't run more than 1 tick
     if (vals.shouldRestart) {
@@ -202,7 +202,7 @@ export function executeGameTicks(deadline) {
     // Even with fractionalMana, we need to set a minimum so that mana usages aren't lost to floating-point precision.
     const manaSpent = Mana.ceil(
       actions.tick(manaAvailable),
-      globalThis.saving.timer / 1e15,
+      vals.timer / 1e15,
     );
 
     // okay, so the current action has used manaSpent effective ticks. figure out how much of our realtime
@@ -211,7 +211,7 @@ export function executeGameTicks(deadline) {
     const timeSpent = baseManaSpent / driverVals.gameSpeed / driverVals.baseManaPerSecond;
 
     // update timers
-    globalThis.saving.timer += manaSpent; // number of effective mana ticks
+    vals.timer += manaSpent; // number of effective mana ticks
     driverVals.timeCounter += timeSpent; // realtime seconds
     driverVals.effectiveTime += timeSpent * driverVals.gameSpeed * bonusSpeed; // "seconds" modified only by gameSpeed and offline bonus
     baseManaToBurn -= baseManaSpent; // burn spent mana
@@ -224,7 +224,7 @@ export function executeGameTicks(deadline) {
 
     refreshDungeons(manaSpent);
 
-    if (vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded) {
+    if (vals.shouldRestart || vals.timer >= vals.timeNeeded) {
       cleanExit = true;
       loopEnd();
       prepareRestart();
@@ -299,7 +299,7 @@ export function pauseGame(ping, message) {
     `time_controls>${gameIsStopped ? 'play_button' : 'pause_button'}`,
   );
   if (
-    !gameIsStopped && (vals.shouldRestart || globalThis.saving.timer >= globalThis.saving.timeNeeded)
+    !gameIsStopped && (vals.shouldRestart || vals.timer >= vals.timeNeeded)
   ) {
     restart();
   } else if (ping) {
@@ -365,10 +365,10 @@ export function prepareRestart() {
 
 export function restart() {
   vals.shouldRestart = false;
-  globalThis.saving.timer = 0;
+  vals.timer = 0;
   driverVals.timeCounter = 0;
   driverVals.effectiveTime = 0;
-  globalThis.saving.timeNeeded = globalThis.saving.timeNeededInitial;
+  vals.timeNeeded = vals.timeNeededInitial;
   document.title = 'Idle Loops';
   vals.currentLoop = vals.totals.loops + 1; // don't let currentLoop get out of sync with totals.loops, that'd cause problems
   resetResources();
@@ -428,7 +428,7 @@ export function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
 // mana and resources
 
 export function addMana(amount) {
-  globalThis.saving.timeNeeded += amount;
+  vals.timeNeeded += amount;
 }
 
 export function addResource(resource, amount) {

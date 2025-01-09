@@ -134,7 +134,7 @@ export class Actions {
               view.requestUpdate('updateTotalTicks', null);
               curAction.loopsLeft = 0;
               curAction.ticks = 0;
-              curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
+              curAction.manaRemaining = vals.timeNeeded - vals.timer;
               curAction.goldRemaining = resources.gold;
               curAction.finish();
               vals.totals.actions++;
@@ -185,7 +185,7 @@ export class Actions {
       this.completedTicks += curAction.adjustedTicks;
       curAction.finish();
       vals.totals.actions++;
-      curAction.manaRemaining = globalThis.saving.timeNeeded - globalThis.saving.timer;
+      curAction.manaRemaining = vals.timeNeeded - vals.timer;
 
       if (curAction.cost) {
         curAction.cost();

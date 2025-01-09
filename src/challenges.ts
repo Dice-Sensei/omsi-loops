@@ -53,10 +53,10 @@ const setupNoodleArms = () => {
 const setupManaBurn = () => {
   restart = function () {
     vals.shouldRestart = false;
-    globalThis.saving.timer = 0;
+    vals.timer = 0;
     driverVals.timeCounter = 0;
     driverVals.effectiveTime = 0;
-    globalThis.saving.timeNeeded = 4320000 - vals.totals.effectiveTime * 50;
+    vals.timeNeeded = 4320000 - vals.totals.effectiveTime * 50;
     document.title = 'Idle Loops';
     resetResources();
     restartStats();

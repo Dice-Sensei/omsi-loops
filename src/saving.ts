@@ -128,6 +128,9 @@ export const vals = {
   curThievesGuildSegment: 0,
   curGodsSegment: 0,
   totalOfflineMs: 0,
+  timeNeededInitial,
+  timer: timeNeededInitial,
+  timeNeeded: timeNeededInitial,
 };
 
 export const selfIsGame = !(typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope);
@@ -1153,9 +1156,6 @@ const _saving = {
   needsDataSnapshots,
   startGame,
   setOption,
-  timeNeededInitial,
-  timer: timeNeededInitial,
-  timeNeeded: timeNeededInitial,
   vals,
   isBuffName,
 };

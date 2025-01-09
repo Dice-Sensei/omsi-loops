@@ -758,16 +758,14 @@ export class View {
   }
 
   updateTime() {
-    document.getElementById('timeBar').style.width = `${
-      100 - globalThis.saving.timer / globalThis.saving.timeNeeded * 100
-    }%`;
+    document.getElementById('timeBar').style.width = `${100 - vals.timer / vals.timeNeeded * 100}%`;
     document.getElementById('timer').textContent = `${
       intToString(
-        globalThis.saving.timeNeeded - globalThis.saving.timer,
+        vals.timeNeeded - vals.timer,
         vals.options.fractionalMana ? 2 : 1,
         true,
       )
-    } | ${formatTime((globalThis.saving.timeNeeded - globalThis.saving.timer) / 50 / getActualGameSpeed())}`;
+    } | ${formatTime((vals.timeNeeded - vals.timer) / 50 / getActualGameSpeed())}`;
     this.adjustGoldCost({ varName: 'Wells', cost: Action.ManaWell.goldCost() });
   }
   updateOffline() {
