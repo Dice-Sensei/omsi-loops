@@ -34,6 +34,7 @@ import { beep, clamp, copyArray, inputElement, Mana } from './helpers.ts';
 import { actions, actionStory, getNumOnList, markActionsComplete } from './actions.ts';
 import { resources, resourcesTemplate, towns } from './globals.ts';
 import { prestigeBonus, prestigeValues } from './prestige.ts';
+import { dragExitUndecorate, draggedDecorate } from './views/main.view.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
@@ -673,7 +674,7 @@ export function showActionIcons() {
 
 export function handleDragStart(event) {
   const index = event.target.getAttribute('data-action-id');
-  globalThis.view.draggedDecorate(index);
+  draggedDecorate(index);
   event.dataTransfer.setData('text/html', index);
   hideActionIcons();
 }
@@ -700,7 +701,7 @@ export function handleDragOver(event) {
 export function handleDragDrop(event) {
   const idOfDroppedOverElement = event.target.getAttribute('data-action-id');
   const indexOfDroppedOverElement = actions.findIndexOfActionWithId(idOfDroppedOverElement);
-  globalThis.view.dragExitUndecorate(idOfDroppedOverElement);
+  dragExitUndecorate(idOfDroppedOverElement);
   const initialId = event.dataTransfer.getData('text/html');
   if (initialId === '') {
     const actionData = JSON.parse(event.dataTransfer.getData('actionData'));

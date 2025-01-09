@@ -307,7 +307,6 @@ export function compressToBase64(item) {
 export function startGame() {
   // load calls recalcInterval, which will start the callbacks
   load();
-  globalThis.view.setScreenSize();
 }
 
 export function _town(townNum) {

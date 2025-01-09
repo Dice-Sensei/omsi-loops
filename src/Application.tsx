@@ -12,7 +12,7 @@ import {
 } from './driver.ts';
 import { vals } from './saving.ts';
 import { createKeyboardHotkeys } from './keyboard.hotkeys.ts';
-import { view } from './views/main.view.ts';
+import { adjustActionListSize, view } from './views/main.view.ts';
 
 const Header = () => (
   <header id='timeInfo' style='width: 100%; text-align: center'>
@@ -72,10 +72,10 @@ const Actions = () => {
           </div>
         </div>
         <div style='position: relative; left: 135px'>
-          <button class='button' style='z-index: 0' onclick='globalThis.view.adjustActionListSize(100)'>
+          <button class='button' style='z-index: 0' onClick={() => adjustActionListSize(100)}>
             <i class='fas fa-plus'></i>
           </button>
-          <button class='button' style='z-index: 0' onclick='globalThis.view.adjustActionListSize(-100)'>
+          <button class='button' style='z-index: 0' onClick={() => adjustActionListSize(-100)}>
             <i class='fas fa-minus'></i>
           </button>
         </div>

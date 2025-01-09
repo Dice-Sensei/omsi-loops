@@ -4,6 +4,7 @@ import { clamp, Mana } from './helpers.ts';
 import { hearts, resources, statList, stats, towns } from './globals.ts';
 import { driverVals, getSpeedMult, pauseGame } from './driver.ts';
 import { prestigeBonus } from './prestige.ts';
+import { setStoryFlag } from './views/main.view.ts';
 import { actions } from './actions.ts';
 
 export class Actions {
@@ -112,13 +113,13 @@ export class Actions {
               curAction.name === 'Dark Ritual' &&
               towns[curAction.townNum][curAction.varName] >= 4000000
             ) {
-              globalThis.view.setStoryFlag('darkRitualThirdSegmentReached');
+              setStoryFlag('darkRitualThirdSegmentReached');
             }
             if (
               curAction.name === 'Imbue Mind' &&
               towns[curAction.townNum][curAction.varName] >= 700000000
             ) {
-              globalThis.view.setStoryFlag('imbueMindThirdSegmentReached');
+              setStoryFlag('imbueMindThirdSegmentReached');
             }
             towns[curAction.townNum][curAction.varName] = 0;
             loopCounter = towns[curAction.townNum][`${curAction.varName}LoopCounter`] += curAction.segments;

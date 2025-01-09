@@ -1103,7 +1103,7 @@ export class View {
       Koviko.postUpdateHandler(actions.next, nextActionsDiv);
     }
     // scrolling down to see the new thing added is okay, scrolling up when you click an action button is not
-    nextActionsDiv.scrollTop = Math.max(nextActionsDiv.scrollTop, scrollTop); 
+    nextActionsDiv.scrollTop = Math.max(nextActionsDiv.scrollTop, scrollTop);
   }
 
   updateCurrentActionsDivs() {
@@ -2417,7 +2417,6 @@ export function adjustActionListSize(amt) {
     height = `${Math.min(Math.max(parseInt(height) + amt, 500), 2000)}px`;
   }
   document.documentElement.style.setProperty('--action-list-height', height);
-  setScreenSize();
   globalThis.saving.saveUISettings();
 }
 
@@ -2433,33 +2432,5 @@ export function updateBuffCaps() {
   }
 }
 
-export function setScreenSize() {
-  _view.screenSize = document.body.scrollHeight;
-}
-
-const _view = {
-  screenSize: undefined,
-  DarkRitualDescription,
-  formatTime,
-  setScreenSize,
-  updateBuffCaps,
-  adjustActionListSize,
-  unlockGlobalStory,
-  setStoryFlag,
-  unlockStory,
-  increaseStoryVarTo,
-  scrollToPanel,
-  addStatColors,
-  dragOverDecorate,
-  dragExitUndecorate,
-  draggedDecorate,
-  draggedUndecorate,
-  townInfos,
-  actionOptionsTown,
-  actionStoriesTown,
-  View,
-};
-
-globalThis.view = _view;
 
 export const view = new View();
