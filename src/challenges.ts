@@ -1,6 +1,6 @@
 import { getTeamStrength, getZombieStrength, restartStats } from './stats.ts';
 import { Action } from './actionList.ts';
-
+import { actions } from './actions.ts';
 import { towns } from './globals.ts';
 import { addMana, addResource, driverVals, resetResources } from './driver.ts';
 
@@ -62,7 +62,7 @@ const setupManaBurn = () => {
       towns[i].restart();
     }
     globalThis.saving.view.requestUpdate('updateSkills');
-    globalThis.saving.actions.restart();
+    actions.restart();
     globalThis.saving.view.requestUpdate('updateCurrentActionsDivs');
     globalThis.saving.view.requestUpdate('updateTrials', null);
   };

@@ -1153,7 +1153,6 @@ const _saving = {
   exitChallenge,
   resumeChallenge,
   trialFloors,
-  actions: actions,
   view,
   loadDefaults,
   needsDataSnapshots,

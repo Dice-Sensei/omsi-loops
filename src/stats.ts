@@ -2,6 +2,7 @@ import { Buff } from './stats.ts';
 import { Localizable } from './localizable.ts';
 import { actionLog, buffHardCaps, buffList, buffs, resources, skillList, skills, statList, stats } from './globals.ts';
 import { prestigeBonus } from './prestige.ts';
+import {  actions } from './actions.ts';
 import { getAdvGuildRank, getCraftGuildRank, getXMLName } from './actionList.ts';
 export class LevelExp {
   level = 0;
@@ -529,7 +530,7 @@ export function addSkillExp(name, amount) {
   skills[name].levelExp.addExp(amount);
   const newLevel = getSkillLevel(name);
   if (oldLevel !== newLevel) {
-    actionLog.addSkillLevel(globalThis.saving.actions.currentAction, name, newLevel, oldLevel);
+    actionLog.addSkillLevel(actions.currentAction, name, newLevel, oldLevel);
   }
   globalThis.saving.view.requestUpdate('updateSkill', name);
 }

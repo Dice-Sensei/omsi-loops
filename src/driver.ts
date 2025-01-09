@@ -85,7 +85,7 @@ export function singleTick() {
   driverVals.timeCounter += 1 / driverVals.baseManaPerSecond;
   driverVals.effectiveTime += 1 / driverVals.baseManaPerSecond;
 
-  globalThis.saving.actions.tick();
+  actions.tick();
 
   refreshDungeons(1);
 
@@ -199,7 +199,7 @@ export function executeGameTicks(deadline) {
     // a single action may not use a partial tick, so ceil() to be sure unless fractionalMana.
     // Even with fractionalMana, we need to set a minimum so that mana usages aren't lost to floating-point precision.
     const manaSpent = Mana.ceil(
-      globalThis.saving.actions.tick(manaAvailable),
+      actions.tick(manaAvailable),
       globalThis.saving.timer / 1e15,
     );
 

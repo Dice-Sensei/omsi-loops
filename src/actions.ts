@@ -4,6 +4,7 @@ import { clamp, Mana } from './helpers.ts';
 import { hearts, resources, statList, stats, towns } from './globals.ts';
 import { driverVals, getSpeedMult, pauseGame } from './driver.ts';
 import { prestigeBonus } from './prestige.ts';
+import { actions } from './actions.ts';
 
 export class Actions {
   current = [];
@@ -615,7 +616,7 @@ export function actionStory(loopCompletedActions) {
 
 export function getNumOnList(actionName) {
   let count = 0;
-  for (const action of globalThis.saving.actions.next) {
+  for (const action of actions.next) {
     if (!action.disabled && action.name === actionName) {
       count += action.loops;
     }
@@ -625,7 +626,7 @@ export function getNumOnList(actionName) {
 
 export function getNumOnCurList(actionName) {
   let count = 0;
-  for (const action of globalThis.saving.actions.current) {
+  for (const action of actions.current) {
     if (action.name === actionName) {
       count += action.loops;
     }

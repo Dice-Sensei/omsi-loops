@@ -148,13 +148,13 @@ export const createKeyboardHotkeys = () => {
       combination: '9',
     }, {
       onDown: {
-        fn: () => changeActionAmount(globalThis.saving.actions.addAmount * 10),
+        fn: () => changeActionAmount(actions.addAmount * 10),
         description: t('shortcuts.changeActionExponent10'),
       },
       combination: '0',
     }, {
       onDown: {
-        fn: () => changeActionAmount(Math.floor(globalThis.saving.actions.addAmount / 10)),
+        fn: () => changeActionAmount(Math.floor(actions.addAmount / 10)),
         description: t('shortcuts.changeActionExponent01'),
       },
       combination: 'backspace',
