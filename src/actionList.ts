@@ -21,6 +21,7 @@ import {
   completedCurrentGame,
   prestigeValues,
 } from './prestige.ts';
+import { vals } from './saving.ts';
 import { Data } from './data.ts';
 import { Localizable } from './localizable.ts';
 import { Localization } from './Localization.ts';
@@ -49,8 +50,8 @@ import {
   unlockTown,
 } from './driver.ts';
 import { vals } from './saving.ts';
-import { setStoryFlag, unlockGlobalStory, increaseStoryVarTo } from './views/main.view.ts';
- 
+import { increaseStoryVarTo, setStoryFlag, unlockGlobalStory } from './views/main.view.ts';
+
 export class ClassNameNotFoundError extends TypeError {}
 
 /**
@@ -3941,7 +3942,7 @@ Action.HeroesTrial = new TrialAction('Heroes Trial', 0, {
     return 100000;
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
+    return this.currentFloor() < vals.trialFloors[this.trialNum];
   },
   baseProgress() {
     return getTeamCombat();
@@ -6436,7 +6437,7 @@ Action.DeadTrial = new TrialAction('Dead Trial', 4, {
     addResource('zombie', 1);
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
+    return this.currentFloor() < vals.trialFloors[this.trialNum];
   },
   visible() {
     return towns[this.townNum].getLevel('Survey') >= 100;
@@ -7804,7 +7805,7 @@ Action.SecretTrial = new TrialAction('Secret Trial', 3, {
     return 100000;
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum];
+    return this.currentFloor() < vals.trialFloors[this.trialNum];
   },
   baseProgress() {
     return getTeamCombat();
@@ -8064,7 +8065,7 @@ Action.GodsTrial = new TrialAction('Gods Trial', 1, {
     return 50000;
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum] && resources.power < 7;
+    return this.currentFloor() < vals.trialFloors[this.trialNum] && resources.power < 7;
   },
   baseProgress() {
     return getTeamCombat();
@@ -8081,7 +8082,7 @@ Action.GodsTrial = new TrialAction('Gods Trial', 1, {
     if (this.currentFloor() >= 80) setStoryFlag('trailGods80Done');
     if (this.currentFloor() >= 90) setStoryFlag('trailGods90Done');
 
-    if (this.currentFloor() === globalThis.saving.trialFloors[this.trialNum]) { //warning: the predictor assumes the old behavior, but this is clearly the intended
+    if (this.currentFloor() === vals.trialFloors[this.trialNum]) { //warning: the predictor assumes the old behavior, but this is clearly the intended
       setStoryFlag('trailGodsAllDone');
       addResource('power', 1);
     }
@@ -8164,7 +8165,7 @@ Action.ChallengeGods = new TrialAction('Challenge Gods', 2, {
     return 50000;
   },
   canStart() {
-    return this.currentFloor() < globalThis.saving.trialFloors[this.trialNum] &&
+    return this.currentFloor() < vals.trialFloors[this.trialNum] &&
       resources.power > 0 &&
       resources.power < 8;
   },
