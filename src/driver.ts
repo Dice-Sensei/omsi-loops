@@ -29,7 +29,7 @@ import {
 import { clearPauseNotification, needsDataSnapshots, save, setOption, showPauseNotification, vals } from './saving.ts';
 import { Data } from './data.ts';
 import { KeyboardKey } from './keyboard.hotkeys.ts';
-import { Localization } from './Localization.ts';
+import { Localization } from './localization.ts';
 import { beep, clamp, copyArray, inputElement, Mana } from './helpers.ts';
 import { actions, actionStory, getNumOnList, markActionsComplete } from './actions.ts';
 import { resources, resourcesTemplate, towns } from './globals.ts';

@@ -30,12 +30,12 @@ import {
   townNames,
   translateClassNames,
 } from '../actionList.ts';
-import { vals, isBuffName, saveUISettings } from '../saving.ts';
+import { isBuffName, saveUISettings, vals } from '../saving.ts';
 
 import $ from 'jquery';
 import * as d3 from 'd3';
 import { StatGraph } from '../stats-graph.ts';
-import { Localization } from '../Localization.ts';
+import { Localization } from '../localization.ts';
 import { KeyboardKey } from '../keyboard.hotkeys.ts';
 import { getPrestigeCost, getPrestigeCurrentBonus, prestigeValues } from '../prestige.ts';
 import {

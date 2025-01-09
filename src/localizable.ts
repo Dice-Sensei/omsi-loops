@@ -1,4 +1,4 @@
-import { Localization } from './Localization.ts';
+import { Localization } from './localization.ts';
 
 export class Localizable {
   #txtsObj;

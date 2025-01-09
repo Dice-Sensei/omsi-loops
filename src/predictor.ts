@@ -12,7 +12,7 @@ import {
 } from './stats.ts';
 import $ from 'jquery';
 import { Data } from './data.ts';
-import { Localization } from './Localization.ts';
+import { Localization } from './localization.ts';
 import { prestigeBonus, prestigeValues } from './prestige.ts';
 import {
   capitalizeFirst,

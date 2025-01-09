@@ -1,6 +1,6 @@
 import { Buff } from '../stats.ts';
 import $ from 'jquery';
-import { Localization } from '../Localization.ts';
+import { Localization } from '../localization.ts';
 import { camelize, htmlElement } from '../helpers.ts';
 import { buffHardCaps, buffList, statList } from '../globals.ts';
 import { prestigeUpgrade, resetAllPrestiges } from '../prestige.ts';

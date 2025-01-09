@@ -24,7 +24,7 @@ import {
 import { vals } from './saving.ts';
 import { Data } from './data.ts';
 import { Localizable } from './localizable.ts';
-import { Localization } from './Localization.ts';
+import { Localization } from './localization.ts';
 import { camelize, fibonacci, numberToWords, precision3 } from './helpers.ts';
 import { getNumOnList } from './actions.ts';
 import {
