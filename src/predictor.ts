@@ -1149,9 +1149,9 @@ export const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in globalThis.saving.trials[a.trialNum]
+              return floor in globalThis.saving.vals.trials[a.trialNum]
                 ? h.getTeamCombat(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.vals.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1608,9 +1608,9 @@ export const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in globalThis.saving.trials[a.trialNum]
+              return floor in globalThis.saving.vals.trials[a.trialNum]
                 ? h.getZombieStrength(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.vals.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: { loop: (r) => (r.zombie++) },
@@ -1793,9 +1793,9 @@ export const Koviko = {
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
               if (!p.progress) p.teamCombat = h.getTeamCombat(r, k);
-              return floor in globalThis.saving.trials[a.trialNum]
+              return floor in globalThis.saving.vals.trials[a.trialNum]
                 ? p.teamCombat * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.vals.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {},
@@ -1840,9 +1840,9 @@ export const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in globalThis.saving.trials[a.trialNum]
+              return floor in globalThis.saving.vals.trials[a.trialNum]
                 ? h.getTeamCombat(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.vals.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {
@@ -1873,9 +1873,9 @@ export const Koviko = {
               ),
             tick: (p, a, s, k, r) => (offset) => {
               const floor = Math.floor(p.completed / a.segments + .0000001);
-              return floor in globalThis.saving.trials[a.trialNum]
+              return floor in globalThis.saving.vals.trials[a.trialNum]
                 ? h.getSelfCombat(r, k) * h.getStatProgress(p, a, s, offset) *
-                  Math.sqrt(1 + globalThis.saving.trials[a.trialNum][floor].completed / 200)
+                  Math.sqrt(1 + globalThis.saving.vals.trials[a.trialNum][floor].completed / 200)
                 : 0;
             },
             effect: {

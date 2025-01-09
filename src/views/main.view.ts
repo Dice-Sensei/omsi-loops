@@ -2075,7 +2075,7 @@ export class View {
   }
 
   updateTrials() {
-    for (let i = 0; i < globalThis.saving.trials.length; i++) {
+    for (let i = 0; i < globalThis.saving.vals.trials.length; i++) {
       this.updateTrialInfo({ trialNum: i, curFloor: 0 });
     }
   }
@@ -2083,7 +2083,7 @@ export class View {
   updateTrialInfo(updateInfo) {
     const curFloor = updateInfo.curFloor;
     const trialNum = updateInfo.trialNum;
-    const trial = globalThis.saving.trials[trialNum];
+    const trial = globalThis.saving.vals.trials[trialNum];
     document.getElementById(`trial${trialNum}HighestFloor`).textContent = String(trial.highestFloor + 1);
     if (curFloor >= trial.length) {
       document.getElementById(`trial${trialNum}CurFloor`).textContent = '';

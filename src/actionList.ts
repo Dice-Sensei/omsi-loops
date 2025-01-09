@@ -540,7 +540,7 @@ class TrialAction extends MultipartAction {
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
     const floor = Math.floor((loopCounter + 0.0001) / this.segments + 1);
     return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
-      floor <= globalThis.saving.trials[this.trialNum].length
+      floor <= globalThis.saving.vals.trials[this.trialNum].length
         ? numberToWords(floor)
         : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
     }`;
@@ -558,17 +558,17 @@ class TrialAction extends MultipartAction {
 
   tickProgress(offset, loopCounter) {
     return this.baseProgress() *
-      Math.sqrt(1 + globalThis.saving.trials[this.trialNum][this.currentFloor(loopCounter)].completed / 200);
+      Math.sqrt(1 + globalThis.saving.vals.trials[this.trialNum][this.currentFloor(loopCounter)].completed / 200);
   }
   loopsFinished(loopCounter) {
     const finishedFloor = this.currentFloor(loopCounter) - 1;
     //console.log("Finished floor: " + finishedFloor + " Current Floor: " + this.currentFloor());
-    globalThis.saving.trials[this.trialNum][finishedFloor].completed++;
+    globalThis.saving.vals.trials[this.trialNum][finishedFloor].completed++;
     if (
-      finishedFloor > globalThis.saving.trials[this.trialNum].highestFloor ||
-      globalThis.saving.trials[this.trialNum].highestFloor === undefined
+      finishedFloor > globalThis.saving.vals.trials[this.trialNum].highestFloor ||
+      globalThis.saving.vals.trials[this.trialNum].highestFloor === undefined
     ) {
-      globalThis.saving.trials[this.trialNum].highestFloor = finishedFloor;
+      globalThis.saving.vals.trials[this.trialNum].highestFloor = finishedFloor;
     }
     globalThis.saving.view.requestUpdate('updateTrialInfo', {
       trialNum: this.trialNum,

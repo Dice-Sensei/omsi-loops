@@ -212,7 +212,7 @@ const optionValueHandlers = {
         input.indeterminate = false;
       }
     } else if (!value) {
-      globalThis.saving.vals.options.notifyOnPause = false;
+      vals.options.notifyOnPause = false;
       input.checked = false;
       input.indeterminate = false;
     }
@@ -243,7 +243,7 @@ const optionValueHandlers = {
     }
   },
   repeatLastAction() {
-    if (globalThis.saving.vals.options.predictor) {
+    if (vals.options.predictor) {
       view.requestUpdate('updateNextActions');
     }
   },
@@ -335,10 +335,10 @@ export function isBuffName(name) {
 }
 
 export function initializeActions() {
-  globalThis.saving.vals.totalActionList.length = 0;
+  vals.totalActionList.length = 0;
   for (const prop in Action) {
     const action = Action[prop];
-    globalThis.saving.vals.totalActionList.push(action);
+    vals.totalActionList.push(action);
   }
 }
 
@@ -389,22 +389,22 @@ export function handleOption(option, value, init, getInput) {
   optionValueHandlers[option]?.(value, init, getInput);
   // The handler can change the value of the option. Recheck when setting or clearing the indicator class.
   if (option in optionIndicatorClasses) {
-    document.documentElement.classList.toggle(optionIndicatorClasses[option], !!globalThis.saving.vals.options[option]);
+    document.documentElement.classList.toggle(optionIndicatorClasses[option], !!vals.options[option]);
   }
 }
 
 export function setOption(option, value, updateUI = false) {
-  const oldValue = globalThis.saving.vals.options[option];
-  globalThis.saving.vals.options[option] = value;
+  const oldValue = vals.options[option];
+  vals.options[option] = value;
   handleOption(option, value, false, () => valueElement(`${option}Input`));
-  if (globalThis.saving.vals.options[option] !== oldValue) {
+  if (vals.options[option] !== oldValue) {
     save();
   }
   if (
     updateUI &&
-    (globalThis.saving.vals.options[option] !== oldValue || globalThis.saving.vals.options[option] !== value)
+    (vals.options[option] !== oldValue || vals.options[option] !== value)
   ) {
-    loadOption(option, globalThis.saving.vals.options[option], false);
+    loadOption(option, vals.options[option], false);
   }
 }
 
@@ -470,18 +470,18 @@ export function saveUISettings() {
 }
 
 export function needsDataSnapshots() {
-  return globalThis.saving.vals.options.predictor && globalThis.saving.vals.options.predictorBackgroundThread;
+  return vals.options.predictor && vals.options.predictorBackgroundThread;
 }
 
 export function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
   loadDefaults();
   loadUISettings();
 
-  globalThis.saving.vals.loadouts = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
-  globalThis.saving.vals.loadoutnames = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+  vals.loadouts = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
+  vals.loadoutnames = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
   // loadoutnames[-1] is what displays in the loadout renaming box when no loadout is selected
   // It isn't technically part of the array, just a property on it, so it doesn't count towards loadoutnames.length
-  globalThis.saving.vals.loadoutnames[-1] = '';
+  vals.loadoutnames[-1] = '';
 
   let toLoad = {};
   // has a save file
@@ -493,24 +493,24 @@ export function load(inChallenge, saveJson = globalThis.localStorage[saveName]) 
 
   if (toLoad.challengeSave !== undefined) {
     for (let challengeProgress in toLoad.challengeSave) {
-      globalThis.saving.vals.challengeSave[challengeProgress] = toLoad.challengeSave[challengeProgress];
+      vals.challengeSave[challengeProgress] = toLoad.challengeSave[challengeProgress];
     }
   }
-  if (inChallenge !== undefined) globalThis.saving.vals.challengeSave.inChallenge = inChallenge;
+  if (inChallenge !== undefined) vals.challengeSave.inChallenge = inChallenge;
 
   console.log(
-    'Challenge Mode: ' + globalThis.saving.vals.challengeSave.challengeMode + ' In Challenge: ' +
-      globalThis.saving.vals.challengeSave.inChallenge,
+    'Challenge Mode: ' + vals.challengeSave.challengeMode + ' In Challenge: ' +
+      vals.challengeSave.inChallenge,
   );
 
-  if (saveName === defaultSaveName && globalThis.saving.vals.challengeSave.inChallenge === true) {
+  if (saveName === defaultSaveName && vals.challengeSave.inChallenge === true) {
     console.log('Switching to challenge save');
     saveName = challengeSaveName;
     load(true);
     return;
   }
 
-  if (globalThis.saving.vals.challengeSave.challengeMode !== 0) {
+  if (vals.challengeSave.challengeMode !== 0) {
     saveName = challengeSaveName;
   }
 
@@ -602,29 +602,29 @@ export function doLoad(toLoad) {
         temptotalTalent += toLoad.stats[property].talent * 100;
       }
     }
-    globalThis.saving.vals.totalTalent = temptotalTalent;
+    vals.totalTalent = temptotalTalent;
   } else {
-    globalThis.saving.vals.totalTalent = toLoad.totalTalent;
+    vals.totalTalent = toLoad.totalTalent;
   }
 
   if (toLoad.maxTown) {
-    globalThis.saving.vals.townsUnlocked = [0];
+    vals.townsUnlocked = [0];
     for (let i = 1; i <= toLoad.maxTown; i++) {
-      globalThis.saving.vals.townsUnlocked.push(i);
+      vals.townsUnlocked.push(i);
     }
   } else {
-    globalThis.saving.vals.townsUnlocked = toLoad.townsUnlocked === undefined ? [0] : toLoad.townsUnlocked;
+    vals.townsUnlocked = toLoad.townsUnlocked === undefined ? [0] : toLoad.townsUnlocked;
   }
-  globalThis.saving.vals.completedActions = [];
+  vals.completedActions = [];
   if (toLoad.completedActions && toLoad.completedActions.length > 0) {
     toLoad.completedActions.forEach((action) => {
-      globalThis.saving.vals.completedActions.push(action);
+      vals.completedActions.push(action);
     });
   }
-  globalThis.saving.vals.completedActions.push('FoundGlasses');
-  globalThis.saving.vals.trainingLimits = 10 + getBuffLevel('Imbuement');
-  globalThis.saving.vals.goldInvested = toLoad.goldInvested === undefined ? 0 : toLoad.goldInvested;
-  globalThis.saving.vals.stonesUsed = toLoad.stonesUsed === undefined ? { 1: 0, 3: 0, 5: 0, 6: 0 } : toLoad.stonesUsed;
+  vals.completedActions.push('FoundGlasses');
+  vals.trainingLimits = 10 + getBuffLevel('Imbuement');
+  vals.goldInvested = toLoad.goldInvested === undefined ? 0 : toLoad.goldInvested;
+  vals.stonesUsed = toLoad.stonesUsed === undefined ? { 1: 0, 3: 0, 5: 0, 6: 0 } : toLoad.stonesUsed;
 
   actions.clearActions();
   if (toLoad.nextList) {
@@ -647,14 +647,14 @@ export function doLoad(toLoad) {
       if (action.name === 'Purchase Mana') {
         action.name = 'Buy Mana Z3';
       }
-      if (globalThis.saving.vals.totalActionList.some((x) => x.name === action.name)) {
+      if (vals.totalActionList.some((x) => x.name === action.name)) {
         actions.addActionRecord(action, -1, false);
       }
     }
   }
 
   if (toLoad.loadouts) {
-    for (let i = 0; i < globalThis.saving.vals.loadouts.length; i++) {
+    for (let i = 0; i < vals.loadouts.length; i++) {
       if (!toLoad.loadouts[i]) {
         continue;
       }
@@ -675,99 +675,87 @@ export function doLoad(toLoad) {
         if (action.name === 'Purchase Mana') {
           action.name = 'Buy Mana Z3';
         }
-        if (globalThis.saving.vals.totalActionList.some((x) => x.name === action.name)) {
-          globalThis.saving.vals.loadouts[i].push(action);
+        if (vals.totalActionList.some((x) => x.name === action.name)) {
+          vals.loadouts[i].push(action);
         }
       }
     }
   }
-  for (let i = 0; i < globalThis.saving.vals.loadoutnames.length; i++) {
-    globalThis.saving.vals.loadoutnames[i] = 'Loadout ' + (i + 1);
+  for (let i = 0; i < vals.loadoutnames.length; i++) {
+    vals.loadoutnames[i] = 'Loadout ' + (i + 1);
   }
   if (toLoad.loadoutnames) {
-    for (let i = 0; i < globalThis.saving.vals.loadoutnames.length; i++) {
+    for (let i = 0; i < vals.loadoutnames.length; i++) {
       if (toLoad.loadoutnames[i] != undefined && toLoad.loadoutnames != '') {
-        globalThis.saving.vals.loadoutnames[i] = toLoad.loadoutnames[i];
+        vals.loadoutnames[i] = toLoad.loadoutnames[i];
       } else {
-        globalThis.saving.vals.loadoutnames[i] = 'Loadout ' + (i + 1);
+        vals.loadoutnames[i] = 'Loadout ' + (i + 1);
       }
     }
   }
-  globalThis.saving.vals.curLoadout = toLoad.curLoadout;
-  const elem = typeof document === 'undefined'
-    ? undefined
-    : document.getElementById(`load${globalThis.saving.vals.curLoadout}`);
+  vals.curLoadout = toLoad.curLoadout;
+  const elem = typeof document === 'undefined' ? undefined : document.getElementById(`load${vals.curLoadout}`);
   if (elem) {
     removeClassFromDiv(
-      document.getElementById(`load${globalThis.saving.vals.curLoadout}`),
+      document.getElementById(`load${vals.curLoadout}`),
       'unused',
     );
   }
 
-  globalThis.saving.vals.dungeons = [[], [], []];
+  vals.dungeons = [[], [], []];
   const level = { ssChance: 1, completed: 0 };
   let floors = 0;
-  if (toLoad.dungeons === undefined) toLoad.dungeons = copyArray(globalThis.saving.vals.dungeons);
-  for (let i = 0; i < globalThis.saving.vals.dungeons.length; i++) {
+  if (toLoad.dungeons === undefined) toLoad.dungeons = copyArray(vals.dungeons);
+  for (let i = 0; i < vals.dungeons.length; i++) {
     floors = dungeonFloors[i];
     for (let j = 0; j < floors; j++) {
       if (toLoad.dungeons[i] != undefined && toLoad.dungeons && toLoad.dungeons[i][j]) {
-        globalThis.saving.vals.dungeons[i][j] = toLoad.dungeons[i][j];
+        vals.dungeons[i][j] = toLoad.dungeons[i][j];
       } else {
-        globalThis.saving.vals.dungeons[i][j] = copyArray(level);
+        vals.dungeons[i][j] = copyArray(level);
       }
-      globalThis.saving.vals.dungeons[i][j].lastStat = 'NA';
+      vals.dungeons[i][j].lastStat = 'NA';
     }
   }
 
-  globalThis.saving.vals.trials = [[], [], [], [], []];
+  vals.trials = [[], [], [], [], []];
   const trialLevel = { completed: 0 };
-  if (toLoad.trials === undefined) toLoad.trials = copyArray(globalThis.saving.vals.trials);
-  for (let i = 0; i < globalThis.saving.trials.length; i++) {
+  if (toLoad.trials === undefined) toLoad.trials = copyArray(vals.trials);
+  for (let i = 0; i < vals.trials.length; i++) {
     floors = trialFloors[i];
-    globalThis.saving.vals.trials[i].highestFloor = 0;
+    vals.trials[i].highestFloor = 0;
     for (let j = 0; j < floors; j++) {
       if (toLoad.trials[i] != undefined && toLoad.trials && toLoad.trials[i][j]) {
-        globalThis.saving.vals.trials[i][j] = toLoad.trials[i][j];
-        if (trials[i][j].completed > 0) trials[i].highestFloor = j;
+        vals.trials[i][j] = toLoad.trials[i][j];
+        if (vals.trials[i][j].completed > 0) vals.trials[i].highestFloor = j;
       } else {
-        trials[i][j] = copyArray(trialLevel);
+        vals.trials[i][j] = copyArray(trialLevel);
       }
     }
   }
 
   if (toLoad.options === undefined) {
-    globalThis.saving.vals.options.theme = toLoad.currentTheme === undefined
-      ? globalThis.saving.vals.options.theme
-      : toLoad.currentTheme;
-    globalThis.saving.vals.options.repeatLastAction = toLoad.repeatLast;
-    globalThis.saving.vals.options.pingOnPause = toLoad.pingOnPause === undefined
-      ? globalThis.saving.vals.options.pingOnPause
-      : toLoad.pingOnPause;
-    globalThis.saving.vals.options.notifyOnPause = toLoad.notifyOnPause === undefined
-      ? globalThis.saving.vals.options.notifyOnPause
-      : toLoad.notifyOnPause;
-    globalThis.saving.vals.options.autoMaxTraining = toLoad.autoMaxTraining === undefined
-      ? globalThis.saving.vals.options.autoMaxTraining
+    vals.options.theme = toLoad.currentTheme === undefined ? vals.options.theme : toLoad.currentTheme;
+    vals.options.repeatLastAction = toLoad.repeatLast;
+    vals.options.pingOnPause = toLoad.pingOnPause === undefined ? vals.options.pingOnPause : toLoad.pingOnPause;
+    vals.options.notifyOnPause = toLoad.notifyOnPause === undefined ? vals.options.notifyOnPause : toLoad.notifyOnPause;
+    vals.options.autoMaxTraining = toLoad.autoMaxTraining === undefined
+      ? vals.options.autoMaxTraining
       : toLoad.autoMaxTraining;
-    globalThis.saving.vals.options.highlightNew = toLoad.highlightNew === undefined
-      ? globalThis.saving.vals.options.highlightNew
-      : toLoad.highlightNew;
-    globalThis.saving.vals.options.hotkeys = toLoad.hotkeys === undefined
-      ? globalThis.saving.vals.options.hotkeys
-      : toLoad.hotkeys;
-    globalThis.saving.vals.options.updateRate = toLoad.updateRate === undefined
-      ? globalThis.saving.vals.options.updateRate
+    vals.options.highlightNew = toLoad.highlightNew === undefined ? vals.options.highlightNew : toLoad.highlightNew;
+    vals.options.hotkeys = toLoad.hotkeys === undefined ? vals.options.hotkeys : toLoad.hotkeys;
+    vals.options.updateRate = toLoad.updateRate === undefined
+      ? vals.options.updateRate
       : globalThis.localStorage['updateRate'] ?? toLoad.updateRate;
   } else {
     const optionsToLoad = { ...toLoad.options, ...toLoad.extraOptions };
     for (const option in optionsToLoad) {
-      if (option in globalThis.saving.vals.options) {
-        globalThis.saving.vals.options[option] = optionsToLoad[option];
+      if (option in vals.options) {
+        vals.options[option] = optionsToLoad[option];
       }
     }
     if ('updateRate' in optionsToLoad && globalThis.localStorage['updateRate']) {
-      globalThis.saving.vals.options.updateRate = globalThis.localStorage['updateRate'];
+      vals.options.updateRate = globalThis.localStorage['updateRate'];
     }
   }
 
@@ -826,35 +814,33 @@ export function doLoad(toLoad) {
     }
   }
 
-  globalThis.saving.vals.totalOfflineMs = toLoad.totalOfflineMs === undefined ? 0 : toLoad.totalOfflineMs; // must load before options
+  vals.totalOfflineMs = toLoad.totalOfflineMs === undefined ? 0 : toLoad.totalOfflineMs; // must load before options
 
-  for (const option of Object.keys(globalThis.saving.vals.options)) {
-    loadOption(option, globalThis.saving.vals.options[option]);
+  for (const option of Object.keys(vals.options)) {
+    loadOption(option, vals.options[option]);
   }
-  globalThis.saving.vals.storyShowing = toLoad.storyShowing === undefined ? 0 : toLoad.storyShowing;
-  globalThis.saving.vals.storyMax = toLoad.storyMax === undefined ? 0 : toLoad.storyMax;
+  vals.storyShowing = toLoad.storyShowing === undefined ? 0 : toLoad.storyShowing;
+  vals.storyMax = toLoad.storyMax === undefined ? 0 : toLoad.storyMax;
   if (
     toLoad.unreadActionStories === undefined ||
     toLoad.unreadActionStories.find((s) => !s.includes('storyContainer'))
   ) {
-    globalThis.saving.vals.unreadActionStories = [];
+    vals.unreadActionStories = [];
   } else {
-    globalThis.saving.vals.unreadActionStories = toLoad.unreadActionStories;
-    for (const name of globalThis.saving.vals.unreadActionStories) {
+    vals.unreadActionStories = toLoad.unreadActionStories;
+    for (const name of vals.unreadActionStories) {
       showNotification(name);
     }
   }
 
   if (toLoad.totals != undefined) {
-    globalThis.saving.vals.totals.time = toLoad.totals.time === undefined ? 0 : toLoad.totals.time;
-    globalThis.saving.vals.totals.effectiveTime = toLoad.totals.effectiveTime === undefined
-      ? 0
-      : toLoad.totals.effectiveTime;
-    globalThis.saving.vals.totals.borrowedTime = toLoad.totals.borrowedTime ?? 0;
-    globalThis.saving.vals.totals.loops = toLoad.totals.loops === undefined ? 0 : toLoad.totals.loops;
-    globalThis.saving.vals.totals.actions = toLoad.totals.actions === undefined ? 0 : toLoad.totals.actions;
-  } else globalThis.saving.vals.totals = { time: 0, effectiveTime: 0, borrowedTime: 0, loops: 0, actions: 0 };
-  globalThis.saving.vals.currentLoop = globalThis.saving.vals.totals.loops;
+    vals.totals.time = toLoad.totals.time === undefined ? 0 : toLoad.totals.time;
+    vals.totals.effectiveTime = toLoad.totals.effectiveTime === undefined ? 0 : toLoad.totals.effectiveTime;
+    vals.totals.borrowedTime = toLoad.totals.borrowedTime ?? 0;
+    vals.totals.loops = toLoad.totals.loops === undefined ? 0 : toLoad.totals.loops;
+    vals.totals.actions = toLoad.totals.actions === undefined ? 0 : toLoad.totals.actions;
+  } else vals.totals = { time: 0, effectiveTime: 0, borrowedTime: 0, loops: 0, actions: 0 };
+  vals.currentLoop = vals.totals.loops;
   view.updateTotals();
   console.log('Updating prestige values from load');
   view.updatePrestigeValues();
@@ -864,25 +850,25 @@ export function doLoad(toLoad) {
 
   if (toLoad.version75 === undefined) {
     const total = towns[0].totalSDungeon;
-    globalThis.saving.vals.dungeons[0][0].completed = Math.floor(total / 2);
-    globalThis.saving.vals.dungeons[0][1].completed = Math.floor(total / 4);
-    globalThis.saving.vals.dungeons[0][2].completed = Math.floor(total / 8);
-    globalThis.saving.vals.dungeons[0][3].completed = Math.floor(total / 16);
-    globalThis.saving.vals.dungeons[0][4].completed = Math.floor(total / 32);
-    globalThis.saving.vals.dungeons[0][5].completed = Math.floor(total / 64);
-    towns[0].totalSDungeon = globalThis.saving.vals.dungeons[0][0].completed +
-      globalThis.saving.vals.dungeons[0][1].completed + globalThis.saving.vals.dungeons[0][2].completed +
-      globalThis.saving.vals.dungeons[0][3].completed + globalThis.saving.vals.dungeons[0][4].completed +
-      globalThis.saving.vals.dungeons[0][5].completed;
+    vals.dungeons[0][0].completed = Math.floor(total / 2);
+    vals.dungeons[0][1].completed = Math.floor(total / 4);
+    vals.dungeons[0][2].completed = Math.floor(total / 8);
+    vals.dungeons[0][3].completed = Math.floor(total / 16);
+    vals.dungeons[0][4].completed = Math.floor(total / 32);
+    vals.dungeons[0][5].completed = Math.floor(total / 64);
+    towns[0].totalSDungeon = vals.dungeons[0][0].completed +
+      vals.dungeons[0][1].completed + vals.dungeons[0][2].completed +
+      vals.dungeons[0][3].completed + vals.dungeons[0][4].completed +
+      vals.dungeons[0][5].completed;
   }
 
   //Handle players on previous challenge system
   if (toLoad.challenge !== undefined && toLoad.challenge !== 0) {
-    globalThis.saving.vals.challengeSave.challengeMode = 0;
-    globalThis.saving.vals.challengeSave.inChallenge = true;
+    vals.challengeSave.challengeMode = 0;
+    vals.challengeSave.inChallenge = true;
     save();
 
-    globalThis.saving.vals.challengeSave.challengeMode = toLoad.challenge;
+    vals.challengeSave.challengeMode = toLoad.challenge;
     saveName = challengeSaveName;
     save();
     location.reload();
@@ -900,25 +886,25 @@ export function doLoad(toLoad) {
   view.updateMultiPartActions();
   view.updateStories(true);
   view.update();
-  recalcInterval(globalThis.saving.vals.options.updateRate);
+  recalcInterval(vals.options.updateRate);
   pauseGame();
 }
 
 export function doSave() {
   const toSave = {};
-  toSave.curLoadout = globalThis.saving.vals.curLoadout;
-  toSave.dungeons = globalThis.saving.vals.dungeons;
-  toSave.trials = globalThis.saving.vals.trials;
-  toSave.townsUnlocked = globalThis.saving.vals.townsUnlocked;
-  toSave.completedActions = globalThis.saving.vals.completedActions;
+  toSave.curLoadout = vals.curLoadout;
+  toSave.dungeons = vals.dungeons;
+  toSave.trials = vals.trials;
+  toSave.townsUnlocked = vals.townsUnlocked;
+  toSave.completedActions = vals.completedActions;
 
   toSave.stats = stats;
-  toSave.totalTalent = globalThis.saving.vals.totalTalent;
+  toSave.totalTalent = vals.totalTalent;
   toSave.skills = skills;
   toSave.buffs = buffs;
   toSave.prestigeValues = prestigeValues;
-  toSave.goldInvested = globalThis.saving.vals.goldInvested;
-  toSave.stonesUsed = globalThis.saving.vals.stonesUsed;
+  toSave.goldInvested = vals.goldInvested;
+  toSave.stonesUsed = vals.stonesUsed;
   toSave.version75 = true;
 
   const hiddenVars = [];
@@ -944,32 +930,32 @@ export function doSave() {
   }
   toSave.hiddenVars = hiddenVars;
   toSave.nextList = actions.next;
-  toSave.loadouts = globalThis.saving.vals.loadouts;
-  toSave.loadoutnames = globalThis.saving.vals.loadoutnames;
+  toSave.loadouts = vals.loadouts;
+  toSave.loadoutnames = vals.loadoutnames;
   toSave.options = {};
   toSave.extraOptions = {}; // to avoid crashing when exporting to lloyd, etc
-  for (const option in globalThis.saving.vals.options) {
+  for (const option in vals.options) {
     if (isStandardOption[option]) {
-      toSave.options[option] = globalThis.saving.vals.options[option];
+      toSave.options[option] = vals.options[option];
     } else {
-      toSave.extraOptions[option] = globalThis.saving.vals.options[option];
+      toSave.extraOptions[option] = vals.options[option];
     }
   }
-  toSave.storyShowing = globalThis.saving.vals.storyShowing;
-  toSave.storyMax = globalThis.saving.vals.storyMax;
+  toSave.storyShowing = vals.storyShowing;
+  toSave.storyMax = vals.storyMax;
   toSave.storyReqs = storyFlags; // save uses the legacy name "storyReqs" for compatibility
-  toSave.storyVars = globalThis.saving.vals.storyVars;
-  toSave.unreadActionStories = globalThis.saving.vals.unreadActionStories;
+  toSave.storyVars = vals.storyVars;
+  toSave.unreadActionStories = vals.unreadActionStories;
   toSave.actionLog = actionLog;
   toSave.buffCaps = buffCaps;
 
   toSave.date = new Date();
-  toSave.totalOfflineMs = globalThis.saving.vals.totalOfflineMs;
-  toSave.totals = globalThis.saving.vals.totals;
+  toSave.totalOfflineMs = vals.totalOfflineMs;
+  toSave.totals = vals.totals;
 
-  toSave.challengeSave = globalThis.saving.vals.challengeSave;
-  for (const challengeProgress in globalThis.saving.vals.challengeSave) {
-    toSave.challengeSave[challengeProgress] = globalThis.saving.vals.challengeSave[challengeProgress];
+  toSave.challengeSave = vals.challengeSave;
+  for (const challengeProgress in vals.challengeSave) {
+    toSave.challengeSave[challengeProgress] = vals.challengeSave[challengeProgress];
   }
 
   return toSave;
@@ -979,7 +965,7 @@ export function save() {
   const toSave = doSave();
   const saveJson = JSON.stringify(toSave);
   storeSaveJson(saveJson);
-  globalThis.localStorage['updateRate'] = globalThis.saving.vals.options.updateRate;
+  globalThis.localStorage['updateRate'] = vals.options.updateRate;
   return saveJson;
 }
 
@@ -1001,7 +987,7 @@ export function importSave() {
 export function processSave(saveData) {
   if (saveData === '') {
     if (confirm('Importing nothing will delete your save. Are you sure you want to delete your save?')) {
-      globalThis.saving.vals.challengeSave = {};
+      vals.challengeSave = {};
       clearSave();
     } else {
       return;
@@ -1041,7 +1027,7 @@ export function storeSaveJson(saveJson) {
 export function saveFileName() {
   const gameName = document.title.replace('*PAUSED* ', '');
   const version = document.querySelector('#changelog > li[data-verNum]').firstChild.textContent.trim();
-  return `${gameName} ${version} - Loop ${globalThis.saving.vals.totals.loops}.txt`;
+  return `${gameName} ${version} - Loop ${vals.totals.loops}.txt`;
 }
 
 export function exportSaveFile() {
@@ -1116,22 +1102,22 @@ export function beginChallenge(challengeNum) {
       return false;
     }
   }
-  if (globalThis.saving.vals.challengeSave.challengeMode === 0) {
-    globalThis.saving.vals.challengeSave.inChallenge = true;
+  if (vals.challengeSave.challengeMode === 0) {
+    vals.challengeSave.inChallenge = true;
     save();
     console.log('Saving to: ' + saveName);
   }
-  globalThis.saving.vals.challengeSave.challengeMode = challengeNum;
+  vals.challengeSave.challengeMode = challengeNum;
   saveName = challengeSaveName;
   load(true);
-  globalThis.saving.vals.totalOfflineMs = 1000000;
+  vals.totalOfflineMs = 1000000;
   save();
   pauseGame();
   restart();
 }
 
 export function exitChallenge() {
-  if (globalThis.saving.vals.challengeSave.challengeMode !== 0) {
+  if (vals.challengeSave.challengeMode !== 0) {
     saveName = defaultSaveName;
     load(false);
     save();
@@ -1141,10 +1127,10 @@ export function exitChallenge() {
 
 export function resumeChallenge() {
   if (
-    globalThis.saving.vals.challengeSave.challengeMode === 0 && globalThis.localStorage[challengeSaveName] &&
+    vals.challengeSave.challengeMode === 0 && globalThis.localStorage[challengeSaveName] &&
     globalThis.localStorage[challengeSaveName] !== ''
   ) {
-    globalThis.saving.vals.challengeSave.inChallenge = true;
+    vals.challengeSave.inChallenge = true;
     save();
     saveName = challengeSaveName;
     load(true);
@@ -1166,7 +1152,6 @@ const _saving = {
   beginChallenge,
   exitChallenge,
   resumeChallenge,
-  trials,
   trialFloors,
   actions: actions,
   view,
