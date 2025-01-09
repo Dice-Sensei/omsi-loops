@@ -4,7 +4,7 @@ import { clamp, Mana } from './helpers.ts';
 import { hearts, resources, statList, stats, towns } from './globals.ts';
 import { driverVals, getSpeedMult, pauseGame } from './driver.ts';
 import { prestigeBonus } from './prestige.ts';
-import { setStoryFlag } from './views/main.view.ts';
+import { setStoryFlag, view } from './views/main.view.ts';
 import { actions } from './actions.ts';
 import { vals } from './saving.ts';
 
