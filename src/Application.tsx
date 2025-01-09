@@ -10,6 +10,7 @@ import {
   selectLoadout,
   setCustomActionAmount,
 } from './driver.ts';
+import { vals } from './saving.ts';
 import { createKeyboardHotkeys } from './keyboard.hotkeys.ts';
 import { view } from './views/main.view.ts';
 
@@ -356,7 +357,7 @@ const Towns = () => (
           style='float: left; margin-left: 150px'
           class='actionIcon fa fa-arrow-left'
           id='townViewLeft'
-          onclick='globalThis.saving.view.showTown(globalThis.saving.vals.townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.saving.vals.townshowing)-1])'
+          onClick={() => view.showTown(vals.townsUnlocked[vals.townsUnlocked.indexOf(vals.townshowing) - 1])}
         >
         </div>
         <div class='showthat'>
@@ -369,10 +370,10 @@ const Towns = () => (
           style='float: right; margin-right: 150px'
           class='actionIcon fa fa-arrow-right'
           id='townViewRight'
-          onclick='globalThis.saving.view.showTown(globalThis.saving.vals.townsUnlocked[globalThis.saving.vals.townsUnlocked.indexOf(globalThis.saving.vals.townshowing)+1])'
+          onClick={() => view.showTown(vals.townsUnlocked[vals.townsUnlocked.indexOf(vals.townshowing) + 1])}
         >
         </div>
-        <div id='hideVarsButton' class='far fa-eye' onclick='globalThis.saving.view.toggleHiding()'></div>
+        <div id='hideVarsButton' class='far fa-eye' onClick={() => view.toggleHiding()}></div>
       </div>
       <br></br>
       <div id='townInfos'>
@@ -392,7 +393,7 @@ const Towns = () => (
           style='float: left; margin-left: 150px'
           class='actionIcon fa fa-arrow-left'
           id='actionsViewLeft'
-          onclick='globalThis.saving.view.showActions(false)'
+          onClick={() => view.showActions(false)}
         >
         </div>
         <span class='large bold' id='actionsTitle'></span>
@@ -401,7 +402,7 @@ const Towns = () => (
           style='float: right; margin-right: 150px'
           class='actionIcon fa fa-arrow-right'
           id='actionsViewRight'
-          onclick='globalThis.saving.view.showActions(true)'
+          onClick={() => view.showActions(true)}
         >
         </div>
       </div>
@@ -460,12 +461,12 @@ const Stats = () => (
           type='radio'
           id='regularStats'
           name='statView'
-          onclick='globalThis.saving.view.changeStatView()'
+          onClick={() => view.changeStatView()}
           checked
         >
         </input>
         <label for='regularStats' class='localized' data-locale='stats>view>regular'></label>
-        <input type='radio' id='radarStats' name='statView' onclick='globalThis.saving.view.changeStatView()'>
+        <input type='radio' id='radarStats' name='statView' onClick={() => view.changeStatView()}>
         </input>
         <label for='radarStats' class='localized' data-locale='stats>view>radar'></label>
       </div>
@@ -543,8 +544,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillCombatContainer'
-          onmouseover="globalThis.saving.view.showSkill('Combat')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Combat')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>combat>label'></div>
           <div class='statNum medium'>
@@ -568,8 +569,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillMagicContainer'
-          onmouseover="globalThis.saving.view.showSkill('Magic')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Magic')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>magic>label'></div>
           <div class='statNum medium'>
@@ -593,8 +594,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillPracticalContainer'
-          onmouseover="globalThis.saving.view.showSkill('Practical')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Practical')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>practical>label'></div>
           <div class='statNum medium'>
@@ -619,8 +620,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillAlchemyContainer'
-          onmouseover="globalThis.saving.view.showSkill('Alchemy')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Alchemy')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>alchemy>label'>Alchemy</div>
           <div class='statNum medium'>
@@ -646,8 +647,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillDarkContainer'
-          onmouseover="globalThis.saving.view.showSkill('Dark')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Dark')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>dark>label'></div>
           <div class='statNum medium'>
@@ -672,8 +673,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillCraftingContainer'
-          onmouseover="globalThis.saving.view.showSkill('Crafting')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Crafting')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>crafting>label'></div>
           <div class='statNum medium'>
@@ -697,8 +698,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillChronomancyContainer'
-          onmouseover="globalThis.saving.view.showSkill('Chronomancy')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Chronomancy')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>chronomancy>label'></div>
           <div class='statNum medium'>
@@ -723,8 +724,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillPyromancyContainer'
-          onmouseover="globalThis.saving.view.showSkill('Pyromancy')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Pyromancy')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>pyromancy>label'></div>
           <div class='statNum medium'>
@@ -749,8 +750,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillRestorationContainer'
-          onmouseover="globalThis.saving.view.showSkill('Restoration')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Restoration')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>restoration>label'></div>
           <div class='statNum medium'>
@@ -775,8 +776,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillSpatiomancyContainer'
-          onmouseover="globalThis.saving.view.showSkill('Spatiomancy')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Spatiomancy')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>spatiomancy>label'></div>
           <div class='statNum medium'>
@@ -801,8 +802,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillMercantilismContainer'
-          onmouseover="globalThis.saving.view.showSkill('Mercantilism')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Mercantilism')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>mercantilism>label'></div>
           <div class='statNum medium'>
@@ -827,8 +828,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillDivineContainer'
-          onmouseover="globalThis.saving.view.showSkill('Divine')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Divine')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>divine>label'></div>
           <div class='statNum medium'>
@@ -853,8 +854,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillCommuneContainer'
-          onmouseover="globalThis.saving.view.showSkill('Commune')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Commune')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>commune>label'></div>
           <div class='statNum medium'>
@@ -879,8 +880,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillGluttonyContainer'
-          onmouseover="globalThis.saving.view.showSkill('Gluttony')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Gluttony')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>gluttony>label'></div>
           <div class='statNum medium'>
@@ -905,8 +906,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillWunderkindContainer'
-          onmouseover="globalThis.saving.view.showSkill('Wunderkind')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Wunderkind')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>wunderkind>label'></div>
           <div class='statNum medium'>
@@ -931,8 +932,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillThieveryContainer'
-          onmouseover="globalThis.saving.view.showSkill('Thievery')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Thievery')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>thievery>label'></div>
           <div class='statNum medium'>
@@ -957,8 +958,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillLeadershipContainer'
-          onmouseover="globalThis.saving.view.showSkill('Leadership')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Leadership')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>leadership>label'></div>
           <div class='statNum medium'>
@@ -983,8 +984,8 @@ const Stats = () => (
         <div
           class='skillContainer showthat'
           id='skillAssassinContainer'
-          onmouseover="globalThis.saving.view.showSkill('Assassin')"
-          onmouseout='globalThis.saving.view.showSkill(undefined)'
+          onMouseOver={() => view.showSkill('Assassin')}
+          onMouseOut={() => view.showSkill(undefined)}
         >
           <div class='skillLabel medium bold localized' data-locale='skills>assassin>label'></div>
           <div class='statNum medium'>
