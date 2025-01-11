@@ -1,4 +1,3 @@
-import { htmlElement } from './helpers.ts';
 import { view } from './views/main.view.ts';
 import {
   beginChallenge,
@@ -44,7 +43,7 @@ const onEnableMenu = (event) => {
   const input = event.target as HTMLInputElement;
 
   const menu = input.dataset.menu;
-  htmlElement('menusMenu').classList.toggle(`disabled-${menu}`, !input.checked);
+  document.getElementById('menusMenu')?.classList.toggle(`disabled-${menu}`, !input.checked);
 
   const disabledMenus = getDisabledMenus();
 

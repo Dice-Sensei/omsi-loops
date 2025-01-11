@@ -38,17 +38,7 @@ import { StatGraph } from '../stats-graph.ts';
 import { Localization } from '../localization.ts';
 import { KeyboardKey } from '../keyboard.hotkeys.ts';
 import { getPrestigeCost, getPrestigeCurrentBonus, prestigeValues } from '../prestige.ts';
-import {
-  addClassToDiv,
-  camelize,
-  formatNumber,
-  htmlElement,
-  inputElement,
-  intToString,
-  intToStringRound,
-  removeClassFromDiv,
-  toSuffix,
-} from '../helpers.ts';
+import { camelize, formatNumber, intToString, intToStringRound, toSuffix } from '../helpers.ts';
 import { getNumOnList } from '../actions.ts';
 import { actions } from '../actions.ts';
 import {
@@ -251,7 +241,7 @@ export class View {
   }
 
   modifierkeychangeHandler() {
-    htmlElement('clearList').textContent = KeyboardKey.shift
+    document.getElementById('clearList').textContent = KeyboardKey.shift
       ? Localization.txt('actions>tooltip>clear_disabled')
       : Localization.txt('actions>tooltip>clear_list');
   }
@@ -269,7 +259,7 @@ export class View {
     if (this.statGraph.initalized) return;
 
     this.statGraph.init(document.getElementById('statsContainer'));
-    const totalContainer = htmlElement('totalStatContainer');
+    const totalContainer = document.getElementById('totalStatContainer');
     for (const stat of statList) {
       const axisTip = this.statGraph.getAxisTip(stat);
       totalContainer.insertAdjacentHTML(
@@ -581,11 +571,11 @@ export class View {
    * @param {string} [levelPrc]
    */
   updateLevelLogBar(maxContainerId, logBarId, level, levelBarId, levelPrc) {
-    const maxContainer = htmlElement(maxContainerId);
+    const maxContainer = document.getElementById(maxContainerId);
     const logLevel = level; //Math.log10(level);
     let maxValue = parseFloat(getComputedStyle(maxContainer).getPropertyValue('--max-bar-value')) || 0;
 
-    const logBar = htmlElement(logBarId);
+    const logBar = document.getElementById(logBarId);
     if (level > maxValue) {
       maxValue = this.getMaxLogBarScale(level + 1);
       maxContainer.style.setProperty('--max-bar-value', String(maxValue));
@@ -608,7 +598,7 @@ export class View {
       }
     }
     maxValue = this.getMaxLogBarScale(maxValue);
-    const statsContainer = htmlElement('statsContainer');
+    const statsContainer = document.getElementById('statsContainer');
     if (skipAnimation) {
       statsContainer.classList.remove('animate-logBars');
       this.statGraph.update(true);
@@ -850,7 +840,7 @@ export class View {
     document.getElementById('effectiveTime').textContent = `${formatTime(driverVals.effectiveTime)}`;
   }
   updateResource(resource) {
-    const element = htmlElement(`${resource}Div`, false, false);
+    const element = document.getElementById(`${resource}Div`, false, false);
     if (element) element.style.display = resources[resource] ? 'inline-block' : 'none';
 
     if (resource === 'supplies') {
@@ -861,7 +851,7 @@ export class View {
     }
 
     if (Number.isFinite(resources[resource])) {
-      htmlElement(resource).textContent = resources[resource];
+      document.getElementById(resource).textContent = resources[resource];
     }
   }
   updateResources() {
@@ -1295,8 +1285,8 @@ export class View {
       element.id = `actionLogEntry${index}`;
       element.style.order = index;
 
-      const nextEntry = htmlElement(`actionLogEntry${index + 1}`, false, false);
-      log.insertBefore(element, nextEntry ?? htmlElement('actionLogLatest'));
+      const nextEntry = document.getElementById(`actionLogEntry${index + 1}`);
+      log.insertBefore(element, nextEntry ?? document.getElementById('actionLogLatest'));
     }
     if ((actionLog.firstNewOrUpdatedEntry ?? Infinity) <= index) {
       element.classList.add('highlight');
@@ -1370,43 +1360,40 @@ export class View {
       const infoDiv = document.getElementById(`infoContainer${action.varName}`);
       const storyDiv = document.getElementById(`storyContainer${action.varName}`);
       if (action.allowed && getNumOnList(action.name) >= action.allowed()) {
-        addClassToDiv(actionDiv, 'capped');
+        actionDiv.classList.add('capped');
       } else if (action.unlocked()) {
         if (infoDiv) {
-          removeClassFromDiv(infoDiv, 'hidden');
+          infoDiv.classList.remove('hidden');
           if (action.varName.startsWith('Survey')) {
-            removeClassFromDiv(
-              document.getElementById(`infoContainer${action.varName}Global`),
-              'hidden',
-            );
+            document.getElementById(`infoContainer${action.varName}Global`).classList.remove('hidden');
           }
         }
-        removeClassFromDiv(actionDiv, 'locked');
-        removeClassFromDiv(actionDiv, 'capped');
+        actionDiv.classList.remove('locked');
+        actionDiv.classList.remove('capped');
       } else {
-        addClassToDiv(actionDiv, 'locked');
+        actionDiv.classList.add('locked');
         if (infoDiv) {
-          addClassToDiv(infoDiv, 'hidden');
+          infoDiv.classList.add('hidden');
           if (action.varName.startsWith('Survey')) {
-            addClassToDiv(document.getElementById(`infoContainer${action.varName}Global`), 'hidden');
+            document.getElementById(`infoContainer${action.varName}Global`).classList.add('hidden');
           }
         }
       }
       if (action.unlocked() && infoDiv) {
-        removeClassFromDiv(infoDiv, 'hidden');
+        infoDiv.classList.remove('hidden');
       }
       if (action.visible()) {
-        removeClassFromDiv(actionDiv, 'hidden');
-        if (storyDiv !== null) removeClassFromDiv(storyDiv, 'hidden');
+        actionDiv.classList.remove('hidden');
+        if (storyDiv !== null) storyDiv.classList.remove('hidden');
       } else {
-        addClassToDiv(actionDiv, 'hidden');
-        if (storyDiv !== null) addClassToDiv(storyDiv, 'hidden');
+        actionDiv.classList.add('hidden');
+        if (storyDiv !== null) storyDiv.classList.add('hidden');
       }
       if (storyDiv !== null) {
         if (action.unlocked()) {
-          removeClassFromDiv(storyDiv, 'hidden');
+          storyDiv.classList.remove('hidden');
         } else {
-          addClassToDiv(storyDiv, 'hidden');
+          storyDiv.classList.add('hidden');
         }
       }
     }
@@ -1514,10 +1501,10 @@ export class View {
     townInfos[townNum].style.display = '';
     $('#TownSelect').val(townNum);
 
-    htmlElement('shortTownColumn').classList.remove(
+    document.getElementById('shortTownColumn').classList.remove(
       `zone-${vals.townshowing + 1}`,
     );
-    htmlElement('shortTownColumn').classList.add(`zone-${townNum + 1}`);
+    document.getElementById('shortTownColumn').classList.add(`zone-${townNum + 1}`);
     document.getElementById('townDesc').textContent = Localization.txt(`towns>town${townNum}>desc`);
     vals.townshowing = townNum;
   }
@@ -1552,10 +1539,10 @@ export class View {
     const isHidden = towns[vals.townshowing].hiddenVars.has(varName);
     if ((isHidden && force !== true) || force === false) {
       towns[vals.townshowing].hiddenVars.delete(varName);
-      htmlElement(`infoContainer${varName}`).classList.remove('user-hidden');
+      document.getElementById(`infoContainer${varName}`).classList.remove('user-hidden');
     } else if (!isHidden || force === true) {
       towns[vals.townshowing].hiddenVars.add(varName);
-      htmlElement(`infoContainer${varName}`).classList.add('user-hidden');
+      document.getElementById(`infoContainer${varName}`).classList.add('user-hidden');
     }
   }
 
@@ -1563,13 +1550,13 @@ export class View {
     const varName = updateInfo.name;
     const index = updateInfo.index;
     const town = towns[index];
-    htmlElement(`total${varName}`).textContent = String(town[`total${varName}`]);
-    htmlElement(`checked${varName}`).textContent = String(town[`checked${varName}`]);
-    htmlElement(`unchecked${varName}`).textContent = String(
+    document.getElementById(`total${varName}`).textContent = String(town[`total${varName}`]);
+    document.getElementById(`checked${varName}`).textContent = String(town[`checked${varName}`]);
+    document.getElementById(`unchecked${varName}`).textContent = String(
       town[`total${varName}`] - town[`checked${varName}`],
     );
-    htmlElement(`goodTemp${varName}`).textContent = String(town[`goodTemp${varName}`]);
-    htmlElement(`good${varName}`).textContent = String(town[`good${varName}`]);
+    document.getElementById(`goodTemp${varName}`).textContent = String(town[`goodTemp${varName}`]);
+    document.getElementById(`good${varName}`).textContent = String(town[`good${varName}`]);
   }
 
   updateAddAmount(amount) {
@@ -1582,12 +1569,12 @@ export class View {
     for (let i = 0; i < 16; i++) {
       const elem = document.getElementById(`load${i}`);
       if (elem) {
-        addClassToDiv(elem, 'unused');
+        elem.classList.add('unused');
       }
     }
     const elem = document.getElementById(`load${num}`);
     if (elem) {
-      removeClassFromDiv(document.getElementById(`load${num}`), 'unused');
+      elem.classList.remove('unused');
     }
   }
 
@@ -1595,7 +1582,7 @@ export class View {
     for (let i = 0; i < vals.loadoutnames.length; i++) {
       document.getElementById(`load${i + 1}`).textContent = vals.loadoutnames[i];
     }
-    inputElement('renameLoadout').value = vals.loadoutnames[vals.curLoadout - 1];
+    document.getElementById('renameLoadout').value = vals.loadoutnames[vals.curLoadout - 1];
   }
 
   createTownActions() {
@@ -2100,7 +2087,7 @@ export class View {
     for (const stat of statList) {
       if (stats[stat].soulstone) {
         total += stats[stat].soulstone;
-        htmlElement(`stat${stat}SoulstoneLogBar`).parentElement.style.display = '';
+        document.getElementById(`stat${stat}SoulstoneLogBar`).parentElement.style.display = '';
         this.updateLevelLogBar(
           'statsContainer',
           `stat${stat}SoulstoneLogBar`,
@@ -2118,7 +2105,7 @@ export class View {
           1,
         );
       } else {
-        htmlElement(`stat${stat}SoulstoneLogBar`).parentElement.style.display = 'none';
+        document.getElementById(`stat${stat}SoulstoneLogBar`).parentElement.style.display = 'none';
         document.getElementById(`ss${stat}Container`).style.display = 'none';
         document.getElementById(`stat${stat}ss`).textContent = '';
       }
@@ -2199,7 +2186,7 @@ export class View {
 
   changeStatView() {
     const statsWindow = document.getElementById('statsWindow');
-    if (inputElement('regularStats').checked) {
+    if (document.getElementById('regularStats').checked) {
       statsWindow.dataset.view = 'regular';
     } else {
       statsWindow.dataset.view = 'radar';
@@ -2403,13 +2390,13 @@ export function draggedUndecorate(i) {
 
 export function updateBuffCaps() {
   for (const buff of buffList) {
-    inputElement(`buff${buff}Cap`).value = String(
+    document.getElementById(`buff${buff}Cap`).value = String(
       Math.min(
-        parseInt(inputElement(`buff${buff}Cap`).value),
+        parseInt(document.getElementById(`buff${buff}Cap`).value),
         buffHardCaps[buff],
       ),
     );
-    buffCaps[buff] = parseInt(inputElement(`buff${buff}Cap`).value);
+    buffCaps[buff] = parseInt(document.getElementById(`buff${buff}Cap`).value);
   }
 }
 

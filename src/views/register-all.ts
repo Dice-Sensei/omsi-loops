@@ -1,4 +1,3 @@
-import { htmlElement } from '../helpers.ts';
 import { buffList, statList } from '../globals.ts';
 import { prestigeUpgrade, resetAllPrestiges } from '../prestige.ts';
 import { borrowTime, manualRestart, pauseGame, returnTime, toggleOffline } from '../driver.ts';
@@ -18,7 +17,7 @@ const getDisabledMenus = () => {
 
 globalThis.onEnableMenu = (input) => {
   const menu = input.dataset.menu;
-  htmlElement('menusMenu').classList.toggle(`disabled-${menu}`, !input.checked);
+  document.getElementById('menusMenu').classList.toggle(`disabled-${menu}`, !input.checked);
 
   const disabledMenus = getDisabledMenus();
 

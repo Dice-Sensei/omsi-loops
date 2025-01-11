@@ -14,18 +14,7 @@ import $ from 'jquery';
 import { Data } from './data.ts';
 import { Localization } from './localization.ts';
 import { prestigeBonus, prestigeValues } from './prestige.ts';
-import {
-  capitalizeFirst,
-  delay,
-  fibonacci,
-  formatNumber,
-  htmlElement,
-  inputElement,
-  intToString,
-  nextIdle,
-  precision3,
-  selectElement,
-} from './helpers.ts';
+import { capitalizeFirst, delay, fibonacci, formatNumber, intToString, nextIdle, precision3 } from './helpers.ts';
 import { calcSoulstoneMult, getNumOnCurList, getNumOnList } from './actions.ts';
 import { buffs, skillList, skills, statList, stats, towns } from './globals.ts';
 import { getSpeedMult } from './driver.ts';
@@ -406,8 +395,8 @@ export const Koviko = {
         console.error(`Unrecoverable error in background predictor worker; disabling background predictor`, data);
         this.terminateWorker();
         this.#workerDisabled = true;
-        inputElement('predictorBackgroundThreadInput').indeterminate = true;
-        inputElement('predictorBackgroundThreadInput').disabled = true;
+        document.getElementById('predictorBackgroundThreadInput').indeterminate = true;
+        document.getElementById('predictorBackgroundThreadInput').disabled = true;
         return;
       } else if (data.type === 'getSnapshots') {
         const { snapshotIds } = data;
@@ -484,8 +473,8 @@ export const Koviko = {
        * Element that displays the total amount of mana used in the action list
        * @type {HTMLElement}
        */
-      this.totalDisplay = htmlElement('predictorTotalDisplay');
-      this.statisticDisplay = htmlElement('predictorStatisticDisplay');
+      this.totalDisplay = document.getElementById('predictorTotalDisplay');
+      this.statisticDisplay = document.getElementById('predictorStatisticDisplay');
 
       Koviko.trackedStats = [
         { type: 'R', name: 'soul', display_name: 'SS Equi %' },
@@ -546,7 +535,7 @@ export const Koviko = {
           statistic.hidden = false;
         }
       }
-      selectElement('predictorTrackedStatInput').value = vals.options.predictorTrackedStat;
+      document.getElementById('predictorTrackedStatInput').value = vals.options.predictorTrackedStat;
     }
 
     /**

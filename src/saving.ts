@@ -1,7 +1,7 @@
 import { view } from './views/main.view.ts';
 import { Town } from './town.ts';
 import { Data } from './data.ts';
-import { copyArray, inputElement, removeClassFromDiv, textAreaElement, valueElement } from './helpers.ts';
+import { copyArray } from './helpers.ts';
 import { prestigeValues } from './prestige.ts';
 import { getBuffLevel, initializeBuffs, initializeSkills, initializeStats } from './stats.ts';
 import {
@@ -396,7 +396,7 @@ export function handleOption(option, value, init, getInput) {
 export function setOption(option, value, updateUI = false) {
   const oldValue = vals.options[option];
   vals.options[option] = value;
-  handleOption(option, value, false, () => valueElement(`${option}Input`));
+  handleOption(option, value, false, () => document.getElementById(`${option}Input`));
   if (vals.options[option] !== oldValue) {
     save();
   }
@@ -409,7 +409,7 @@ export function setOption(option, value, updateUI = false) {
 }
 
 export function loadOption(option, value, callHandler = true) {
-  const input = valueElement(`${option}Input`, false); // this is allowed to have errors
+  const input = document.getElementById(`${option}Input`, false); // this is allowed to have errors
   if (!input) return;
   if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = !!value;
   else if (option === 'speedIncreaseBackground' && (typeof value !== 'number' || isNaN(value) || value < 0)) {
@@ -540,7 +540,7 @@ export function doLoad(toLoad) {
     for (const property in buffCaps) {
       if (toLoad.buffCaps.hasOwnProperty(property)) {
         buffCaps[property] = toLoad.buffCaps[property];
-        inputElement(`buff${property}Cap`).value = buffCaps[property];
+        document.getElementById(`buff${property}Cap`).value = buffCaps[property];
       }
     }
   }
@@ -692,10 +692,7 @@ export function doLoad(toLoad) {
   vals.curLoadout = toLoad.curLoadout;
   const elem = typeof document === 'undefined' ? undefined : document.getElementById(`load${vals.curLoadout}`);
   if (elem) {
-    removeClassFromDiv(
-      document.getElementById(`load${vals.curLoadout}`),
-      'unused',
-    );
+    document.getElementById(`load${vals.curLoadout}`).classList.remove('unused');
   }
 
   vals.dungeons = [[], [], []];
@@ -803,7 +800,7 @@ export function doLoad(toLoad) {
       if (action.type === 'limited') {
         const varName = action.varName;
         if (toLoad[`searchToggler${varName}`] !== undefined) {
-          inputElement(`searchToggler${varName}`).checked = toLoad[`searchToggler${varName}`];
+          document.getElementById(`searchToggler${varName}`).checked = toLoad[`searchToggler${varName}`];
         }
         view.updateRegular({ name: action.varName, index: town.index });
       }
@@ -919,7 +916,7 @@ export function doSave() {
         toSave[`good${varName}`] = town[`good${varName}`];
         toSave[`goodTemp${varName}`] = town[`good${varName}`];
         if (document.getElementById(`searchToggler${varName}`)) {
-          toSave[`searchToggler${varName}`] = inputElement(`searchToggler${varName}`).checked;
+          toSave[`searchToggler${varName}`] = document.getElementById(`searchToggler${varName}`).checked;
         }
       }
     }
@@ -968,15 +965,15 @@ export function save() {
 export function exportSave() {
   const saveJson = save();
   // idle loops save version 01. patch v0.94, moved from old save system to lzstring base 64
-  inputElement('exportImport').value = `ILSV01${compressToBase64(saveJson)}`;
-  inputElement('exportImport').select();
+  document.getElementById('exportImport').value = `ILSV01${compressToBase64(saveJson)}`;
+  document.getElementById('exportImport').select();
   if (!document.execCommand('copy')) {
     alert('Copying the save to the clipboard failed! You will need to copy the highlighted value yourself.');
   }
 }
 
 export function importSave() {
-  const saveData = inputElement('exportImport').value;
+  const saveData = document.getElementById('exportImport').value;
   processSave(saveData);
 }
 
@@ -1059,13 +1056,13 @@ export function exportCurrentList() {
     toReturn += `${action.loops}x ${action.name}`;
     toReturn += '\n';
   }
-  textAreaElement('exportImportList').value = toReturn.slice(0, -1);
-  textAreaElement('exportImportList').select();
+  document.getElementById('exportImportList').value = toReturn.slice(0, -1);
+  document.getElementById('exportImportList').select();
   document.execCommand('copy');
 }
 
 export function importCurrentList() {
-  const toImport = textAreaElement('exportImportList').value.split('\n');
+  const toImport = document.getElementById('exportImportList').value.split('\n');
   actions.clearActions();
   for (let i = 0; i < toImport.length; i++) {
     if (!toImport[i]) {

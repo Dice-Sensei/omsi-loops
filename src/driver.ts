@@ -30,7 +30,7 @@ import { clearPauseNotification, needsDataSnapshots, save, setOption, showPauseN
 import { Data } from './data.ts';
 import { KeyboardKey } from './keyboard.hotkeys.ts';
 import { Localization } from './localization.ts';
-import { beep, clamp, copyArray, inputElement, Mana } from './helpers.ts';
+import { beep, clamp, copyArray, Mana } from './helpers.ts';
 import { actions, actionStory, getNumOnList, markActionsComplete } from './actions.ts';
 import { resources, resourcesTemplate, towns } from './globals.ts';
 import { prestigeBonus, prestigeValues } from './prestige.ts';
@@ -117,7 +117,7 @@ export function animationTick(animationTime) {
 export function tick() {
   const newTime = Date.now();
   gameTicksLeft += newTime - curTime;
-  if (inputElement('radarStats').checked) radarUpdateTime += newTime - curTime;
+  if (document.getElementById('radarStats')?.checked) radarUpdateTime += newTime - curTime;
   const delta = newTime - curTime;
   curTime = newTime;
 
@@ -459,7 +459,7 @@ export function changeActionAmount(amount) {
   amount = Math.max(amount, 1);
   amount = Math.min(amount, 1e12);
   actions.addAmount = amount;
-  const customInput = inputElement('amountCustom');
+  const customInput = document.getElementById('amountCustom');
   if (document.activeElement !== customInput) {
     customInput.value = amount;
   }
@@ -477,7 +477,7 @@ export function selectLoadout(num) {
   } else {
     vals.curLoadout = num;
   }
-  inputElement('renameLoadout').value = vals.loadoutnames[vals.curLoadout - 1];
+  document.getElementById('renameLoadout').value = vals.loadoutnames[vals.curLoadout - 1];
   view.updateLoadout(vals.curLoadout);
 }
 
@@ -496,12 +496,12 @@ export function saveList() {
   nameList(false);
   vals.loadouts[vals.curLoadout] = copyArray(actions.next);
   save();
-  if ((inputElement('renameLoadout').value !== 'Saved!')) {
-    globalCustomInput = inputElement('renameLoadout').value;
+  if ((document.getElementById('renameLoadout').value !== 'Saved!')) {
+    globalCustomInput = document.getElementById('renameLoadout').value;
   }
-  inputElement('renameLoadout').value = 'Saved!';
+  document.getElementById('renameLoadout').value = 'Saved!';
   setTimeout(() => {
-    inputElement('renameLoadout').value = globalCustomInput;
+    document.getElementById('renameLoadout').value = globalCustomInput;
   }, 1000);
 }
 
@@ -510,14 +510,14 @@ export function nameList(saveGame) {
   // and the user tries to save under a numeric name, the loadout will
   // be saved under an old name
   // if both the old AND the new names are numeric, then we insist on a non-numeric name
-  if (isNaN(parseFloat(inputElement('renameLoadout').value))) {
-    if (inputElement('renameLoadout').value.length > 30) {
-      inputElement('renameLoadout').value = '30 Letter Max';
-    } else if (inputElement('renameLoadout').value !== 'Saved!') {
-      vals.loadoutnames[vals.curLoadout - 1] = inputElement('renameLoadout').value;
+  if (isNaN(parseFloat(document.getElementById('renameLoadout').value))) {
+    if (document.getElementById('renameLoadout').value.length > 30) {
+      document.getElementById('renameLoadout').value = '30 Letter Max';
+    } else if (document.getElementById('renameLoadout').value !== 'Saved!') {
+      vals.loadoutnames[vals.curLoadout - 1] = document.getElementById('renameLoadout').value;
     }
   } else if (!isNaN(parseFloat(vals.loadoutnames[vals.curLoadout - 1]))) {
-    inputElement('renameLoadout').value = 'Enter a name!';
+    document.getElementById('renameLoadout').value = 'Enter a name!';
   }
   document.getElementById(`load${vals.curLoadout}`).textContent = vals.loadoutnames[vals.curLoadout - 1];
   if (saveGame) save();
@@ -527,7 +527,7 @@ export function loadList() {
   if (vals.curLoadout === 0) {
     return;
   }
-  inputElement('amountCustom').value = actions.addAmount.toString();
+  document.getElementById('amountCustom').value = actions.addAmount.toString();
   actions.clearActions();
   if (vals.loadouts[vals.curLoadout]) {
     actions.appendActionRecords(vals.loadouts[vals.curLoadout]);
