@@ -15,7 +15,7 @@ export namespace Keyboard {
     Listeners.add(descriptor.type, descriptor.handler);
   };
 
-  type KeyboardEventFn = (event: KeyboardEvent) => Promise<void> | void;
+  type KeyboardEventFn = (event: KeyboardEvent) => Promise<any> | any;
   type KeyFn = { fn: KeyboardEventFn; description: string };
   type AddOptions = {
     onDown?: KeyFn;
@@ -45,7 +45,7 @@ export namespace Keyboard {
             if (useControl && !event.ctrlKey) return;
             if (useAlt && !event.altKey) return;
             if (useMeta && !event.metaKey) return;
-            if (useKey && key !== event.key) return;
+            if (useKey && key !== event.key.toLowerCase()) return;
 
             await onDown.fn(event);
           },

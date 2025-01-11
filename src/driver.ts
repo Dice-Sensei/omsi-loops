@@ -35,6 +35,7 @@ import { actions, actionStory, getNumOnList, markActionsComplete } from './actio
 import { resources, resourcesTemplate, towns } from './globals.ts';
 import { prestigeBonus, prestigeValues } from './prestige.ts';
 import { dragExitUndecorate, draggedDecorate } from './views/main.view.ts';
+import { setActionAmount } from './values.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
@@ -455,22 +456,6 @@ export function resetResources() {
   view.requestUpdate('updateResources', null);
 }
 
-export function changeActionAmount(amount) {
-  amount = Math.max(amount, 1);
-  amount = Math.min(amount, 1e12);
-  actions.addAmount = amount;
-  const customInput = document.getElementById('amountCustom');
-  if (document.activeElement !== customInput) {
-    customInput.value = amount;
-  }
-  view.updateAddAmount(amount);
-}
-
-export function setCustomActionAmount(value: string) {
-  const amount = parseInt(value) || 1;
-  changeActionAmount(amount);
-}
-
 export function selectLoadout(num) {
   if (vals.curLoadout === num) {
     vals.curLoadout = 0;
@@ -527,7 +512,9 @@ export function loadList() {
   if (vals.curLoadout === 0) {
     return;
   }
-  document.getElementById('amountCustom').value = actions.addAmount.toString();
+
+  setActionAmount(actions.addAmount);
+
   actions.clearActions();
   if (vals.loadouts[vals.curLoadout]) {
     actions.appendActionRecords(vals.loadouts[vals.curLoadout]);

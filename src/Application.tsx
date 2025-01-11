@@ -10,51 +10,40 @@ import {
   importSaveFile,
   openSaveFile,
   resumeChallenge,
+  save,
   setOption,
   vals,
 } from './saving.ts';
+import { t } from './locales/translations.utils.ts';
 
 import { WelcomeMessage } from './modules/WelcomeMessage.tsx';
 import { actionLog } from './globals.ts';
-import {
-  capAllTraining,
-  changeActionAmount,
-  clearList,
-  loadList,
-  nameList,
-  saveList,
-  selectLoadout,
-  setCustomActionAmount,
-} from './driver.ts';
+import { capAllTraining, clearList, loadList, nameList, saveList, selectLoadout } from './driver.ts';
 import { createKeyboardHotkeys } from './keyboard.hotkeys.ts';
 import { actionAmount, setActionAmount } from './values.ts';
+import { createSignal } from 'solid-js';
+import { Button } from './components/buttons/Button/Button.tsx';
+import { NumberField } from './components/forms/NumberField.tsx';
+import { Localization } from './localization.ts';
+import { EventType } from './components/forms/InputField.tsx';
 
-const getDisabledMenus = () => {
-  let disabledMenus = [];
+const [disabledMenus, setDisabledMenus] = createSignal<string[]>([]);
 
-  try {
-    disabledMenus = JSON.parse(localStorage.getItem('disabledMenus')) ?? disabledMenus;
-  } catch {}
+const onEnableMenu = (event: EventType<HTMLInputElement>) => {
+  const input = event.currentTarget;
 
-  return disabledMenus;
-};
-
-const onEnableMenu = (event) => {
-  const input = event.target as HTMLInputElement;
-
-  const menu = input.dataset.menu;
+  const menu = input.dataset.menu!;
   document.getElementById('menusMenu')?.classList.toggle(`disabled-${menu}`, !input.checked);
 
-  const disabledMenus = getDisabledMenus();
-
-  const index = disabledMenus.indexOf(menu);
+  const menus = disabledMenus();
+  const index = menus.indexOf(menu);
   if (index === -1 && !input.checked) {
-    disabledMenus.push(menu);
+    menus.push(menu);
   } else if (index >= 0 && input.checked) {
-    disabledMenus.splice(index, 1);
+    menus.splice(index, 1);
   }
 
-  localStorage.setItem('disabledMenus', JSON.stringify(disabledMenus));
+  setDisabledMenus(menus);
 };
 
 const Header = () => (
@@ -70,8 +59,13 @@ const Header = () => (
       </div>
     </div>
     <menu id='menu' style='float: left; height: 30px; margin-left: 24px; margin-right: -24px'>
-      <li id='menusMenu' tabindex='0' style='display:inline-block;height:30px;margin-right:10px;' class='showthatH'>
-        <i class='fas fa-bars'></i>
+      <li
+        id='menusMenu'
+        tabindex='0'
+        style='display:inline-block;height:30px;margin-right:10px;'
+        class='w-8 h-8 showthatH'
+      >
+        <i class='fas fa-bars w-8 h-8 block'></i>
         <div class='showthisH' id='menus'>
           <ul>
             <li>
@@ -79,25 +73,23 @@ const Header = () => (
                 type='checkbox'
                 id='enableMenu_changelog'
                 data-menu='changelog'
+                onChange={(e) => onEnableMenu(this)}
                 onchange='onEnableMenu(this)'
                 checked=''
               >
               </input>
               <label for='enableMenu_changelog'>Changelog</label>
             </li>
-
             <li>
               <input type='checkbox' id='enableMenu_save' data-menu='save' onchange='onEnableMenu(this)' checked=''>
               </input>
               <label for='enableMenu_save'>Saving</label>
             </li>
-
             <li>
               <input type='checkbox' id='enableMenu_faq' data-menu='faq' onchange='onEnableMenu(this)' checked=''>
               </input>
               <label for='enableMenu_faq'>FAQ</label>
             </li>
-
             <li>
               <input
                 type='checkbox'
@@ -2221,32 +2213,11 @@ const Actions = () => {
             >
             </div>
             <div class='flex gap-2 items-center'>
-              <div class='bold localized' data-locale='actions>tooltip>amount'></div>
-              <button
-                class='w-8 h-8 border-neutral-500 active:border-neutral-600 hover:border-neutral-700 border rounded-sm'
-                onClick={() => setActionAmount(1)}
-              >
-                1
-              </button>
-              <button
-                class='w-8 h-8 border-neutral-500 active:border-neutral-600 hover:border-neutral-700 border rounded-sm'
-                onClick={() => setActionAmount(5)}
-              >
-                5
-              </button>
-              <button
-                class='w-8 h- border-neutral-500 active:border-neutral-600 hover:border-neutral-700 border rounded-sm'
-                onClick={() => setActionAmount(10)}
-              >
-                10
-              </button>
-              <input
-                id='amountCustom'
-                onInput={({ target: { value } }) => setActionAmount(parseInt(value) || 1)}
-                value={actionAmount()}
-                class='border border-neutral-500 focus:border-neutral-700 outline-none rounded-sm h-8 px-4'
-              >
-              </input>
+              <span class='font-bold'>{t('actions.amounts.title')}</span>
+              <Button class='w-8' onClick={() => setActionAmount(1)}>1</Button>
+              <Button class='w-8' onClick={() => setActionAmount(5)}>5</Button>
+              <Button class='w-8' onClick={() => setActionAmount(10)}>10</Button>
+              <NumberField id='actionAmount' value={actionAmount()} onChange={setActionAmount} />
             </div>
           </div>
         </div>

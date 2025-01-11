@@ -5,32 +5,6 @@ import { actions } from '../actions.ts';
 import { updateBuffCaps, view } from './main.view.ts';
 import { vals } from '../saving.ts';
 
-const getDisabledMenus = () => {
-  let disabledMenus = [];
-
-  try {
-    disabledMenus = JSON.parse(localStorage.getItem('disabledMenus')) ?? disabledMenus;
-  } catch {}
-
-  return disabledMenus;
-};
-
-globalThis.onEnableMenu = (input) => {
-  const menu = input.dataset.menu;
-  document.getElementById('menusMenu').classList.toggle(`disabled-${menu}`, !input.checked);
-
-  const disabledMenus = getDisabledMenus();
-
-  const index = disabledMenus.indexOf(menu);
-  if (index === -1 && !input.checked) {
-    disabledMenus.push(menu);
-  } else if (index >= 0 && input.checked) {
-    disabledMenus.splice(index, 1);
-  }
-
-  localStorage.setItem('disabledMenus', JSON.stringify(disabledMenus));
-};
-
 export const renderViews = () => {
   requestAnimationFrame(() => {
     const borrowTimeButtonId = 'borrowTimeButton';

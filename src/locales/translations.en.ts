@@ -1,4 +1,9 @@
 export const translationsEn = {
+  actions: {
+    amounts: {
+      title: 'Amount',
+    },
+  },
   misc: {
     loading: 'Loading...',
   },

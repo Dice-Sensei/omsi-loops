@@ -5,7 +5,6 @@ import { actions } from './actions.ts';
 import { view } from './views/main.view.ts';
 import { vals } from './saving.ts';
 import {
-  changeActionAmount,
   checkExtraSpeed,
   clearList,
   loadList,
@@ -15,6 +14,7 @@ import {
   saveList,
   toggleOffline,
 } from './driver.ts';
+import { actionAmount, setActionAmount } from './values.ts';
 
 export function setShiftKey(value: boolean): void {
   if (KeyboardKey.shift === value) return;
@@ -96,70 +96,70 @@ export const createKeyboardHotkeys = () => {
       combination: 'shift+5',
     }, {
       onDown: {
-        fn: () => changeActionAmount(1),
+        fn: () => setActionAmount(1),
         description: t('shortcuts.changeActionAmount1'),
       },
-      combination: '1',
+      combination: 'alt+1',
     }, {
       onDown: {
-        fn: () => changeActionAmount(2),
+        fn: () => setActionAmount(2),
         description: t('shortcuts.changeActionAmount2'),
       },
-      combination: '2',
+      combination: 'alt+2',
     }, {
       onDown: {
-        fn: () => changeActionAmount(3),
+        fn: () => setActionAmount(3),
         description: t('shortcuts.changeActionAmount3'),
       },
-      combination: '3',
+      combination: 'alt+3',
     }, {
       onDown: {
-        fn: () => changeActionAmount(4),
+        fn: () => setActionAmount(4),
         description: t('shortcuts.changeActionAmount4'),
       },
-      combination: '4',
+      combination: 'alt+4',
     }, {
       onDown: {
-        fn: () => changeActionAmount(5),
+        fn: () => setActionAmount(5),
         description: t('shortcuts.changeActionAmount5'),
       },
-      combination: '5',
+      combination: 'alt+5',
     }, {
       onDown: {
-        fn: () => changeActionAmount(6),
+        fn: () => setActionAmount(6),
         description: t('shortcuts.changeActionAmount6'),
       },
-      combination: '6',
+      combination: 'alt+6',
     }, {
       onDown: {
-        fn: () => changeActionAmount(7),
+        fn: () => setActionAmount(7),
         description: t('shortcuts.changeActionAmount7'),
       },
-      combination: '7',
+      combination: 'alt+7',
     }, {
       onDown: {
-        fn: () => changeActionAmount(8),
+        fn: () => setActionAmount(8),
         description: t('shortcuts.changeActionAmount8'),
       },
-      combination: '8',
+      combination: 'alt+8',
     }, {
       onDown: {
-        fn: () => changeActionAmount(9),
+        fn: () => setActionAmount(9),
         description: t('shortcuts.changeActionAmount9'),
       },
-      combination: '9',
+      combination: 'alt+9',
     }, {
       onDown: {
-        fn: () => changeActionAmount(actions.addAmount * 10),
+        fn: () => setActionAmount(actionAmount() * 10),
         description: t('shortcuts.changeActionExponent10'),
       },
-      combination: '0',
+      combination: 'alt+0',
     }, {
       onDown: {
-        fn: () => changeActionAmount(Math.floor(actions.addAmount / 10)),
+        fn: () => setActionAmount(Math.floor(actionAmount() / 10)),
         description: t('shortcuts.changeActionExponent01'),
       },
-      combination: 'backspace',
+      combination: 'alt+backspace',
     }, {
       onDown: {
         fn: () => saveList(),
