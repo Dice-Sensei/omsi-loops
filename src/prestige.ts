@@ -149,10 +149,7 @@ export function getPrestigeCost(prestigeSelected: PrestigeBuffName) {
 }
 
 export function getPrestigeCurrentBonus(prestigeSelected: PrestigeBuffName) {
-  return prestigeBonus(prestigeSelected) > 1
-    // *100 - 100 is to get percent values, otherwise 1.02 will just round to 1, rather than 2%.
-    ? prestigeBonus(prestigeSelected) * 100 - 100
-    : 0;
+  return prestigeBonus(prestigeSelected) > 1 ? prestigeBonus(prestigeSelected) * 100 - 100 : 0;
 }
 
 export type PrestigeBuffName =
@@ -185,7 +182,7 @@ export const prestigeBases: Record<PrestigeBuffName, number> = {
   PrestigeSpatiomancy: 1.1,
 };
 
-export function prestigeBonus(buff) {
+export function prestigeBonus(buff: PrestigeBuffName) {
   const cache = prestigeCache[buff];
 
   const level = getBuffLevel(buff);

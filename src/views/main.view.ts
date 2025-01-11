@@ -2401,19 +2401,6 @@ export function draggedUndecorate(i) {
   showActionIcons();
 }
 
-export function adjustActionListSize(amt) {
-  let height = document.documentElement.style.getPropertyValue('--action-list-height');
-  if (height === '' && amt > 0) {
-    height = `${500 + amt}px`;
-  } else if (height === '' && amt === -100) {
-    height = '500px';
-  } else {
-    height = `${Math.min(Math.max(parseInt(height) + amt, 500), 2000)}px`;
-  }
-  document.documentElement.style.setProperty('--action-list-height', height);
-  saveUISettings();
-}
-
 export function updateBuffCaps() {
   for (const buff of buffList) {
     inputElement(`buff${buff}Cap`).value = String(

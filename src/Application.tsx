@@ -1,5 +1,5 @@
 import { htmlElement } from './helpers.ts';
-import { adjustActionListSize, view } from './views/main.view.ts';
+import { view } from './views/main.view.ts';
 import {
   beginChallenge,
   exitChallenge,
@@ -28,6 +28,7 @@ import {
   setCustomActionAmount,
 } from './driver.ts';
 import { createKeyboardHotkeys } from './keyboard.hotkeys.ts';
+import { actionAmount, setActionAmount } from './values.ts';
 
 const getDisabledMenus = () => {
   let disabledMenus = [];
@@ -1738,7 +1739,7 @@ const Header = () => (
       </div>
       <div class='showthat resource'>
         <div class='bold'>
-          <i class='il-icon il-mana'></i> Mana:
+          Mana:
         </div>
         <div id='timer'>0 | 0s</div>
         <div class='showthis' style='position: fixed; inset: 28px auto auto 1642.12px; margin: 0px;'>
@@ -2203,14 +2204,6 @@ const Actions = () => {
             <span class='localized' data-locale='actions>tooltip>list_explanation'></span>
           </div>
         </div>
-        <div style='position: relative; left: 135px'>
-          <button class='button' style='z-index: 0' onClick={() => adjustActionListSize(100)}>
-            <i class='fas fa-plus'></i>
-          </button>
-          <button class='button' style='z-index: 0' onClick={() => adjustActionListSize(-100)}>
-            <i class='fas fa-minus'></i>
-          </button>
-        </div>
         <br></br>
         <div id='expandableList'>
           <div id='curActionsListContainer'>
@@ -2228,17 +2221,31 @@ const Actions = () => {
               style='margin-top: 10px; width: 100%; text-align: left; max-height: 357px; overflow: auto'
             >
             </div>
-            <div id='nextActionsAmountButtons'>
+            <div class='flex gap-2 items-center'>
               <div class='bold localized' data-locale='actions>tooltip>amount'></div>
-              <button class='button change-amount' onClick={() => changeActionAmount(1)}>1</button>
-              <button class='button change-amount' onClick={() => changeActionAmount(5)}>5</button>
-              <button class='button change-amount' onClick={() => changeActionAmount(10)}>10</button>
+              <button
+                class='w-8 h-8 border-neutral-500 active:border-neutral-600 hover:border-neutral-700 border rounded-sm'
+                onClick={() => setActionAmount(1)}
+              >
+                1
+              </button>
+              <button
+                class='w-8 h-8 border-neutral-500 active:border-neutral-600 hover:border-neutral-700 border rounded-sm'
+                onClick={() => setActionAmount(5)}
+              >
+                5
+              </button>
+              <button
+                class='w-8 h- border-neutral-500 active:border-neutral-600 hover:border-neutral-700 border rounded-sm'
+                onClick={() => setActionAmount(10)}
+              >
+                10
+              </button>
               <input
                 id='amountCustom'
-                onInput={() => setCustomActionAmount()}
-                onBlur={() => setCustomActionAmount()}
-                value='1'
-                style='width: 75px; position: relative; left: 0; top: -2px; border: 1px solid var(--input-border); height: 16px'
+                onInput={({ target: { value } }) => setActionAmount(parseInt(value) || 1)}
+                value={actionAmount()}
+                class='border border-neutral-500 focus:border-neutral-700 outline-none rounded-sm h-8 px-4'
               >
               </input>
             </div>

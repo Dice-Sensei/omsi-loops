@@ -14,7 +14,7 @@ export const WelcomeMessage = () => {
     <Show when={showWelcomeMessage()}>
       <Modal
         title={t('modals.welcome.title')}
-        Actions={() => <Button onClick={() => toggleWelcomeMessage(false)}>{t('modals.welcome.actions.begin')}</Button>}
+        Actions={() => <Button class='min-w-40' onClick={() => toggleWelcomeMessage(false)}>{t('modals.welcome.actions.begin')}</Button>}
         class='min-h-96 max-w-2xl'
       >
         <div class='flex flex-col items-center justify-center gap-2'>

@@ -826,7 +826,7 @@ export const translationsEn = {
         },
         timer: {
           label: 'Mana',
-          title: '<i class="il-icon il-mana"></i> Mana:',
+          title: 'Mana:',
           desc: 'Your main resource. The higher your mana, the more you can do before reset.',
           no_reset_on_restart: true,
         },
@@ -1206,7 +1206,7 @@ export const translationsEn = {
       `,
       actions: {
         begin: 'Begin!',
-      }
+      },
     },
   },
 } as const;

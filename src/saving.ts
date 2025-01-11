@@ -460,13 +460,9 @@ export function loadDefaults() {
 }
 
 export function loadUISettings() {
-  const height = localStorage.getItem('actionListHeight');
-  if (height !== '') document.documentElement.style.setProperty('--action-list-height', height);
 }
 
 export function saveUISettings() {
-  const height = document.documentElement.style.getPropertyValue('--action-list-height');
-  if (height !== '') localStorage.setItem('actionListHeight', height);
 }
 
 export function needsDataSnapshots() {

@@ -466,9 +466,9 @@ export function changeActionAmount(amount) {
   view.updateAddAmount(amount);
 }
 
-export function setCustomActionAmount() {
-  const value = parseInt(inputElement('amountCustom').value) || 1;
-  changeActionAmount(value);
+export function setCustomActionAmount(value: string) {
+  const amount = parseInt(value) || 1;
+  changeActionAmount(amount);
 }
 
 export function selectLoadout(num) {

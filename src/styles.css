@@ -1,35 +1,15 @@
-@import url('https://use.fontawesome.com/releases/v5.15.4/css/all.css');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: IdleLoopsIcons;
+body {
+  font-family: 'Quicksand', serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 1rem;
   font-style: normal;
-  font-weight: normal;
-  src: url(../fonts/IdleLoopsIcons.woff2);
-}
-
-.il-icon::before {
-  font-family: IdleLoopsIcons;
-  font-style: normal;
-  font-weight: normal;
-}
-
-.il-icon.icon-space::before {
-  margin-right: 0.25em;
-}
-
-.il-mana::before {
-  content: '\e000';
-}
-
-.il-effort::before {
-  content: '\e001';
-}
-
-.il-exp::before {
-  content: '\e002';
+  @apply text-slate-800;
 }
 
 :root {
@@ -220,15 +200,6 @@ div.block {
   display: block;
 }
 
-p {
-  margin: 0.75ex 0;
-}
-p:first-child {
-  margin-top: 0;
-}
-p:last-child {
-  margin-bottom: 0;
-}
 
 menu {
   margin: 0;
@@ -284,16 +255,6 @@ menu > li:focus-within, #story_control:focus-within, #story_control:focus-within
   text-align: center;
 }
 
-button {
-  font: inherit;
-  padding: unset;
-  border: unset;
-  background: unset;
-  color: unset;
-  margin: unset;
-  box-sizing: unset;
-}
-
 :link {
   color: var(--link-color);
 }
@@ -307,8 +268,6 @@ button {
 :root {
   /* non-responsive view sets pixel-based font size */
   font-size: 14px;
-  /* default action list height for non-responsive */
-  --action-list-height: 500px;
 }
 
 body {
@@ -317,9 +276,7 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  font-family: Arial, Helvetica, serif;
   color: var(--default-color);
-  font-size: 1rem;
   height: 100%;
   margin: 0;
   background-color: var(--body-background);
@@ -698,11 +655,6 @@ ul#faq > li {
 input, label {
   cursor: pointer;
 }
-input {
-  margin-right: 0;
-  margin-left: 0;
-  font-family: Arial, Helvetica, serif;
-}
 input, textarea, select {
   background: var(--input-background);
   color: var(--input-color);
@@ -751,7 +703,6 @@ input[type='checkbox'][disabled] + label {
 
 .button, .loadoutbutton {
   padding: 1px 5px;
-  font-family: Arial, Helvetica, serif;
   font-weight: normal;
   text-align: center;
   min-width: 9px;
@@ -1848,7 +1799,6 @@ li#actionLogLatest {
 
 #expandableList {
   position: relative;
-  height: var(--action-list-height);
   width: 100%;
 }
 
@@ -1857,28 +1807,10 @@ li#actionLogLatest {
   display: flex;
   flex-direction: column;
 }
-#curActionsList {
-  max-height: calc(var(--action-list-height) - 55px);
-}
-#nextActionsList {
-  max-height: calc(var(--action-list-height) - 50px);
-}
 
 #nextActionsList[style*='none'] {
   visibility: collapse;
 }
-
-/* Unused
-.resizable {
-    width: 10px;
-    height: 10px;
-    background: blue;
-    position:absolute;
-    right: 0;
-    bottom: 0;
-    cursor: se-resize;
-}
-*/
 
 .draggedOverAction {
   background: var(--action-hover-background) !important;
@@ -1913,7 +1845,6 @@ li#actionLogLatest {
 }
 
 /* responsive layout */
-
 :root.responsive {
   height: 100%;
   overflow: clip;
@@ -2809,7 +2740,6 @@ select.bold {
   border: 1px solid transparent;
   background: var(--default-background);
   font-size: 1.14286rem;
-  font-family: Arial, Helvetica, serif;
   padding: 0;
   color: var(--default-color);
 }
