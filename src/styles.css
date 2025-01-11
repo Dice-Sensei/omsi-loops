@@ -231,10 +231,6 @@ menu > li:focus-within, #story_control:focus-within, #story_control:focus-within
 #menusMenu.disabled-extras #enableMenu_extras ~ label,
 #menusMenu.disabled-challenges #enableMenu_challenges ~ label,
 #menusMenu.disabled-totals #enableMenu_totals ~ label,
-#menusMenu.disabled-prestige_bonus #enableMenu_prestige_bonus ~ label {
-  text-decoration: line-through;
-  opacity: 0.5;
-}
 
 #menusMenu.disabled-changelog ~ #changelogMenu,
 #menusMenu.disabled-save ~ #saveMenu,
@@ -673,19 +669,6 @@ input, textarea, select {
   color: var(--default-color);
 }
 
-input[type='number']::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type='number'] {
-  -moz-appearance: textfield;
-}
-
-input[type='checkbox'][disabled] + label {
-  text-decoration: line-through;
-  opacity: 0.5;
-}
 
 /*.button {*/
 /*border:2px white solid;*/
