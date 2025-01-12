@@ -1,8 +1,8 @@
-import { ChallengeMode } from '../../../../challenges.ts';
+import { ChallengeMode } from '../../../../original/challenges.ts';
 import { Button } from '../../../../components/buttons/Button/Button.tsx';
-import { challengeSaveName, getSaveName, load, save, setSaveName, vals } from '../../../../saving.ts';
+import { challengeSaveName, getSaveName, load, save, setSaveName, vals } from '../../../../original/saving.ts';
 import { t } from '../../../../locales/translations.utils.ts';
-import { pauseGame, restart } from '../../../../driver.ts';
+import { pauseGame, restart } from '../../../../original/driver.ts';
 
 function beginChallenge(challenge: ChallengeMode) {
   console.log('Beginning Challenge');

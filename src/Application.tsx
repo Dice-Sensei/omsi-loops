@@ -1,10 +1,10 @@
 import { view } from './views/main.view.ts';
-import { setOption, vals } from './saving.ts';
+import { setOption, vals } from './original/saving.ts';
 import { t } from './locales/translations.utils.ts';
 
 import { WelcomeMessage } from './modules/WelcomeMessage.tsx';
-import { actionLog } from './globals.ts';
-import { capAllTraining, clearList, loadList, nameList, saveList, selectLoadout } from './driver.ts';
+import { actionLog } from './original/globals.ts';
+import { capAllTraining, clearList, loadList, nameList, saveList, selectLoadout } from './original/driver.ts';
 import { createKeyboardHotkeys } from './keyboard.hotkeys.ts';
 import { actionAmount, setActionAmount } from './values.ts';
 import { Button } from './components/buttons/Button/Button.tsx';

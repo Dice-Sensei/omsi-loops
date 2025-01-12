@@ -1,6 +1,6 @@
 import { createStore } from 'solid-js/store';
-import { formatNumber } from '../../../../helpers.ts';
-import { vals } from '../../../../saving.ts';
+import { formatNumber } from '../../../../original/helpers.ts';
+import { vals } from '../../../../original/saving.ts';
 import { formatTime } from '../../../../views/main.view.ts';
 import { createInterval } from '../../../../signals/createInterval.ts';
 

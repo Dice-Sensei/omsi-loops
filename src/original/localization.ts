@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { SearchParams } from './logic/search-params.ts';
+import { SearchParams } from '../logic/search-params.ts';
 
 export namespace Localization {
   export const languages = { 'en-EN': 'English' };

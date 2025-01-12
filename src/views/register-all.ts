@@ -1,9 +1,9 @@
-import { buffList, statList } from '../globals.ts';
-import { prestigeUpgrade, resetAllPrestiges } from '../prestige.ts';
-import { borrowTime, manualRestart, pauseGame, returnTime, toggleOffline } from '../driver.ts';
-import { actions } from '../actions.ts';
+import { buffList, statList } from '../original/globals.ts';
+import { prestigeUpgrade, resetAllPrestiges } from '../original/prestige.ts';
+import { borrowTime, manualRestart, pauseGame, returnTime, toggleOffline } from '../original/driver.ts';
+import { actions } from '../original/actions.ts';
 import { updateBuffCaps, view } from './main.view.ts';
-import { vals } from '../saving.ts';
+import { vals } from '../original/saving.ts';
 
 export const setActions = () => {
   requestAnimationFrame(() => {

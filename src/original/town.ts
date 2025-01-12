@@ -1,7 +1,7 @@
 import { towns } from './globals.ts';
 import { adjustAll, pauseGame } from './driver.ts';
 import { isTravel, lateGameActions } from './actionList.ts';
-import { view } from './views/main.view.ts';
+import { view } from '../views/main.view.ts';
 import { vals } from './saving.ts';
 
 'use strict';

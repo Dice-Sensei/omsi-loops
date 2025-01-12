@@ -1,9 +1,9 @@
 import { Keyboard } from './logic/keyboard.ts';
 import { Listeners } from './logic/listeners.ts';
 import { t } from './locales/translations.utils.ts';
-import { actions } from './actions.ts';
+import { actions } from './original/actions.ts';
 import { view } from './views/main.view.ts';
-import { vals } from './saving.ts';
+import { vals } from './original/saving.ts';
 import {
   checkExtraSpeed,
   clearList,
@@ -13,7 +13,7 @@ import {
   pauseGame,
   saveList,
   toggleOffline,
-} from './driver.ts';
+} from './original/driver.ts';
 import { actionAmount, setActionAmount } from './values.ts';
 
 export function setShiftKey(value: boolean): void {

@@ -1,5 +1,5 @@
-import { Localization } from '../../../../localization.ts';
-import { setOption } from '../../../../saving.ts';
+import { Localization } from '../../../../original/localization.ts';
+import { setOption } from '../../../../original/saving.ts';
 
 export const OptionsMenu = () => {
   return (

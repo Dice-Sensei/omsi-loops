@@ -1,4 +1,4 @@
-import { view } from './views/main.view.ts';
+import { view } from '../views/main.view.ts';
 import { Town } from './town.ts';
 import { Data } from './data.ts';
 import { copyArray } from './helpers.ts';

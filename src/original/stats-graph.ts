@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { Localization } from './localization.ts';
 import { statList, stats } from './globals.ts';
-import { view } from './views/main.view.ts';
+import { view } from '../views/main.view.ts';
 
 type Dataset = {
   name: string;

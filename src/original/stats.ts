@@ -4,7 +4,7 @@ import { actionLog, buffHardCaps, buffList, buffs, resources, skillList, skills,
 import { prestigeBonus } from './prestige.ts';
 import { actions } from './actions.ts';
 import { getAdvGuildRank, getCraftGuildRank, getXMLName } from './actionList.ts';
-import { view } from './views/main.view.ts';
+import { view } from '../views/main.view.ts';
 import { vals } from './saving.ts';
 export class LevelExp {
   level = 0;

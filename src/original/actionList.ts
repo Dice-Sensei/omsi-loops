@@ -1,4 +1,4 @@
-import { view } from './views/main.view.ts';
+import { view } from '../views/main.view.ts';
 import {
   addBuffAmt,
   getBuffCap,
@@ -50,7 +50,7 @@ import {
   unlockTown,
 } from './driver.ts';
 import { vals } from './saving.ts';
-import { increaseStoryVarTo, setStoryFlag, unlockGlobalStory } from './views/main.view.ts';
+import { increaseStoryVarTo, setStoryFlag, unlockGlobalStory } from '../views/main.view.ts';
 
 export class ClassNameNotFoundError extends TypeError {}
 

@@ -1,5 +1,5 @@
 import { vals } from './saving.ts';
-import { view } from './views/main.view.ts';
+import { view } from '../views/main.view.ts';
 import { Localization } from './localization.ts';
 import { extractStrings, formatNumber, intToString, restoreStrings } from './helpers.ts';
 import { getActionPrototype, getXMLName, townNames } from './actionList.ts';

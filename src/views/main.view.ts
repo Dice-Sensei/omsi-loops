@@ -11,7 +11,7 @@ import {
   getTalent,
   getTeamCombat,
   getTotalBonusXP,
-} from '../stats.ts';
+} from '../original/stats.ts';
 import {
   Action,
   actionsWithGoldCost,
@@ -29,18 +29,18 @@ import {
   isTraining,
   townNames,
   translateClassNames,
-} from '../actionList.ts';
-import { isBuffName, saveUISettings, vals } from '../saving.ts';
+} from '../original/actionList.ts';
+import { isBuffName, saveUISettings, vals } from '../original/saving.ts';
 
 import $ from 'jquery';
 import * as d3 from 'd3';
-import { StatGraph } from '../stats-graph.ts';
-import { Localization } from '../localization.ts';
+import { StatGraph } from '../original/stats-graph.ts';
+import { Localization } from '../original/localization.ts';
 import { KeyboardKey } from '../keyboard.hotkeys.ts';
-import { getPrestigeCost, getPrestigeCurrentBonus, prestigeValues } from '../prestige.ts';
-import { camelize, formatNumber, intToString, intToStringRound, toSuffix } from '../helpers.ts';
-import { getNumOnList } from '../actions.ts';
-import { actions } from '../actions.ts';
+import { getPrestigeCost, getPrestigeCurrentBonus, prestigeValues } from '../original/prestige.ts';
+import { camelize, formatNumber, intToString, intToStringRound, toSuffix } from '../original/helpers.ts';
+import { getNumOnList } from '../original/actions.ts';
+import { actions } from '../original/actions.ts';
 import {
   actionLog,
   buffCaps,
@@ -53,7 +53,7 @@ import {
   statList,
   stats,
   towns,
-} from '../globals.ts';
+} from '../original/globals.ts';
 import {
   addActionToList,
   addLoop,
@@ -77,8 +77,8 @@ import {
   showActionIcons,
   showNotification,
   split,
-} from '../driver.ts';
-import { Koviko } from '../predictor.ts';
+} from '../original/driver.ts';
+import { Koviko } from '../original/predictor.ts';
 
 const DarkRitualDescription = [
   `10% faster in Beginnersville per ritual from 1-20<br>`,

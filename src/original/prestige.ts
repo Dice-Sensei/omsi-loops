@@ -1,7 +1,7 @@
 import { towns } from './globals.ts';
 import { clearList, pauseGame, restart } from './driver.ts';
 import { addBuffAmt, getBuffLevel } from './stats.ts';
-import { view } from './views/main.view.ts';
+import { view } from '../views/main.view.ts';
 import { vals } from './saving.ts';
 import { load, save } from './saving.ts';
 

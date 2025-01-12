@@ -1,5 +1,5 @@
 // prestige predictor from https://github.com/GustavJakobsson/IdleLoops-Predictor
-import { view } from './views/main.view.ts';
+import { view } from '../views/main.view.ts';
 import { vals } from './saving.ts';
 import {
   getBuffLevel,

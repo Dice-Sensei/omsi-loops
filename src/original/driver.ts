@@ -1,4 +1,4 @@
-import { view } from './views/main.view.ts';
+import { view } from '../views/main.view.ts';
 import { getBuffLevel, getRitualBonus, getSkillBonus, getSkillLevel, restartStats } from './stats.ts';
 import {
   adjustAllRocks,
@@ -28,14 +28,14 @@ import {
 } from './actionList.ts';
 import { clearPauseNotification, needsDataSnapshots, save, setOption, showPauseNotification, vals } from './saving.ts';
 import { Data } from './data.ts';
-import { KeyboardKey } from './keyboard.hotkeys.ts';
+import { KeyboardKey } from '../keyboard.hotkeys.ts';
 import { Localization } from './localization.ts';
 import { beep, clamp, copyArray, Mana } from './helpers.ts';
 import { actions, actionStory, getNumOnList, markActionsComplete } from './actions.ts';
 import { resources, resourcesTemplate, towns } from './globals.ts';
 import { prestigeBonus, prestigeValues } from './prestige.ts';
-import { dragExitUndecorate, draggedDecorate } from './views/main.view.ts';
-import { setActionAmount } from './values.ts';
+import { dragExitUndecorate, draggedDecorate } from '../views/main.view.ts';
+import { setActionAmount } from '../values.ts';
 
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks

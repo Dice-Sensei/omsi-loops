@@ -3,7 +3,7 @@ import { Action } from './actionList.ts';
 import { actions } from './actions.ts';
 import { towns } from './globals.ts';
 import { addMana, addResource, driverVals, resetResources } from './driver.ts';
-import { view } from './views/main.view.ts';
+import { view } from '../views/main.view.ts';
 import { vals } from './saving.ts';
 
 export enum ChallengeMode {
