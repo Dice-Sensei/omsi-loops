@@ -13,7 +13,7 @@
   },
   "lint": {
     "rules": {
-      "exclude": ["no-namespace", "no-var"]
+      "exclude": ["no-namespace", "no-var", "no-explicit-any"]
     }
   },
   "fmt": {

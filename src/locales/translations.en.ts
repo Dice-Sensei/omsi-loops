@@ -1,4 +1,4 @@
-export type VersionChange = {
+export type ChangelogEntry = {
   name: string;
   date: string;
   changes: string[];
@@ -723,7 +723,7 @@ export const translationsEn = {
             'Probably lots more stuff, too?',
           ],
         },
-      ] satisfies VersionChange[],
+      ] satisfies ChangelogEntry[],
     },
     save: {
       title: 'Saving',

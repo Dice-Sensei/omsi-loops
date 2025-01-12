@@ -296,8 +296,8 @@ main, #actionLogContainer, #timeControlsMain, #timeControlsOptions {
 }
 
 /* Top menus, loadouts, and action stories can have focusable children in the popup, so they're sticky (they use focus-within) */
-.showthatH:hover .showthisH,
-.showthatH:focus-within .showthisH,
+.showthatH:hover .visible-on-hover,
+.showthatH:focus-within .visible-on-hover,
 .showthatloadout:hover .showthisloadout,
 .showthisloadout:hover,
 .showthatloadout:focus-within .showthisloadout,
@@ -333,7 +333,7 @@ main, #actionLogContainer, #timeControlsMain, #timeControlsOptions {
   outline: 1px solid var(--popup-border);
 }
 
-.showthis, .showthis2, .showthisH {
+.showthis, .showthis2, .visible-on-hover {
   visibility: hidden;
   opacity: 0;
   width: max-content;
@@ -351,13 +351,13 @@ main, #actionLogContainer, #timeControlsMain, #timeControlsOptions {
   font-style: normal;
 }
 
-.showthisH {
+.visible-on-hover {
   max-height: 95svh;
   overflow: auto;
   overscroll-behavior: contain;
 }
 
-:is(.showthatH, .showthatH:hover) ul.showthisH {
+:is(.showthatH, .showthatH:hover) ul.visible-on-hover {
   list-style: none;
   display: flex;
   flex-direction: column;
@@ -2669,7 +2669,7 @@ li#actionLogLatest {
   border-radius: 0;
 }
 
-.t-cubic .showthis, .t-cubic .showthis2, .t-cubic .showthisH, .t-cubic .showthisname {
+.t-cubic .showthis, .t-cubic .showthis2, .t-cubic .visible-on-hover, .t-cubic .showthisname {
   border: 1px solid var(--default-border);
   border-radius: 0;
 }

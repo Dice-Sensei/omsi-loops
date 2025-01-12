@@ -861,3 +861,5 @@ export const driverVals = {
   baseManaPerSecond: 50,
   gameSpeed: 1,
 };
+
+globalThis.driver = {};

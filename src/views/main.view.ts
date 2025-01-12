@@ -230,7 +230,7 @@ export class View {
       }
       if (tooltipSelector === '') {
         console.warn('Could not find tooltip class for trigger! Using generic selector', trigger);
-        tooltipSelector = '.showthis,.showthisO,.showthis2,.showthisH,.showthisloadout,.showthisstory';
+        tooltipSelector = '.showthis,.showthisO,.showthis2,.visible-on-hover,.showthisloadout,.showthisstory';
       }
       for (const tooltip of trigger.querySelectorAll(tooltipSelector)) {
         if (tooltip instanceof HTMLElement) {
@@ -1535,7 +1535,7 @@ export class View {
     document.documentElement.classList.toggle('editing-hidden-vars');
   }
 
-  toggleHidden(varName, force) {
+  toggleHidden(varName: string, force?: boolean) {
     const isHidden = towns[vals.townshowing].hiddenVars.has(varName);
     if ((isHidden && force !== true) || force === false) {
       towns[vals.townshowing].hiddenVars.delete(varName);
@@ -1625,13 +1625,21 @@ export class View {
       Localization.txt('actions>tooltip>progress_label')
     }</div> <div id='progress${action.varName}${varSuffix}'></div>%
             </div>
-            <div class='hideVarButton far' onclick='globalThis.view.toggleHidden("${action.varName}${varSuffix}")'></div>
+            <div id='hideVarButton${action.varName}${varSuffix}' class='hideVarButton far' onclick='globalThis.view.toggleHidden("${action.varName}${varSuffix}")'></div>
         </div>`;
     const progressDiv = document.createElement('div');
     progressDiv.className = 'townContainer progressType';
     progressDiv.id = `infoContainer${action.varName}${varSuffix}`;
     progressDiv.style.display = '';
     progressDiv.innerHTML = totalDivText;
+
+    requestAnimationFrame(() => {
+      const id = `${action.varName}${varSuffix}`;
+
+      const hidevarButton = document.getElementById(`hideVarButton${id}`) as HTMLDivElement;
+      hidevarButton.onclick = () => view.toggleHidden(id);
+    });
+
     townInfos[action.townNum].appendChild(progressDiv);
     if (towns[action.townNum].hiddenVars.has(`${action.varName}${varSuffix}`)) {
       progressDiv.classList.add('user-hidden');
@@ -1780,12 +1788,12 @@ export class View {
                 id='container${action.varName}'
                 class='${divClass} actionOrTravelContainer ${action.type}ActionContainer showthat'
                 draggable='true'
-                ondragover='driverVals.handleDragOver(event)'
-                ondragstart='driverVals.handleDirectActionDragStart(event, "${action.name}", ${action.townNum}, "${action.varName}", false)'
-                ondragend='driverVals.handleDirectActionDragEnd("${action.varName}")'
-                onclick='driverVals.addActionToList("${action.name}", ${action.townNum})'
-                onmouseover='.updateAction("${action.varName}")'
-                onmouseout='.updateAction(undefined)'
+                ondragover='globalThis.driver.handleDragOver(event)'
+                ondragstart='globalThis.driver.handleDirectActionDragStart(event, "${action.name}", ${action.townNum}, "${action.varName}", false)'
+                ondragend='globalThis.driver.handleDirectActionDragEnd("${action.varName}")'
+                onclick='globalThis.driver.addActionToList("${action.name}", ${action.townNum})'
+                onmouseover='globalThis.view.updateAction("${action.varName}")'
+                onmouseout='globalThis.view.updateAction(undefined)'
             >
                 <label>${action.label}</label><br>
                 <div style='position:relative'>
@@ -1839,7 +1847,7 @@ export class View {
       }
 
       const storyDivText =
-        `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='driverVals.hideNotification("storyContainer${action.varName}")'>${action.label}
+        `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='globalThis.driver.hideNotification("storyContainer${action.varName}")'>${action.label}
                     <br>
                     <div style='position:relative'>
                         <img src='icons/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>
@@ -2242,12 +2250,15 @@ export class View {
   updateTotals() {
     document.getElementById('totalPlaytime').textContent = `${formatTime(vals.totals.time)}`;
     document.getElementById('totalEffectiveTime').textContent = `${formatTime(vals.totals.effectiveTime)}`;
+
     document.getElementById('borrowedTimeBalance').textContent = formatTime(vals.totals.borrowedTime);
     document.getElementById('borrowedTimeDays').textContent = `${
       formatNumber(Math.floor(vals.totals.borrowedTime / 86400))
     }${Localization.txt('time_controls>days')}`;
+
     document.getElementById('totalLoops').textContent = `${formatNumber(vals.totals.loops)}`;
     document.getElementById('totalActions').textContent = `${formatNumber(vals.totals.actions)}`;
+
     if (vals.totals.borrowedTime > 0) document.documentElement.classList.add('time-borrowed');
     else document.documentElement.classList.remove('time-borrowed');
   }
