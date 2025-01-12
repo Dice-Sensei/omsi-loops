@@ -1,8 +1,8 @@
 export const PrestigeMenu = () => {
   return (
-    <li class='showthatH'>
+    <li class='contains-popover'>
       Prestige Perks
-      <div class='visible-on-hover'>
+      <div class='popover-content'>
         <div>
           <br></br>
           Prestige bonuses are always active.<br></br>

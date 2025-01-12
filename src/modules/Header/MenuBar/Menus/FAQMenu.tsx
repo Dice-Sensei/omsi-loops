@@ -3,16 +3,16 @@ import { t } from '../../../../locales/translations.utils.ts';
 
 export const FaqMenu = () => {
   return (
-    <li class='showthatH'>
+    <li class='contains-popover'>
       {t('menu.faq.title')}
-      <ul class='flex flex-col gap-1 visible-on-hover'>
+      <ul class='flex flex-col gap-1 popover-content'>
         <For each={t('menu.faq.questions')}>
           {(question) => (
-            <li class='showthat2' tabindex='0'>
+            <li class='showthat' tabindex='0'>
               <div>
                 <span class='font-medium'>{t('menu.faq.question')}:</span> {question.q}
               </div>
-              <div class='showthis2'>
+              <div class='showthis'>
                 <span class='font-medium'>{t('menu.faq.answer')}:</span>
                 {question.a}
               </div>

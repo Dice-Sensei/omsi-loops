@@ -12,9 +12,9 @@ import {
 
 export const SaveMenu = () => {
   return (
-    <li class='showthatH'>
+    <li class='contains-popover'>
       {t('menu.save.title')}
-      <div class='visible-on-hover'>
+      <div class='popover-content'>
         <button class='button' onClick={() => save()}>Save Manually</button>
         <br></br>
         <textarea id='exportImportList'></textarea>

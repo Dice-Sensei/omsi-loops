@@ -7,9 +7,9 @@ interface ChangelogEntryProps {
 }
 
 export const VersionOption = (props: ChangelogEntryProps) => (
-  <li class='showthat2 w-40'>
+  <li class='showthat w-40'>
     <span class='font-medium'>{t('menu.changelog.version')}</span>: {props.version.name}
-    <div class='showthis2'>
+    <div class='showthis'>
       <div class='font-medium text-center'>{props.version.date}</div>
       <hr class='border-neutral-500'></hr>
       <For each={props.version.changes}>
@@ -21,9 +21,9 @@ export const VersionOption = (props: ChangelogEntryProps) => (
 
 export const ChangelogMenu = () => {
   return (
-    <li class='showthatH'>
+    <li class='contains-popover'>
       {t('menu.changelog.title')}
-      <ul class='visible-on-hover'>
+      <ul class='popover-content'>
         <For each={t('menu.changelog.versions')}>
           {(version) => <VersionOption version={version} />}
         </For>

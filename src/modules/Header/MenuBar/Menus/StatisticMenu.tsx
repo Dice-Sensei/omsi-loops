@@ -2,6 +2,7 @@ import { createStore } from 'solid-js/store';
 import { formatNumber } from '../../../../helpers.ts';
 import { vals } from '../../../../saving.ts';
 import { formatTime } from '../../../../views/main.view.ts';
+import { createInterval } from '../../../../signals/createInterval.ts';
 
 export const StatisticMenu = () => {
   // document.getElementById('totalPlaytime').textContent = `${formatTime(vals.totals.time)}`;
@@ -19,37 +20,39 @@ export const StatisticMenu = () => {
     actions: vals.totals.actions,
   });
 
-  setInterval(() => {
-    setStore('time', vals.totals.time);
-    setStore('effectiveTime', vals.totals.effectiveTime);
-    setStore('borrowedTime', vals.totals.borrowedTime);
-    setStore('loops', vals.totals.loops);
-    setStore('actions', vals.totals.actions);
-  }, 1000);
+  createInterval(() => {
+    setStore({
+      time: vals.totals.time,
+      effectiveTime: vals.totals.effectiveTime,
+      borrowedTime: vals.totals.borrowedTime,
+      loops: vals.totals.loops,
+      actions: vals.totals.actions,
+    });
+  });
 
   return (
-    <li class='showthatH'>
+    <li class='contains-popover'>
       Totals
-      <div class='visible-on-hover'>
+      <div class='popover-content'>
         <div class='grid grid-cols-[1fr_auto] gap-2'>
-          <span>Time borrowed:</span>
-          <span id='borrowedTimeBalance'>
+          <span class='font-medium'>Time borrowed:</span>
+          <span>
             {formatTime(store.borrowedTime)}
           </span>
-          <span>Effective Time:</span>
-          <span id='totalEffectiveTime'>
+          <span class='font-medium'>Effective Time:</span>
+          <span>
             {formatTime(store.effectiveTime)}
           </span>
-          <span>Running Time:</span>
-          <span id='totalPlaytime'>
+          <span class='font-medium'>Running Time:</span>
+          <span>
             {formatTime(store.time)}
           </span>
-          <span>Loops:</span>
-          <span id='totalLoops'>
+          <span class='font-medium'>Loops:</span>
+          <span>
             {formatNumber(store.loops)}
           </span>
-          <span>Actions:</span>
-          <span id='totalActions'>
+          <span class='font-medium'>Actions:</span>
+          <span>
             {formatNumber(store.actions)}
           </span>
         </div>

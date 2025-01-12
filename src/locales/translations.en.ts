@@ -846,13 +846,32 @@ export const translationsEn = {
     },
     challenges: {
       title: 'Challenges',
-      standard_game: 'The original experience, as the game was meant to be played.',
-      mana_drought:
-        "The mana merchant in Beginnersville only has 5k mana to sell, and they're charging double the usual price. No other mana merchants exist.",
-      noodle_arms:
-        'You have no base Self-Combat ability. All combat is based on followers. Self combat is half of your team member or zombie strength (whichever is higher).',
-      mana_burn:
-        "You have a day's worth of mana that persists through loops, but once that runs out, you'll be stuck in time. How far can you make it?",
+      messages: {
+        description: 'Challenges are special modes that impose special conditions and restrictions.',
+        recommendation: 'It is only recommended to try them after beating the main game.',
+        saveBeforeStarting: 'Please export and save your data locally before starting.',
+        warnBeginChallenge: 'Beginning a challenge will permanently delete your current save.',
+      },
+
+      challenges: {
+        exit: 'Exit Challenge',
+        resume: 'Resume Challenge',
+        manaDrought: {
+          title: 'Mana Drought',
+          description:
+            "The mana merchant in Beginnersville only has 5k mana to sell, and they're charging double the usual price. No other mana merchants exist.",
+        },
+        noodleArms: {
+          title: 'Noodle Arms',
+          description:
+            'You have no base Self-Combat ability. All combat is based on followers. Self combat is half of your team member or zombie strength (whichever is higher).',
+        },
+        manaBurn: {
+          title: 'Mana Burn',
+          description:
+            "You have a day's worth of mana that persists through loops, but once that runs out, you'll be stuck in time. How far can you make it?",
+        },
+      },
     },
     totals: {
       title: 'Totals',

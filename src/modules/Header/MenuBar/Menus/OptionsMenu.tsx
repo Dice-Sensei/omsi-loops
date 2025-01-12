@@ -3,9 +3,9 @@ import { setOption } from '../../../../saving.ts';
 
 export const OptionsMenu = () => {
   return (
-    <li class='showthatH'>
+    <li class='contains-popover'>
       Options
-      <div class='visible-on-hover'>
+      <div class='popover-content'>
         <a target='_blank' href='https://discord.gg/dnKA6Xd'>
           Discord Link
         </a>

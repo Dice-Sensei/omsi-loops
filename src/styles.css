@@ -296,8 +296,8 @@ main, #actionLogContainer, #timeControlsMain, #timeControlsOptions {
 }
 
 /* Top menus, loadouts, and action stories can have focusable children in the popup, so they're sticky (they use focus-within) */
-.showthatH:hover .visible-on-hover,
-.showthatH:focus-within .visible-on-hover,
+.contains-popover:hover .popover-content,
+.contains-popover:focus-within .popover-content,
 .showthatloadout:hover .showthisloadout,
 .showthisloadout:hover,
 .showthatloadout:focus-within .showthisloadout,
@@ -324,16 +324,7 @@ main, #actionLogContainer, #timeControlsMain, #timeControlsOptions {
   opacity: 1;
 }
 
-.showthat2 {
-  white-space: nowrap;
-}
-
-.showthat2:is(:hover, :focus-within) {
-  background: var(--popup-background);
-  outline: 1px solid var(--popup-border);
-}
-
-.showthis, .showthis2, .visible-on-hover {
+.showthis, .showthis2, .popover-content {
   visibility: hidden;
   opacity: 0;
   width: max-content;
@@ -351,13 +342,13 @@ main, #actionLogContainer, #timeControlsMain, #timeControlsOptions {
   font-style: normal;
 }
 
-.visible-on-hover {
+.popover-content {
   max-height: 95svh;
   overflow: auto;
   overscroll-behavior: contain;
 }
 
-:is(.showthatH, .showthatH:hover) ul.visible-on-hover {
+:is(.contains-popover, .contains-popover:hover) ul.popover-content {
   list-style: none;
   display: flex;
   flex-direction: column;
@@ -382,29 +373,6 @@ ul#faq > li {
   }
 }
 
-.showthis2 {
-  margin-top: -20px;
-  margin-left: 110px;
-  z-index: 1000;
-  min-width: 450px;
-  max-height: 600px;
-  overflow: auto;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
-  white-space: initial;
-}
-
-.showthat2:focus-within .showthis2 {
-  pointer-events: initial;
-  user-select: text;
-}
-
-.showthat2:is(:hover, :focus-within) .showthis2 {
-  display: flex;
-  visibility: visible;
-  opacity: 1;
-}
 
 .showthatloadout {
   padding: 1px 5px;
@@ -2669,7 +2637,7 @@ li#actionLogLatest {
   border-radius: 0;
 }
 
-.t-cubic .showthis, .t-cubic .showthis2, .t-cubic .visible-on-hover, .t-cubic .showthisname {
+.t-cubic .showthis, .t-cubic .showthis2, .t-cubic .popover-content, .t-cubic .showthisname {
   border: 1px solid var(--default-border);
   border-radius: 0;
 }

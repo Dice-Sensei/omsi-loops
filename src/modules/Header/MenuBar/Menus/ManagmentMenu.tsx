@@ -8,9 +8,9 @@ export const ManagmentMenu = () => {
   const createOnChange = (menu: Menu) => (value: boolean) => toggleVisible(menu, value);
 
   return (
-    <li class='w-8 h-8 showthatH'>
+    <li class='w-8 h-8 contains-popover'>
       <span>O</span>
-      <div class='visible-on-hover'>
+      <div class='popover-content'>
         <span class='font-medium'>{t('menu.enable.title')}</span>
         <CheckboxField onChange={createOnChange(Menu.Changelog)} value={isVisible(Menu.Changelog)}>
           {t('menu.changelog.title')}

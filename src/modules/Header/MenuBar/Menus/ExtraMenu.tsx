@@ -2,9 +2,9 @@ import { setOption } from '../../../../saving.ts';
 
 export const ExtraMenu = () => {
   return (
-    <li class='showthatH'>
+    <li class='contains-popover'>
       Extras
-      <div class='visible-on-hover' style='padding-top:1ex'>
+      <div class='popover-content' style='padding-top:1ex'>
         The options in this menu allow you to customize the balance and functionality of the game in ways that affect
         the play experience. If experiencing the "vanilla" Idle Loops experience is important to you, leave these
         options unchanged. Otherwise, have fun!

@@ -274,7 +274,7 @@ const Header = () => (
     <div id='timeControls'>
       <div id='timeControlsMain'>
         <button id='pausePlay' class='button control'>Play</button>
-        <button id='manualRestart' class='button showthatO control'>
+        <button id='manualRestart' class='button showthat control'>
           Restart
           <div class='showthis' style='color:var(--default-color);width:230px;'>
             Resets the loop. Not a hard reset.
@@ -282,7 +282,7 @@ const Header = () => (
         </button>
         <input id='bonusIsActiveInput' type='checkbox' onchange='setOption(&quot;bonusIsActive&quot;, this.checked)'>
         </input>
-        <button id='toggleOfflineButton' class='button showthatO control'>
+        <button id='toggleOfflineButton' class='button showthat control'>
           Bonus Seconds
           <div class='showthis' id='bonusText' style='max-width:500px;color:var(--default-color);'>
             <p>While this bonus is on, you get 19 extra seconds per second (20x game speed).</p>
@@ -303,7 +303,7 @@ const Header = () => (
           <div
             tabindex='0'
             id='story_control'
-            class='showthatH'
+            class='contains-popover'
             onfocus={() => view.updateStory(vals.storyShowing)}
             style='height:30px;'
           >
@@ -311,7 +311,7 @@ const Header = () => (
               Story
             </div>
             <div id='newStory' style='color:var(--alert-color);display:none;'>(!)</div>
-            <div id='story_tooltip' class='visible-on-hover' style='width:400px;'>
+            <div id='story_tooltip' class='popover-content' style='width:400px;'>
               <button style='margin-left:175px;' class='actionIcon fa fa-arrow-left control' id='storyLeft'></button>
               <div style='' id='storyPage' class='bold control'></div>
               <button style='' class='actionIcon fa fa-arrow-right control' id='storyRight'></button>

@@ -234,7 +234,7 @@ export class View {
       }
       if (tooltipSelector === '') {
         console.warn('Could not find tooltip class for trigger! Using generic selector', trigger);
-        tooltipSelector = '.showthis,.showthisO,.showthis2,.visible-on-hover,.showthisloadout,.showthisstory';
+        tooltipSelector = '.showthis,.showthisO,.showthis2,.popover-content,.showthisloadout,.showthisstory';
       }
       for (const tooltip of trigger.querySelectorAll(tooltipSelector)) {
         if (tooltip instanceof HTMLElement) {
@@ -253,7 +253,8 @@ export class View {
   getClosestTrigger(element) {
     let trigger = this.tooltipTriggerMap.get(element);
     if (trigger == null) {
-      trigger = element.closest('.showthat,.showthatO,.showthat2,.showthatH,.showthatloadout,.showthatstory') || false;
+      trigger = element.closest('.showthat,.showthatO,.showthat,.contains-popover,.showthatloadout,.showthatstory') ||
+        false;
       this.tooltipTriggerMap.set(element, trigger);
     }
     return trigger;
@@ -401,12 +402,6 @@ export class View {
   }
 
   adjustTooltipPosition(tooltipDiv) {
-    // this is a no-op now, all repositioning happens dynamically on mouseover.
-    // if the delegation in mouseoverHandler ends up being too costly, though, this is where
-    // we'll bind discrete mouseenter handlers, like so:
-
-    // const trigger = (tooltipDiv.closest(".showthat,.showthatO,.showthat2,.showthatH,.showthatloadout"));
-    // trigger.onmouseenter = e => this.fixTooltipPosition(tooltipDiv, trigger, e);
   }
 
   /**
@@ -2282,19 +2277,9 @@ export class View {
   }
 
   updateTotals() {
-    document.getElementById('totalPlaytime').textContent = `${formatTime(vals.totals.time)}`;
-    document.getElementById('totalEffectiveTime').textContent = `${formatTime(vals.totals.effectiveTime)}`;
-
-    document.getElementById('borrowedTimeBalance').textContent = formatTime(vals.totals.borrowedTime);
     document.getElementById('borrowedTimeDays').textContent = `${
       formatNumber(Math.floor(vals.totals.borrowedTime / 86400))
     }${Localization.txt('time_controls>days')}`;
-
-    document.getElementById('totalLoops').textContent = `${formatNumber(vals.totals.loops)}`;
-    document.getElementById('totalActions').textContent = `${formatNumber(vals.totals.actions)}`;
-
-    if (vals.totals.borrowedTime > 0) document.documentElement.classList.add('time-borrowed');
-    else document.documentElement.classList.remove('time-borrowed');
   }
 
   updatePrestigeValues() {
