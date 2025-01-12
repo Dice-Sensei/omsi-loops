@@ -1132,29 +1132,3 @@ export function resumeChallenge() {
     restart();
   }
 }
-
-const _saving = {
-  save,
-  exportSave,
-  importSave,
-  exportSaveFile,
-  openSaveFile,
-  importSaveFile,
-  exportCurrentList,
-  importCurrentList,
-  beginChallenge,
-  exitChallenge,
-  resumeChallenge,
-  loadDefaults,
-  needsDataSnapshots,
-  startGame,
-  setOption,
-  vals,
-  isBuffName,
-};
-
-declare global {
-  var saving: typeof _saving;
-}
-
-globalThis.saving = _saving;

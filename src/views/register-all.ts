@@ -5,7 +5,7 @@ import { actions } from '../actions.ts';
 import { updateBuffCaps, view } from './main.view.ts';
 import { vals } from '../saving.ts';
 
-export const renderViews = () => {
+export const setActions = () => {
   requestAnimationFrame(() => {
     const borrowTimeButtonId = 'borrowTimeButton';
     const returnTimeButtonId = 'returnTimeButton';

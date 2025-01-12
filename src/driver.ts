@@ -283,7 +283,7 @@ export function stopGame() {
   }
 }
 
-export function pauseGame(ping, message) {
+export function pauseGame(ping?: boolean, message?: string) {
   gameIsStopped = !gameIsStopped;
   if (needsDataSnapshots()) {
     Data.discardToSnapshot('base', 1);
@@ -392,7 +392,7 @@ export function manualRestart() {
   view.update();
 }
 
-export function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
+export function addActionToList(name, townNum, isTravelAction?: boolean, insertAtIndex?: number) {
   for (const action of towns[townNum].totalActionList) {
     if (action.name === name) {
       if (
@@ -861,5 +861,3 @@ export const driverVals = {
   baseManaPerSecond: 50,
   gameSpeed: 1,
 };
-
-globalThis.driver = {};

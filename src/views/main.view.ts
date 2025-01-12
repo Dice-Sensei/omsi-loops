@@ -55,6 +55,7 @@ import {
   towns,
 } from '../globals.ts';
 import {
+  addActionToList,
   addLoop,
   adjustAll,
   capAction,
@@ -62,9 +63,12 @@ import {
   disableAction,
   driverVals,
   getActualGameSpeed,
+  handleDirectActionDragEnd,
+  handleDirectActionDragStart,
   handleDragDrop,
   handleDragOver,
   handleDragStart,
+  hideNotification,
   isBonusActive,
   moveDown,
   moveUp,
@@ -1623,9 +1627,9 @@ export class View {
                 ${Localization.txt('actions>tooltip>higher_done_percent_benefic')}<br>
                 <div class='bold'>${
       Localization.txt('actions>tooltip>progress_label')
-    }</div> <div id='progress${action.varName}${varSuffix}'></div>%
+    }</div><div id='progress${action.varName}${varSuffix}'></div>%
             </div>
-            <div id='hideVarButton${action.varName}${varSuffix}' class='hideVarButton far' onclick='globalThis.view.toggleHidden("${action.varName}${varSuffix}")'></div>
+            <div id='hideVarButton${action.varName}${varSuffix}' class='hideVarButton far'></div>
         </div>`;
     const progressDiv = document.createElement('div');
     progressDiv.className = 'townContainer progressType';
@@ -1788,12 +1792,6 @@ export class View {
                 id='container${action.varName}'
                 class='${divClass} actionOrTravelContainer ${action.type}ActionContainer showthat'
                 draggable='true'
-                ondragover='globalThis.driver.handleDragOver(event)'
-                ondragstart='globalThis.driver.handleDirectActionDragStart(event, "${action.name}", ${action.townNum}, "${action.varName}", false)'
-                ondragend='globalThis.driver.handleDirectActionDragEnd("${action.varName}")'
-                onclick='globalThis.driver.addActionToList("${action.name}", ${action.townNum})'
-                onmouseover='globalThis.view.updateAction("${action.varName}")'
-                onmouseout='globalThis.view.updateAction(undefined)'
             >
                 <label>${action.label}</label><br>
                 <div style='position:relative'>
@@ -1824,6 +1822,19 @@ export class View {
 
     const actionsDiv = document.createElement('div');
     actionsDiv.innerHTML = totalDivText;
+
+    requestAnimationFrame(() => {
+      const container = document.getElementById(`container${action.varName}`) as HTMLButtonElement;
+
+      container.ondragover = () => handleDragOver(event);
+      container.ondragstart = () =>
+        handleDirectActionDragStart(event, action.name, action.townNum, action.varName, false);
+      container.ondragend = () => handleDirectActionDragEnd(action.varName);
+      container.onclick = () => addActionToList(action.name, action.townNum);
+      container.onmouseover = () => view.updateAction(action.varName);
+      container.onmouseout = () => view.updateAction(undefined);
+    });
+
     actionOptionsTown[action.townNum].querySelector(`:scope > .${isTravel ? 'travelDiv' : 'actionDiv'}`).appendChild(
       actionsDiv,
     );
@@ -1847,7 +1858,7 @@ export class View {
       }
 
       const storyDivText =
-        `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false' onmouseover='globalThis.driver.hideNotification("storyContainer${action.varName}")'>${action.label}
+        `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false'>${action.label}
                     <br>
                     <div style='position:relative'>
                         <img src='icons/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>
@@ -1860,6 +1871,12 @@ export class View {
 
       const storyDiv = document.createElement('div');
       storyDiv.innerHTML = storyDivText;
+
+      requestAnimationFrame(() => {
+        const container = document.getElementById(`storyContainer${action.varName}`) as HTMLDivElement;
+        container.onmouseover = () => hideNotification(`storyContainer${action.varName}`);
+      });
+
       actionStoriesTown[action.townNum].appendChild(storyDiv);
     }
   }
@@ -1916,9 +1933,7 @@ export class View {
   }
 
   createTownInfo(action) {
-    const totalInfoText =
-      // important that there be 8 element children of townInfoContainer (excluding the showthis popup and hideVarButton)
-      `
+    const totalInfoText = `
             <div class='townInfoContainer showthat'>
                 <div class='bold townLabel'>${action.labelDone}</div>
                 <div class='numeric goodTemp' id='goodTemp${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
@@ -1927,14 +1942,22 @@ export class View {
                 <input type='checkbox' id='searchToggler${action.varName}' style='margin-left:10px;'>
                 <label for='searchToggler${action.varName}'> Lootable first</label>
                 <div class='showthis'>${action.infoText()}</div>
-                <div class='hideVarButton far' onclick='globalThis.view.toggleHidden("${action.varName}")'></div>
-            </div><br>`;
+                <div id='hideVarButton${action.varName}' class='hideVarButton far'></div>
+            </div><br>
+    `;
 
     const infoDiv = document.createElement('div');
     infoDiv.className = 'townContainer infoType';
     infoDiv.id = `infoContainer${action.varName}`;
     infoDiv.style.display = '';
     infoDiv.innerHTML = totalInfoText;
+
+    requestAnimationFrame(() => {
+      const hidevarButton = document.getElementById(`hideVarButton${action.varName}`) as HTMLDivElement;
+
+      hidevarButton.onclick = () => view.toggleHidden(`${action.varName}`);
+    });
+
     townInfos[action.townNum].appendChild(infoDiv);
     if (towns[action.townNum].hiddenVars.has(action.varName)) {
       infoDiv.classList.add('user-hidden');
@@ -1956,20 +1979,13 @@ export class View {
                     </div>`;
     }
     const completedTooltip = action.completedTooltip ? action.completedTooltip() : '';
-    let mouseOver = '';
-    if (varName === 'SDungeon') {
-      mouseOver = "onmouseover='view.showDungeon(0)' onmouseout='view.showDungeon(undefined)'";
-    } else if (varName === 'LDungeon') {
-      mouseOver = "onmouseover='view.showDungeon(1)' onmouseout='view.showDungeon(undefined)'";
-    } else if (varName === 'TheSpire') {
-      mouseOver = "onmouseover='view.showDungeon(2)' onmouseout='view.showDungeon(undefined)'";
-    }
+
     const totalDivText = `
             <div class='townStatContainer' id='infoContainer${varName}'>
                 <div class='multipartLabel'>
                     <div class='flexMargin'></div>
                     <div class='bold townLabel' id='multiPartName${varName}'></div>
-                    <div id='completedInfo${varName}' class='completedInfo showthat' ${mouseOver}>
+                    <div id='completedInfo${varName}' class='completedInfo showthat'>
                         <div class='bold'>${action.labelDone}</div>
                         <div id='completed${varName}'></div>
                         ${
@@ -1983,13 +1999,31 @@ export class View {
                 <div class='multipartBars'>
                     ${pbars}
                 </div>
-                <div class='hideVarButton far' onclick='globalThis.view.toggleHidden("${action.varName}")'></div>
+                <div id='hideVarButton${action.varName}' class='hideVarButton far'></div>
             </div>`;
 
     const progressDiv = document.createElement('div');
     progressDiv.className = 'townContainer multipartType';
     progressDiv.style.display = '';
     progressDiv.innerHTML = totalDivText;
+
+    requestAnimationFrame(() => {
+      const hidevarButton = document.getElementById(`hideVarButton${action.varName}`) as HTMLDivElement;
+      hidevarButton.onclick = () => view.toggleHidden(`${action.varName}`);
+
+      const completedInfo = document.getElementById(`completedInfo${action.varName}`) as HTMLDivElement;
+      if (action.varName === 'SDungeon') {
+        completedInfo.onmouseover = () => view.showDungeon(0);
+        completedInfo.onmouseout = () => view.showDungeon(undefined);
+      } else if (action.varName === 'LDungeon') {
+        completedInfo.onmouseover = () => view.showDungeon(1);
+        completedInfo.onmouseout = () => view.showDungeon(undefined);
+      } else if (action.varName === 'TheSpire') {
+        completedInfo.onmouseover = () => view.showDungeon(2);
+        completedInfo.onmouseout = () => view.showDungeon(undefined);
+      }
+    });
+
     townInfos[action.townNum].appendChild(progressDiv);
     if (towns[action.townNum].hiddenVars.has(action.varName)) {
       progressDiv.firstElementChild.classList.add('user-hidden');
@@ -2412,5 +2446,3 @@ export function updateBuffCaps() {
 }
 
 export const view = new View();
-
-globalThis.view = view;
