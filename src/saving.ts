@@ -41,7 +41,7 @@ import { loadChallenge } from './challenges.ts';
 import { Koviko } from './predictor.ts';
 
 const defaultSaveName = 'idleLoops1';
-const challengeSaveName = 'idleLoopsChallenge';
+export const challengeSaveName = 'idleLoopsChallenge';
 let saveName = defaultSaveName;
 
 const timeNeededInitial = 5 * 50;
@@ -1086,49 +1086,10 @@ export function importCurrentList() {
   view.updateNextActions();
 }
 
-export function beginChallenge(challengeNum) {
-  console.log('Beginning Challenge');
-  if (globalThis.localStorage[challengeSaveName] && globalThis.localStorage[challengeSaveName] !== '') {
-    if (confirm('Beginning a new challenge will delete your current challenge save. Are you sure you want to begin?')) {
-      globalThis.localStorage[challengeSaveName] = '';
-    } else {
-      return false;
-    }
-  }
-  if (vals.challengeSave.challengeMode === 0) {
-    vals.challengeSave.inChallenge = true;
-    save();
-    console.log('Saving to: ' + saveName);
-  }
-  vals.challengeSave.challengeMode = challengeNum;
-  saveName = challengeSaveName;
-  load(true);
-  vals.totalOfflineMs = 1000000;
-  save();
-  pauseGame();
-  restart();
+export function setSaveName(name: string) {
+  saveName = name;
 }
 
-export function exitChallenge() {
-  if (vals.challengeSave.challengeMode !== 0) {
-    saveName = defaultSaveName;
-    load(false);
-    save();
-    location.reload();
-  }
-}
-
-export function resumeChallenge() {
-  if (
-    vals.challengeSave.challengeMode === 0 && globalThis.localStorage[challengeSaveName] &&
-    globalThis.localStorage[challengeSaveName] !== ''
-  ) {
-    vals.challengeSave.inChallenge = true;
-    save();
-    saveName = challengeSaveName;
-    load(true);
-    save();
-    pauseGame();
-    restart();
-  }
+export function getSaveName() {
+  return saveName;
 }

@@ -1,19 +1,5 @@
 import { view } from './views/main.view.ts';
-import {
-  beginChallenge,
-  exitChallenge,
-  exportCurrentList,
-  exportSave,
-  exportSaveFile,
-  importCurrentList,
-  importSave,
-  importSaveFile,
-  openSaveFile,
-  resumeChallenge,
-  save,
-  setOption,
-  vals,
-} from './saving.ts';
+import { setOption, vals } from './saving.ts';
 import { t } from './locales/translations.utils.ts';
 
 import { WelcomeMessage } from './modules/WelcomeMessage.tsx';

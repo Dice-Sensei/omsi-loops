@@ -6,7 +6,7 @@ import { addMana, addResource, driverVals, resetResources } from './driver.ts';
 import { view } from './views/main.view.ts';
 import { vals } from './saving.ts';
 
-enum ChallengeMode {
+export enum ChallengeMode {
   ManaDrought = 1,
   NoodleArms = 2,
   ManaBurn = 3,

@@ -220,28 +220,7 @@ export class View {
     this.modifierkeychangeHandler = this.modifierkeychangeHandler.bind(this);
   }
 
-  mouseoverHandler(event) {
-    if (!(event.target instanceof HTMLElement)) return;
-    const trigger = this.getClosestTrigger(event.target);
-    this.mouseoverCount++;
-    if (trigger) {
-      let tooltipSelector = '';
-      for (const cls of trigger.classList) {
-        if (cls.startsWith('showthat')) {
-          tooltipSelector = `.showthis${cls.slice(8)}`;
-          break;
-        }
-      }
-      if (tooltipSelector === '') {
-        console.warn('Could not find tooltip class for trigger! Using generic selector', trigger);
-        tooltipSelector = '.showthis,.showthisO,.showthis2,.popover-content,.showthisloadout,.showthisstory';
-      }
-      for (const tooltip of trigger.querySelectorAll(tooltipSelector)) {
-        if (tooltip instanceof HTMLElement) {
-          this.fixTooltipPosition(tooltip, trigger, event.target);
-        }
-      }
-    }
+  mouseoverHandler() {
   }
 
   modifierkeychangeHandler() {
