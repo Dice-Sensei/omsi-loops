@@ -11,6 +11,21 @@ import { performGamePause } from '../../../../original/driver.ts';
 import { Card } from '../../../../components/containers/Card/Card.tsx';
 import { getActionPrototype } from '../../../../original/actionList.ts';
 import { readFileContents } from '../../../../utils/readFileContents.ts';
+import { saveTextFile } from '../../../../utils/saveTextFile.tsx';
+import { createRef, Reference } from '../../../../signals/createRef.ts';
+import { maybe } from '../../../../utils/maybe.tsx';
+import { Popover } from '../../../../components/containers/Popover/Popover.tsx';
+
+const loadSaveState = (saveStr: string) => {
+  if (!confirm(t('menu.save.messages.loadWarning'))) return;
+  const save = decompressFromBase64(saveStr);
+
+  globalThis.localStorage[getSaveName()] = save;
+
+  performClearSave();
+  performGameLoad(null, save);
+  performGamePause();
+};
 
 const parseActionListToStr = (actions: any): string => actions.map(({ name, loops }) => `${loops}x ${name}`).join('\n');
 
@@ -27,44 +42,14 @@ const parseActionListFromStr = (str: string): { action: any; name: string; loops
   return actions;
 };
 
-const saveTextFile = (content: string, title: string) => {
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${title}.txt`;
-  a.click();
-
-  URL.revokeObjectURL(url);
-  a.remove();
-};
-
-const loadSaveState = (saveStr: string) => {
-  if (!confirm(t('menu.save.messages.loadWarning'))) return;
-
-  const save = decompressFromBase64(saveStr);
-  globalThis.localStorage[getSaveName()] = save;
-
-  performClearSave();
-  performGameLoad(null, save);
-  performGamePause();
-};
-
-export const SaveMenu = () => {
+const manageActionList = (inputRef: Reference<HTMLTextAreaElement>) => {
   const [actionlistStr, setActionlistStr] = createSignal<string>('');
-  const [saveStr, setSaveStr] = createSignal<string>('');
-  const isSaveStrValid = createMemo(() => typeof decompressFromBase64(saveStr()) === 'object');
   const isActionListValid = createMemo(() => !!parseActionListFromStr(actionlistStr()));
-
-  let manageActionlistRef!: HTMLTextAreaElement;
-  let manageTextRef!: HTMLInputElement;
-  let manageFileRef!: HTMLInputElement;
 
   const exportActionList = () => {
     setActionlistStr(parseActionListToStr(actions.next));
 
-    manageActionlistRef.select();
+    inputRef.active.select();
     navigator.clipboard.writeText(actionlistStr());
   };
 
@@ -76,21 +61,52 @@ export const SaveMenu = () => {
     view.updateNextActions();
   };
 
-  const importSaveText = () => loadSaveState(saveStr());
+  return {
+    actionlistStr,
+    setActionlistStr,
+    isActionListValid,
+    exportActionList,
+    importActionList,
+  };
+};
+
+const manageSaveText = (inputRef: Reference<HTMLInputElement>) => {
+  const [saveStr, setSaveStr] = createSignal<string>('');
+
+  const isSaveStrValid = createMemo(() =>
+    maybe(() => typeof JSON.parse(decompressFromBase64(saveStr())) === 'object', false)
+  );
+
+  const selectSaveText = () => inputRef.active.select();
   const exportSaveText = () => {
     setSaveStr(compressToBase64(performSaveGame()));
 
-    manageTextRef.select();
+    selectSaveText();
     navigator.clipboard.writeText(saveStr());
   };
 
-  const selectSaveFile = () => manageFileRef.click();
+  const importSaveText = () => loadSaveState(saveStr());
+
+  return {
+    saveStr,
+    setSaveStr,
+    isSaveStrValid,
+    selectSaveText,
+    exportSaveText,
+    importSaveText,
+  };
+};
+
+const manageSaveFile = (inputRef: Reference<HTMLInputElement>) => {
+  const selectSaveFile = () => inputRef.active.click();
+
   const importSaveFile = async (event: Event) => {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
 
     loadSaveState(await readFileContents(file));
   };
+
   const exportSaveFile = () => {
     const name = t('game.title');
     const version = t('menu.changelog.versions.0.name');
@@ -100,60 +116,98 @@ export const SaveMenu = () => {
     return saveTextFile(compressToBase64(performSaveGame()), savename);
   };
 
+  return {
+    selectSaveFile,
+    importSaveFile,
+    exportSaveFile,
+  };
+};
+
+const ManageSaveFileSection = () => {
+  const manageFileRef = createRef<HTMLInputElement>();
+  const { selectSaveFile, importSaveFile, exportSaveFile } = manageSaveFile(manageFileRef);
+
   return (
-    <div class='contains-popover'>
-      {t('menu.save.title')}
-      <div class='popover-content'>
-        <Card class='flex flex-col gap-2 z-50'>
-          <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>
-          <hr class='border-neutral-500'></hr>
-          <span class='font-bold'>{t('menu.save.titles.actionlist')}</span>
-          <span>{t('menu.save.messages.manageActionlist')}</span>
-          <textarea
-            ref={manageActionlistRef}
-            class='
+    <section class='flex flex-col gap-2'>
+      <span class='font-bold'>{t('menu.save.titles.saveToFile')}</span>
+      <span>{t('menu.save.messages.manageSaveFile')}</span>
+      <div class='grid grid-cols-2 gap-2'>
+        <Button onClick={exportSaveFile}>{t('menu.save.actions.export')}</Button>
+        <Button onClick={selectSaveFile}>{t('menu.save.actions.import')}</Button>
+      </div>
+      <input ref={manageFileRef} class='hidden' type='file' onChange={importSaveFile} />
+    </section>
+  );
+};
+
+const ManageSaveTextSection = () => {
+  const manageTextRef = createRef<HTMLInputElement>();
+  const { saveStr, setSaveStr, isSaveStrValid, exportSaveText, importSaveText } = manageSaveText(manageTextRef);
+
+  return (
+    <section class='flex flex-col gap-2'>
+      <span class='font-bold'>{t('menu.save.titles.saveToText')}</span>
+      <span>{t('menu.save.messages.manageSaveText')}</span>
+      <input
+        ref={manageTextRef}
+        class='
+              px-2
+              border border-neutral-500 hover:border-neutral-700
+              rounded-sm
+              transition-colors duration-100
+            '
+        value={saveStr()}
+        oninput={(e) => setSaveStr(e.target.value)}
+      >
+      </input>
+      <div class='grid grid-cols-2 gap-2'>
+        <Button onClick={exportSaveText}>{t('menu.save.actions.export')}</Button>
+        <Button disabled={!isSaveStrValid()} onClick={importSaveText}>{t('menu.save.actions.import')}</Button>
+      </div>
+    </section>
+  );
+};
+
+const ManageActionlistSection = () => {
+  const manageActionlistRef = createRef<HTMLTextAreaElement>();
+  const { actionlistStr, setActionlistStr, isActionListValid, exportActionList, importActionList } = manageActionList(
+    manageActionlistRef,
+  );
+
+  return (
+    <section class='flex flex-col gap-2'>
+      <span class='font-bold'>{t('menu.save.titles.actionlist')}</span>
+      <span>{t('menu.save.messages.manageActionlist')}</span>
+      <textarea
+        ref={manageActionlistRef}
+        class='
               w-full min-h-20 max-h-80
               px-2
               border border-neutral-500 hover:border-neutral-700
               rounded-sm
               transition-colors duration-100
             '
-            value={actionlistStr()}
-            oninput={(e) => setActionlistStr(e.target.value)}
-          />
-          <div class='grid grid-cols-2 gap-2'>
-            <Button onClick={exportActionList}>{t('menu.save.actions.export')}</Button>
-            <Button disabled={!isActionListValid()} onClick={importActionList}>{t('menu.save.actions.import')}</Button>
-          </div>
-          <hr class='border-neutral-500'></hr>
-          <span class='font-bold'>{t('menu.save.titles.saveToText')}</span>
-          <span>{t('menu.save.messages.manageSaveText')}</span>
-          <input
-            ref={manageTextRef}
-            class='
-              px-2
-              border border-neutral-500 hover:border-neutral-700
-              rounded-sm
-              transition-colors duration-100
-            '
-            value={saveStr()}
-            oninput={(e) => setSaveStr(e.target.value)}
-          >
-          </input>
-          <div class='grid grid-cols-2 gap-2'>
-            <Button onClick={exportSaveText}>{t('menu.save.actions.export')}</Button>
-            <Button disabled={!isSaveStrValid()} onClick={importSaveText}>{t('menu.save.actions.import')}</Button>
-          </div>
-          <hr class='border-neutral-500'></hr>
-          <span class='font-bold'>{t('menu.save.titles.saveToFile')}</span>
-          <span>{t('menu.save.messages.manageSaveFile')}</span>
-          <div class='grid grid-cols-2 gap-2'>
-            <Button onClick={exportSaveFile}>{t('menu.save.actions.export')}</Button>
-            <Button onClick={selectSaveFile}>{t('menu.save.actions.import')}</Button>
-          </div>
-          <input ref={manageFileRef} class='hidden' type='file' onChange={importSaveFile} />
-        </Card>
+        value={actionlistStr()}
+        oninput={(e) => setActionlistStr(e.target.value)}
+      />
+      <div class='grid grid-cols-2 gap-2'>
+        <Button onClick={exportActionList}>{t('menu.save.actions.export')}</Button>
+        <Button disabled={!isActionListValid()} onClick={importActionList}>{t('menu.save.actions.import')}</Button>
       </div>
-    </div>
+    </section>
   );
 };
+
+export const SaveMenu = () => (
+  <Popover title={t('menu.save.title')}>
+    <Card class='flex flex-col gap-2'>
+      <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>
+      <hr class='border-neutral-500'></hr>
+      <ManageActionlistSection />
+      <hr class='border-neutral-500'></hr>
+      <ManageSaveTextSection />
+      <hr class='border-neutral-500'></hr>
+      <ManageSaveFileSection />
+    </Card>
+  </Popover>
+);

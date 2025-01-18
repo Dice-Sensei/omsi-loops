@@ -477,9 +477,6 @@ export function performGameLoad(inChallenge, saveJson = globalThis.localStorage[
 
   vals.loadouts = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
   vals.loadoutnames = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
-  // loadoutnames[-1] is what displays in the loadout renaming box when no loadout is selected
-  // It isn't technically part of the array, just a property on it, so it doesn't count towards loadoutnames.length
-  vals.loadoutnames[-1] = '';
 
   let toLoad = {};
   // has a save file
