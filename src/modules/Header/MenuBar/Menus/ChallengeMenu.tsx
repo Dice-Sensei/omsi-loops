@@ -1,8 +1,15 @@
 import { ChallengeMode } from '../../../../original/challenges.ts';
 import { Button } from '../../../../components/buttons/Button/Button.tsx';
-import { challengeSaveName, getSaveName, load, save, setSaveName, vals } from '../../../../original/saving.ts';
+import {
+  challengeSaveName,
+  getSaveName,
+  performGameLoad,
+  performSaveGame,
+  setSaveName,
+  vals,
+} from '../../../../original/saving.ts';
 import { t } from '../../../../locales/translations.utils.ts';
-import { pauseGame, restart } from '../../../../original/driver.ts';
+import { performGamePause, performGameRestart } from '../../../../original/driver.ts';
 
 function beginChallenge(challenge: ChallengeMode) {
   console.log('Beginning Challenge');
@@ -17,26 +24,26 @@ function beginChallenge(challenge: ChallengeMode) {
 
   if (vals.challengeSave.challengeMode === 0) {
     vals.challengeSave.inChallenge = true;
-    save();
+    performSaveGame();
     console.log('Saving to: ' + getSaveName());
   }
 
   vals.challengeSave.challengeMode = challenge;
   setSaveName(challengeSaveName);
 
-  load(true);
+  performGameLoad(true);
   vals.totalOfflineMs = 1000000;
 
-  save();
-  pauseGame();
-  restart();
+  performSaveGame();
+  performGamePause();
+  performGameRestart();
 }
 
 function exitChallenge() {
   if (vals.challengeSave.challengeMode !== 0) {
     setSaveName(vals.defaultSaveName);
-    load(false);
-    save();
+    performGameLoad(false);
+    performSaveGame();
     location.reload();
   }
 }
@@ -47,12 +54,12 @@ function resumeChallenge() {
     globalThis.localStorage[challengeSaveName] !== ''
   ) {
     vals.challengeSave.inChallenge = true;
-    save();
+    performSaveGame();
     setSaveName(challengeSaveName);
-    load(true);
-    save();
-    pauseGame();
-    restart();
+    performGameLoad(true);
+    performSaveGame();
+    performGamePause();
+    performGameRestart();
   }
 }
 

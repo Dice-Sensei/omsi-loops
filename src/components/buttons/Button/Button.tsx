@@ -20,6 +20,8 @@ export const Button = (props: ButtonProps) => {
         border rounded-sm
         bg-amber-500 active:bg-amber-600 hover:bg-amber-400 
         border-amber-600 active:border-amber-700
+        disabled:bg-amber-300 disabled:border-amber-400 
+        disabled:text-neutral-500 disabled:cursor-not-allowed
         transition-all duration-100
         `,
         props.class,

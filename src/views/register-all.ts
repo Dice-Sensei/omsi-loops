@@ -1,6 +1,6 @@
 import { buffList, statList } from '../original/globals.ts';
 import { prestigeUpgrade, resetAllPrestiges } from '../original/prestige.ts';
-import { borrowTime, manualRestart, pauseGame, returnTime, toggleOffline } from '../original/driver.ts';
+import { borrowTime, manualRestart, performGamePause, returnTime, toggleOffline } from '../original/driver.ts';
 import { actions } from '../original/actions.ts';
 import { updateBuffCaps, view } from './main.view.ts';
 import { vals } from '../original/saving.ts';
@@ -20,7 +20,7 @@ export const setActions = () => {
     returnTimeButton.onclick = () => returnTime();
 
     const pauseButton = document.getElementById(pauseButtonId)!;
-    pauseButton.onclick = () => pauseGame();
+    pauseButton.onclick = () => performGamePause();
 
     const restartButton = document.getElementById(restartButtonId)!;
     restartButton.onclick = () => manualRestart();

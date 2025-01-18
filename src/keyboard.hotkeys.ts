@@ -10,7 +10,7 @@ import {
   loadList,
   loadLoadout,
   manualRestart,
-  pauseGame,
+  performGamePause,
   saveList,
   toggleOffline,
 } from './original/driver.ts';
@@ -48,22 +48,22 @@ export const createKeyboardHotkeys = () => {
   Keyboard
     .listens([{
       onDown: {
-        fn: () => pauseGame(),
+        fn: () => performGamePause(),
         description: t('shortcuts.pauseGame'),
       },
-      combination: 'space',
+      combination: 'alt+space',
     }, {
       onDown: {
         fn: () => manualRestart(),
         description: t('shortcuts.manualRestart'),
       },
-      combination: 'r',
+      combination: 'alt+r',
     }, {
       onDown: {
         fn: () => toggleOffline(),
         description: t('shortcuts.toggleOffline'),
       },
-      combination: 'b',
+      combination: 'alt+b',
     }, {
       onDown: {
         fn: () => loadLoadout(1),

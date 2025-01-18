@@ -45,7 +45,7 @@ import {
   adjustAll,
   capAllTraining,
   driverVals,
-  pauseGame,
+  performGamePause,
   resetResource,
   unlockTown,
 } from './driver.ts';
@@ -720,7 +720,7 @@ export function SurveyAction(townNum) {
         towns[this.townNum].finishProgress(this.varName, getExploreSkill());
         view.requestUpdate('updateActionTooltips', null);
       } else if (vals.options.pauseOnComplete) {
-        pauseGame(true, 'Survey complete! (Game paused)');
+        performGamePause(true, 'Survey complete! (Game paused)');
       }
     },
   });

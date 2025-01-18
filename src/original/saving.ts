@@ -26,9 +26,9 @@ import {
   adjustAll,
   checkExtraSpeed,
   isBonusActive,
-  pauseGame,
+  performGamePause,
+  performGameRestart,
   recalcInterval,
-  restart,
   showNotification,
   toggleOffline,
 } from './driver.ts';
@@ -309,7 +309,7 @@ export function compressToBase64(item) {
 
 export function startGame() {
   // load calls recalcInterval, which will start the callbacks
-  load();
+  performGameLoad();
 }
 
 export function _town(townNum) {
@@ -398,7 +398,7 @@ export function setOption(option, value, updateUI = false) {
   vals.options[option] = value;
   handleOption(option, value, false, () => document.getElementById(`${option}Input`));
   if (vals.options[option] !== oldValue) {
-    save();
+    performSaveGame();
   }
   if (
     updateUI &&
@@ -434,10 +434,12 @@ export function clearPauseNotification() {
   }
 }
 
-export function clearSave() {
+export function performClearSave() {
+  actions.clearActions();
+  actions.current = [];
+  vals.challengeSave = {};
   globalThis.localStorage[vals.defaultSaveName] = '';
   globalThis.localStorage[challengeSaveName] = '';
-  location.reload();
 }
 
 let defaultsRecorded = false;
@@ -469,7 +471,7 @@ export function needsDataSnapshots() {
   return vals.options.predictor && vals.options.predictorBackgroundThread;
 }
 
-export function load(inChallenge, saveJson = globalThis.localStorage[saveName]) {
+export function performGameLoad(inChallenge, saveJson = globalThis.localStorage[saveName]) {
   loadDefaults();
   loadUISettings();
 
@@ -502,7 +504,7 @@ export function load(inChallenge, saveJson = globalThis.localStorage[saveName]) 
   if (saveName === defaultSaveName && vals.challengeSave.inChallenge === true) {
     console.log('Switching to challenge save');
     saveName = challengeSaveName;
-    load(true);
+    performGameLoad(true);
     return;
   }
 
@@ -859,11 +861,11 @@ export function doLoad(toLoad) {
   if (toLoad.challenge !== undefined && toLoad.challenge !== 0) {
     vals.challengeSave.challengeMode = 0;
     vals.challengeSave.inChallenge = true;
-    save();
+    performSaveGame();
 
     vals.challengeSave.challengeMode = toLoad.challenge;
     saveName = challengeSaveName;
-    save();
+    performSaveGame();
     location.reload();
   }
 
@@ -880,7 +882,7 @@ export function doLoad(toLoad) {
   view.updateStories(true);
   view.update();
   recalcInterval(vals.options.updateRate);
-  pauseGame();
+  performGamePause();
 }
 
 export function doSave() {
@@ -954,8 +956,9 @@ export function doSave() {
   return toSave;
 }
 
-export function save() {
+export function performSaveGame() {
   const toSave = doSave();
+
   const saveJson = JSON.stringify(toSave);
   globalThis.localStorage[saveName] = saveJson;
   globalThis.localStorage['updateRate'] = vals.options.updateRate;

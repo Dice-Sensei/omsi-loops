@@ -1,5 +1,5 @@
 import { towns } from './globals.ts';
-import { adjustAll, pauseGame } from './driver.ts';
+import { adjustAll, performGamePause } from './driver.ts';
 import { isTravel, lateGameActions } from './actionList.ts';
 import { view } from '../views/main.view.ts';
 import { vals } from './saving.ts';
@@ -76,7 +76,7 @@ export class Town<TN extends number> {
     // return if capped, for performance
     if (this[`exp${varName}`] === 505000) {
       if (vals.options.pauseOnComplete) {
-        pauseGame(true, 'Progress complete! (Game paused)');
+        performGamePause(true, 'Progress complete! (Game paused)');
       } else return;
     }
 

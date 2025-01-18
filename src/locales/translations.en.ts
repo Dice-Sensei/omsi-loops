@@ -5,6 +5,9 @@ export type ChangelogEntry = {
 };
 
 export const translationsEn = {
+  game: {
+    title: 'omsi-loops',
+  },
   actions: {
     amounts: {
       title: 'Amount',
@@ -736,15 +739,12 @@ export const translationsEn = {
         manageActionlist: 'Exports the current list in plain-text',
         manageSaveText: 'Exports the savestate as a b64-text',
         manageSaveFile: 'Exports the savestate as a b64-file',
+        loadWarning: 'Warning: This will overwrite your current save!',
       },
       actions: {
         saveGame: 'Save game',
-        exportList: 'Export current list',
-        importList: 'Import list to active',
-        exportSaveToText: 'Export text',
-        importSaveToText: 'Import text',
-        exportSaveToFile: 'Export file',
-        importSaveToFile: 'Import file',
+        import: 'Import',
+        export: 'Export',
       },
     },
     faq: {

@@ -1,6 +1,7 @@
 import { CheckboxField } from '../../../../components/forms/CheckboxField.tsx';
 import { Menu } from '../MenuBar.types.ts';
 import { useMenuBar } from '../MenuBar.context.ts';
+import { t } from '../../../../locales/translations.utils.ts';
 
 export const ManagmentMenu = () => {
   const { toggleVisible, isVisible } = useMenuBar();

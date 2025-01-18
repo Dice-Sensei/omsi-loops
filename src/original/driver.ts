@@ -26,7 +26,14 @@ import {
   isTraining,
   trainingActions,
 } from './actionList.ts';
-import { clearPauseNotification, needsDataSnapshots, save, setOption, showPauseNotification, vals } from './saving.ts';
+import {
+  clearPauseNotification,
+  needsDataSnapshots,
+  performSaveGame,
+  setOption,
+  showPauseNotification,
+  vals,
+} from './saving.ts';
 import { Data } from './data.ts';
 import { KeyboardKey } from '../keyboard.hotkeys.ts';
 import { Localization } from './localization.ts';
@@ -125,7 +132,7 @@ export function tick() {
   // save even when paused
   if (curTime - lastSave > vals.options.autosaveRate * 1000) {
     lastSave = curTime;
-    save();
+    performSaveGame();
   }
 
   // don't do any updates until we've got enough time built up to match the refresh rate setting
@@ -283,7 +290,7 @@ export function stopGame() {
   }
 }
 
-export function pauseGame(ping?: boolean, message?: string) {
+export function performGamePause(ping?: boolean, message?: string) {
   gameIsStopped = !gameIsStopped;
   if (needsDataSnapshots()) {
     Data.discardToSnapshot('base', 1);
@@ -302,7 +309,7 @@ export function pauseGame(ping?: boolean, message?: string) {
   if (
     !gameIsStopped && (vals.shouldRestart || vals.timer >= vals.timeNeeded)
   ) {
-    restart();
+    performGameRestart();
   } else if (ping) {
     if (vals.options.pingOnPause) {
       beep(250);
@@ -360,11 +367,11 @@ export function prepareRestart() {
     }
     stopGame();
   } else {
-    restart();
+    performGameRestart();
   }
 }
 
-export function restart() {
+export function performGameRestart() {
   vals.shouldRestart = false;
   vals.timer = 0;
   driverVals.timeCounter = 0;
@@ -388,7 +395,7 @@ export function restart() {
 
 export function manualRestart() {
   loopEnd();
-  restart();
+  performGameRestart();
   view.update();
 }
 
@@ -475,12 +482,12 @@ export function loadLoadout(num) {
 let globalCustomInput = '';
 export function saveList() {
   if (vals.curLoadout === 0) {
-    save();
+    performSaveGame();
     return;
   }
   nameList(false);
   vals.loadouts[vals.curLoadout] = copyArray(actions.next);
-  save();
+  performSaveGame();
   if ((document.getElementById('renameLoadout').value !== 'Saved!')) {
     globalCustomInput = document.getElementById('renameLoadout').value;
   }
@@ -505,7 +512,7 @@ export function nameList(saveGame) {
     document.getElementById('renameLoadout').value = 'Enter a name!';
   }
   document.getElementById(`load${vals.curLoadout}`).textContent = vals.loadoutnames[vals.curLoadout - 1];
-  if (saveGame) save();
+  if (saveGame) performSaveGame();
 }
 
 export function loadList() {

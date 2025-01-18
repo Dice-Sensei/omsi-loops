@@ -2,7 +2,7 @@ import { addExp, getExpToLevel, getTotalBonusXP } from './stats.ts';
 import { Action, getActionPrototype, getPossibleTravel, translateClassNames, withoutSpaces } from './actionList.ts';
 import { clamp, Mana } from './helpers.ts';
 import { hearts, resources, statList, stats, towns } from './globals.ts';
-import { driverVals, getSpeedMult, pauseGame } from './driver.ts';
+import { driverVals, getSpeedMult, performGamePause } from './driver.ts';
 import { prestigeBonus } from './prestige.ts';
 import { setStoryFlag, view } from '../views/main.view.ts';
 import { actions } from './actions.ts';
@@ -332,7 +332,7 @@ export class Actions {
       }
     }
     if (this.current.length === 0) {
-      pauseGame();
+      performGamePause();
     }
     this.adjustTicksNeeded();
     view.requestUpdate('updateMultiPartActions');
@@ -593,6 +593,14 @@ export class Actions {
     }
     if (nextValidIndex === Infinity && prevValidIndex === -Infinity) return desiredIndex; // nowhere is good so anywhere is fine
     return nextValidIndex - desiredIndex <= desiredIndex - prevValidIndex ? nextValidIndex : prevValidIndex; // send it to whichever is closer
+  }
+
+  fromRecords(records) {
+    this.clearActions();
+    for (const { action, name, loops } of records) {
+      if (!action.unlocked()) continue;
+      this.addActionRecord({ name, loops, disabled: false }, -1, false);
+    }
   }
 }
 

@@ -304,26 +304,24 @@ main, #actionLogContainer, #timeControlsMain, #timeControlsOptions {
 
 .showthis, .showthis2, .popover-content {
   visibility: hidden;
-  opacity: 0;
-  width: max-content;
-  max-width: 400px;
-  max-width: min(400px, 95svw);
+
+  
   position: fixed;
   color: var(--popup-color);
   background-color: var(--popup-background);
+  
   border: 1px solid;
+  
   padding: 3px 5px;
   border-radius: 4px;
   margin-top: 5px;
+  
   z-index: 999999;
-  text-align: left;
-  font-style: normal;
 }
 
 .popover-content {
   max-height: 95svh;
   overflow: auto;
-  overscroll-behavior: contain;
 }
 
 .showthatloadout {
