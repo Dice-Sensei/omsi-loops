@@ -2336,7 +2336,6 @@ export function setStoryFlag(name) {
     if (vals.options.actionLog) view.requestUpdate('updateStories', false);
   }
 }
-const unlockStory = setStoryFlag; // compatibility alias
 
 export function increaseStoryVarTo(name, value) {
   if (storyVars[name] < value) {

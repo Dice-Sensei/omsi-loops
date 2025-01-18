@@ -3,7 +3,7 @@ import { setOption } from '../../../../original/saving.ts';
 
 export const OptionsMenu = () => {
   return (
-    <li class='contains-popover'>
+    <div class='contains-popover'>
       Options
       <div class='popover-content'>
         <a target='_blank' href='https://discord.gg/dnKA6Xd'>
@@ -140,6 +140,6 @@ export const OptionsMenu = () => {
         </input>
         <br></br>
       </div>
-    </li>
+    </div>
   );
 };

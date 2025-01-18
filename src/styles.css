@@ -192,29 +192,7 @@ body {
   }
 }
 
-div {
-  display: inline-block;
-}
 
-div.block {
-  display: block;
-}
-
-
-menu {
-  margin: 0;
-  padding: 0;
-}
-
-menu > li:focus-within, #story_control:focus-within, #story_control:focus-within > div:first-child {
-  text-decoration: underline;
-  outline: none;
-  pointer-events: none; /* a second click bleeds through to base and defocuses the element */
-  & > * {
-    /* but children/tooltips are clickable */
-    pointer-events: initial;
-  }
-}
 #story_control:focus-within > div:first-child {
   pointer-events: none; /* repeating to override the initial */
 }
@@ -347,32 +325,6 @@ main, #actionLogContainer, #timeControlsMain, #timeControlsOptions {
   overflow: auto;
   overscroll-behavior: contain;
 }
-
-:is(.contains-popover, .contains-popover:hover) ul.popover-content {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  padding: 3px 0;
-  & > li {
-    padding: 0 5px;
-  }
-}
-
-ul#faq > li {
-  position: relative;
-  padding-right: 2.5em;
-  &::before {
-    content: 'Q: ';
-    font-weight: bold;
-  }
-  &:is(:hover, :focus-within)::after {
-    content: 'A →';
-    font-weight: bold;
-    position: absolute;
-    right: 2px;
-  }
-}
-
 
 .showthatloadout {
   padding: 1px 5px;
@@ -637,20 +589,6 @@ input, textarea, select {
   color: var(--default-color);
 }
 
-
-/*.button {*/
-/*border:2px white solid;*/
-/*background-color: #bde0b7;*/
-/*padding:3px 5px;*/
-/*cursor:pointer;*/
-/*border-radius:10px;*/
-/*min-width:9px;*/
-/*text-align:center;*/
-/*vertical-align:center;*/
-/*}*/
-/*.button:hover {*/
-/*border:2px blue solid;*/
-/*}*/
 
 .button, .loadoutbutton {
   padding: 1px 5px;

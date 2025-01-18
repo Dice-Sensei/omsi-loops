@@ -2,7 +2,7 @@ import { setOption } from '../../../../original/saving.ts';
 
 export const ExtraMenu = () => {
   return (
-    <li class='contains-popover'>
+    <div class='contains-popover'>
       Extras
       <div class='popover-content' style='padding-top:1ex'>
         The options in this menu allow you to customize the balance and functionality of the game in ways that affect
@@ -164,6 +164,6 @@ export const ExtraMenu = () => {
           </label>
         </div>
       </div>
-    </li>
+    </div>
   );
 };

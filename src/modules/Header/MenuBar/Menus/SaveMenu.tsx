@@ -12,7 +12,7 @@ import {
 
 export const SaveMenu = () => {
   return (
-    <li class='contains-popover'>
+    <div class='contains-popover'>
       {t('menu.save.title')}
       <div class='popover-content'>
         <button class='button' onClick={() => save()}>Save Manually</button>
@@ -60,6 +60,6 @@ export const SaveMenu = () => {
         </input>
         <br></br>
       </div>
-    </li>
+    </div>
   );
 };

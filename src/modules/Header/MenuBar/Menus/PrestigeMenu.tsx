@@ -1,6 +1,6 @@
 export const PrestigeMenu = () => {
   return (
-    <li class='contains-popover'>
+    <div class='contains-popover'>
       Prestige Perks
       <div class='popover-content'>
         <div>
@@ -128,6 +128,6 @@ export const PrestigeMenu = () => {
           <br></br>
         </div>
       </div>
-    </li>
+    </div>
   );
 };

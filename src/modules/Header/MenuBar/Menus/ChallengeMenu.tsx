@@ -58,7 +58,7 @@ function resumeChallenge() {
 
 export const ChallengeMenu = () => {
   return (
-    <li class='contains-popover'>
+    <div class='contains-popover'>
       {t('menu.challenges.title')}
       <div class='popover-content'>
         <div>{t('menu.challenges.messages.description')}</div>
@@ -97,6 +97,6 @@ export const ChallengeMenu = () => {
           </div>
         </div>
       </div>
-    </li>
+    </div>
   );
 };

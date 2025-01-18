@@ -5,13 +5,6 @@ import { formatTime } from '../../../../views/main.view.ts';
 import { createInterval } from '../../../../signals/createInterval.ts';
 
 export const StatisticMenu = () => {
-  // document.getElementById('totalPlaytime').textContent = `${formatTime(vals.totals.time)}`;
-  // document.getElementById('totalEffectiveTime').textContent = `${formatTime(vals.totals.effectiveTime)}`;
-  // document.getElementById('borrowedTimeBalance').textContent = formatTime(vals.totals.borrowedTime);
-  // document.getElementById('borrowedTimeDays').textContent = `${formatNumber(Math.floor(vals.totals.borrowedTime / 86400))}${Localization.txt('time_controls>days')}`;
-  // document.getElementById('totalLoops').textContent = `${formatNumber(vals.totals.loops)}`;
-  // document.getElementById('totalActions').textContent = `${formatNumber(vals.totals.actions)}`;
-
   const [store, setStore] = createStore({
     time: vals.totals.time,
     effectiveTime: vals.totals.effectiveTime,
@@ -28,10 +21,10 @@ export const StatisticMenu = () => {
       loops: vals.totals.loops,
       actions: vals.totals.actions,
     });
-  });
+  }, 1000);
 
   return (
-    <li class='contains-popover'>
+    <div class='contains-popover'>
       Totals
       <div class='popover-content'>
         <div class='grid grid-cols-[1fr_auto] gap-2'>
@@ -57,6 +50,6 @@ export const StatisticMenu = () => {
           </span>
         </div>
       </div>
-    </li>
+    </div>
   );
 };
