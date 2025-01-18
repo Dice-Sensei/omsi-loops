@@ -726,32 +726,26 @@ export const translationsEn = {
       ] satisfies ChangelogEntry[],
     },
     save: {
-      title: 'Saving',
-      manual_save: 'Save Manually',
-      export_list: 'Export Current List',
-      import_list: 'Import List to Current',
-      list_label: 'Export/Import List',
-      list_comment: 'Exports the current list in a plain-text format you can paste and share with others',
-      input_label: 'Export/Import Savefile',
-      export_button: 'Export',
-      export_button_old: 'Export To Stopsign',
-      export_comment:
-        'Click Export to export to your clipboard (ctrl-v somewhere else).\nPaste a save and click Import to import.',
-      import_button: 'Import',
-      import_comment:
-        'WARNING: Import will break the game if invalid save. Empty import will hard clear the game\nIf you reaaallly want to edit your save file,',
-      import_hover_special: 'hover me',
-      import_hover_special_tooltip:
-        "In the console, use decode(\"pasted savefile\"), edit, then encode('pasted savefile'), then import it\nThis is mainly for fixing broken savefiles - don't be a cheater.",
-      exportfile_button: 'Export File',
-      importfile_button: 'Import File',
-      cloud_label:
-        'The buttons below may require you to authorize with Google. If so, come back to this menu afterward.',
-      exportcloud_button: 'Export to Google Drive',
-      importcloud_button: 'Import from Google Drive',
-      cloud_saved: 'Saved as {name}',
-      delete_button: 'Delete',
-      confirm_button: 'Confirm?',
+      title: 'Save',
+      titles: {
+        actionlist: 'Actionlist',
+        saveToText: 'Save to text',
+        saveToFile: 'Save to file',
+      },
+      messages: {
+        manageActionlist: 'Exports the current list in plain-text',
+        manageSaveText: 'Exports the savestate as a b64-text',
+        manageSaveFile: 'Exports the savestate as a b64-file',
+      },
+      actions: {
+        saveGame: 'Save game',
+        exportList: 'Export current list',
+        importList: 'Import list to active',
+        exportSaveToText: 'Export text',
+        importSaveToText: 'Import text',
+        exportSaveToFile: 'Export file',
+        importSaveToFile: 'Import file',
+      },
     },
     faq: {
       title: 'FAQ',

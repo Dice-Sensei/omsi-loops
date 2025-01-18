@@ -536,7 +536,7 @@ export class Actions {
     this.updateAction(this.#lastModifiedIndex, { loops: action.loops - amountToSplit });
   }
 
-  clearActions(predicate) {
+  clearActions(predicate?: (action: Action) => boolean) {
     if (this.next.length === 0) return;
     this.recordLast();
     if (predicate) {
