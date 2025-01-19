@@ -12,9 +12,9 @@ import { readFileContents } from '../../../../utils/readFileContents.ts';
 import { saveTextFile } from '../../../../utils/saveTextFile.tsx';
 import { createRef, Reference } from '../../../../signals/createRef.ts';
 import { maybe } from '../../../../utils/maybe.tsx';
-import { PopoverOriginal } from '../../../../components/containers/Popover/PopoverOriginal.tsx';
-import { Popover } from '../../../../components/containers/Popover/Popover.tsx';
-import { Tooltip } from '../../../../components/containers/Popover/Tooltip.tsx';
+import { PopoverOriginal } from '../../../../components/containers/Overlay/PopoverOriginal.tsx';
+import { Overlay } from '../../../../components/containers/Overlay/Overlay.tsx';
+import { Tooltip } from '../../../../components/containers/Overlay/primitives/Tooltip.tsx';
 import { Base64 } from '../../../../utils/Base64.ts';
 
 const loadSaveState = (saveStr: string) => {
@@ -210,13 +210,13 @@ export const SaveMenu = () => (
         <ManageSaveFileSection />
       </Card>
     </PopoverOriginal>
-    <Tooltip id='tooltip-1'>
-      <Popover.Target>
+    <Tooltip id='overlay-1'>
+      <Overlay.Target>
         <span>{t('menu.save.title')}</span>
-      </Popover.Target>
-      <Popover.Content>
+      </Overlay.Target>
+      <Overlay.Content>
         <span class='bg-slate-500'>HellADADo</span>
-      </Popover.Content>
+      </Overlay.Content>
     </Tooltip>
   </>
 );

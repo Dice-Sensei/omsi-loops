@@ -5,18 +5,20 @@ import { onCleanup } from 'solid-js';
 import { createRef } from '../../../signals/createRef.ts';
 import { PlacementNs } from './placement.ns.ts';
 
-export interface CreatePopoverOptions {
+export interface CreateOverlayOptions {
   placement?: Placement;
   useHover?: boolean;
   useFocus?: boolean;
 }
 
-export interface PopoverState {
+export interface OverlayState {
   isHover: Accessor<boolean>;
   isFocus: Accessor<boolean>;
   isShown: Accessor<boolean>;
   show: () => void;
   hide: () => void;
+  target: Accessor<HTMLElement>;
+  content: Accessor<HTMLElement>;
 }
 
 export interface ActivateOptions {
@@ -25,8 +27,8 @@ export interface ActivateOptions {
   content: HTMLElement;
   arrow?: HTMLElement;
 }
-export type ActivatePopover = (props: ActivateOptions) => void;
-export const createPopover = (props: CreatePopoverOptions): ActivatePopover => {
+export type ActivateOverlay = (props: ActivateOptions) => void;
+export const createOverlay = (props: CreateOverlayOptions): ActivateOverlay => {
   const [isHover, toggleHover] = createSignal(false);
   const [isFocus, toggleFocus] = createSignal(false);
   const [isShown, toggleShown] = createSignal(false);
@@ -87,15 +89,23 @@ export const createPopover = (props: CreatePopoverOptions): ActivatePopover => {
     targetRef.active.addEventListener('focus', () => toggleFocus(true));
     targetRef.active.addEventListener('blur', () => toggleFocus(false));
 
-    setPopoverStore(props.id, { isHover, isFocus, isShown, show, hide });
+    setOverlayStore(props.id, {
+      isHover,
+      isFocus,
+      isShown,
+      show,
+      hide,
+      target: targetRef.active,
+      content: contentRef.active,
+    });
     const cleanup = autoUpdate(targetRef.active, contentRef.active, update);
 
     onCleanup(() => {
       cleanup();
-      setPopoverStore(props.id, undefined!);
+      setOverlayStore(props.id, undefined!);
     });
   };
 };
 
-export const [PopoverStore, setPopoverStore] = createStore<Record<string, PopoverState>>({});
-export const usePopover = (id: string): Accessor<PopoverState | undefined> => createMemo(() => PopoverStore[id]);
+export const [OverlayStore, setOverlayStore] = createStore<Record<string, OverlayState>>({});
+export const useOverlay = (id: string): Accessor<OverlayState | undefined> => createMemo(() => OverlayStore[id]);

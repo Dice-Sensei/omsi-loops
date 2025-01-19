@@ -1,7 +1,7 @@
 import { createEffect, createSignal, createUniqueId, mergeProps, ParentProps } from 'solid-js';
 import { Placement } from '@floating-ui/dom';
-import { usePopover } from './createPopover.ts';
-import { Popover } from './Popover.tsx';
+import { useOverlay } from '../createOverlay.ts';
+import { Overlay } from '../Overlay.tsx';
 
 interface TooltipProps extends ParentProps {
   id?: string;
@@ -13,10 +13,10 @@ interface TooltipProps extends ParentProps {
 export const Tooltip = (props: TooltipProps) => {
   const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'bottom' }, props);
   const [isVisible, setIsVisible] = createSignal($?.visible ?? false);
-  const popover = usePopover($.id);
+  const overlay = useOverlay($.id);
 
   createEffect(() => {
-    const state = popover();
+    const state = overlay();
     if (!state) return;
     const visible = isVisible();
     if ($.disabled) return;
@@ -31,16 +31,21 @@ export const Tooltip = (props: TooltipProps) => {
   createEffect(
     () => {
       if ($.disabled) return;
-      const state = popover();
+      const state = overlay();
       if (!state) return;
       const isHover = state.isHover();
       setIsVisible($.visible ?? isHover);
     },
   );
 
+  createEffect(() => {
+    const state = overlay();
+    if (!state) return;
+  });
+
   return (
-    <Popover id={$.id} placement={$.placement}>
+    <Overlay id={$.id} placement={$.placement}>
       {$.children}
-    </Popover>
+    </Overlay>
   );
 };
