@@ -6,7 +6,7 @@ interface OverlayArrowProps {
   class?: string;
 }
 
-export const OverlayArrow = (props: OverlayArrowProps) => (
+const OverlayArrow = (props: OverlayArrowProps) => (
   <div data-overlay-arrow class={cx('absolute w-2 h-2 bg-inherit border-inherit', props.class)} />
 );
 OverlayArrow.is = (child: any): child is HTMLDivElement =>
@@ -24,16 +24,13 @@ OverlayTarget.is = (child: any): child is HTMLDivElement =>
 
 export interface OverlayContentProps extends ParentProps {
   class?: string;
-  arrow?: boolean;
 }
 
 export const OverlayContent = (props: OverlayContentProps) => (
   <Portal>
     <div data-overlay-content data-overlay-unset class={props.class}>
       {props.children}
-      <Show when={props.arrow}>
-        <OverlayArrow />
-      </Show>
+      <OverlayArrow />
     </div>
   </Portal>
 );

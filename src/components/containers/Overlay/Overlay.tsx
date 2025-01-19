@@ -1,12 +1,11 @@
 import { children as resolveChildren, onMount, ParentProps } from 'solid-js';
 import { Placement } from '@floating-ui/dom';
-import { OverlayArrow, OverlayContent, OverlayTarget } from './Overlay.components.tsx';
+import { OverlayContent, OverlayTarget } from './Overlay.components.tsx';
 import { createOverlay } from './createOverlay.ts';
 
 export interface OverlayProps {
   id: string;
   placement?: Placement;
-  useArrow?: boolean;
 }
 
 export const Overlay = (props: ParentProps<OverlayProps>) => {
@@ -16,15 +15,13 @@ export const Overlay = (props: ParentProps<OverlayProps>) => {
 
   onMount(() => {
     const resolved = children();
-    console.log({ resolved });
-
     if (!Array.isArray(resolved)) return;
     const target = resolved.find(OverlayTarget.is) as HTMLElement;
 
     const content = document.querySelector('[data-overlay-unset]') as HTMLElement;
     content.removeAttribute('data-overlay-unset');
 
-    const arrow = OverlayArrow.is(content.lastElementChild) ? content.lastElementChild : undefined;
+    const arrow = content.lastElementChild as HTMLElement;
 
     activate({ id: props.id, target, content, arrow });
   });
@@ -34,4 +31,3 @@ export const Overlay = (props: ParentProps<OverlayProps>) => {
 
 Overlay.Target = OverlayTarget;
 Overlay.Content = OverlayContent;
-Overlay.Arrow = OverlayArrow;

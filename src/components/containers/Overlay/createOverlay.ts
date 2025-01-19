@@ -2,7 +2,7 @@ import { Accessor, createMemo, createSignal } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { arrow, autoUpdate, computePosition, flip, offset, Placement, shift } from '@floating-ui/dom';
 import { onCleanup } from 'solid-js';
-import { createRef } from '../../../signals/createRef.ts';
+import { createRef, Reference } from '../../../signals/createRef.ts';
 import { PlacementNs } from './placement.ns.ts';
 
 export interface CreateOverlayOptions {
@@ -17,8 +17,8 @@ export interface OverlayState {
   isShown: Accessor<boolean>;
   show: () => void;
   hide: () => void;
-  target: Accessor<HTMLElement>;
-  content: Accessor<HTMLElement>;
+  target: HTMLElement;
+  content: HTMLElement;
 }
 
 export interface ActivateOptions {
@@ -45,7 +45,7 @@ export const createOverlay = (props: CreateOverlayOptions): ActivateOverlay => {
       middleware: [
         flip(),
         shift({ padding: 8 }),
-        offset({ crossAxis: 8, mainAxis: 8 }),
+        offset({ crossAxis: 0, mainAxis: 8 }),
         useArrow && arrow({ element: arrowRef.active }),
       ],
     });
@@ -89,6 +89,7 @@ export const createOverlay = (props: CreateOverlayOptions): ActivateOverlay => {
     targetRef.active.addEventListener('focus', () => toggleFocus(true));
     targetRef.active.addEventListener('blur', () => toggleFocus(false));
 
+    if (OverlayStore[props.id]) throw new Error(`Overlay with id '${props.id}' already exists`);
     setOverlayStore(props.id, {
       isHover,
       isFocus,
@@ -98,8 +99,8 @@ export const createOverlay = (props: CreateOverlayOptions): ActivateOverlay => {
       target: targetRef.active,
       content: contentRef.active,
     });
-    const cleanup = autoUpdate(targetRef.active, contentRef.active, update);
 
+    const cleanup = autoUpdate(targetRef.active, contentRef.active, update);
     onCleanup(() => {
       cleanup();
       setOverlayStore(props.id, undefined!);

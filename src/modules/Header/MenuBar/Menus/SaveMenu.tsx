@@ -16,6 +16,7 @@ import { PopoverOriginal } from '../../../../components/containers/Overlay/Popov
 import { Overlay } from '../../../../components/containers/Overlay/Overlay.tsx';
 import { Tooltip } from '../../../../components/containers/Overlay/primitives/Tooltip.tsx';
 import { Base64 } from '../../../../utils/Base64.ts';
+import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
 
 const loadSaveState = (saveStr: string) => {
   if (!confirm(t('menu.save.messages.loadWarning'))) return;
@@ -211,12 +212,20 @@ export const SaveMenu = () => (
       </Card>
     </PopoverOriginal>
     <Tooltip id='overlay-1'>
-      <Overlay.Target>
-        <span>{t('menu.save.title')}</span>
-      </Overlay.Target>
-      <Overlay.Content>
-        <span class='bg-slate-500'>HellADADo</span>
-      </Overlay.Content>
+      <Tooltip.Target class='bg-blue-800'>
+        <span>Contains Tooltip</span>
+      </Tooltip.Target>
+      <Tooltip.Content>
+        <span>Hi Gf!</span>
+      </Tooltip.Content>
     </Tooltip>
+    <Popover id='overlay-2'>
+      <Popover.Target class='bg-blue-800'>
+        <span>Contains Popover</span>
+      </Popover.Target>
+      <Popover.Content>
+        <span>Hi Gf!</span>
+      </Popover.Content>
+    </Popover>
   </>
 );

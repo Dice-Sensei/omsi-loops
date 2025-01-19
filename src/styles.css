@@ -245,11 +245,6 @@ body {
 }
 
 body {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
   color: var(--default-color);
   height: 100%;
   margin: 0;
@@ -1711,14 +1706,6 @@ li#actionLogLatest {
   display: none;
 }
 
-.imageDragFix {
-  pointer-events: none;
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-drag: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-}
 
 #trackedResources .resource, #timeControls .control {
   margin-right: 5px;
