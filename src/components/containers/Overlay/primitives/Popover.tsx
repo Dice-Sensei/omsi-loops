@@ -1,6 +1,6 @@
 import { createEffect, createSignal, createUniqueId, mergeProps, onCleanup, ParentProps } from 'solid-js';
 import { Placement } from '@floating-ui/dom';
-import { useOverlay } from '../createOverlay.ts';
+import { OverlayState, useOverlay } from '../createOverlay.ts';
 import { Overlay } from '../Overlay.tsx';
 import { OverlayContentProps } from '../Overlay.components.tsx';
 import cx from 'clsx';
@@ -9,12 +9,20 @@ interface PopoverProps extends ParentProps {
   id?: string;
   placement?: Placement;
   disabled?: boolean;
+  nodismiss?: boolean;
   open?: boolean;
+  visible?: boolean;
+}
+
+interface VisibilityEffectProps {
+  overlay: OverlayState;
+  isVisible?: boolean;
+  disabled?: boolean;
 }
 
 export const Popover = (props: PopoverProps) => {
-  const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'right' }, props);
-  const [isVisible, setIsVisible] = createSignal($?.visible ?? false);
+  const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'right' as const }, props);
+  const [isVisible, toggleVisible] = createSignal($?.visible ?? false);
   const overlay = useOverlay($.id);
 
   createEffect(() => {
@@ -30,18 +38,34 @@ export const Popover = (props: PopoverProps) => {
     }
   });
 
-  const onClick = () => setIsVisible((v) => !v);
+  createEffect(() => {
+    if ($.disabled) return;
+    const state = overlay();
+    if (!state) return;
 
-  createEffect(
-    () => {
-      if ($.disabled) return;
-      const state = overlay();
-      if (!state) return;
-      const target = state.target;
-      target.addEventListener('click', onClick);
-      onCleanup(() => target.removeEventListener('click', onClick));
-    },
-  );
+    const handleDismiss = (event: MouseEvent) => {
+      if (!state || state.content.contains(event.target as Node)) return;
+      toggleVisible(false);
+    };
+
+    const handleClick = (event: MouseEvent) => {
+      event.stopImmediatePropagation();
+      const next = !isVisible();
+      toggleVisible(next);
+
+      if ($.nodismiss || !next) {
+        document.removeEventListener('click', handleDismiss);
+      } else {
+        document.addEventListener('click', handleDismiss);
+      }
+    };
+
+    state.target.addEventListener('click', handleClick);
+    onCleanup(() => {
+      state.target.removeEventListener('click', handleClick);
+      document.removeEventListener('click', handleDismiss);
+    });
+  });
 
   return (
     <Overlay id={$.id} placement={$.placement}>

@@ -211,12 +211,28 @@ export const SaveMenu = () => (
         <ManageSaveFileSection />
       </Card>
     </PopoverOriginal>
+    <Popover>
+      <Popover.Target>
+        <span>{t('menu.save.title')}</span>
+      </Popover.Target>
+      <Popover.Content>
+        <Card class='flex flex-col gap-2'>
+          <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>
+          <hr class='border-neutral-500'></hr>
+          <ManageActionlistSection />
+          <hr class='border-neutral-500'></hr>
+          <ManageSaveTextSection />
+          <hr class='border-neutral-500'></hr>
+          <ManageSaveFileSection />
+        </Card>
+      </Popover.Content>
+    </Popover>
     <Tooltip id='overlay-1'>
       <Tooltip.Target class='bg-blue-800'>
         <span>Contains Tooltip</span>
       </Tooltip.Target>
       <Tooltip.Content>
-        <span>Hi Gf!</span>
+        <span>Hi Mom!</span>
       </Tooltip.Content>
     </Tooltip>
     <Popover id='overlay-2'>
@@ -224,7 +240,7 @@ export const SaveMenu = () => (
         <span>Contains Popover</span>
       </Popover.Target>
       <Popover.Content>
-        <span>Hi Gf!</span>
+        <span>Hi Mom!</span>
       </Popover.Content>
     </Popover>
   </>
