@@ -1,45 +1,37 @@
-import { children, createEffect, createMemo, createSignal, createUniqueId, mergeProps, ParentProps } from 'solid-js';
-import cx from 'clsx';
-import { createContext } from '../../../signals/createContext.tsx';
-import { chdir } from 'node:process';
-
-type Placement = 'top' | 'right' | 'bottom' | 'left' | 'auto';
-type Align = 'start' | 'center' | 'end';
-type Position = `${Placement}-${Align}`;
+import { children as resolveChildren, onMount, ParentProps } from 'solid-js';
+import { Placement } from '@floating-ui/dom';
+import { PopoverArrow, PopoverContent, PopoverTarget } from './Popover.components.tsx';
+import { createPopover } from './createPopover.ts';
 
 export interface PopoverProps {
-  position?: Position;
-  show?: boolean;
-  id?: string;
-  class?: string;
-  dismissable?: boolean;
+  id: string;
+  placement?: Placement;
+  useArrow?: boolean;
 }
 
-const [usePopover, PopoverProvider] = createContext((props: PopoverProps) => {
-  const [show, setShow] = createSignal(props.show);
-
-  return { show, setShow, id: props.id, dismissable: props.dismissable };
-});
-
 export const Popover = (props: ParentProps<PopoverProps>) => {
-  const $ = mergeProps({ id: props.id ?? createUniqueId(), position: 'right-center', dismissable: false }, props);
+  const activate = createPopover(props);
 
-  return (
-    <PopoverProvider value={$.id}>
-      {$.children}
-    </PopoverProvider>
-  );
-};
+  const children = resolveChildren(() => props.children);
 
-const PopoverTarget = (props: ParentProps<PopoverProps>) => {
-  return <div data-popover-target>{props.children}</div>;
-};
+  onMount(() => {
+    const resolved = children();
+    console.log({ resolved });
 
-const PopoverContent = (props: ParentProps<PopoverProps>) => {
-  return <div data-popover-content>{props.children}</div>;
+    if (!Array.isArray(resolved)) return;
+    const target = resolved.find(PopoverTarget.is) as HTMLElement;
+
+    const content = document.querySelector('[data-popover-unset]') as HTMLElement;
+    content.removeAttribute('data-popover-unset');
+
+    const arrow = PopoverArrow.is(content.lastElementChild) ? content.lastElementChild : undefined;
+
+    activate({ id: props.id, target, content, arrow });
+  });
+
+  return children();
 };
-PopoverContent.is = (child: any) =>
-  !!child && child instanceof HTMLDivElement && child.dataset.popoverContent !== undefined;
 
 Popover.Target = PopoverTarget;
 Popover.Content = PopoverContent;
+Popover.Arrow = PopoverArrow;

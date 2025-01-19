@@ -14,6 +14,7 @@ import { createRef, Reference } from '../../../../signals/createRef.ts';
 import { maybe } from '../../../../utils/maybe.tsx';
 import { PopoverOriginal } from '../../../../components/containers/Popover/PopoverOriginal.tsx';
 import { Popover } from '../../../../components/containers/Popover/Popover.tsx';
+import { Tooltip } from '../../../../components/containers/Popover/Tooltip.tsx';
 import { Base64 } from '../../../../utils/Base64.ts';
 
 const loadSaveState = (saveStr: string) => {
@@ -209,21 +210,13 @@ export const SaveMenu = () => (
         <ManageSaveFileSection />
       </Card>
     </PopoverOriginal>
-    <Popover show={true}>
+    <Tooltip id='tooltip-1'>
       <Popover.Target>
-        {t('menu.save.title')}
+        <span>{t('menu.save.title')}</span>
       </Popover.Target>
       <Popover.Content>
-        <Card class='flex flex-col gap-2'>
-          <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>
-          <hr class='border-neutral-500'></hr>
-          <ManageActionlistSection />
-          <hr class='border-neutral-500'></hr>
-          <ManageSaveTextSection />
-          <hr class='border-neutral-500'></hr>
-          <ManageSaveFileSection />
-        </Card>
+        <span class='bg-slate-500'>HellADADo</span>
       </Popover.Content>
-    </Popover>
+    </Tooltip>
   </>
 );
