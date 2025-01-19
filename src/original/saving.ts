@@ -33,10 +33,6 @@ import {
   toggleOffline,
 } from './driver.ts';
 import { Action, ClassNameNotFoundError, getActionPrototype, getExploreProgress } from './actionList.ts';
-import {
-  compressToBase64 as lZStringCompressToBase64,
-  decompressFromBase64 as lZStringDecompressFromBase64,
-} from 'lz-string';
 import { loadChallenge } from './challenges.ts';
 import { Koviko } from './predictor.ts';
 
@@ -298,14 +294,6 @@ const storyInitializers = {
     },
   },
 };
-
-export function decompressFromBase64(item) {
-  return lZStringDecompressFromBase64(item);
-}
-
-export function compressToBase64(item) {
-  return lZStringCompressToBase64(item);
-}
 
 export function startGame() {
   // load calls recalcInterval, which will start the callbacks

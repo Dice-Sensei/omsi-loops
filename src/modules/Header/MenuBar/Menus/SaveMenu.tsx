@@ -2,8 +2,6 @@ import { t } from '../../../../locales/translations.utils.ts';
 import { getSaveName, performClearSave, performGameLoad, performSaveGame } from '../../../../original/saving.ts';
 import { Button } from '../../../../components/buttons/Button/Button.tsx';
 import { createMemo, createSignal } from 'solid-js';
-import cx from 'clsx';
-import { compressToBase64, decompressFromBase64 } from 'lz-string';
 import { actions } from '../../../../original/actions.ts';
 import { view } from '../../../../views/main.view.ts';
 import { vals } from '../../../../original/saving.ts';
@@ -14,11 +12,13 @@ import { readFileContents } from '../../../../utils/readFileContents.ts';
 import { saveTextFile } from '../../../../utils/saveTextFile.tsx';
 import { createRef, Reference } from '../../../../signals/createRef.ts';
 import { maybe } from '../../../../utils/maybe.tsx';
+import { PopoverOriginal } from '../../../../components/containers/Popover/PopoverOriginal.tsx';
 import { Popover } from '../../../../components/containers/Popover/Popover.tsx';
+import { Base64 } from '../../../../utils/Base64.ts';
 
 const loadSaveState = (saveStr: string) => {
   if (!confirm(t('menu.save.messages.loadWarning'))) return;
-  const save = decompressFromBase64(saveStr);
+  const save = Base64.decode(saveStr);
 
   globalThis.localStorage[getSaveName()] = save;
 
@@ -73,13 +73,11 @@ const manageActionList = (inputRef: Reference<HTMLTextAreaElement>) => {
 const manageSaveText = (inputRef: Reference<HTMLInputElement>) => {
   const [saveStr, setSaveStr] = createSignal<string>('');
 
-  const isSaveStrValid = createMemo(() =>
-    maybe(() => typeof JSON.parse(decompressFromBase64(saveStr())) === 'object', false)
-  );
+  const isSaveStrValid = createMemo(() => maybe(() => typeof Base64.decode(saveStr()) === 'object', false));
 
   const selectSaveText = () => inputRef.active.select();
   const exportSaveText = () => {
-    setSaveStr(compressToBase64(performSaveGame()));
+    setSaveStr(Base64.encode(performSaveGame()));
 
     selectSaveText();
     navigator.clipboard.writeText(saveStr());
@@ -113,7 +111,7 @@ const manageSaveFile = (inputRef: Reference<HTMLInputElement>) => {
 
     const savename = `${name} ${version} - Loop ${vals.totals.loops}`;
 
-    return saveTextFile(compressToBase64(performSaveGame()), savename);
+    return saveTextFile(Base64.encode(performSaveGame()), savename);
   };
 
   return {
@@ -199,15 +197,33 @@ const ManageActionlistSection = () => {
 };
 
 export const SaveMenu = () => (
-  <Popover title={t('menu.save.title')}>
-    <Card class='flex flex-col gap-2'>
-      <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>
-      <hr class='border-neutral-500'></hr>
-      <ManageActionlistSection />
-      <hr class='border-neutral-500'></hr>
-      <ManageSaveTextSection />
-      <hr class='border-neutral-500'></hr>
-      <ManageSaveFileSection />
-    </Card>
-  </Popover>
+  <>
+    <PopoverOriginal title={t('menu.save.title')}>
+      <Card class='flex flex-col gap-2'>
+        <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>
+        <hr class='border-neutral-500'></hr>
+        <ManageActionlistSection />
+        <hr class='border-neutral-500'></hr>
+        <ManageSaveTextSection />
+        <hr class='border-neutral-500'></hr>
+        <ManageSaveFileSection />
+      </Card>
+    </PopoverOriginal>
+    <Popover show={true}>
+      <Popover.Target>
+        {t('menu.save.title')}
+      </Popover.Target>
+      <Popover.Content>
+        <Card class='flex flex-col gap-2'>
+          <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>
+          <hr class='border-neutral-500'></hr>
+          <ManageActionlistSection />
+          <hr class='border-neutral-500'></hr>
+          <ManageSaveTextSection />
+          <hr class='border-neutral-500'></hr>
+          <ManageSaveFileSection />
+        </Card>
+      </Popover.Content>
+    </Popover>
+  </>
 );

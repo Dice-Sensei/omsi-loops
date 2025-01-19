@@ -1,5 +1,5 @@
 import { Path } from '@nimir/a-path';
-import { memoize } from '../utils/memoize.ts';
+import { memoize } from './memoize.ts';
 
 export type TranslateFn<O> = <P extends Path<O>>(path: P) => Path.At<O, P>;
 export type ExtendedTranslateFn<O> = <const K extends Path<O>>(prefix: K) => TranslateFn<Path.At<O, K>>;

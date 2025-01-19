@@ -1,8 +1,6 @@
 {
   "dependencies": {
     "d3": "^7.9.0",
-    "lz-string": "^1.5.0",
-    "mousetrap": "1.6.5",
     "jquery": "^3.7.1",
     "@nimir/a-path": "2.0.2",
     "solid-js": "1.9.4"
@@ -10,7 +8,6 @@
   "devDependencies": {
     "@types/d3": "^7.4.3",
     "@types/jquery": "^3.5.32",
-    "@types/lz-string": "^1.5.0",
     "vite": "^6.0.7",
     "typescript": "5.7.3",
     "postcss": "8.5.1",

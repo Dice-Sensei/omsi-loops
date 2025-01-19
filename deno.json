@@ -39,6 +39,10 @@
     "fmt": {
       "command": "deno fmt",
       "description": "Format all the files in the project"
+    },
+    "test": {
+      "command": "deno test --no-check --allow-all",
+      "description": "Run the tests"
     }
   }
 }
