@@ -158,7 +158,7 @@ export const Tooltip = (props: TooltipProps) => {
 
 Tooltip.Target = Overlay.Target;
 Tooltip.Content = (props: OverlayContentProps) => (
-  <Overlay.Content class={cx('bg-slate-500 border border-neutral-500 px-2', props.class)}>
+  <Overlay.Content class={cx('border bg-slate-900 border-amber-800 px-2', props.class)}>
     {props.children}
   </Overlay.Content>
 );

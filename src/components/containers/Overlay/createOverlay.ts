@@ -58,9 +58,20 @@ export const createOverlay = (props: CreateOverlayOptions): ActivateOverlay => {
       const { x: arrowX, y: arrowY } = middlewareData.arrow!;
       const side = PlacementNs.toSide(placement);
 
-      arrowRef.active.style.setProperty('left', `${arrowX}px`);
-      arrowRef.active.style.setProperty('top', `${arrowY}px`);
-      arrowRef.active.style.setProperty('transform', `rotate(45deg)`);
+      if (side === 'left') {
+        arrowRef.active.style.setProperty('transform', `rotate(270deg)`);
+      } else if (side === 'right') {
+        arrowRef.active.style.setProperty('transform', `rotate(90deg)`);
+      } else if (side === 'top') {
+        arrowRef.active.style.setProperty('transform', `rotate(0deg)`);
+      } else if (side === 'bottom') {
+        arrowRef.active.style.setProperty('transform', `rotate(180deg)`);
+      }
+
+      arrowRef.active.style.setProperty('left', arrowX != null ? `${arrowX}px` : '');
+      arrowRef.active.style.setProperty('top', arrowY != null ? `${arrowY}px` : '');
+      arrowRef.active.style.setProperty('right', '');
+      arrowRef.active.style.setProperty('bottom', '');
       arrowRef.active.style.setProperty(side, '-4px');
     }
   };

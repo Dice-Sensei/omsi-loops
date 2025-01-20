@@ -227,7 +227,7 @@ export const SaveMenu = () => (
         </Card>
       </Popover.Content>
     </Popover>
-    <Tooltip id='overlay-1'>
+    <Tooltip id='overlay-1' placement='left'>
       <Tooltip.Target class='bg-blue-800'>
         <span>Contains Tooltip</span>
       </Tooltip.Target>
@@ -235,13 +235,29 @@ export const SaveMenu = () => (
         <span>Hi Mom!</span>
       </Tooltip.Content>
     </Tooltip>
-    <Popover id='overlay-2'>
-      <Popover.Target class='bg-blue-800'>
-        <span>Contains Popover</span>
-      </Popover.Target>
-      <Popover.Content>
+    <Tooltip id='overlay-2' placement='right'>
+      <Tooltip.Target class='bg-blue-800'>
+        <span>Contains Tooltip</span>
+      </Tooltip.Target>
+      <Tooltip.Content>
         <span>Hi Mom!</span>
-      </Popover.Content>
-    </Popover>
+      </Tooltip.Content>
+    </Tooltip>
+    <Tooltip id='overlay-3' placement='top'>
+      <Tooltip.Target class='bg-blue-800'>
+        <span>Contains Tooltip</span>
+      </Tooltip.Target>
+      <Tooltip.Content>
+        <span>Hi Mom!</span>
+      </Tooltip.Content>
+    </Tooltip>
+    <Tooltip id='overlay-4' placement='bottom'>
+      <Tooltip.Target class='bg-blue-800'>
+        <span>Contains Tooltip</span>
+      </Tooltip.Target>
+      <Tooltip.Content>
+        <span>Hi Mom!</span>
+      </Tooltip.Content>
+    </Tooltip>
   </>
 );
