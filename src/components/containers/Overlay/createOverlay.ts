@@ -2,7 +2,7 @@ import { Accessor, createMemo, createSignal } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { arrow, autoUpdate, computePosition, flip, offset, Placement, shift } from '@floating-ui/dom';
 import { onCleanup } from 'solid-js';
-import { createRef, Reference } from '../../../signals/createRef.ts';
+import { createRef } from '../../../signals/createRef.ts';
 import { PlacementNs } from './placement.ns.ts';
 
 export interface CreateOverlayOptions {

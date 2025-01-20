@@ -9,7 +9,7 @@ import {
   Setter,
 } from 'solid-js';
 import { Placement } from '@floating-ui/dom';
-import { createOverlay, OverlayState } from '../createOverlay.ts';
+import { OverlayState, useOverlay } from '../createOverlay.ts';
 import { Overlay } from '../Overlay.tsx';
 import { OverlayContentProps } from '../Overlay.components.tsx';
 import cx from 'clsx';
@@ -66,9 +66,9 @@ interface PopoverState {
   nodismiss: Accessor<boolean | undefined>;
 }
 
-const createPopoverState = (props: PopoverProps & { id: string }) => {
+const createPopoverState = (props: PopoverProps & { id: string }): PopoverState => {
   const [isVisible, toggleVisible] = createSignal(props.open ?? false);
-  const overlay = createOverlay(props.id);
+  const overlay = useOverlay(props.id);
 
   return {
     isVisible,

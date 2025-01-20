@@ -9,7 +9,7 @@ import {
   Setter,
 } from 'solid-js';
 import { Placement } from '@floating-ui/dom';
-import { createOverlay, OverlayState } from '../createOverlay.ts';
+import { OverlayState, useOverlay } from '../createOverlay.ts';
 import { Overlay } from '../Overlay.tsx';
 import { OverlayContentProps } from '../Overlay.components.tsx';
 import cx from 'clsx';
@@ -34,7 +34,7 @@ interface TooltipState {
 const createTooltipState = (props: TooltipProps & { id: string }): TooltipState => {
   const [isVisible, toggleVisible] = createSignal(props.visible ?? false);
   const [isAnchored, toggleAnchor] = createSignal(false);
-  const overlay = createOverlay(props.id);
+  const overlay = useOverlay(props.id);
 
   return {
     isVisible,
