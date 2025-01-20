@@ -9,10 +9,75 @@ import {
   Setter,
 } from 'solid-js';
 import { Placement } from '@floating-ui/dom';
-import { OverlayState, useOverlay } from '../createOverlay.ts';
+import { createOverlay, OverlayState } from '../createOverlay.ts';
 import { Overlay } from '../Overlay.tsx';
 import { OverlayContentProps } from '../Overlay.components.tsx';
 import cx from 'clsx';
+
+const createVisibilityEffect = (state: PopoverState) =>
+  createEffect(() => {
+    const overlay = state.overlay();
+    if (!overlay) return;
+    const visible = state.isVisible();
+    if (state.disabled()) return;
+
+    if (visible) {
+      overlay.show();
+    } else {
+      overlay.hide();
+    }
+  });
+
+const createPointerEffect = (state: PopoverState) =>
+  createEffect(() => {
+    if (state.disabled()) return;
+    const overlay = state.overlay();
+    if (!overlay) return;
+
+    const handleDismiss = (event: MouseEvent) => {
+      if (!overlay || overlay.content.contains(event.target as Node)) return;
+      state.toggleVisible(false);
+    };
+
+    const handleClick = (event: MouseEvent) => {
+      event.stopImmediatePropagation();
+      const next = !state.isVisible();
+      state.toggleVisible(next);
+
+      if (state.nodismiss() || !next) {
+        document.removeEventListener('click', handleDismiss);
+      } else {
+        document.addEventListener('click', handleDismiss);
+      }
+    };
+
+    overlay.target.addEventListener('click', handleClick);
+    onCleanup(() => {
+      overlay.target.removeEventListener('click', handleClick);
+      document.removeEventListener('click', handleDismiss);
+    });
+  });
+
+interface PopoverState {
+  isVisible: Accessor<boolean>;
+  toggleVisible: Setter<boolean>;
+  overlay: Accessor<OverlayState | undefined>;
+  disabled: Accessor<boolean | undefined>;
+  nodismiss: Accessor<boolean | undefined>;
+}
+
+const createPopoverState = (props: PopoverProps & { id: string }) => {
+  const [isVisible, toggleVisible] = createSignal(props.open ?? false);
+  const overlay = createOverlay(props.id);
+
+  return {
+    isVisible,
+    toggleVisible,
+    overlay,
+    disabled: () => props.disabled,
+    nodismiss: () => props.nodismiss,
+  };
+};
 
 interface PopoverProps extends ParentProps {
   id?: string;
@@ -23,71 +88,11 @@ interface PopoverProps extends ParentProps {
   visible?: boolean;
 }
 
-interface VisibilityEffectProps {
-  overlay: Accessor<OverlayState | undefined>;
-  isVisible: Accessor<boolean>;
-  disabled?: boolean;
-}
-
-const createVisibilityEffect = (props: VisibilityEffectProps) =>
-  createEffect(() => {
-    const state = props.overlay();
-    if (!state) return;
-    const visible = props.isVisible();
-    if (props.disabled) return;
-
-    if (visible) {
-      state.show();
-    } else {
-      state.hide();
-    }
-  });
-
-interface ClickListenersProps {
-  disabled?: boolean;
-  overlay: Accessor<OverlayState | undefined>;
-  isVisible: Accessor<boolean>;
-  toggleVisible: Setter<boolean>;
-  nodismiss?: boolean;
-}
-
-const createClickListeners = (props: ClickListenersProps) =>
-  createEffect(() => {
-    if (props.disabled) return;
-    const state = props.overlay();
-    if (!state) return;
-
-    const handleDismiss = (event: MouseEvent) => {
-      if (!state || state.content.contains(event.target as Node)) return;
-      props.toggleVisible(false);
-    };
-
-    const handleClick = (event: MouseEvent) => {
-      event.stopImmediatePropagation();
-      const next = !props.isVisible();
-      props.toggleVisible(next);
-
-      if (props.nodismiss || !next) {
-        document.removeEventListener('click', handleDismiss);
-      } else {
-        document.addEventListener('click', handleDismiss);
-      }
-    };
-
-    state.target.addEventListener('click', handleClick);
-    onCleanup(() => {
-      state.target.removeEventListener('click', handleClick);
-      document.removeEventListener('click', handleDismiss);
-    });
-  });
-
 export const Popover = (props: PopoverProps) => {
   const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'right' as const }, props);
-  const [isVisible, toggleVisible] = createSignal($?.visible ?? false);
-  const overlay = useOverlay($.id);
-
-  createVisibilityEffect({ isVisible, overlay, disabled: $.disabled });
-  createClickListeners({ isVisible, toggleVisible, overlay, disabled: $.disabled, nodismiss: $.nodismiss });
+  const state = createPopoverState($);
+  createVisibilityEffect(state);
+  createPointerEffect(state);
 
   return (
     <Overlay id={$.id} placement={$.placement}>

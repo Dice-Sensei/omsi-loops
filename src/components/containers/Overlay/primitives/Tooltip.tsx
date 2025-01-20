@@ -1,6 +1,15 @@
-import { createEffect, createSignal, createUniqueId, mergeProps, onCleanup, ParentProps } from 'solid-js';
+import {
+  Accessor,
+  createEffect,
+  createSignal,
+  createUniqueId,
+  mergeProps,
+  onCleanup,
+  ParentProps,
+  Setter,
+} from 'solid-js';
 import { Placement } from '@floating-ui/dom';
-import { useOverlay } from '../createOverlay.ts';
+import { createOverlay, OverlayState } from '../createOverlay.ts';
 import { Overlay } from '../Overlay.tsx';
 import { OverlayContentProps } from '../Overlay.components.tsx';
 import cx from 'clsx';
@@ -12,39 +21,60 @@ interface TooltipProps extends ParentProps {
   visible?: boolean;
 }
 
-export const Tooltip = (props: TooltipProps) => {
-  const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'bottom' }, props);
-  const [isVisible, toggleVisible] = createSignal($?.visible ?? false);
-  const [isAnchored, toggleAnchor] = createSignal(false);
-  const overlay = useOverlay($.id);
+interface TooltipState {
+  isVisible: Accessor<boolean>;
+  toggleVisible: Setter<boolean>;
+  isAnchored: Accessor<boolean>;
+  toggleAnchor: Setter<boolean>;
+  overlay: Accessor<OverlayState | undefined>;
+  visible: Accessor<boolean | undefined>;
+  disabled: Accessor<boolean | undefined>;
+}
 
+const createTooltipState = (props: TooltipProps & { id: string }): TooltipState => {
+  const [isVisible, toggleVisible] = createSignal(props.visible ?? false);
+  const [isAnchored, toggleAnchor] = createSignal(false);
+  const overlay = createOverlay(props.id);
+
+  return {
+    isVisible,
+    toggleVisible,
+    isAnchored,
+    toggleAnchor,
+    overlay,
+    visible: () => props.visible,
+    disabled: () => props.disabled,
+  };
+};
+
+const createVisibilityEffect = (state: TooltipState) =>
   createEffect(() => {
-    const state = overlay();
-    if (!state) return;
-    const visible = isVisible();
-    const anchored = isAnchored();
-    if ($.disabled) return;
+    const overlay = state.overlay();
+    if (!overlay) return;
+    const visible = state.isVisible();
+    const anchored = state.isAnchored();
+    if (state.disabled()) return;
 
     if (visible || anchored) {
-      state.show();
+      overlay.show();
     } else {
-      state.hide();
+      overlay.hide();
     }
   });
 
-  createEffect(
-    () => {
-      if ($.disabled) return;
-      const state = overlay();
-      if (!state) return;
-      const isHover = state.isHover();
-      toggleVisible($.visible ?? isHover);
-    },
-  );
-
+const createHoverEffect = (state: TooltipState) =>
   createEffect(() => {
-    const state = overlay();
-    if (!state) return;
+    if (state.disabled()) return;
+    const overlay = state.overlay();
+    if (!overlay) return;
+    const isHover = overlay.isHover();
+    state.toggleVisible(state.visible() ?? isHover);
+  });
+
+const createPointerEffect = (state: TooltipState) =>
+  createEffect(() => {
+    const overlay = state.overlay();
+    if (!overlay) return;
 
     let timeoutId: number;
     let startTime: number;
@@ -52,7 +82,7 @@ export const Tooltip = (props: TooltipProps) => {
 
     const progress = document.createElement('div');
     progress.className = 'absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-blue-500 bg-transparent';
-    state.content.appendChild(progress);
+    overlay.content.appendChild(progress);
 
     const updateProgress = () => {
       const elapsed = Date.now() - startTime;
@@ -70,7 +100,7 @@ export const Tooltip = (props: TooltipProps) => {
     };
 
     const onMouseEnter = () => {
-      if (isAnchored()) return;
+      if (state.isAnchored()) return;
 
       progress.classList.remove('bg-red-500', 'border-red-500', 'w-2', 'h-2');
       progress.classList.add('bg-transparent', 'border-blue-500', 'w-4', 'h-4');
@@ -79,37 +109,45 @@ export const Tooltip = (props: TooltipProps) => {
       updateProgress();
 
       timeoutId = setTimeout(() => {
-        toggleAnchor(true);
+        state.toggleAnchor(true);
         cancelAnimationFrame(animationFrameId);
 
-        state.content.addEventListener('click', onClick);
-        state.target.removeEventListener('mouseleave', onMouseLeave);
+        overlay.content.addEventListener('click', onClick);
+        overlay.target.removeEventListener('mouseleave', onMouseLeave);
       }, 800);
 
-      state.target.addEventListener('mouseleave', onMouseLeave);
+      overlay.target.addEventListener('mouseleave', onMouseLeave);
     };
 
     const onMouseLeave = () => {
       clearTimeout(timeoutId);
       cancelAnimationFrame(animationFrameId);
-      state.target.removeEventListener('mouseleave', onMouseLeave);
+      overlay.target.removeEventListener('mouseleave', onMouseLeave);
     };
 
     const onClick = () => {
-      toggleAnchor(false);
-      state.content.removeEventListener('click', onClick);
+      state.toggleAnchor(false);
+      overlay.content.removeEventListener('click', onClick);
     };
 
-    state.target.addEventListener('mouseenter', onMouseEnter);
+    overlay.target.addEventListener('mouseenter', onMouseEnter);
 
     onCleanup(() => {
       cancelAnimationFrame(animationFrameId);
       clearTimeout(timeoutId);
-      state.target.removeEventListener('mouseenter', onMouseEnter);
-      state.target.removeEventListener('mouseleave', onMouseLeave);
-      state.content.removeEventListener('click', onClick);
+      overlay.target.removeEventListener('mouseenter', onMouseEnter);
+      overlay.target.removeEventListener('mouseleave', onMouseLeave);
+      overlay.content.removeEventListener('click', onClick);
     });
   });
+
+export const Tooltip = (props: TooltipProps) => {
+  const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'bottom' as const }, props);
+
+  const state = createTooltipState($);
+  createVisibilityEffect(state);
+  createPointerEffect(state);
+  createHoverEffect(state);
 
   return (
     <Overlay id={$.id} placement={$.placement}>
