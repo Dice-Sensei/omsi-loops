@@ -59,13 +59,13 @@ export const createOverlay = (props: CreateOverlayOptions): ActivateOverlay => {
       const side = PlacementNs.toSide(placement);
 
       if (side === 'left') {
-        arrowRef.active.style.setProperty('transform', `rotate(270deg)`);
+        arrowRef.active.style.setProperty('transform', `rotate(315deg)`);
       } else if (side === 'right') {
-        arrowRef.active.style.setProperty('transform', `rotate(90deg)`);
+        arrowRef.active.style.setProperty('transform', `rotate(135deg)`);
       } else if (side === 'top') {
-        arrowRef.active.style.setProperty('transform', `rotate(0deg)`);
+        arrowRef.active.style.setProperty('transform', `rotate(45deg)`);
       } else if (side === 'bottom') {
-        arrowRef.active.style.setProperty('transform', `rotate(180deg)`);
+        arrowRef.active.style.setProperty('transform', `rotate(225deg)`);
       }
 
       arrowRef.active.style.setProperty('left', arrowX != null ? `${arrowX}px` : '');

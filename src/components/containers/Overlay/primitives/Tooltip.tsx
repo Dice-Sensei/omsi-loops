@@ -81,7 +81,7 @@ const createPointerEffect = (state: TooltipState) =>
     let animationFrameId: number;
 
     const progress = document.createElement('div');
-    progress.className = 'absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-blue-500 bg-transparent';
+    progress.className = 'absolute top-0.5 right-0.5 rounded-full border-2 opacity-50';
     overlay.content.appendChild(progress);
 
     const updateProgress = () => {
@@ -94,16 +94,16 @@ const createPointerEffect = (state: TooltipState) =>
         animationFrameId = requestAnimationFrame(updateProgress);
       } else {
         progress.style.background = '';
-        progress.classList.remove('bg-transparent', 'border-blue-500', 'w-4', 'h-4');
-        progress.classList.add('bg-red-500', 'border-red-500', 'w-2', 'h-2');
+        progress.classList.remove('bg-transparent', 'border-blue-600', 'w-3', 'h-3');
+        progress.classList.add('bg-red-500', 'border-red-600', 'w-2', 'h-2');
       }
     };
 
     const onMouseEnter = () => {
       if (state.isAnchored()) return;
 
-      progress.classList.remove('bg-red-500', 'border-red-500', 'w-2', 'h-2');
-      progress.classList.add('bg-transparent', 'border-blue-500', 'w-4', 'h-4');
+      progress.classList.remove('bg-red-500', 'border-red-600', 'w-2', 'h-2');
+      progress.classList.add('bg-transparent', 'border-blue-600', 'w-3', 'h-3');
 
       startTime = Date.now();
       updateProgress();
@@ -158,7 +158,7 @@ export const Tooltip = (props: TooltipProps) => {
 
 Tooltip.Target = Overlay.Target;
 Tooltip.Content = (props: OverlayContentProps) => (
-  <Overlay.Content class={cx('border bg-slate-900 border-amber-800 px-2', props.class)}>
+  <Overlay.Content class={cx('bg-neutral-50 border border-neutral-500 px-2 rounded-sm', props.class)}>
     {props.children}
   </Overlay.Content>
 );

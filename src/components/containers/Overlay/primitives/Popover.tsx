@@ -103,7 +103,7 @@ export const Popover = (props: PopoverProps) => {
 
 Popover.Target = Overlay.Target;
 Popover.Content = (props: OverlayContentProps) => (
-  <Overlay.Content class={cx('bg-slate-500 border border-neutral-500 px-2', props.class)}>
+  <Overlay.Content class={cx('bg-neutral-50 border border-neutral-500 px-2 py-1 rounded-sm', props.class)}>
     {props.children}
   </Overlay.Content>
 );
