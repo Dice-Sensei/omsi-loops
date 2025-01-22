@@ -161,7 +161,12 @@ Tooltip.Target = (props: OverlayTargetProps) => (
   <Overlay.Target class={cx('cursor-help', props.class)}>{props.children}</Overlay.Target>
 );
 Tooltip.Content = (props: OverlayContentProps) => (
-  <Overlay.Content class={cx('bg-neutral-50 border border-neutral-500 px-2 rounded-sm max-w-80', props.class)}>
-    {props.children}
+  <Overlay.Content
+    class={cx(
+      'bg-neutral-50 border border-neutral-500 rounded-sm max-w-80 max-h-[95dvh]',
+      props.class,
+    )}
+  >
+    <div class='overflow-auto px-2 max-h-[calc(95dvh-2rem)]'>{props.children}</div>
   </Overlay.Content>
 );

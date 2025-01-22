@@ -107,8 +107,10 @@ export const Popover = (props: PopoverProps) => {
 
 Popover.Target = Overlay.Target;
 Popover.Content = (props: OverlayContentProps) => (
-  <Overlay.Content class={cx('bg-neutral-50 border border-neutral-500 px-4 py-3 rounded-sm', props.class)}>
+  <Overlay.Content
+    class={cx('bg-neutral-50 border border-neutral-500 rounded-sm max-h-[95dvh]', props.class)}
+  >
     <ButtonIcon class='absolute right-1 top-1' name='close' />
-    {props.children}
+    <div class='overflow-auto px-4 py-3 max-h-[95dvh]'>{props.children}</div>
   </Overlay.Content>
 );
