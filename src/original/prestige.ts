@@ -5,7 +5,13 @@ import { view } from '../views/main.view.ts';
 import { vals } from './saving.ts';
 import { performGameLoad, performSaveGame } from './saving.ts';
 
-export const prestigeValues: Record<string, number> = {};
+export const prestigeValues = {
+  prestigeCurrentPoints: 0,
+  prestigeTotalPoints: 0,
+  prestigeTotalCompletions: 0,
+  completedCurrentPrestige: false,
+  completedAnyPrestige: false,
+};
 
 export function completedCurrentGame() {
   console.log('completed current prestige');

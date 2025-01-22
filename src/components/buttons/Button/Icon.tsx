@@ -29,8 +29,152 @@ const XSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
   </svg>
 );
 
+const ChevronDownSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M6 9L12 15L18 9'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
+const ChevronUpSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M6 15L12 9L18 15'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
+const ChevronLeftSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M15 6L9 12L15 18'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
+const ChevronRightSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M9 6L15 12L9 18'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
+const ArrowDownSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M12 4L12 20M12 20L6 14M12 20L18 14'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
+const ArrowUpSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M12 20L12 4M12 4L6 10M12 4L18 10'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
+const ArrowLeftSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M20 12L4 12M4 12L10 6M4 12L10 18'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
+const ArrowRightSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M4 12L20 12M20 12L14 6M20 12L14 18'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
 const icons = {
   close: XSvg,
+  chevronDown: ChevronDownSvg,
+  chevronUp: ChevronUpSvg,
+  chevronLeft: ChevronLeftSvg,
+  chevronRight: ChevronRightSvg,
+  arrowDown: ArrowDownSvg,
+  arrowUp: ArrowUpSvg,
+  arrowLeft: ArrowLeftSvg,
+  arrowRight: ArrowRightSvg,
 } satisfies Record<string, ValidComponent>;
 
 export type IconName = keyof typeof icons;

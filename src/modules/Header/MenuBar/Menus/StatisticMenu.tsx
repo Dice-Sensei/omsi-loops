@@ -3,6 +3,8 @@ import { formatNumber } from '../../../../original/helpers.ts';
 import { vals } from '../../../../original/saving.ts';
 import { formatTime } from '../../../../views/main.view.ts';
 import { createInterval } from '../../../../signals/createInterval.ts';
+import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
+import { Button } from '../../../../components/buttons/Button/Button.tsx';
 
 export const StatisticMenu = () => {
   const [store, setStore] = createStore({
@@ -24,10 +26,12 @@ export const StatisticMenu = () => {
   }, 1000);
 
   return (
-    <div class='contains-popover'>
-      Totals
-      <div class='popover-content'>
-        <div class='grid grid-cols-[1fr_auto] gap-2'>
+    <Popover>
+      <Popover.Target>
+        <Button variant='text'>Totals</Button>
+      </Popover.Target>
+      <Popover.Content>
+        <div class='grid grid-cols-[auto_1fr] gap-2'>
           <span class='font-medium'>Time borrowed:</span>
           <span>
             {formatTime(store.borrowedTime)}
@@ -49,7 +53,7 @@ export const StatisticMenu = () => {
             {formatNumber(store.actions)}
           </span>
         </div>
-      </div>
-    </div>
+      </Popover.Content>
+    </Popover>
   );
 };

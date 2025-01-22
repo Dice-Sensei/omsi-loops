@@ -1,5 +1,4 @@
 import { buffList, statList } from '../original/globals.ts';
-import { prestigeUpgrade, resetAllPrestiges } from '../original/prestige.ts';
 import { borrowTime, manualRestart, performGamePause, returnTime, toggleOffline } from '../original/driver.ts';
 import { actions } from '../original/actions.ts';
 import { updateBuffCaps, view } from './main.view.ts';
@@ -27,33 +26,6 @@ export const setActions = () => {
 
     const offlineButton = document.getElementById(offlineButtonId)!;
     offlineButton.onclick = () => toggleOffline();
-
-    const prestigeUpgradePhysicalId = 'prestigeUpgradePhysical';
-    const prestigeUpgradeMentalId = 'prestigeUpgradeMental';
-    const prestigeUpgradeCombatId = 'prestigeUpgradeCombat';
-    const prestigeUpgradeSpatiomancyId = 'prestigeUpgradeSpatiomancy';
-    const prestigeUpgradeChronomancyId = 'prestigeUpgradeChronomancy';
-    const prestigeUpgradeBarteringId = 'prestigeUpgradeBartering';
-    const prestigeUpgradeExpOverflowId = 'prestigeUpgradeExpOverflow';
-    const prestigeResetAllId = 'prestigeResetAll';
-
-    const prestigeUpgradePhysical = document.getElementById(prestigeUpgradePhysicalId)!;
-    const prestigeUpgradeMental = document.getElementById(prestigeUpgradeMentalId)!;
-    const prestigeUpgradeCombat = document.getElementById(prestigeUpgradeCombatId)!;
-    const prestigeUpgradeSpatiomancy = document.getElementById(prestigeUpgradeSpatiomancyId)!;
-    const prestigeUpgradeChronomancy = document.getElementById(prestigeUpgradeChronomancyId)!;
-    const prestigeUpgradeBartering = document.getElementById(prestigeUpgradeBarteringId)!;
-    const prestigeUpgradeExpOverflow = document.getElementById(prestigeUpgradeExpOverflowId)!;
-    const prestigeResetAll = document.getElementById(prestigeResetAllId)!;
-
-    prestigeUpgradePhysical.onclick = () => prestigeUpgrade('PrestigePhysical');
-    prestigeUpgradeMental.onclick = () => prestigeUpgrade('PrestigeMental');
-    prestigeUpgradeCombat.onclick = () => prestigeUpgrade('PrestigeCombat');
-    prestigeUpgradeSpatiomancy.onclick = () => prestigeUpgrade('PrestigeSpatiomancy');
-    prestigeUpgradeChronomancy.onclick = () => prestigeUpgrade('PrestigeChronomancy');
-    prestigeUpgradeBartering.onclick = () => prestigeUpgrade('PrestigeBartering');
-    prestigeUpgradeExpOverflow.onclick = () => prestigeUpgrade('PrestigeExpOverflow');
-    prestigeResetAll.onclick = () => resetAllPrestiges();
 
     for (const name of buffList) {
       const id = `buff${name}Container`;

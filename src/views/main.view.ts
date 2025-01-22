@@ -2262,63 +2262,6 @@ export class View {
   }
 
   updatePrestigeValues() {
-    document.getElementById('currentPrestigePoints').textContent = `${
-      formatNumber(prestigeValues['prestigeCurrentPoints'])
-    }`;
-    document.getElementById('currentPrestigesCompleted').textContent = `${
-      formatNumber(prestigeValues['prestigeTotalCompletions'])
-    }`;
-    document.getElementById('maxTotalImbueSoulLevels').textContent = `${
-      formatNumber(Math.min(prestigeValues['prestigeTotalCompletions'], 7))
-    }`;
-
-    document.getElementById('totalPrestigePoints').textContent = `${
-      formatNumber(prestigeValues['prestigeTotalPoints'])
-    }`;
-
-    document.getElementById('prestigePhysicalCurrentBonus').textContent = `${
-      formatNumber(getPrestigeCurrentBonus('PrestigePhysical'))
-    }`;
-    document.getElementById('prestigeMentalCurrentBonus').textContent = `${
-      formatNumber(getPrestigeCurrentBonus('PrestigeMental'))
-    }`;
-    document.getElementById('prestigeCombatCurrentBonus').textContent = `${
-      formatNumber(getPrestigeCurrentBonus('PrestigeCombat'))
-    }`;
-    document.getElementById('prestigeSpatiomancyCurrentBonus').textContent = `${
-      formatNumber(getPrestigeCurrentBonus('PrestigeSpatiomancy'))
-    }`;
-    document.getElementById('prestigeChronomancyCurrentBonus').textContent = `${
-      formatNumber(getPrestigeCurrentBonus('PrestigeChronomancy'))
-    }`;
-    document.getElementById('prestigeBarteringCurrentBonus').textContent = `${
-      formatNumber(getPrestigeCurrentBonus('PrestigeBartering'))
-    }`;
-    document.getElementById('prestigeExpOverflowCurrentBonus').textContent = `${
-      formatNumber(getPrestigeCurrentBonus('PrestigeExpOverflow') * 10)
-    }`;
-
-    document.getElementById('prestigePhysicalNextCost').textContent = `${
-      formatNumber(getPrestigeCost('PrestigePhysical'))
-    }`;
-    document.getElementById('prestigeMentalNextCost').textContent = `${
-      formatNumber(getPrestigeCost('PrestigeMental'))
-    }`;
-    document.getElementById('prestigeCombatNextCost').textContent = `${
-      formatNumber(getPrestigeCost('PrestigeCombat'))
-    }`;
-    document.getElementById('prestigeSpatiomancyNextCost').textContent = `${
-      formatNumber(getPrestigeCost('PrestigeSpatiomancy'))
-    }`;
-    document.getElementById('prestigeChronomancyNextCost').textContent = `${
-      formatNumber(getPrestigeCost('PrestigeChronomancy'))
-    }`;
-    document.getElementById('prestigeBarteringNextCost').textContent = `${
-      formatNumber(getPrestigeCost('PrestigeBartering'))
-    }`;
-    document.getElementById('prestigeExpOverflowNextCost').textContent = `${
-      formatNumber(getPrestigeCost('PrestigeExpOverflow'))
-    }`;
   }
 }
 
