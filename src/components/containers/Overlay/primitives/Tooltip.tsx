@@ -11,7 +11,7 @@ import {
 import { Placement } from '@floating-ui/dom';
 import { OverlayState, useOverlay } from '../createOverlay.ts';
 import { Overlay } from '../Overlay.tsx';
-import { OverlayContentProps } from '../Overlay.components.tsx';
+import { OverlayContentProps, OverlayTargetProps } from '../Overlay.components.tsx';
 import cx from 'clsx';
 
 interface TooltipProps extends ParentProps {
@@ -125,7 +125,8 @@ const createPointerEffect = (state: TooltipState) =>
       overlay.target.removeEventListener('mouseleave', onMouseLeave);
     };
 
-    const onClick = () => {
+    const onClick = (event: MouseEvent) => {
+      event.stopPropagation();
       state.toggleAnchor(false);
       overlay.content.removeEventListener('click', onClick);
     };
@@ -156,9 +157,11 @@ export const Tooltip = (props: TooltipProps) => {
   );
 };
 
-Tooltip.Target = Overlay.Target;
+Tooltip.Target = (props: OverlayTargetProps) => (
+  <Overlay.Target class={cx('cursor-help', props.class)}>{props.children}</Overlay.Target>
+);
 Tooltip.Content = (props: OverlayContentProps) => (
-  <Overlay.Content class={cx('bg-neutral-50 border border-neutral-500 px-2 rounded-sm', props.class)}>
+  <Overlay.Content class={cx('bg-neutral-50 border border-neutral-500 px-2 rounded-sm max-w-80', props.class)}>
     {props.children}
   </Overlay.Content>
 );

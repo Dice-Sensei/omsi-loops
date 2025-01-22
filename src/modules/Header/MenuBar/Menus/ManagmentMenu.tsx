@@ -2,16 +2,19 @@ import { CheckboxField } from '../../../../components/forms/CheckboxField.tsx';
 import { Menu } from '../MenuBar.types.ts';
 import { useMenuBar } from '../MenuBar.context.ts';
 import { t } from '../../../../locales/translations.utils.ts';
+import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
+import { Button } from '../../../../components/buttons/Button/Button.tsx';
 
 export const ManagmentMenu = () => {
   const { toggleVisible, isVisible } = useMenuBar();
-
   const createOnChange = (menu: Menu) => (value: boolean) => toggleVisible(menu, value);
 
   return (
-    <div class='contains-popover'>
-      <span>O</span>
-      <div class='popover-content'>
+    <Popover>
+      <Popover.Target>
+        <Button variant='text'>O</Button>
+      </Popover.Target>
+      <Popover.Content>
         <span class='font-medium'>{t('menu.enable.title')}</span>
         <CheckboxField onChange={createOnChange(Menu.Changelog)} value={isVisible(Menu.Changelog)}>
           {t('menu.changelog.title')}
@@ -37,7 +40,7 @@ export const ManagmentMenu = () => {
         <CheckboxField onChange={createOnChange(Menu.Prestige)} value={isVisible(Menu.Prestige)}>
           {t('menu.prestige.title')}
         </CheckboxField>
-      </div>
-    </div>
+      </Popover.Content>
+    </Popover>
   );
 };

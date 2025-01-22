@@ -6,17 +6,14 @@ import { actions } from '../../../../original/actions.ts';
 import { view } from '../../../../views/main.view.ts';
 import { vals } from '../../../../original/saving.ts';
 import { performGamePause } from '../../../../original/driver.ts';
-import { Card } from '../../../../components/containers/Card/Card.tsx';
 import { getActionPrototype } from '../../../../original/actionList.ts';
 import { readFileContents } from '../../../../utils/readFileContents.ts';
 import { saveTextFile } from '../../../../utils/saveTextFile.tsx';
 import { createRef, Reference } from '../../../../signals/createRef.ts';
 import { maybe } from '../../../../utils/maybe.tsx';
-import { PopoverOriginal } from '../../../../components/containers/Overlay/PopoverOriginal.tsx';
-import { Overlay } from '../../../../components/containers/Overlay/Overlay.tsx';
-import { Tooltip } from '../../../../components/containers/Overlay/primitives/Tooltip.tsx';
 import { Base64 } from '../../../../utils/Base64.ts';
 import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
+import { HorizontalBar } from '../../../../components/flow/HorizontalBar/HorizontalBar.tsx';
 
 const loadSaveState = (saveStr: string) => {
   if (!confirm(t('menu.save.messages.loadWarning'))) return;
@@ -199,65 +196,20 @@ const ManageActionlistSection = () => {
 };
 
 export const SaveMenu = () => (
-  <>
-    <PopoverOriginal title={t('menu.save.title')}>
-      <Card class='flex flex-col gap-2'>
+  <Popover>
+    <Popover.Target>
+      <Button variant='text'>{t('menu.save.title')}</Button>
+    </Popover.Target>
+    <Popover.Content>
+      <div class='flex flex-col gap-2'>
         <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>
-        <hr class='border-neutral-500'></hr>
+        <HorizontalBar />
         <ManageActionlistSection />
-        <hr class='border-neutral-500'></hr>
+        <HorizontalBar />
         <ManageSaveTextSection />
-        <hr class='border-neutral-500'></hr>
+        <HorizontalBar />
         <ManageSaveFileSection />
-      </Card>
-    </PopoverOriginal>
-    <Popover>
-      <Popover.Target>
-        <span>{t('menu.save.title')}</span>
-      </Popover.Target>
-      <Popover.Content>
-        <Card class='flex flex-col gap-2'>
-          <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>
-          <hr class='border-neutral-500'></hr>
-          <ManageActionlistSection />
-          <hr class='border-neutral-500'></hr>
-          <ManageSaveTextSection />
-          <hr class='border-neutral-500'></hr>
-          <ManageSaveFileSection />
-        </Card>
-      </Popover.Content>
-    </Popover>
-    <Tooltip id='overlay-1' placement='left'>
-      <Tooltip.Target class='bg-blue-800'>
-        <span>Contains Tooltip</span>
-      </Tooltip.Target>
-      <Tooltip.Content>
-        <span>Hi Mom!</span>
-      </Tooltip.Content>
-    </Tooltip>
-    <Tooltip id='overlay-2' placement='right'>
-      <Tooltip.Target class='bg-blue-800'>
-        <span>Contains Tooltip</span>
-      </Tooltip.Target>
-      <Tooltip.Content>
-        <span>Hi Mom!</span>
-      </Tooltip.Content>
-    </Tooltip>
-    <Tooltip id='overlay-3' placement='top'>
-      <Tooltip.Target class='bg-blue-800'>
-        <span>Contains Tooltip</span>
-      </Tooltip.Target>
-      <Tooltip.Content>
-        <span>Hi Mom!</span>
-      </Tooltip.Content>
-    </Tooltip>
-    <Tooltip id='overlay-4' placement='bottom'>
-      <Tooltip.Target class='bg-blue-800'>
-        <span>Contains Tooltip</span>
-      </Tooltip.Target>
-      <Tooltip.Content>
-        <span>Hi Mom!</span>
-      </Tooltip.Content>
-    </Tooltip>
-  </>
+      </div>
+    </Popover.Content>
+  </Popover>
 );

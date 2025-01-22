@@ -1,1 +1,1 @@
-export const HorizontalBar = () => <div class='horizontal-bar'></div>;
+export const HorizontalBar = () => <hr class='border-neutral-500' />;

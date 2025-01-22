@@ -13,6 +13,9 @@ import { OverlayState, useOverlay } from '../createOverlay.ts';
 import { Overlay } from '../Overlay.tsx';
 import { OverlayContentProps } from '../Overlay.components.tsx';
 import cx from 'clsx';
+import { Button } from '../../../../components/buttons/Button/Button.tsx';
+import { Icon } from '../../../buttons/Button/Icon.tsx';
+import { ButtonIcon } from '../../../buttons/Button/ButtonIcon.tsx';
 
 const createVisibilityEffect = (state: PopoverState) =>
   createEffect(() => {
@@ -41,6 +44,7 @@ const createPointerEffect = (state: PopoverState) =>
 
     const handleClick = (event: MouseEvent) => {
       event.stopImmediatePropagation();
+      event.stopPropagation();
       const next = !state.isVisible();
       state.toggleVisible(next);
 
@@ -103,7 +107,8 @@ export const Popover = (props: PopoverProps) => {
 
 Popover.Target = Overlay.Target;
 Popover.Content = (props: OverlayContentProps) => (
-  <Overlay.Content class={cx('bg-neutral-50 border border-neutral-500 px-2 py-1 rounded-sm', props.class)}>
+  <Overlay.Content class={cx('bg-neutral-50 border border-neutral-500 px-4 py-3 rounded-sm', props.class)}>
+    <ButtonIcon class='absolute right-1 top-1' name='close' />
     {props.children}
   </Overlay.Content>
 );

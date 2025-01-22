@@ -1,6 +1,6 @@
 import { Accessor, createMemo, createSignal } from 'solid-js';
 import { createStore } from 'solid-js/store';
-import { arrow, autoUpdate, computePosition, flip, offset, Placement, shift } from '@floating-ui/dom';
+import { arrow, autoPlacement, autoUpdate, computePosition, flip, offset, Placement, shift } from '@floating-ui/dom';
 import { onCleanup } from 'solid-js';
 import { createRef } from '../../../signals/createRef.ts';
 import { PlacementNs } from './placement.ns.ts';
