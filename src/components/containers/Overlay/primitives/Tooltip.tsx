@@ -21,7 +21,7 @@ const [useTooltip, TooltipProvider] = createContext(() => {
 });
 
 export const Tooltip = (props: ParentProps<TooltipProps>) => {
-  const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'right' as const }, props);
+  const $ = mergeProps({ placement: 'right' as const }, props);
 
   return (
     <Overlay id={$.id} placement={$.placement}>

@@ -67,7 +67,7 @@ interface PopoverProps extends OverlayProps {
 }
 
 export const Popover = (props: ParentProps<PopoverProps>) => {
-  const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'right' as const }, props);
+  const $ = mergeProps({ placement: 'right' as const }, props);
 
   return (
     <Overlay id={$.id} placement={$.placement}>
