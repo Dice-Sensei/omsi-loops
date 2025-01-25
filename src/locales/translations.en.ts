@@ -872,15 +872,56 @@ export const translationsEn = {
     },
     prestige: {
       title: 'Prestige Perks',
-      PrestigePhysical: 'Increases Experience gain of all Physical stats (Dex, Str, Con, Spd, Per) by 20% per level.',
-      PrestigeMental: 'Increases Experience gain of all Mental stats (Cha, Int, Soul, Luck) by 20% per level.',
-      PrestigeCombat: 'Increases Self and Team Combat by 20% per level.',
-      PrestigeSpatiomancy: 'Increases the number of "Findables" per zone by 10% per level.',
-      PrestigeChronomancy: 'Increases speed of all zones by a multiplier of 5% per level.',
-      PrestigeBartering: 'Increases mana received from merchants by 10% per level.',
-      PrestigeExpOverflow: 'Experience earned is spread amongst all stats by 2% per level.',
-      PrestigeResetAll:
-        'Resets all current prestige bonuses, giving you back the points to allocate again. Note, this DOES trigger a reset, so this cannot be done mid-playthrough.',
+      descriptions: {
+        active:
+          "Prestige bonuses are always active. Each time you complete the game, you receive 90 points to spend on these bonuses. Please export and save your data locally before attempting to trigger a prestige. The ability to spec into prestige bonuses may be done at any time, but keep in mind this will reset ALL progress. Imbue Soul levels will carry over between prestiges, up to the maximum number of prestiges you've completed.",
+        spec:
+          'The ability to spec into prestige bonuses may be done at any time, but keep in mind this will reset ALL progress.',
+        carryover:
+          "Imbue Soul levels will carry over between prestiges, up to the maximum number of prestiges you've completed.",
+        maxCarryover: 'Max carryover possible',
+        totalPrestigesCompleted: 'Total Prestiges Completed',
+        availablePoints: 'Available points',
+        upgradeCost: 'Upgrade cost follows the format of',
+        nextLevelCost: 'Next level cost',
+        currentBonus: 'Current Bonus:',
+        points: 'points',
+      },
+      actions: {
+        reset: {
+          title: 'Reset All Prestiges',
+          description:
+            'Resets all current prestige bonuses, giving you back the points to allocate again. Note, this DOES trigger a reset, so this cannot be done mid-playthrough.',
+        },
+        improvePhysical: {
+          title: 'Prestige Physical',
+          description: 'Increases Experience gain of all Physical stats (Dex, Str, Con, Spd, Per) by 20% per level.',
+        },
+        improveMental: {
+          title: 'Prestige Mental',
+          description: 'Increases Experience gain of all Mental stats (Cha, Int, Soul, Luck) by 20% per level.',
+        },
+        improveCombat: {
+          title: 'Prestige Combat',
+          description: 'Increases Self and Team Combat by 20% per level.',
+        },
+        improveSpatiomancy: {
+          title: 'Prestige Spatiomancy',
+          description: 'Increases the number of "Findables" per zone by 10% per level.',
+        },
+        improveChronomancy: {
+          title: 'Prestige Chronomancy',
+          description: 'Increases speed of all zones by a multiplier of 5% per level.',
+        },
+        improveBartering: {
+          title: 'Prestige Bartering',
+          description: 'Increases mana received from merchants by 10% per level.',
+        },
+        improveExpOverflow: {
+          title: 'Prestige Experience Overflow',
+          description: 'Experience earned is spread amongst all stats by 2% per level.',
+        },
+      },
     },
     navigation: {
       town: 'Location',

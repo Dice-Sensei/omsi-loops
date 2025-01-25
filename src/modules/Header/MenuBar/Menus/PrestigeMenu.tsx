@@ -11,7 +11,10 @@ import {
   prestigeValues,
   resetAllPrestiges,
 } from '../../../../original/prestige.ts';
+import { et } from '../../../../locales/translations.utils.ts';
+import { HorizontalBar } from '../../../../components/flow/HorizontalBar/HorizontalBar.tsx';
 
+const t = et('menu.prestige');
 export const PrestigeMenu = () => {
   const [store, setStore] = createStore({
     prestigeCurrentPoints: 0,
@@ -62,34 +65,25 @@ export const PrestigeMenu = () => {
   return (
     <Popover>
       <Popover.Target>
-        <Button variant='text'>Prestige Perks</Button>
+        <Button variant='text'>{t('title')}</Button>
       </Popover.Target>
       <Popover.Content class='max-w-[400px]'>
         <div class='flex flex-col gap-2'>
           <div>
-            <span>
-              Prestige bonuses are always active. Each time you complete the game, you receive 90 points to spend on
-              these bonuses. Please export and save your data locally before attempting to trigger a prestige.
-            </span>
+            <span>{t('descriptions.active')}</span>
           </div>
           <div>
-            <span class='font-medium'>
-              The ability to spec into prestige bonuses may be done at any time, but keep in mind this will reset ALL
-              progress.
-            </span>
+            <span class='font-medium'>{t('descriptions.spec')}</span>
           </div>
           <div>
-            <span>
-              Imbue Soul levels will carry over between prestiges, up to the maximum number of prestiges you've
-              completed.
-            </span>
+            <span>{t('descriptions.carryover')}</span>
           </div>
           <div class='grid grid-cols-[auto_1fr] gap-2'>
-            <div class='font-medium'>Max carryover possible:</div>
+            <div class='font-medium'>{t('descriptions.maxCarryover')}:</div>
             <div>{store.prestigeTotalCompletions}</div>
-            <div class='font-medium'>Total Prestiges Completed:</div>
+            <div class='font-medium'>{t('descriptions.totalPrestigesCompleted')}:</div>
             <div>{store.prestigeTotalCompletions}</div>
-            <div class='font-medium'>Available points:</div>
+            <div class='font-medium'>{t('descriptions.availablePoints')}:</div>
             <div class='inline-flex gap-1 items-center'>
               <span>{store.prestigeCurrentPoints}</span>
               <span>/</span>
@@ -97,7 +91,12 @@ export const PrestigeMenu = () => {
             </div>
           </div>
           <div>
-            <span class='font-medium'>Upgrade cost follows the format of:</span>
+            <span class='font-medium'>{t('descriptions.upgradeCost')}:</span>
+            <div class='text-sm flex gap-1 items-center'>
+              <span>cost(1) = 30</span>
+              <span>;</span>
+              <span>cost(n) = cost(n - 1) + 5n</span>
+            </div>
             <div class='text-sm flex gap-1 items-center'>
               <span>30</span>
               <Icon class='w-4 h-4' name='arrowRight' />
@@ -114,149 +113,102 @@ export const PrestigeMenu = () => {
               <span>...</span>
             </div>
           </div>
+          <HorizontalBar />
           <div class='grid grid-cols-1 gap-2'>
-            <Tooltip placement='right'>
-              <Tooltip.Target>
-                <Button class='w-full' onClick={() => prestigeUpgrade('PrestigePhysical')}>
-                  Prestige Physical
-                </Button>
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <div>
-                  Increases Experience gain of all Physical stats (Dex, Str, Con, Spd, Per) by 20% per level.
-                </div>
-                <div class='grid grid-cols-[auto_1fr] gap-0.5 items-center'>
-                  <span class='font-medium'>Current Bonus:</span>
-                  <span>{store.prestigePhysicalCurrentBonus}%</span>
-                  <span class='font-medium'>Next level cost:</span>
-                  <span>{store.prestigePhysicalNextCost} points</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip>
-            <Tooltip placement='right'>
-              <Tooltip.Target>
-                <Button class='w-full' onClick={() => prestigeUpgrade('PrestigeMental')}>
-                  Prestige Mental
-                </Button>
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <div>
-                  Increases Experience gain of all Mental stats (Cha, Int, Soul, Luck) by 20% per level.
-                </div>
-                <div class='grid grid-cols-[auto_1fr] gap-0.5 items-center'>
-                  <span class='font-medium'>Current Bonus:</span>
-                  <span>{store.prestigeMentalCurrentBonus}%</span>
-                  <span class='font-medium'>Next level cost:</span>
-                  <span>{store.prestigeMentalNextCost} points</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip>
-            <Tooltip placement='right'>
-              <Tooltip.Target>
-                <Button class='w-full' onClick={() => prestigeUpgrade('PrestigeCombat')}>
-                  Prestige Combat
-                </Button>
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <div>
-                  Increases Self and Team Combat by 20% per level.
-                </div>
-                <div class='grid grid-cols-[auto_1fr] gap-0.5 items-center'>
-                  <span class='font-medium'>Current Bonus:</span>
-                  <span>{store.prestigeCombatCurrentBonus}%</span>
-                  <span class='font-medium'>Next level cost:</span>
-                  <span>{store.prestigeCombatNextCost} points</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip>
-            <Tooltip placement='right'>
-              <Tooltip.Target>
-                <Button class='w-full' onClick={() => prestigeUpgrade('PrestigeSpatiomancy')}>
-                  Prestige Spatiomancy
-                </Button>
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <div>
-                  Increases the number of "Findables" per zone by 10% per level.
-                </div>
-                <div class='grid grid-cols-[auto_1fr] gap-0.5 items-center'>
-                  <span class='font-medium'>Current Bonus:</span>
-                  <span>{store.prestigeSpatiomancyCurrentBonus}%</span>
-                  <span class='font-medium'>Next level cost:</span>
-                  <span>{store.prestigeSpatiomancyNextCost} points</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip>
-            <Tooltip placement='right'>
-              <Tooltip.Target>
-                <Button class='w-full' onClick={() => prestigeUpgrade('PrestigeChronomancy')}>
-                  Prestige Chronomancy
-                </Button>
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <div>
-                  Increases speed of all zones by a multiplier of 5% per level.
-                </div>
-                <div class='grid grid-cols-[auto_1fr] gap-0.5 items-center'>
-                  <span class='font-medium'>Current Bonus:</span>
-                  <span>{store.prestigeChronomancyCurrentBonus}%</span>
-                  <span class='font-medium'>Next level cost:</span>
-                  <span>{store.prestigeChronomancyNextCost} points</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip>
-            <Tooltip placement='right'>
-              <Tooltip.Target>
-                <Button class='w-full' onClick={() => prestigeUpgrade('PrestigeBartering')}>
-                  Prestige Bartering
-                </Button>
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <div>
-                  Increases mana received from merchants by 10% per level.
-                </div>
-                <div class='grid grid-cols-[auto_1fr] gap-0.5 items-center'>
-                  <span class='font-medium'>Current Bonus:</span>
-                  <span>{store.prestigeBarteringCurrentBonus}%</span>
-                  <span class='font-medium'>Next level cost:</span>
-                  <span>{store.prestigeBarteringNextCost} points</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip>
-            <Tooltip placement='right'>
-              <Tooltip.Target>
-                <Button class='w-full' onClick={() => prestigeUpgrade('PrestigeExpOverflow')}>
-                  Prestige Experience Overflow
-                </Button>
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <div>
-                  Experience earned is spread amongst all stats by 2% per level.
-                </div>
-                <div class='grid grid-cols-[auto_1fr] gap-0.5 items-center'>
-                  <span class='font-medium'>Current Bonus:</span>
-                  <span>{store.prestigeExpOverflowCurrentBonus}%</span>
-                  <span class='font-medium'>Next level cost:</span>
-                  <span>{store.prestigeExpOverflowNextCost} points</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip>
-            <Tooltip placement='right'>
-              <Tooltip.Target>
-                <Button class='w-full' onClick={() => resetAllPrestiges()}>
-                  Reset All Prestiges
-                </Button>
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <div>
-                  Resets all current prestige bonuses, giving you back the points to allocate again. Note, this DOES
-                  trigger a reset, so this cannot be done mid-playthrough.
-                </div>
-              </Tooltip.Content>
-            </Tooltip>
+            <PrestigeOption
+              title={t('actions.improvePhysical.title')}
+              description={t('actions.improvePhysical.description')}
+              currentBonus={store.prestigePhysicalCurrentBonus}
+              nextLevelCost={store.prestigePhysicalNextCost}
+              action={() => prestigeUpgrade('PrestigePhysical')}
+            />
+            <PrestigeOption
+              title={t('actions.improveMental.title')}
+              description={t('actions.improveMental.description')}
+              currentBonus={store.prestigeMentalCurrentBonus}
+              nextLevelCost={store.prestigeMentalNextCost}
+              action={() => prestigeUpgrade('PrestigeMental')}
+            />
+            <PrestigeOption
+              title={t('actions.improveCombat.title')}
+              description={t('actions.improveCombat.description')}
+              currentBonus={store.prestigeCombatCurrentBonus}
+              nextLevelCost={store.prestigeCombatNextCost}
+              action={() => prestigeUpgrade('PrestigeCombat')}
+            />
+            <PrestigeOption
+              title={t('actions.improveSpatiomancy.title')}
+              description={t('actions.improveSpatiomancy.description')}
+              currentBonus={store.prestigeSpatiomancyCurrentBonus}
+              nextLevelCost={store.prestigeSpatiomancyNextCost}
+              action={() => prestigeUpgrade('PrestigeSpatiomancy')}
+            />
+            <PrestigeOption
+              title={t('actions.improveChronomancy.title')}
+              description={t('actions.improveChronomancy.description')}
+              currentBonus={store.prestigeChronomancyCurrentBonus}
+              nextLevelCost={store.prestigeChronomancyNextCost}
+              action={() => prestigeUpgrade('PrestigeChronomancy')}
+            />
+            <PrestigeOption
+              title={t('actions.improveBartering.title')}
+              description={t('actions.improveBartering.description')}
+              currentBonus={store.prestigeBarteringCurrentBonus}
+              nextLevelCost={store.prestigeBarteringNextCost}
+              action={() => prestigeUpgrade('PrestigeBartering')}
+            />
+            <PrestigeOption
+              title={t('actions.improveExpOverflow.title')}
+              description={t('actions.improveExpOverflow.description')}
+              currentBonus={store.prestigeExpOverflowCurrentBonus}
+              nextLevelCost={store.prestigeExpOverflowNextCost}
+              action={() => prestigeUpgrade('PrestigeExpOverflow')}
+            />
+            <HorizontalBar />
+            <PrestigeReset />
           </div>
         </div>
       </Popover.Content>
     </Popover>
   );
 };
+
+interface PrestigeOptionProps {
+  title: string;
+  description: string;
+  currentBonus: number;
+  nextLevelCost: number;
+  action: () => void;
+}
+
+const PrestigeOption = (props: PrestigeOptionProps) => (
+  <Tooltip placement='right'>
+    <Tooltip.Target>
+      <Button class='w-full' onClick={props.action}>
+        {props.title}
+      </Button>
+    </Tooltip.Target>
+    <Tooltip.Content>
+      <div>{props.description}</div>
+      <div class='grid grid-cols-[auto_1fr] gap-0.5 items-center'>
+        <span class='font-medium'>{t('descriptions.currentBonus')}:</span>
+        <span>{props.currentBonus}%</span>
+        <span class='font-medium'>{t('descriptions.nextLevelCost')}:</span>
+        <span>{props.nextLevelCost} {t('descriptions.points')}</span>
+      </div>
+    </Tooltip.Content>
+  </Tooltip>
+);
+
+const PrestigeReset = () => (
+  <Tooltip placement='right'>
+    <Tooltip.Target>
+      <Button class='w-full' onClick={() => resetAllPrestiges()}>
+        {t('actions.reset.title')}
+      </Button>
+    </Tooltip.Target>
+    <Tooltip.Content>
+      <div>{t('actions.reset.description')}</div>
+    </Tooltip.Content>
+  </Tooltip>
+);
