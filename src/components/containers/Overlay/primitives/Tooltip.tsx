@@ -1,172 +1,111 @@
-import {
-  Accessor,
-  createEffect,
-  createSignal,
-  createUniqueId,
-  mergeProps,
-  onCleanup,
-  ParentProps,
-  Setter,
-} from 'solid-js';
-import { Placement } from '@floating-ui/dom';
-import { OverlayState, useOverlay } from '../createOverlay.ts';
-import { Overlay } from '../Overlay.tsx';
-import { OverlayContentProps, OverlayTargetProps } from '../Overlay.components.tsx';
+import { createEffect, createSignal, createUniqueId, mergeProps, onCleanup, onMount, ParentProps } from 'solid-js';
+import { Overlay, OverlayProps } from '../Overlay.tsx';
+import { selectOverlay } from '../createOverlay.ts';
+import { OverlayContentProps, OverlayTriggerProps } from '../Overlay.components.tsx';
 import cx from 'clsx';
+import { createContext } from '../../../../signals/createContext.tsx';
+import s from './Tooltip.module.css';
+import { autoUpdate } from '@floating-ui/dom';
 
-interface TooltipProps extends ParentProps {
-  id?: string;
-  disabled?: boolean;
-  placement?: Placement;
-  visible?: boolean;
+export interface TooltipProps extends OverlayProps {
 }
 
-interface TooltipState {
-  isVisible: Accessor<boolean>;
-  toggleVisible: Setter<boolean>;
-  isAnchored: Accessor<boolean>;
-  toggleAnchor: Setter<boolean>;
-  overlay: Accessor<OverlayState | undefined>;
-  visible: Accessor<boolean | undefined>;
-  disabled: Accessor<boolean | undefined>;
-}
-
-const createTooltipState = (props: TooltipProps & { id: string }): TooltipState => {
-  const [isVisible, toggleVisible] = createSignal(props.visible ?? false);
+const [useTooltip, TooltipProvider] = createContext(() => {
+  const [isHover, toggleHover] = createSignal(false);
+  const [isFocus, toggleFocus] = createSignal(false);
   const [isAnchored, toggleAnchor] = createSignal(false);
-  const overlay = useOverlay(props.id);
 
-  return {
-    isVisible,
-    toggleVisible,
-    isAnchored,
-    toggleAnchor,
-    overlay,
-    visible: () => props.visible,
-    disabled: () => props.disabled,
-  };
-};
+  const overlay = selectOverlay();
 
-const createVisibilityEffect = (state: TooltipState) =>
-  createEffect(() => {
-    const overlay = state.overlay();
-    if (!overlay) return;
-    const visible = state.isVisible();
-    const anchored = state.isAnchored();
-    if (state.disabled()) return;
+  return { overlay, isAnchored, toggleAnchor, isHover, toggleHover, isFocus, toggleFocus };
+});
 
-    if (visible || anchored) {
-      overlay.show();
-    } else {
-      overlay.hide();
-    }
-  });
-
-const createHoverEffect = (state: TooltipState) =>
-  createEffect(() => {
-    if (state.disabled()) return;
-    const overlay = state.overlay();
-    if (!overlay) return;
-    const isHover = overlay.isHover();
-    state.toggleVisible(state.visible() ?? isHover);
-  });
-
-const createPointerEffect = (state: TooltipState) =>
-  createEffect(() => {
-    const overlay = state.overlay();
-    if (!overlay) return;
-
-    let timeoutId: number;
-    let startTime: number;
-    let animationFrameId: number;
-
-    const progress = document.createElement('div');
-    progress.className = 'absolute top-0.5 right-0.5 rounded-full border-2 opacity-50';
-    overlay.content.appendChild(progress);
-
-    const updateProgress = () => {
-      const elapsed = Date.now() - startTime;
-      const percent = Math.min((elapsed / 800) * 100, 100);
-
-      progress.style.background = `conic-gradient(rgb(59 130 246) ${percent}%, transparent ${percent}%)`;
-
-      if (percent < 99) {
-        animationFrameId = requestAnimationFrame(updateProgress);
-      } else {
-        progress.style.background = '';
-        progress.classList.remove('bg-transparent', 'border-blue-600', 'w-3', 'h-3');
-        progress.classList.add('bg-red-500', 'border-red-600', 'w-2', 'h-2');
-      }
-    };
-
-    const onMouseEnter = () => {
-      if (state.isAnchored()) return;
-
-      progress.classList.remove('bg-red-500', 'border-red-600', 'w-2', 'h-2');
-      progress.classList.add('bg-transparent', 'border-blue-600', 'w-3', 'h-3');
-
-      startTime = Date.now();
-      updateProgress();
-
-      timeoutId = setTimeout(() => {
-        state.toggleAnchor(true);
-        cancelAnimationFrame(animationFrameId);
-
-        overlay.content.addEventListener('click', onClick);
-        overlay.target.removeEventListener('mouseleave', onMouseLeave);
-      }, 800);
-
-      overlay.target.addEventListener('mouseleave', onMouseLeave);
-    };
-
-    const onMouseLeave = () => {
-      clearTimeout(timeoutId);
-      cancelAnimationFrame(animationFrameId);
-      overlay.target.removeEventListener('mouseleave', onMouseLeave);
-    };
-
-    const onClick = (event: MouseEvent) => {
-      event.stopPropagation();
-      state.toggleAnchor(false);
-      overlay.content.removeEventListener('click', onClick);
-    };
-
-    overlay.target.addEventListener('mouseenter', onMouseEnter);
-
-    onCleanup(() => {
-      cancelAnimationFrame(animationFrameId);
-      clearTimeout(timeoutId);
-      overlay.target.removeEventListener('mouseenter', onMouseEnter);
-      overlay.target.removeEventListener('mouseleave', onMouseLeave);
-      overlay.content.removeEventListener('click', onClick);
-    });
-  });
-
-export const Tooltip = (props: TooltipProps) => {
-  const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'bottom' as const }, props);
-
-  const state = createTooltipState($);
-  createVisibilityEffect(state);
-  createPointerEffect(state);
-  createHoverEffect(state);
+export const Tooltip = (props: ParentProps<TooltipProps>) => {
+  const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'right' as const }, props);
 
   return (
     <Overlay id={$.id} placement={$.placement}>
-      {$.children}
+      <TooltipProvider>
+        {$.children}
+      </TooltipProvider>
     </Overlay>
   );
 };
 
-Tooltip.Target = (props: OverlayTargetProps) => (
-  <Overlay.Target class={cx('cursor-help', props.class)}>{props.children}</Overlay.Target>
-);
+Tooltip.Trigger = (props: OverlayTriggerProps) => {
+  const { overlay, toggleFocus, toggleHover, isAnchored, isFocus, isHover } = useTooltip();
+
+  createEffect(() => overlay().toggleShown(isHover() || isFocus() || isAnchored()));
+
+  onMount(() => {
+    const { triggerRef: { active: trigger } } = overlay();
+    trigger.addEventListener('pointerover', () => toggleHover(true));
+    trigger.addEventListener('pointerleave', () => toggleHover(false));
+    trigger.addEventListener('focus', () => toggleFocus(true));
+    trigger.addEventListener('blur', () => toggleFocus(false));
+  });
+
+  return <Overlay.Trigger {...props} class={cx('cursor-help', props.class)} />;
+};
+
+const Content = (props: OverlayContentProps) => {
+  const { overlay } = useTooltip();
+
+  onMount(() => {
+    const { triggerRef, contentRef, update } = overlay();
+
+    onCleanup(autoUpdate(triggerRef.active, contentRef.active, update));
+  });
+
+  return <div class='overflow-auto px-2 max-h-[calc(95dvh-2rem)]'>{props.children}</div>;
+};
+
 Tooltip.Content = (props: OverlayContentProps) => (
   <Overlay.Content
-    class={cx(
-      'bg-neutral-50 border border-neutral-500 rounded-sm max-w-80 max-h-[95dvh]',
-      props.class,
-    )}
+    {...props}
+    class={cx('bg-neutral-50 border border-neutral-500 rounded-sm max-w-80 max-h-[95dvh]', props.class)}
   >
-    <div class='overflow-auto px-2 max-h-[calc(95dvh-2rem)]'>{props.children}</div>
+    <Content>{props.children}</Content>
+    <ProgressCircle />
   </Overlay.Content>
 );
+
+const ProgressCircle = () => {
+  const { overlay, isAnchored, toggleAnchor } = useTooltip();
+  let hoverTimeoutId: number;
+  const attachDismiss = () => overlay().contentRef.active.addEventListener('click', disableAnchor, { once: true });
+  const detachDismiss = () => overlay().contentRef.active.removeEventListener('click', disableAnchor);
+
+  const enableAnchor = () => {
+    toggleAnchor(true);
+    attachDismiss();
+  };
+  const disableAnchor = (event: MouseEvent) => {
+    event.stopImmediatePropagation();
+    toggleAnchor(false);
+  };
+
+  onMount(() => {
+    hoverTimeoutId = setTimeout(enableAnchor, 1000);
+  });
+
+  onCleanup(() => {
+    clearTimeout(hoverTimeoutId);
+    detachDismiss();
+  });
+
+  return (
+    <svg
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
+      class={cx(
+        'absolute rounded-full top-0.5 right-0.5',
+        isAnchored() ? 'bg-red-500 border-red-600 w-2 h-2' : s.circularProgress + ' border-blue-600 w-3 h-3',
+      )}
+    >
+      <circle class={s.bg} />
+      <circle class={s.fg} />
+    </svg>
+  );
+};

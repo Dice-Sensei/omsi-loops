@@ -1,7 +1,8 @@
-import { children as resolveChildren, onMount, ParentProps } from 'solid-js';
+import { createRenderEffect, ParentProps } from 'solid-js';
 import { Placement } from '@floating-ui/dom';
-import { OverlayContent, OverlayTarget } from './Overlay.components.tsx';
+import { OverlayContent, OverlayTrigger } from './Overlay.components.tsx';
 import { createOverlay } from './createOverlay.ts';
+import { OverlayIdProvider } from './Overlay.context.tsx';
 
 export interface OverlayProps {
   id: string;
@@ -9,25 +10,10 @@ export interface OverlayProps {
 }
 
 export const Overlay = (props: ParentProps<OverlayProps>) => {
-  const activate = createOverlay(props);
+  createRenderEffect(() => createOverlay(props));
 
-  const children = resolveChildren(() => props.children);
-
-  onMount(() => {
-    const resolved = children();
-    if (!Array.isArray(resolved)) return;
-    const target = resolved.find(OverlayTarget.is) as HTMLElement;
-
-    const content = document.querySelector('[data-overlay-unset]') as HTMLElement;
-    content.removeAttribute('data-overlay-unset');
-
-    const arrow = content.lastElementChild as HTMLElement;
-
-    activate({ id: props.id, target, content, arrow });
-  });
-
-  return children();
+  return <OverlayIdProvider id={props.id}>{props.children}</OverlayIdProvider>;
 };
 
-Overlay.Target = OverlayTarget;
+Overlay.Trigger = OverlayTrigger;
 Overlay.Content = OverlayContent;

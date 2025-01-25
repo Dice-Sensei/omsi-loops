@@ -9,7 +9,8 @@
     "jsx": "precompile",
     "jsxImportSource": "solid-js",
     "noImplicitOverride": true,
-    "noImplicitThis": true
+    "noImplicitThis": true,
+    "types": ["./declarations"]
   },
   "lint": {
     "rules": {

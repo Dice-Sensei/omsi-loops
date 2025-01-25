@@ -197,9 +197,9 @@ const ManageActionlistSection = () => {
 
 export const SaveMenu = () => (
   <Popover>
-    <Popover.Target>
+    <Popover.Trigger>
       <Button variant='text'>{t('menu.save.title')}</Button>
-    </Popover.Target>
+    </Popover.Trigger>
     <Popover.Content>
       <div class='flex flex-col gap-2'>
         <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>

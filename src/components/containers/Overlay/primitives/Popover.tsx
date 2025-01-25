@@ -1,116 +1,106 @@
-import {
-  Accessor,
-  createEffect,
-  createSignal,
-  createUniqueId,
-  mergeProps,
-  onCleanup,
-  ParentProps,
-  Setter,
-} from 'solid-js';
-import { Placement } from '@floating-ui/dom';
-import { OverlayState, useOverlay } from '../createOverlay.ts';
-import { Overlay } from '../Overlay.tsx';
-import { OverlayContentProps } from '../Overlay.components.tsx';
+import { createUniqueId, mergeProps, onCleanup, onMount, ParentProps } from 'solid-js';
+import { Overlay, OverlayProps } from '../Overlay.tsx';
+import { selectOverlay } from '../createOverlay.ts';
+import { OverlayContentProps, OverlayTriggerProps } from '../Overlay.components.tsx';
 import cx from 'clsx';
-import { Button } from '../../../../components/buttons/Button/Button.tsx';
-import { Icon } from '../../../buttons/Button/Icon.tsx';
 import { ButtonIcon } from '../../../buttons/Button/ButtonIcon.tsx';
+import { createContext } from '../../../../signals/createContext.tsx';
 
-const createVisibilityEffect = (state: PopoverState) =>
-  createEffect(() => {
-    const overlay = state.overlay();
-    if (!overlay) return;
-    const visible = state.isVisible();
-    if (state.disabled()) return;
+const [usePopover, PopoverProvider] = createContext(() => {
+  const overlay = selectOverlay();
 
-    if (visible) {
-      overlay.show();
-    } else {
-      overlay.hide();
-    }
-  });
-
-const createPointerEffect = (state: PopoverState) =>
-  createEffect(() => {
-    if (state.disabled()) return;
-    const overlay = state.overlay();
-    if (!overlay) return;
-
-    const handleDismiss = (event: MouseEvent) => {
-      if (!overlay || overlay.content.contains(event.target as Node)) return;
-      state.toggleVisible(false);
-    };
-
-    const handleClick = (event: MouseEvent) => {
-      event.stopImmediatePropagation();
-      event.stopPropagation();
-      const next = !state.isVisible();
-      state.toggleVisible(next);
-
-      if (state.nodismiss() || !next) {
-        document.removeEventListener('click', handleDismiss);
-      } else {
-        document.addEventListener('click', handleDismiss);
-      }
-    };
-
-    overlay.target.addEventListener('click', handleClick);
-    onCleanup(() => {
-      overlay.target.removeEventListener('click', handleClick);
-      document.removeEventListener('click', handleDismiss);
-    });
-  });
-
-interface PopoverState {
-  isVisible: Accessor<boolean>;
-  toggleVisible: Setter<boolean>;
-  overlay: Accessor<OverlayState | undefined>;
-  disabled: Accessor<boolean | undefined>;
-  nodismiss: Accessor<boolean | undefined>;
-}
-
-const createPopoverState = (props: PopoverProps & { id: string }): PopoverState => {
-  const [isVisible, toggleVisible] = createSignal(props.open ?? false);
-  const overlay = useOverlay(props.id);
-
-  return {
-    isVisible,
-    toggleVisible,
-    overlay,
-    disabled: () => props.disabled,
-    nodismiss: () => props.nodismiss,
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape') return;
+    event.stopImmediatePropagation();
+    close();
   };
+
+  const handleDismiss = (event: MouseEvent) => {
+    event.stopImmediatePropagation();
+    if (overlay().contentRef.active.contains(event.target as Node)) return;
+    close();
+  };
+
+  const open = () => {
+    const o = overlay();
+    o.toggleShown(true);
+    document.addEventListener('click', handleDismiss);
+    document.addEventListener('keydown', handleEscape);
+    o.contentRef.active.focus();
+  };
+
+  const close = () => {
+    overlay().toggleShown(false);
+    cleanup();
+    overlay().triggerRef.active.focus();
+  };
+
+  const toggle = (event: Event) => {
+    event.stopImmediatePropagation();
+    if (!overlay().isShown()) open();
+    else close();
+  };
+
+  const cleanup = () => {
+    document.removeEventListener('click', handleDismiss);
+    document.removeEventListener('keydown', handleEscape);
+  };
+
+  return { overlay, open, close, toggle, cleanup };
+});
+
+const Content = (props: ParentProps) => {
+  const { overlay, toggle, cleanup } = usePopover();
+
+  onMount(() => {
+    overlay().triggerRef.active.addEventListener('click', toggle);
+  });
+  onCleanup(() => {
+    cleanup();
+    overlay().triggerRef.active.removeEventListener('click', toggle);
+  });
+
+  return <>{props.children}</>;
 };
 
-interface PopoverProps extends ParentProps {
-  id?: string;
-  placement?: Placement;
-  disabled?: boolean;
-  nodismiss?: boolean;
-  open?: boolean;
-  visible?: boolean;
+interface PopoverProps extends OverlayProps {
 }
 
-export const Popover = (props: PopoverProps) => {
+export const Popover = (props: ParentProps<PopoverProps>) => {
   const $ = mergeProps({ id: props.id ?? createUniqueId(), placement: 'right' as const }, props);
-  const state = createPopoverState($);
-  createVisibilityEffect(state);
-  createPointerEffect(state);
 
   return (
     <Overlay id={$.id} placement={$.placement}>
-      {$.children}
+      <PopoverProvider>
+        <Content>{$.children}</Content>
+      </PopoverProvider>
     </Overlay>
   );
 };
 
-Popover.Target = Overlay.Target;
+Popover.Trigger = (props: OverlayTriggerProps) => <Overlay.Trigger {...props} tabIndex={-1} />;
 Popover.Content = (props: OverlayContentProps) => (
   <Overlay.Content
-    class={cx('bg-neutral-50 border border-neutral-500 rounded-sm max-h-[95dvh]', props.class)}
+    {...props}
+    tabIndex={-1}
+    class={cx('relative bg-neutral-50 border border-neutral-500 rounded-sm max-h-[95dvh]', props.class)}
   >
-    <ButtonIcon class='absolute right-1 top-1' name='close' />
+    <PopoverCloseButton />
     <div class='overflow-auto px-4 py-3 max-h-[95dvh]'>{props.children}</div>
   </Overlay.Content>
 );
+
+const PopoverCloseButton = () => {
+  const { close } = usePopover();
+
+  return (
+    <ButtonIcon
+      class='absolute top-1 right-1'
+      name='close'
+      onClick={(event) => {
+        event.stopImmediatePropagation();
+        close();
+      }}
+    />
+  );
+};

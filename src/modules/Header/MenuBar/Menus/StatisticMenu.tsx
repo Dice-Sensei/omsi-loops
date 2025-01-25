@@ -27,9 +27,9 @@ export const StatisticMenu = () => {
 
   return (
     <Popover>
-      <Popover.Target>
+      <Popover.Trigger>
         <Button variant='text'>Totals</Button>
-      </Popover.Target>
+      </Popover.Trigger>
       <Popover.Content>
         <div class='grid grid-cols-[auto_1fr] gap-2'>
           <span class='font-medium'>Time borrowed:</span>

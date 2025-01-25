@@ -11,9 +11,9 @@ interface ChangelogEntryProps {
 
 export const VersionOption = (props: ChangelogEntryProps) => (
   <Tooltip placement='right'>
-    <Tooltip.Target>
+    <Tooltip.Trigger>
       <span class='font-medium'>{t('menu.changelog.version')}</span>: {props.version.name}
-    </Tooltip.Target>
+    </Tooltip.Trigger>
     <Tooltip.Content>
       <div>
         <div class='font-medium text-center'>{props.version.date}</div>
@@ -28,9 +28,9 @@ export const VersionOption = (props: ChangelogEntryProps) => (
 
 export const ChangelogMenu = () => (
   <Popover>
-    <Popover.Target>
+    <Popover.Trigger>
       <Button variant='text'>{t('menu.changelog.title')}</Button>
-    </Popover.Target>
+    </Popover.Trigger>
     <Popover.Content>
       <For each={t('menu.changelog.versions')} as='ul'>
         {(version) => <VersionOption version={version} />}

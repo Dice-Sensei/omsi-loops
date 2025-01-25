@@ -1,46 +1,61 @@
 import cx from 'clsx';
-import { ParentProps, Show } from 'solid-js';
+import { JSX, ParentProps, Show } from 'solid-js';
 import { Portal } from 'solid-js/web';
+import { selectOverlay } from './createOverlay.ts';
 
 interface OverlayArrowProps {
   class?: string;
 }
 
-const OverlayArrow = (props: OverlayArrowProps) => (
-  <div
-    data-overlay-arrow
-    class='
+const OverlayArrow = (props: OverlayArrowProps) => {
+  const overlay = selectOverlay();
+
+  return (
+    <div
+      ref={overlay().arrowRef}
+      class={cx(
+        `
     absolute
     w-2 h-2
     border bg-neutral-50 border-neutral-500 
     [clip-path:polygon(0%_0%,_100%_0%,_0%_100%)]
-    '
-  />
-);
-OverlayArrow.is = (child: any): child is HTMLDivElement =>
-  !!child && child instanceof HTMLDivElement && child.dataset.overlayArrow !== undefined;
+    `,
+        props.class,
+      )}
+    />
+  );
+};
 
-export interface OverlayTargetProps extends ParentProps {
+export interface OverlayTriggerProps extends ParentProps<JSX.HTMLAttributes<HTMLDivElement>> {
   class?: string;
 }
 
-export const OverlayTarget = (props: OverlayTargetProps) => (
-  <div data-overlay-target class={props.class}>{props.children}</div>
-);
-OverlayTarget.is = (child: any): child is HTMLDivElement =>
-  !!child && child instanceof HTMLDivElement && child.dataset.overlayTarget !== undefined;
+export const OverlayTrigger = (props: OverlayTriggerProps) => {
+  const overlay = selectOverlay();
 
-export interface OverlayContentProps extends ParentProps {
-  class?: string;
-}
-
-export const OverlayContent = (props: OverlayContentProps) => (
-  <Portal>
-    <div data-overlay-content data-overlay-unset class={props.class}>
+  return (
+    <div ref={overlay().triggerRef} class={props.class}>
       {props.children}
-      <OverlayArrow />
     </div>
-  </Portal>
-);
-OverlayContent.is = (child: any): child is HTMLDivElement =>
-  !!child && child instanceof HTMLDivElement && child.dataset.overlayContent !== undefined;
+  );
+};
+
+export interface OverlayContentProps extends ParentProps<JSX.HTMLAttributes<HTMLDivElement>> {
+  class?: string;
+}
+
+const overlays = document.getElementById('overlays')!;
+export const OverlayContent = (props: OverlayContentProps) => {
+  const overlay = selectOverlay();
+
+  return (
+    <Show when={overlay().isShown()}>
+      <Portal mount={overlays}>
+        <div ref={overlay().contentRef} {...props}>
+          {props.children}
+          <OverlayArrow />
+        </div>
+      </Portal>
+    </Show>
+  );
+};

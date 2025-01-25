@@ -1,8 +1,10 @@
 import { Button, ButtonProps } from './Button.tsx';
-import { Icon, IconProps } from './Icon.tsx';
+import { Icon, IconName } from './Icon.tsx';
 import cx from 'clsx';
 
-export type ButtonIconProps = ButtonProps & IconProps;
+export interface ButtonIconProps extends ButtonProps {
+  name: IconName;
+}
 
 export const ButtonIcon = (props: ButtonIconProps) => (
   <Button

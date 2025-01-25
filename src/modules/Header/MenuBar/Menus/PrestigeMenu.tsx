@@ -64,9 +64,9 @@ export const PrestigeMenu = () => {
 
   return (
     <Popover>
-      <Popover.Target>
+      <Popover.Trigger>
         <Button variant='text'>{t('title')}</Button>
-      </Popover.Target>
+      </Popover.Trigger>
       <Popover.Content class='max-w-[400px]'>
         <div class='flex flex-col gap-2'>
           <div>
@@ -183,11 +183,11 @@ interface PrestigeOptionProps {
 
 const PrestigeOption = (props: PrestigeOptionProps) => (
   <Tooltip placement='right'>
-    <Tooltip.Target>
+    <Tooltip.Trigger>
       <Button class='w-full' onClick={props.action}>
         {props.title}
       </Button>
-    </Tooltip.Target>
+    </Tooltip.Trigger>
     <Tooltip.Content>
       <div>{props.description}</div>
       <div class='grid grid-cols-[auto_1fr] gap-0.5 items-center'>
@@ -202,11 +202,11 @@ const PrestigeOption = (props: PrestigeOptionProps) => (
 
 const PrestigeReset = () => (
   <Tooltip placement='right'>
-    <Tooltip.Target>
+    <Tooltip.Trigger>
       <Button class='w-full' onClick={() => resetAllPrestiges()}>
         {t('actions.reset.title')}
       </Button>
-    </Tooltip.Target>
+    </Tooltip.Trigger>
     <Tooltip.Content>
       <div>{t('actions.reset.description')}</div>
     </Tooltip.Content>

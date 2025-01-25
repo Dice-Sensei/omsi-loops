@@ -7,18 +7,18 @@ import { HorizontalBar } from '../../../../components/flow/HorizontalBar/Horizon
 
 export const FaqMenu = () => (
   <Popover>
-    <Popover.Target>
+    <Popover.Trigger>
       <Button variant='text'>{t('menu.faq.title')}</Button>
-    </Popover.Target>
+    </Popover.Trigger>
     <Popover.Content>
       <For each={t('menu.faq.questions')} as='ul' class='flex flex-col gap-1'>
         {(question) => (
           <>
             <Tooltip>
-              <Tooltip.Target>
+              <Tooltip.Trigger>
                 <span class='font-medium'>{t('menu.faq.question')}:{' '}</span>
                 {question.q}
-              </Tooltip.Target>
+              </Tooltip.Trigger>
               <Tooltip.Content>
                 <span class='font-medium'>{t('menu.faq.answer')}:{' '}</span>
                 {question.a}

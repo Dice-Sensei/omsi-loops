@@ -11,9 +11,9 @@ export const ManagmentMenu = () => {
 
   return (
     <Popover>
-      <Popover.Target>
+      <Popover.Trigger>
         <Button variant='text'>O</Button>
-      </Popover.Target>
+      </Popover.Trigger>
       <Popover.Content>
         <span class='font-medium'>{t('menu.enable.title')}</span>
         <CheckboxField onChange={createOnChange(Menu.Changelog)} value={isVisible(Menu.Changelog)}>

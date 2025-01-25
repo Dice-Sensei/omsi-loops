@@ -1,46 +1,38 @@
-import { Accessor, createMemo, createSignal } from 'solid-js';
+import { Accessor, createEffect, createMemo, createSignal, onCleanup, Setter } from 'solid-js';
 import { createStore } from 'solid-js/store';
-import { arrow, autoPlacement, autoUpdate, computePosition, flip, offset, Placement, shift } from '@floating-ui/dom';
-import { onCleanup } from 'solid-js';
-import { createRef } from '../../../signals/createRef.ts';
+import { arrow, computePosition, flip, offset, Placement, shift } from '@floating-ui/dom';
+import { createRef, Reference } from '../../../signals/createRef.ts';
 import { PlacementNs } from './placement.ns.ts';
+import { useOverlayId } from './Overlay.context.tsx';
 
-export interface CreateOverlayOptions {
+export interface OverlayOptions {
   placement?: Placement;
   useHover?: boolean;
   useFocus?: boolean;
+  id: string;
 }
 
 export interface OverlayState {
-  isHover: Accessor<boolean>;
-  isFocus: Accessor<boolean>;
   isShown: Accessor<boolean>;
-  show: () => void;
-  hide: () => void;
-  target: HTMLElement;
-  content: HTMLElement;
+  toggleShown: Setter<boolean>;
+  update: () => Promise<void>;
+  contentRef: Reference<HTMLElement>;
+  triggerRef: Reference<HTMLElement>;
+  arrowRef: Reference<HTMLElement>;
 }
 
-export interface ActivateOptions {
-  id: string;
-  target: HTMLElement;
-  content: HTMLElement;
-  arrow?: HTMLElement;
-}
-export type ActivateOverlay = (props: ActivateOptions) => void;
-export const createOverlay = (props: CreateOverlayOptions): ActivateOverlay => {
-  const [isHover, toggleHover] = createSignal(false);
-  const [isFocus, toggleFocus] = createSignal(false);
+export const createOverlay = (options: OverlayOptions) => {
   const [isShown, toggleShown] = createSignal(false);
   const contentRef = createRef<HTMLElement>();
-  const targetRef = createRef<HTMLElement>();
+  const triggerRef = createRef<HTMLElement>();
   const arrowRef = createRef<HTMLElement>();
 
   const update = async () => {
+    if (!triggerRef.active || !contentRef.active) return;
     const useArrow = !!arrowRef.active;
 
-    const { x, y, placement, strategy, middlewareData } = await computePosition(targetRef.active, contentRef.active, {
-      placement: props?.placement ?? 'right',
+    const { x, y, placement, strategy, middlewareData } = await computePosition(triggerRef.active, contentRef.active, {
+      placement: options?.placement ?? 'right',
       strategy: 'fixed',
       middleware: [
         flip(),
@@ -76,48 +68,24 @@ export const createOverlay = (props: CreateOverlayOptions): ActivateOverlay => {
     }
   };
 
-  const show = () => {
-    if (isShown()) return;
-    toggleShown(true);
-    contentRef.active.style.setProperty('display', 'block');
-    update();
-  };
+  createEffect(() => {
+    if (isShown()) update();
+  });
 
-  const hide = () => {
-    if (!isShown()) return;
-    toggleShown(false);
-    contentRef.active.style.setProperty('display', 'none');
-  };
+  setOverlayStore(options.id, {
+    isShown,
+    toggleShown,
+    update,
+    arrowRef,
+    triggerRef,
+    contentRef,
+  });
 
-  return (props) => {
-    targetRef(props.target);
-    contentRef(props.content);
-    if (props.arrow) arrowRef(props.arrow);
-
-    contentRef.active.style.setProperty('display', 'none');
-    targetRef.active.addEventListener('mouseenter', () => toggleHover(true));
-    targetRef.active.addEventListener('mouseleave', () => toggleHover(false));
-    targetRef.active.addEventListener('focus', () => toggleFocus(true));
-    targetRef.active.addEventListener('blur', () => toggleFocus(false));
-
-    if (OverlayStore[props.id]) throw new Error(`Overlay with id '${props.id}' already exists`);
-    setOverlayStore(props.id, {
-      isHover,
-      isFocus,
-      isShown,
-      show,
-      hide,
-      target: targetRef.active,
-      content: contentRef.active,
-    });
-
-    const cleanup = autoUpdate(targetRef.active, contentRef.active, update);
-    onCleanup(() => {
-      cleanup();
-      setOverlayStore(props.id, undefined!);
-    });
-  };
+  onCleanup(() => removeOverlay(options));
 };
 
+export const removeOverlay = (options: OverlayOptions) => setOverlayStore(options.id, undefined!);
+
 export const [OverlayStore, setOverlayStore] = createStore<Record<string, OverlayState>>({});
-export const useOverlay = (id: string): Accessor<OverlayState | undefined> => createMemo(() => OverlayStore[id]);
+export const selectOverlay = (id: string = useOverlayId()): Accessor<OverlayState> =>
+  createMemo(() => OverlayStore[id]);

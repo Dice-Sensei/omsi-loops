@@ -1,6 +1,7 @@
 import type { JSXElement, ParentProps } from 'solid-js';
 import { createContext as createSolidContext, splitProps, useContext } from 'solid-js';
 
+const hmr = new Map<symbol, any>();
 export const createContext = <State, Args extends Record<string, unknown>>(
   provider: (props: Args) => State,
 ): [() => State, (props: ParentProps<Args>) => JSXElement] => {
@@ -8,11 +9,13 @@ export const createContext = <State, Args extends Record<string, unknown>>(
 
   return [
     () => {
-      const context = useContext(Context);
+      const context = useContext(Context) ?? hmr.get(Context.id);
 
       if (context === undefined) {
         throw Error(`useContext must be used within a Provider, '${Context.id.toString()}'`);
       }
+
+      hmr.set(Context.id, context);
 
       return context;
     },

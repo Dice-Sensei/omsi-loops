@@ -4,13 +4,13 @@ import type { JSX } from 'solid-js/jsx-runtime';
 import { Spinner } from '../../flow/Spinner/Spinner.tsx';
 import cx from 'clsx';
 
-export type ButtonProps = ParentProps<JSX.ButtonHTMLAttributes<HTMLButtonElement>> & {
+export interface ButtonProps extends ParentProps<JSX.ButtonHTMLAttributes<HTMLButtonElement>> {
   variant?: 'primary' | 'text';
-};
+}
 
 export const Button = (props: ButtonProps) => {
   const $ = mergeProps({ variant: 'primary' }, props);
-  const [isLoading, handleClick] = createLoadingCallback($.onClick);
+  const [isLoading, handleClick] = createLoadingCallback($.onClick as () => void);
 
   return (
     <button
