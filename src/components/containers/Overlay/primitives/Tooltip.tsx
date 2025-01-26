@@ -70,28 +70,55 @@ Tooltip.Content = (props: OverlayContentProps) => (
   </Overlay.Content>
 );
 
+const createMouseClick = (fn: (e: MouseEvent) => void) => {
+  const mousePosition = { x: 0, y: 0 };
+
+  const handleMouseDown = ({ clientX, clientY }: MouseEvent) => {
+    mousePosition.x = clientX;
+    mousePosition.y = clientY;
+  };
+
+  const handleMouseUp = (e: MouseEvent) => {
+    const dx = Math.abs(e.clientX - mousePosition.x);
+    const dy = Math.abs(e.clientY - mousePosition.y);
+    if (dx < 5 && dy < 5) fn(e);
+  };
+
+  const attach = (element: HTMLElement) => {
+    element.addEventListener('mousedown', handleMouseDown);
+    element.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const detach = (element: HTMLElement) => {
+    element.removeEventListener('mousedown', handleMouseDown);
+    element.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  return { mousePosition, handleMouseDown, handleMouseUp, attach, detach };
+};
+
 const ProgressCircle = () => {
   const { overlay, isAnchored, toggleAnchor } = useTooltip();
-  let hoverTimeoutId: number;
-  const attachDismiss = () => overlay().contentRef.active.addEventListener('click', disableAnchor, { once: true });
-  const detachDismiss = () => overlay().contentRef.active.removeEventListener('click', disableAnchor);
+
+  const { attach, detach } = createMouseClick((event: MouseEvent) => {
+    event.stopImmediatePropagation();
+    toggleAnchor(false);
+    detach(overlay().contentRef.active);
+  });
 
   const enableAnchor = () => {
     toggleAnchor(true);
-    attachDismiss();
-  };
-  const disableAnchor = (event: MouseEvent) => {
-    event.stopImmediatePropagation();
-    toggleAnchor(false);
+    attach(overlay().contentRef.active);
   };
 
+  let hoverTimeoutId: number;
   onMount(() => {
     hoverTimeoutId = setTimeout(enableAnchor, 1000);
   });
 
   onCleanup(() => {
     clearTimeout(hoverTimeoutId);
-    detachDismiss();
+    detach(overlay().contentRef.active);
   });
 
   return (
