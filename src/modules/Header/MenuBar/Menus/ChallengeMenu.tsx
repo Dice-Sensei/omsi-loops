@@ -10,6 +10,7 @@ import {
 } from '../../../../original/saving.ts';
 import { t } from '../../../../locales/translations.utils.ts';
 import { performGamePause, performGameRestart } from '../../../../original/driver.ts';
+import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
 
 function beginChallenge(challenge: ChallengeMode) {
   console.log('Beginning Challenge');
@@ -65,9 +66,11 @@ function resumeChallenge() {
 
 export const ChallengeMenu = () => {
   return (
-    <div class='contains-popover'>
-      {t('menu.challenges.title')}
-      <div class='popover-content'>
+    <Popover>
+      <Popover.Trigger>
+        <Button variant='text'>{t('menu.challenges.title')}</Button>
+      </Popover.Trigger>
+      <Popover.Content>
         <div>{t('menu.challenges.messages.description')}</div>
         <div>{t('menu.challenges.messages.recommendation')}</div>
         <div>{t('menu.challenges.messages.saveBeforeStarting')}</div>
@@ -103,7 +106,7 @@ export const ChallengeMenu = () => {
             </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </Popover.Content>
+    </Popover>
   );
 };
