@@ -5,6 +5,7 @@ import { formatTime } from '../../../../views/main.view.ts';
 import { createInterval } from '../../../../signals/createInterval.ts';
 import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
 import { Button } from '../../../../components/buttons/Button/Button.tsx';
+import { t } from '../../../../locales/translations.utils.ts';
 
 export const StatisticMenu = () => {
   const [store, setStore] = createStore({
@@ -28,30 +29,20 @@ export const StatisticMenu = () => {
   return (
     <Popover>
       <Popover.Trigger>
-        <Button variant='text'>Totals</Button>
+        <Button variant='text'>{t('menu.statistics.title')}</Button>
       </Popover.Trigger>
       <Popover.Content>
         <div class='grid grid-cols-[auto_1fr] gap-2'>
-          <span class='font-medium'>Time borrowed:</span>
-          <span>
-            {formatTime(store.borrowedTime)}
-          </span>
-          <span class='font-medium'>Effective Time:</span>
-          <span>
-            {formatTime(store.effectiveTime)}
-          </span>
-          <span class='font-medium'>Running Time:</span>
-          <span>
-            {formatTime(store.time)}
-          </span>
-          <span class='font-medium'>Loops:</span>
-          <span>
-            {formatNumber(store.loops)}
-          </span>
-          <span class='font-medium'>Actions:</span>
-          <span>
-            {formatNumber(store.actions)}
-          </span>
+          <span class='font-medium'>{t('menu.statistics.borrowedTime')}:</span>
+          <span>{formatTime(store.borrowedTime)}</span>
+          <span class='font-medium'>{t('menu.statistics.effectiveTime')}:</span>
+          <span>{formatTime(store.effectiveTime)}</span>
+          <span class='font-medium'>{t('menu.statistics.runningTime')}:</span>
+          <span>{formatTime(store.time)}</span>
+          <span class='font-medium'>{t('menu.statistics.loops')}:</span>
+          <span>{formatNumber(store.loops)}</span>
+          <span class='font-medium'>{t('menu.statistics.actions')}:</span>
+          <span>{formatNumber(store.actions)}</span>
         </div>
       </Popover.Content>
     </Popover>

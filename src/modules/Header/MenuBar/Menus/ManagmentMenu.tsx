@@ -35,7 +35,7 @@ export const ManagmentMenu = () => {
           {t('menu.challenges.title')}
         </CheckboxField>
         <CheckboxField onChange={createOnChange(Menu.Statistic)} value={isVisible(Menu.Statistic)}>
-          {t('menu.totals.title')}
+          {t('menu.statistics.title')}
         </CheckboxField>
         <CheckboxField onChange={createOnChange(Menu.Prestige)} value={isVisible(Menu.Prestige)}>
           {t('menu.prestige.title')}

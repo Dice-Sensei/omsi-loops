@@ -783,10 +783,7 @@ export const translationsEn = {
       localization_title: 'Language',
       theme_title: 'Theme',
       theme_variant_title: 'Theme Variant',
-      discord: {
-        link: 'https://discord.gg/dnKA6Xd',
-        title: 'Discord Link',
-      },
+      discord: 'Discord Link',
       adblock_warning:
         "WARNING: This game won't ever have ads. (This spot used to mention an incompatibility with ad-blockers, but that has since been fixed. Feel free to leave them enabled.)",
       extras_warning:
@@ -867,8 +864,13 @@ export const translationsEn = {
         },
       },
     },
-    totals: {
-      title: 'Totals',
+    statistics: {
+      title: 'Statistics',
+      borrowedTime: 'Time borrowed',
+      effectiveTime: 'Effective Time',
+      runningTime: 'Running Time',
+      loops: 'Loops',
+      actions: 'Actions',
     },
     prestige: {
       title: 'Prestige Perks',
