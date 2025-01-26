@@ -6,17 +6,9 @@ import { vals } from '../original/saving.ts';
 
 export const setActions = () => {
   requestAnimationFrame(() => {
-    const borrowTimeButtonId = 'borrowTimeButton';
-    const returnTimeButtonId = 'returnTimeButton';
     const pauseButtonId = 'pausePlay';
     const restartButtonId = 'manualRestart';
     const offlineButtonId = 'toggleOfflineButton';
-
-    const borrowTimeButton = document.getElementById(borrowTimeButtonId)!;
-    borrowTimeButton.onclick = () => borrowTime();
-
-    const returnTimeButton = document.getElementById(returnTimeButtonId)!;
-    returnTimeButton.onclick = () => returnTime();
 
     const pauseButton = document.getElementById(pauseButtonId)!;
     pauseButton.onclick = () => performGamePause();

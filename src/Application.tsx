@@ -266,7 +266,11 @@ const Header = () => (
             Resets the loop. Not a hard reset.
           </div>
         </button>
-        <input id='bonusIsActiveInput' type='checkbox' onchange='setOption(&quot;bonusIsActive&quot;, this.checked)'>
+        <input
+          id='bonusIsActiveInput'
+          type='checkbox'
+          onchange={() => setOption('bonusIsActive', !vals.options.bonusIsActive)}
+        >
         </input>
         <button id='toggleOfflineButton' class='button showthat control'>
           Bonus Seconds

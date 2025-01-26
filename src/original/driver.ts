@@ -854,8 +854,6 @@ export function checkExtraSpeed() {
     bonusSpeed = 1;
     return;
   }
-  if (vals.options.speedIncrease10x === true) bonusSpeed = 10;
-  if (vals.options.speedIncrease20x === true) bonusSpeed = 20;
   if (bonusSpeed < vals.options.speedIncreaseCustom) {
     bonusSpeed = vals.options.speedIncreaseCustom;
   }

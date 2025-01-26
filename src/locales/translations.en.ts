@@ -834,6 +834,49 @@ export const translationsEn = {
     },
     extras: {
       title: 'Extras',
+      description: `
+        The options in this menu allow you to customize the balance and functionality of the game in ways that affect
+        the play experience. If experiencing the "vanilla" Idle Loops experience is important to you, leave these
+        options unchanged. Otherwise, have fun!
+      `,
+      options: {
+        fractionalMana: {
+          title: 'Fractional mana consumption',
+          description:
+            'This option allows you to consume mana in fractional amounts. For example, if you have 100 mana and you consume 1.5 mana, you will lose 1 mana and have 0.5 mana left over.',
+        },
+        speed: {
+          title: 'Speed Managment',
+          custom: 'Custom',
+          bonusMultiplier: 'Bonus Multiplier',
+          bonusMultiplierDescription:
+            'This option applies a multiplier to the speed of the game when it is running in the foreground and is using bonus seconds.',
+          backgroundMultiplier: 'Background Multiplier',
+          backgroundMultiplierDescription:
+            'This option applies a multiplier to the speed of the game whether it is running in the background. To make the game run at full speed in the background, unset this or set it to 1 or greater.',
+        },
+        bonusTime: {
+          title: 'Bonus Time',
+          borrow: 'Borrow',
+          borrowDescription:
+            "You can grant yourself extra Bonus Seconds with this button, in one-day increments. You will always be able to see how much time you have borrowed in this way, and it will never have any impact on anything else in the game. You can return time you've borrowed if you want to get the number back down to zero, but you aren't required to.",
+          return: 'Return',
+          returnDescription:
+            'Returns the time you have borrowed to the default amount. This will not remove any borrowed time from your current loop.',
+        },
+        predictor: {
+          title: 'Predictor',
+          description:
+            'Predictor is a tool that helps you make decisions about your actions. It is not perfect, but it can help you make decisions about your actions.',
+          enabled: 'Enabled',
+          backgroundThread: 'Run predictor in background thread',
+          timePrecision: 'Time precision',
+          nextPrecision: 'Next precision',
+          slowmode: 'Slowmode',
+          slowTimer: 'Update every',
+          minutes: 'Minutes',
+        },
+      },
     },
     challenges: {
       title: 'Challenges',

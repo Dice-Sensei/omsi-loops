@@ -759,17 +759,11 @@ export class View {
   }
 
   getBonusReplacement(lhs, op, rhs) {
-    // this is the second time I've manually implemented this text-replacement pattern (first was for Action Log entries). Next time I need to make it a
-    // generic operation on Localization; I think I'm beginning to figure out what will be needed for it
-    const fgSpeed = Math.max(
-      5,
-      vals.options.speedIncrease10x ? 10 : 0,
-      vals.options.speedIncrease20x ? 20 : 0,
-      vals.options.speedIncreaseCustom,
-    );
+    const fgSpeed = Math.max(1, vals.options.speedIncreaseCustom);
     const bgSpeed = !isFinite(vals.options.speedIncreaseBackground) ? -1 : vals.options.speedIncreaseBackground ?? -1;
+
     const variables = {
-      __proto__: null, // toString is not a valid replacement name
+      __proto__: null,
       get background_info() {
         if (bgSpeed < 0 || bgSpeed === fgSpeed) {
           return Localization.txt('time_controls>bonus_seconds>background_disabled');
@@ -2256,9 +2250,6 @@ export class View {
   }
 
   updateTotals() {
-    document.getElementById('borrowedTimeDays').textContent = `${
-      formatNumber(Math.floor(vals.totals.borrowedTime / 86400))
-    }${Localization.txt('time_controls>days')}`;
   }
 
   updatePrestigeValues() {

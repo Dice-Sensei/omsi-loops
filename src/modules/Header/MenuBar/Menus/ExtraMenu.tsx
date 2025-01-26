@@ -1,169 +1,127 @@
-import { setOption } from '../../../../original/saving.ts';
+import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
+import { setOption, vals } from '../../../../original/saving.ts';
+import { Button } from '../../../../components/buttons/Button/Button.tsx';
+import { borrowTime, returnTime } from '../../../../original/driver.ts';
+import { et } from '../../../../locales/translations.utils.ts';
+import { CheckboxField } from '../../../../components/forms/CheckboxField.tsx';
+import { NumberField } from '../../../../components/forms/NumberField.tsx';
+import { HorizontalBar } from '../../../../components/flow/HorizontalBar/HorizontalBar.tsx';
+import { Tooltip } from '../../../../components/containers/Overlay/primitives/Tooltip.tsx';
+import { createInterval } from '../../../../signals/createInterval.ts';
+import { createStore } from 'solid-js/store';
 
+const t = et('menu.extras');
 export const ExtraMenu = () => {
+  const [store, setStore] = createStore({
+    borrowedTime: 0,
+  });
+
+  createInterval(() => {
+    setStore({
+      borrowedTime: Math.floor(vals.totals.borrowedTime / 86400),
+    });
+  }, 1000);
+
   return (
-    <div class='contains-popover'>
-      Extras
-      <div class='popover-content' style='padding-top:1ex'>
-        The options in this menu allow you to customize the balance and functionality of the game in ways that affect
-        the play experience. If experiencing the "vanilla" Idle Loops experience is important to you, leave these
-        options unchanged. Otherwise, have fun!
-        <br></br>
-        <br></br>
-        <input
-          id='fractionalManaInput'
-          type='checkbox'
-          onChange={({ target: { checked } }) => setOption('fractionalMana', checked)}
-        >
-        </input>
-        <label for='fractionalManaInput'>Fractional mana consumption</label>
-        <br></br>
-        <input
-          id='predictorInput'
-          type='checkbox'
-          onChange={({ target: { checked } }) => setOption('predictor', checked)}
-        >
-        </input>
-        <label for='predictorInput'>Enable predictor</label>
-        <br></br>
-        <div class='control'>
-          <input
-            type='checkbox'
-            id='speedIncrease10xInput'
-            onChange={({ target: { checked } }) => setOption('speedIncrease10x', checked)}
-          >
-          </input>
-          <label for='speedIncrease10xInput'>10x Bonus Speed</label>
-        </div>
-        <br></br>
-        <div class='control'>
-          <input
-            type='checkbox'
-            id='speedIncrease20xInput'
-            onChange={({ target: { checked } }) => setOption('speedIncrease20x', checked)}
-          >
-          </input>
-          <label for='speedIncrease20xInput'>20x Bonus Speed</label>
-        </div>
-        <br></br>
-        Custom Bonus Speed
-        <input
-          id='speedIncreaseCustomInput'
-          type='number'
-          value='5'
-          min='1'
-          style='width: 50px;transform: translateY(-2px);'
-          oninput={({ target: { value } }) => setOption('speedIncreaseCustom', parseInt(value))}
-        >
-        </input>
-        <br></br>
-        Background Bonus Speed
-        <input
-          id='speedIncreaseBackgroundInput'
-          type='number'
-          value=''
-          placeholder='same'
-          min='0'
-          style='width: 50px;transform: translateY(-2px);'
-          oninput={({ target: { value } }) => setOption('speedIncreaseBackground', parseFloat(value))}
-        >
-        </input>
-        <div id='speedIncreaseBackgroundWarning' class='small block' style='display:none'>
-          (This will apply even if bonus is inactive. To make the game run at full speed in the background, unset this
-          or set it to 1 or greater)
-        </div>
-        <br></br>
-        <button id='borrowTimeButton' class='button showthat control'>
-          Borrow Time
-          <div class='showthis'>
-            You can grant yourself extra Bonus Seconds with this button, in one-day increments. You will always be able
-            to see how much time you have borrowed in this way, and it will never have any impact on anything else in
-            the game. You can return time you've borrowed if you want to get the number back down to zero, but you
-            aren't required to.
+    <Popover>
+      <Popover.Trigger>
+        <Button variant='text'>{t('title')}</Button>
+      </Popover.Trigger>
+      <Popover.Content class='max-w-[400px]'>
+        <div class='flex flex-col gap-2'>
+          <span>{t('description')}</span>
+          <HorizontalBar />
+          <div class='flex flex-col gap-2'>
+            <span class='font-medium'>{t('options.speed.title')}</span>
+            <div class='grid grid-cols-[auto_1fr] gap-2'>
+              <Tooltip>
+                <Tooltip.Trigger>
+                  <span class='font-medium'>{t('options.speed.bonusMultiplier')}:</span>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                  <span>{t('options.speed.bonusMultiplierDescription')}</span>
+                </Tooltip.Content>
+              </Tooltip>
+              <NumberField value={5} onChange={(value) => setOption('speedIncreaseCustom', value)} />
+              <Tooltip>
+                <Tooltip.Trigger>
+                  <span class='font-medium'>{t('options.speed.backgroundMultiplier')}:</span>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                  <span>{t('options.speed.backgroundMultiplierDescription')}</span>
+                </Tooltip.Content>
+              </Tooltip>
+              <NumberField value={5} onChange={(value) => setOption('speedIncreaseBackground', value)} />
+            </div>
           </div>
-        </button>
-        <div class='show-when-time-borrowed'>
-          <button id='returnTimeButton' class='button control'>Return Time</button>
-          Time borrowed: <span id='borrowedTimeDays'>0d</span>
+          <HorizontalBar />
+          <div class='flex items-center gap-2 justify-between'>
+            <div class='flex items-center gap-2'>
+              <span class='font-medium'>{t('options.bonusTime.title')}:</span>
+              <span>{store.borrowedTime}d</span>
+            </div>
+            <div class='flex gap-2 self-end'>
+              <Tooltip>
+                <Tooltip.Trigger>
+                  <Button class='w-28' onClick={borrowTime}>{t('options.bonusTime.borrow')}</Button>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                  <span>{t('options.bonusTime.borrowDescription')}</span>
+                </Tooltip.Content>
+              </Tooltip>
+              <Tooltip>
+                <Tooltip.Trigger>
+                  <Button class='w-28' onClick={returnTime}>{t('options.bonusTime.return')}</Button>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                  <span>{t('options.bonusTime.returnDescription')}</span>
+                </Tooltip.Content>
+              </Tooltip>
+            </div>
+          </div>
+          <HorizontalBar />
+          <CheckboxField value={false} onChange={(value) => setOption('fractionalMana', value)}>
+            <Tooltip>
+              <Tooltip.Trigger>
+                <span>{t('options.fractionalMana.title')}</span>
+              </Tooltip.Trigger>
+              <Tooltip.Content>
+                <span>{t('options.fractionalMana.description')}</span>
+              </Tooltip.Content>
+            </Tooltip>
+          </CheckboxField>
+          <HorizontalBar />
+          <div class='flex flex-col gap-2'>
+            <Tooltip>
+              <Tooltip.Trigger>
+                <CheckboxField value={false} onChange={(value) => setOption('predictor', value)}>
+                  <span class='font-medium'>{t('options.predictor.title')}</span>
+                </CheckboxField>
+              </Tooltip.Trigger>
+              <Tooltip.Content>
+                <span>{t('options.predictor.description')}</span>
+              </Tooltip.Content>
+            </Tooltip>
+            <CheckboxField value={false} onChange={(value) => setOption('predictorBackgroundThread', value)}>
+              <span>{t('options.predictor.backgroundThread')}</span>
+            </CheckboxField>
+            <div class='grid grid-cols-[auto_1fr] gap-2'>
+              <span>{t('options.predictor.timePrecision')}</span>
+              <NumberField value={1} onChange={(value) => setOption('predictorTimePrecision', value)} />
+              <span>{t('options.predictor.nextPrecision')}</span>
+              <NumberField value={2} onChange={(value) => setOption('predictorNextPrecision', value)} />
+            </div>
+            <CheckboxField value={false} onChange={(value) => setOption('predictorRepeatPrediction', value)}>
+              <span>{t('options.predictor.slowmode')}</span>
+            </CheckboxField>
+            <div class='flex items-center gap-2'>
+              <span>{t('options.predictor.slowTimer')}</span>
+              <NumberField class='w-16' value={1} onChange={(value) => setOption('predictorSlowTimer', value)} />
+              <span>{t('options.predictor.minutes')}</span>
+            </div>
+          </div>
         </div>
-        <br></br>
-        <div id='predictorSettings'>
-          <br></br>
-          <b>Predictor Settings</b>
-          <br></br>
-          <input
-            id='predictorBackgroundThreadInput'
-            type='checkbox'
-            onChange={({ target: { checked } }) => setOption('predictorBackgroundThread', checked)}
-          >
-          </input>{' '}
-          <label for='predictorBackgroundThreadInput'>Run predictor in background thread</label>
-          <br></br>
-          <label for='predictorTimePrecisionInput'>Degrees of precision on Time</label>
-          <input
-            id='predictorTimePrecisionInput'
-            type='number'
-            value='1'
-            min='1'
-            max='10'
-            style='width: 50px;'
-            oninput={({ target: { value } }) => setOption('predictorTimePrecision', parseInt(value))}
-          >
-          </input>
-          <br></br>
-          <label for='predictorNextPrecisionInput'>Degrees of precision on Next</label>
-          <input
-            id='predictorNextPrecisionInput'
-            type='number'
-            value='2'
-            min='1'
-            max='10'
-            style='width: 50px;'
-            oninput={({ target: { value } }) => setOption('predictorNextPrecision', parseInt(value))}
-          >
-          </input>
-          <br></br>
-          <label for='predictorActionWidthInput'>Width of the Action List (non-responsive UI only)</label>
-          <input
-            id='predictorActionWidthInput'
-            type='number'
-            value='500'
-            min='100'
-            max='4000'
-            style='width: 50px; margin-left:40px'
-            oninput={({ target: { value } }) => setOption('predictorActionWidth', parseInt(value))}
-          >
-          </input>
-          <br></br>
-          <input
-            id='predictorRepeatPredictionInput'
-            type='checkbox'
-            onChange={({ target: { checked } }) => setOption('predictorRepeatPrediction', checked)}
-          >
-          </input>
-          <label for='predictorRepeatPredictionInput'>"Repeat last action on list" applies to the Predictor</label>
-          <br></br>
-          <input
-            id='predictorSlowModeInput'
-            type='checkbox'
-            onChange={({ target: { checked } }) => setOption('predictorSlowMode', checked)}
-          >
-          </input>
-          <label for='predictorSlowModeInput'>
-            Only update the predictor every
-            <input
-              id='predictorSlowTimerInput'
-              type='number'
-              value='1'
-              min='1'
-              style='width: 20px;'
-              oninput={({ target: { value } }) => setOption('predictorSlowTimer', parseInt(value))}
-            >
-            </input>{' '}
-            Minutes
-          </label>
-        </div>
-      </div>
-    </div>
+      </Popover.Content>
+    </Popover>
   );
 };

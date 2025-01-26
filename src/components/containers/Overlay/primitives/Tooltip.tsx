@@ -45,7 +45,7 @@ Tooltip.Trigger = (props: OverlayTriggerProps) => {
     trigger.addEventListener('blur', () => toggleFocus(false));
   });
 
-  return <Overlay.Trigger {...props} class={cx('cursor-help', props.class)} />;
+  return <Overlay.Trigger {...props} class={cx('cursor-help self-center', props.class)} />;
 };
 
 const Content = (props: OverlayContentProps) => {
