@@ -151,7 +151,7 @@ const stringOptions = [
 ];
 
 const isStandardOption = {
-  responsiveUI: false,
+  responsiveUI: true,
   actionLog: false,
   fractionalMana: false,
   keepCurrentList: true,
@@ -193,29 +193,29 @@ const optionIndicatorClasses = {
 };
 
 const optionValueHandlers = {
-  notifyOnPause(value, init, getInput) {
-    const input = getInput();
+  notifyOnPause(value, init) {
+    // const input = getInput();
     if (value && !init) {
       if (Notification && Notification.permission === 'default') {
-        input.checked = false;
-        input.indeterminate = true;
+        // input.checked = false;
+        // input.indeterminate = true;
         Notification.requestPermission((_) => {
-          input.indeterminate = false;
-          input.checked = value;
+          // input.indeterminate = false;
+          // input.checked = value;
           setOption('notifyOnPause', value);
         });
       } else if (Notification && Notification.permission === 'denied') {
-        input.checked = false;
-        input.indeterminate = false;
+        // input.checked = false;
+        // input.indeterminate = false;
         alert('Notification permission denied. You may need to allow this site to send you notifications manually.');
       } else if (!Notification || Notification.permission !== 'granted') {
-        input.checked = false;
-        input.indeterminate = false;
+        // input.checked = false;
+        // input.indeterminate = false;
       }
     } else if (!value) {
       vals.options.notifyOnPause = false;
-      input.checked = false;
-      input.indeterminate = false;
+      // input.checked = false;
+      // input.indeterminate = false;
     }
   },
   updateRate(value, init) {
@@ -374,37 +374,26 @@ export function importPredictorSettings() {
   return newOptions;
 }
 
-export function handleOption(option, value, init, getInput) {
-  optionValueHandlers[option]?.(value, init, getInput);
-  // The handler can change the value of the option. Recheck when setting or clearing the indicator class.
+export function handleOption(option, value, init) {
+  optionValueHandlers[option]?.(value, init);
   if (option in optionIndicatorClasses) {
     document.documentElement.classList.toggle(optionIndicatorClasses[option], !!vals.options[option]);
   }
 }
 
-export function setOption(option, value, updateUI = false) {
+export function setOption(option, value) {
   const oldValue = vals.options[option];
   vals.options[option] = value;
-  handleOption(option, value, false, () => document.getElementById(`${option}Input`));
+
+  handleOption(option, value, false);
+
   if (vals.options[option] !== oldValue) {
     performSaveGame();
   }
-  if (
-    updateUI &&
-    (vals.options[option] !== oldValue || vals.options[option] !== value)
-  ) {
-    loadOption(option, vals.options[option], false);
-  }
 }
 
-export function loadOption(option, value, callHandler = true) {
-  const input = document.getElementById(`${option}Input`, false); // this is allowed to have errors
-  if (!input) return;
-  if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = !!value;
-  else if (option === 'speedIncreaseBackground' && (typeof value !== 'number' || isNaN(value) || value < 0)) {
-    input.value = '';
-  } else input.value = String(value);
-  handleOption(option, value, true, () => input);
+export function loadOption(option, value) {
+  handleOption(option, value, true);
 }
 
 export function showPauseNotification(message) {

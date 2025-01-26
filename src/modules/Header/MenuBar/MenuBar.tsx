@@ -16,7 +16,7 @@ export const MenuBar = withProvider(MenuBarProvider, () => {
   const { isVisible } = useMenuBar();
 
   return (
-    <div class='flex gap-2 h-8'>
+    <div class='flex gap-2 h-full'>
       <ManagmentMenu />
       <Show when={isVisible(Menu.Changelog)}>
         <ChangelogMenu />

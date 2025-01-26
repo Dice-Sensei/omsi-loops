@@ -1,3 +1,5 @@
+import { title } from 'node:process';
+
 export type ChangelogEntry = {
   name: string;
   date: string;
@@ -780,57 +782,12 @@ export const translationsEn = {
     },
     options: {
       title: 'Options',
-      localization_title: 'Language',
-      theme_title: 'Theme',
-      theme_variant_title: 'Theme Variant',
-      discord: 'Discord Link',
-      adblock_warning:
-        "WARNING: This game won't ever have ads. (This spot used to mention an incompatibility with ad-blockers, but that has since been fixed. Feel free to leave them enabled.)",
-      extras_warning:
-        'The options in this menu allow you to customize the balance and functionality of the game in ways that affect the play experience. If experiencing the "vanilla" Idle Loops experience is important to you, leave these options unchanged. Otherwise, have fun!',
-      responsive_ui: 'Responsive UI',
-      action_log: 'Show action log',
-      fractional_mana: 'Fractional mana consumption',
-      highlight_new: 'Highlight new actions',
-      stat_colors: 'Use stat colors in menu and tooltips',
-      stat_hints: 'Show stat hints on actions',
-      pause_audio_cue: 'Ping on pause',
-      pause_notify_cue: 'Notify on pause',
-      auto_max_training: 'Max All Training Actions on Training cap increase',
-      hotkeys: 'Hotkeys',
-      predictor: 'Enable predictor',
-      google_cloud: 'Enable saving to Google Drive',
-      speedIncrease10x_text: '10x Bonus Speed',
-      speedIncrease20x_text: '20x Bonus Speed',
-      speedIncreaseCustom_text: 'Custom Bonus Speed',
-      speedIncreaseBackground_text: 'Background Bonus Speed',
-      speedIncreaseBackground_warning:
-        '(This will apply even if bonus is inactive. To make the game run at full speed in the background, unset this or set it to 1 or greater)',
-      borrow_time: 'Borrow Time',
-      return_time: 'Return Time',
-      time_borrowed: 'Time borrowed:',
-      borrow_time_tooltip:
-        "You can grant yourself extra Bonus Seconds with this button, in one-day increments. You will always be able to see how much time you have borrowed in this way, and it will never have any impact on anything else in the game. You can return time you've borrowed if you want to get the number back down to zero, but you aren't required to.",
-      hotkeys_tooltip: [
-        'Spacebar: Pause/play',
-        'R: Restart',
-        'B: Toggle bonus seconds',
-        '1-9: Set current action list multiplier to 1-9',
-        '0: Multiply action list multiplier by 10',
-        'Backspace: Remove last digit of action list multiplier',
-        'Shift+1-5: Select and load loadout 1-5',
-        '+/-: Increase/decrease action list size',
-        'Shift+S: Save current list to selected loadout',
-        'Shift+L: Load selected loadout',
-        'Shift+C: Clear current list',
-        'Right/D: Show next zone',
-        'Left/A: Show previous zone',
-        'Shift+Right/D: Show action stories',
-        'Shift+Left/A: Show action options',
-        'Shift+Z: Undo most recent change to action list',
-      ],
-      update_rate: 'Visual updates per second:',
-      autosave_rate: 'Autosave rate (seconds):',
+      options: {
+        language: {
+          title: 'Language',
+          description: 'Change the language of the game',
+        },
+      },
     },
     extras: {
       title: 'Extras',
