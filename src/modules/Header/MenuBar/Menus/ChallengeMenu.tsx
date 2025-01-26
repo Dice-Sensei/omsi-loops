@@ -8,9 +8,9 @@ import {
   setSaveName,
   vals,
 } from '../../../../original/saving.ts';
-import { t } from '../../../../locales/translations.utils.ts';
+import { et } from '../../../../locales/translations.utils.ts';
 import { performGamePause, performGameRestart } from '../../../../original/driver.ts';
-import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
+import { MenuOption } from './MenuOption.tsx';
 
 function beginChallenge(challenge: ChallengeMode) {
   console.log('Beginning Challenge');
@@ -64,49 +64,43 @@ function resumeChallenge() {
   }
 }
 
-export const ChallengeMenu = () => {
-  return (
-    <Popover>
-      <Popover.Trigger>
-        <Button variant='text'>{t('menu.challenges.title')}</Button>
-      </Popover.Trigger>
-      <Popover.Content>
-        <div>{t('menu.challenges.messages.description')}</div>
-        <div>{t('menu.challenges.messages.recommendation')}</div>
-        <div>{t('menu.challenges.messages.saveBeforeStarting')}</div>
-        <div class='font-bold'>{t('menu.challenges.messages.warnBeginChallenge')}</div>
-        <div class='font-bold'>Current challenge: {vals.challengeSave.challengeMode}</div>
-        <div class='flex flex-col gap-4'>
-          <div class='flex flex-col gap-2'>
-            <Button class='showthat' onClick={() => beginChallenge(ChallengeMode.ManaDrought)}>
-              {t('menu.challenges.challenges.manaDrought.title')}
-              <div class='showthis'>
-                {t('menu.challenges.challenges.manaDrought.description')}
-              </div>
-            </Button>
-            <Button class='showthat' onClick={() => beginChallenge(ChallengeMode.NoodleArms)}>
-              {t('menu.challenges.challenges.noodleArms.title')}
-              <div class='showthis'>
-                {t('menu.challenges.challenges.noodleArms.description')}
-              </div>
-            </Button>
-            <Button class='showthat' onClick={() => beginChallenge(ChallengeMode.ManaBurn)}>
-              {t('menu.challenges.challenges.manaBurn.title')}
-              <div class='showthis'>
-                {t('menu.challenges.challenges.manaBurn.description')}
-              </div>
-            </Button>
+const t = et('menu.challenges');
+export const ChallengeMenu = () => (
+  <MenuOption title={t('title')}>
+    <div>{t('messages.description')}</div>
+    <div>{t('messages.recommendation')}</div>
+    <div>{t('messages.saveBeforeStarting')}</div>
+    <div class='font-bold'>{t('messages.warnBeginChallenge')}</div>
+    <div class='font-bold'>Current challenge: {vals.challengeSave.challengeMode}</div>
+    <div class='flex flex-col gap-4'>
+      <div class='flex flex-col gap-2'>
+        <Button class='showthat' onClick={() => beginChallenge(ChallengeMode.ManaDrought)}>
+          {t('challenges.manaDrought.title')}
+          <div class='showthis'>
+            {t('challenges.manaDrought.description')}
           </div>
-          <div class='flex gap-2'>
-            <Button class='w-full' onClick={() => exitChallenge()}>
-              {t('menu.challenges.challenges.exit')}
-            </Button>
-            <Button class='w-full' onClick={() => resumeChallenge()}>
-              {t('menu.challenges.challenges.resume')}
-            </Button>
+        </Button>
+        <Button class='showthat' onClick={() => beginChallenge(ChallengeMode.NoodleArms)}>
+          {t('challenges.noodleArms.title')}
+          <div class='showthis'>
+            {t('challenges.noodleArms.description')}
           </div>
-        </div>
-      </Popover.Content>
-    </Popover>
-  );
-};
+        </Button>
+        <Button class='showthat' onClick={() => beginChallenge(ChallengeMode.ManaBurn)}>
+          {t('challenges.manaBurn.title')}
+          <div class='showthis'>
+            {t('challenges.manaBurn.description')}
+          </div>
+        </Button>
+      </div>
+      <div class='flex gap-2'>
+        <Button class='w-full' onClick={() => exitChallenge()}>
+          {t('challenges.exit')}
+        </Button>
+        <Button class='w-full' onClick={() => resumeChallenge()}>
+          {t('challenges.resume')}
+        </Button>
+      </div>
+    </div>
+  </MenuOption>
+);

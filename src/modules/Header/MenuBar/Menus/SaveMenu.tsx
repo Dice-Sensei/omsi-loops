@@ -1,4 +1,4 @@
-import { t } from '../../../../locales/translations.utils.ts';
+import { et, t } from '../../../../locales/translations.utils.ts';
 import { getSaveName, performClearSave, performGameLoad, performSaveGame } from '../../../../original/saving.ts';
 import { Button } from '../../../../components/buttons/Button/Button.tsx';
 import { createMemo, createSignal } from 'solid-js';
@@ -14,9 +14,12 @@ import { maybe } from '../../../../utils/maybe.tsx';
 import { Base64 } from '../../../../utils/Base64.ts';
 import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
 import { HorizontalBar } from '../../../../components/flow/HorizontalBar/HorizontalBar.tsx';
+import { MenuOption } from './MenuOption.tsx';
+
+const menuT = et('menu.save');
 
 const loadSaveState = (saveStr: string) => {
-  if (!confirm(t('menu.save.messages.loadWarning'))) return;
+  if (!confirm(menuT('messages.loadWarning'))) return;
   const save = Base64.decode(saveStr);
 
   globalThis.localStorage[getSaveName()] = save;
@@ -126,11 +129,11 @@ const ManageSaveFileSection = () => {
 
   return (
     <section class='flex flex-col gap-2'>
-      <span class='font-bold'>{t('menu.save.titles.saveToFile')}</span>
-      <span>{t('menu.save.messages.manageSaveFile')}</span>
+      <span class='font-bold'>{menuT('titles.saveToFile')}</span>
+      <span>{menuT('messages.manageSaveFile')}</span>
       <div class='grid grid-cols-2 gap-2'>
-        <Button onClick={exportSaveFile}>{t('menu.save.actions.export')}</Button>
-        <Button onClick={selectSaveFile}>{t('menu.save.actions.import')}</Button>
+        <Button onClick={exportSaveFile}>{menuT('actions.export')}</Button>
+        <Button onClick={selectSaveFile}>{menuT('actions.import')}</Button>
       </div>
       <input ref={manageFileRef} class='hidden' type='file' onChange={importSaveFile} />
     </section>
@@ -143,8 +146,8 @@ const ManageSaveTextSection = () => {
 
   return (
     <section class='flex flex-col gap-2'>
-      <span class='font-bold'>{t('menu.save.titles.saveToText')}</span>
-      <span>{t('menu.save.messages.manageSaveText')}</span>
+      <span class='font-bold'>{menuT('titles.saveToText')}</span>
+      <span>{menuT('messages.manageSaveText')}</span>
       <input
         ref={manageTextRef}
         class='
@@ -158,8 +161,8 @@ const ManageSaveTextSection = () => {
       >
       </input>
       <div class='grid grid-cols-2 gap-2'>
-        <Button onClick={exportSaveText}>{t('menu.save.actions.export')}</Button>
-        <Button disabled={!isSaveStrValid()} onClick={importSaveText}>{t('menu.save.actions.import')}</Button>
+        <Button onClick={exportSaveText}>{menuT('actions.export')}</Button>
+        <Button disabled={!isSaveStrValid()} onClick={importSaveText}>{menuT('actions.import')}</Button>
       </div>
     </section>
   );
@@ -173,8 +176,8 @@ const ManageActionlistSection = () => {
 
   return (
     <section class='flex flex-col gap-2'>
-      <span class='font-bold'>{t('menu.save.titles.actionlist')}</span>
-      <span>{t('menu.save.messages.manageActionlist')}</span>
+      <span class='font-bold'>{menuT('titles.actionlist')}</span>
+      <span>{menuT('messages.manageActionlist')}</span>
       <textarea
         ref={manageActionlistRef}
         class='
@@ -188,28 +191,23 @@ const ManageActionlistSection = () => {
         oninput={(e) => setActionlistStr(e.target.value)}
       />
       <div class='grid grid-cols-2 gap-2'>
-        <Button onClick={exportActionList}>{t('menu.save.actions.export')}</Button>
-        <Button disabled={!isActionListValid()} onClick={importActionList}>{t('menu.save.actions.import')}</Button>
+        <Button onClick={exportActionList}>{menuT('actions.export')}</Button>
+        <Button disabled={!isActionListValid()} onClick={importActionList}>{menuT('actions.import')}</Button>
       </div>
     </section>
   );
 };
 
 export const SaveMenu = () => (
-  <Popover>
-    <Popover.Trigger>
-      <Button variant='text'>{t('menu.save.title')}</Button>
-    </Popover.Trigger>
-    <Popover.Content>
-      <div class='flex flex-col gap-2'>
-        <Button onClick={() => performSaveGame()}>{t('menu.save.actions.saveGame')}</Button>
-        <HorizontalBar />
-        <ManageActionlistSection />
-        <HorizontalBar />
-        <ManageSaveTextSection />
-        <HorizontalBar />
-        <ManageSaveFileSection />
-      </div>
-    </Popover.Content>
-  </Popover>
+  <MenuOption title={menuT('title')}>
+    <div class='flex flex-col gap-2'>
+      <Button onClick={() => performSaveGame()}>{menuT('actions.saveGame')}</Button>
+      <HorizontalBar />
+      <ManageActionlistSection />
+      <HorizontalBar />
+      <ManageSaveTextSection />
+      <HorizontalBar />
+      <ManageSaveFileSection />
+    </div>
+  </MenuOption>
 );

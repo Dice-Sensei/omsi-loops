@@ -13,6 +13,7 @@ import {
 } from '../../../../original/prestige.ts';
 import { et } from '../../../../locales/translations.utils.ts';
 import { HorizontalBar } from '../../../../components/flow/HorizontalBar/HorizontalBar.tsx';
+import { MenuOption } from './MenuOption.tsx';
 
 const t = et('menu.prestige');
 export const PrestigeMenu = () => {
@@ -63,113 +64,108 @@ export const PrestigeMenu = () => {
   }, 1000);
 
   return (
-    <Popover>
-      <Popover.Trigger>
-        <Button variant='text'>{t('title')}</Button>
-      </Popover.Trigger>
-      <Popover.Content class='max-w-[400px]'>
-        <div class='flex flex-col gap-2'>
-          <div>
-            <span>{t('descriptions.active')}</span>
-          </div>
-          <div>
-            <span class='font-medium'>{t('descriptions.spec')}</span>
-          </div>
-          <div>
-            <span>{t('descriptions.carryover')}</span>
-          </div>
-          <div class='grid grid-cols-[auto_1fr] gap-2'>
-            <div class='font-medium'>{t('descriptions.maxCarryover')}:</div>
-            <div>{store.prestigeTotalCompletions}</div>
-            <div class='font-medium'>{t('descriptions.totalPrestigesCompleted')}:</div>
-            <div>{store.prestigeTotalCompletions}</div>
-            <div class='font-medium'>{t('descriptions.availablePoints')}:</div>
-            <div class='inline-flex gap-1 items-center'>
-              <span>{store.prestigeCurrentPoints}</span>
-              <span>/</span>
-              <span>{store.prestigeTotalPoints}</span>
-            </div>
-          </div>
-          <div>
-            <span class='font-medium'>{t('descriptions.upgradeCost')}:</span>
-            <div class='text-sm flex gap-1 items-center'>
-              <span>cost(1) = 30</span>
-              <span>;</span>
-              <span>cost(n) = cost(n - 1) + 5n</span>
-            </div>
-            <div class='text-sm flex gap-1 items-center'>
-              <span>30</span>
-              <Icon class='w-4 h-4' name='arrowRight' />
-              <span>40</span>
-              <Icon class='w-4 h-4' name='arrowRight' />
-              <span>55</span>
-              <Icon class='w-4 h-4' name='arrowRight' />
-              <span>75</span>
-              <Icon class='w-4 h-4' name='arrowRight' />
-              <span>100</span>
-              <Icon class='w-4 h-4' name='arrowRight' />
-              <span>130</span>
-              <Icon class='w-4 h-4' name='arrowRight' />
-              <span>...</span>
-            </div>
-          </div>
-          <HorizontalBar />
-          <div class='grid grid-cols-1 gap-2'>
-            <PrestigeOption
-              title={t('actions.improvePhysical.title')}
-              description={t('actions.improvePhysical.description')}
-              currentBonus={store.prestigePhysicalCurrentBonus}
-              nextLevelCost={store.prestigePhysicalNextCost}
-              action={() => prestigeUpgrade('PrestigePhysical')}
-            />
-            <PrestigeOption
-              title={t('actions.improveMental.title')}
-              description={t('actions.improveMental.description')}
-              currentBonus={store.prestigeMentalCurrentBonus}
-              nextLevelCost={store.prestigeMentalNextCost}
-              action={() => prestigeUpgrade('PrestigeMental')}
-            />
-            <PrestigeOption
-              title={t('actions.improveCombat.title')}
-              description={t('actions.improveCombat.description')}
-              currentBonus={store.prestigeCombatCurrentBonus}
-              nextLevelCost={store.prestigeCombatNextCost}
-              action={() => prestigeUpgrade('PrestigeCombat')}
-            />
-            <PrestigeOption
-              title={t('actions.improveSpatiomancy.title')}
-              description={t('actions.improveSpatiomancy.description')}
-              currentBonus={store.prestigeSpatiomancyCurrentBonus}
-              nextLevelCost={store.prestigeSpatiomancyNextCost}
-              action={() => prestigeUpgrade('PrestigeSpatiomancy')}
-            />
-            <PrestigeOption
-              title={t('actions.improveChronomancy.title')}
-              description={t('actions.improveChronomancy.description')}
-              currentBonus={store.prestigeChronomancyCurrentBonus}
-              nextLevelCost={store.prestigeChronomancyNextCost}
-              action={() => prestigeUpgrade('PrestigeChronomancy')}
-            />
-            <PrestigeOption
-              title={t('actions.improveBartering.title')}
-              description={t('actions.improveBartering.description')}
-              currentBonus={store.prestigeBarteringCurrentBonus}
-              nextLevelCost={store.prestigeBarteringNextCost}
-              action={() => prestigeUpgrade('PrestigeBartering')}
-            />
-            <PrestigeOption
-              title={t('actions.improveExpOverflow.title')}
-              description={t('actions.improveExpOverflow.description')}
-              currentBonus={store.prestigeExpOverflowCurrentBonus}
-              nextLevelCost={store.prestigeExpOverflowNextCost}
-              action={() => prestigeUpgrade('PrestigeExpOverflow')}
-            />
-            <HorizontalBar />
-            <PrestigeReset />
+    <MenuOption title={t('title')}>
+      <div class='flex flex-col gap-2'>
+        <div>
+          <span>{t('descriptions.active')}</span>
+        </div>
+        <div>
+          <span class='font-medium'>{t('descriptions.spec')}</span>
+        </div>
+        <div>
+          <span>{t('descriptions.carryover')}</span>
+        </div>
+        <div class='grid grid-cols-[auto_1fr] gap-2'>
+          <div class='font-medium'>{t('descriptions.maxCarryover')}:</div>
+          <div>{store.prestigeTotalCompletions}</div>
+          <div class='font-medium'>{t('descriptions.totalPrestigesCompleted')}:</div>
+          <div>{store.prestigeTotalCompletions}</div>
+          <div class='font-medium'>{t('descriptions.availablePoints')}:</div>
+          <div class='inline-flex gap-1 items-center'>
+            <span>{store.prestigeCurrentPoints}</span>
+            <span>/</span>
+            <span>{store.prestigeTotalPoints}</span>
           </div>
         </div>
-      </Popover.Content>
-    </Popover>
+        <div>
+          <span class='font-medium'>{t('descriptions.upgradeCost')}:</span>
+          <div class='text-sm flex gap-1 items-center'>
+            <span>cost(1) = 30</span>
+            <span>;</span>
+            <span>cost(n) = cost(n - 1) + 5n</span>
+          </div>
+          <div class='text-sm flex gap-1 items-center'>
+            <span>30</span>
+            <Icon class='w-4 h-4' name='arrowRight' />
+            <span>40</span>
+            <Icon class='w-4 h-4' name='arrowRight' />
+            <span>55</span>
+            <Icon class='w-4 h-4' name='arrowRight' />
+            <span>75</span>
+            <Icon class='w-4 h-4' name='arrowRight' />
+            <span>100</span>
+            <Icon class='w-4 h-4' name='arrowRight' />
+            <span>130</span>
+            <Icon class='w-4 h-4' name='arrowRight' />
+            <span>...</span>
+          </div>
+        </div>
+        <HorizontalBar />
+        <div class='grid grid-cols-1 gap-2'>
+          <PrestigeOption
+            title={t('actions.improvePhysical.title')}
+            description={t('actions.improvePhysical.description')}
+            currentBonus={store.prestigePhysicalCurrentBonus}
+            nextLevelCost={store.prestigePhysicalNextCost}
+            action={() => prestigeUpgrade('PrestigePhysical')}
+          />
+          <PrestigeOption
+            title={t('actions.improveMental.title')}
+            description={t('actions.improveMental.description')}
+            currentBonus={store.prestigeMentalCurrentBonus}
+            nextLevelCost={store.prestigeMentalNextCost}
+            action={() => prestigeUpgrade('PrestigeMental')}
+          />
+          <PrestigeOption
+            title={t('actions.improveCombat.title')}
+            description={t('actions.improveCombat.description')}
+            currentBonus={store.prestigeCombatCurrentBonus}
+            nextLevelCost={store.prestigeCombatNextCost}
+            action={() => prestigeUpgrade('PrestigeCombat')}
+          />
+          <PrestigeOption
+            title={t('actions.improveSpatiomancy.title')}
+            description={t('actions.improveSpatiomancy.description')}
+            currentBonus={store.prestigeSpatiomancyCurrentBonus}
+            nextLevelCost={store.prestigeSpatiomancyNextCost}
+            action={() => prestigeUpgrade('PrestigeSpatiomancy')}
+          />
+          <PrestigeOption
+            title={t('actions.improveChronomancy.title')}
+            description={t('actions.improveChronomancy.description')}
+            currentBonus={store.prestigeChronomancyCurrentBonus}
+            nextLevelCost={store.prestigeChronomancyNextCost}
+            action={() => prestigeUpgrade('PrestigeChronomancy')}
+          />
+          <PrestigeOption
+            title={t('actions.improveBartering.title')}
+            description={t('actions.improveBartering.description')}
+            currentBonus={store.prestigeBarteringCurrentBonus}
+            nextLevelCost={store.prestigeBarteringNextCost}
+            action={() => prestigeUpgrade('PrestigeBartering')}
+          />
+          <PrestigeOption
+            title={t('actions.improveExpOverflow.title')}
+            description={t('actions.improveExpOverflow.description')}
+            currentBonus={store.prestigeExpOverflowCurrentBonus}
+            nextLevelCost={store.prestigeExpOverflowNextCost}
+            action={() => prestigeUpgrade('PrestigeExpOverflow')}
+          />
+          <HorizontalBar />
+          <PrestigeReset />
+        </div>
+      </div>
+    </MenuOption>
   );
 };
 
