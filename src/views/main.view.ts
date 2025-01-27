@@ -36,7 +36,7 @@ import $ from 'jquery';
 import * as d3 from 'd3';
 import { StatGraph } from '../original/stats-graph.ts';
 import { Localization } from '../original/localization.ts';
-import { KeyboardKey } from '../keyboard.hotkeys.ts';
+import { KeyboardKey } from '../modules/hotkeys/keyboard.hotkeys.ts';
 import { getPrestigeCost, getPrestigeCurrentBonus, prestigeValues } from '../original/prestige.ts';
 import { camelize, formatNumber, intToString, intToStringRound, toSuffix } from '../original/helpers.ts';
 import { getNumOnList } from '../original/actions.ts';
@@ -726,7 +726,6 @@ export class View {
   }
 
   updateTime() {
-    document.getElementById('timeBar').style.width = `${100 - vals.timer / vals.timeNeeded * 100}%`;
     document.getElementById('timer').textContent = `${
       intToString(
         vals.timeNeeded - vals.timer,

@@ -10,6 +10,11 @@ body {
   font-size: 1rem;
   font-style: normal;
   @apply text-slate-800;
+
+}
+
+#app {
+  @apply grid grid-cols-3 gap-4;
 }
 
 :root {
@@ -1731,16 +1736,18 @@ li#actionLogLatest {
 }
 
 .responsive {
-  & body {
-    min-width: 0 !important;
+  /* & body { */
+    /* min-width: 0 !important;
+
     display: grid;
+
     grid:
       'header header header' max-content
       'actions town stats' minmax(0, 1fr)
       / minmax(min-content, 1fr) minmax(535px, 2fr) minmax(min-content, 1fr);
 
-    justify-items: stretch;
-  }
+    justify-items: stretch; */
+  /* } */
 
   & #timeInfo {
     /* width: 100vw !important; -- causes Chrome to have sad grid times? */

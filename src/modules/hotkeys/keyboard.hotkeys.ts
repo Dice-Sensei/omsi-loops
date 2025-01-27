@@ -1,9 +1,9 @@
-import { Keyboard } from './logic/keyboard.ts';
-import { Listeners } from './logic/listeners.ts';
-import { t } from './locales/translations.utils.ts';
-import { actions } from './original/actions.ts';
-import { view } from './views/main.view.ts';
-import { vals } from './original/saving.ts';
+import { Keyboard } from '../../logic/keyboard.ts';
+import { Listeners } from '../../logic/listeners.ts';
+import { t } from '../../locales/translations.utils.ts';
+import { actions } from '../../original/actions.ts';
+import { view } from '../../views/main.view.ts';
+import { vals } from '../../original/saving.ts';
 import {
   checkExtraSpeed,
   clearList,
@@ -13,8 +13,8 @@ import {
   performGamePause,
   saveList,
   toggleOffline,
-} from './original/driver.ts';
-import { actionAmount, setActionAmount } from './values.ts';
+} from '../../original/driver.ts';
+import { actionAmount, setActionAmount } from '../../values.ts';
 
 export function setShiftKey(value: boolean): void {
   if (KeyboardKey.shift === value) return;
@@ -40,8 +40,8 @@ export function moveToTown(townNum: number | undefined): void {
 }
 
 export namespace KeyboardKey {
-  export const shift = false;
-  export const control = false;
+  export let shift = false;
+  export let control = false;
 }
 
 export const createKeyboardHotkeys = () => {
@@ -203,7 +203,7 @@ export const createKeyboardHotkeys = () => {
         fn: () =>
           moveToTown(
             vals
-              .townsUnlocked[vals.townsUnlocked.indexOf(vals.townshowing) + 1],
+              .townsUnlocked[vals.townsUnlocked.indexOf(vals.townShowing) + 1],
           ),
         description: t('shortcuts.moveToNextTown'),
       },
@@ -213,7 +213,7 @@ export const createKeyboardHotkeys = () => {
         fn: () =>
           moveToTown(
             vals
-              .townsUnlocked[vals.townsUnlocked.indexOf(vals.townshowing) - 1],
+              .townsUnlocked[vals.townsUnlocked.indexOf(vals.townShowing) - 1],
           ),
         description: t('shortcuts.moveToPreviousTown'),
       },

@@ -1325,4 +1325,159 @@ export const translationsEn = {
       },
     },
   },
+  stories: {
+    items: [
+      {
+        story: `
+          You're a simple courier, on a long trip to deliver a high priority package. Just as you entered town,
+          you tripped - breaking your glasses - and the package burst open, spilling a strange liquid on you.
+          Immediately, your meager amount of mana started draining rapidly. Right as your mana completely ran
+          out, you found yourself back in the moment the liquid was absorbed into your skin, with your tiny
+          reserves filled... yet draining just as before. This happened again and again, the world resetting
+          with you, until you decided you had to figure out a way to prolong how long these 'loops' were. 
+          Mana crystals are often stored in pottery around town, perhaps you'll start there ...
+        `,
+      },
+      {
+        story: `
+          You reach the end of the dungeon, where a softly glowing orb floats on a pedestal. You've found the
+          dungeon core - for the first level of the dungeon, at least. As you grasp it, the essence dives into
+          you, infusing your very being with the power it holds. It is a small amount of power, but this is a
+          small dungeon. You'll be back to take this power again, knowing with the foreign knowledge implanted
+          that it will stay with you no matter when you are.
+        `,
+      },
+      {
+        story: `
+          You reach the end of the dungeon again, but for the first time the core isn't glowing. It's always
+          been thought that dungeon cores feed upon the mana spent around them, but you're beginning to think
+          the essence of its previous incarnations drains it somehow. It doesn't always happen, but you'll need
+          to put more mana into the world to reap the core's benefits out of it. You shrug, accepting yet
+          another oddity of the loops.
+        `,
+      },
+      {
+        story: `
+          After spending most of a loop preparing, you're finally ready to leave Beginnersville. In a way,
+          you're going to miss this town, and the thought of leaving almost brings a tear to your eye - until
+          you realize you'll just be back next loop. Grumbling, you set off, hiking into the forest. By the time
+          you're ready to make camp, you're in a good mood again. The forest is beautiful, teeming with life,
+          and looks to have boundless places to explore. Best of all, on your way here, you passed several
+          locations that are absolutely saturated with mana - you think you'll check those out first.
+        `,
+      },
+      {
+        story: `
+          It's always nice, after doing the same dull tasks over and over, to make your way through the forest
+          and get to do something new. Whether you're exploring, hunting, learning something or just sitting by
+          the waterfall, the forest always makes a great backdrop. However, as pleasant as it's been here, it's
+          time to move on, at least for now. It would be a long trip, but luckily, after all your exploring,
+          you know some shortcuts, and before long, Merchanton emerges out of the trees. There's a lot to do here!
+          Maybe one of the guilds can help you with your looping problem! Or maybe there's a book in the library
+          that can lead you to a solution! Or maybe... or maybe... that all sounds like a lot of work, and you
+          have been going through a lot lately. Maybe before any of that, you should find a bar and get a drink.
+        `,
+      },
+      {
+        story: `
+          Abandoning Merchanton's warm and inviting cityscape for the cold and empty hills, you continue on your  
+          quest, now moving towards Mount Olympus. As the mountain's jagged peaks grow ever larger on the
+          horizon, you groan at the thought that you're going to have to climb that colossus. The only things
+          that keep you from turning right around and just looking for another town are the stories you heard in
+          Merchanton. Stories of ancient cities made from fire; of a secret civilization of immortals hiding in
+          the caverns; of mana so plentiful that it takes only seconds to perform magics that would normally
+          take hours. The stories are so outrageous you're sure they're only myths, but myths have to come from
+          somewhere, and if these have even a grain of truth to them, the power you could gain far outweighs the
+          unpleasantness of simply climbing a mountain.
+        `,
+      },
+      {
+        story: `
+          You expected to be whisked away to a land of opulence and wonder beyond your wildest dreams. Instead,
+          you sat in a cramped room filling out paperwork for three hours before being dropped off outside what
+          appears to be an ordinary town, with manicured lawns and meandering sidewalks leading to tidy parks
+          and decorations. It's not ordinary though, if you stare at the grass you notice it's just a bit too
+          green, the sky just a bit too blue. The literal deity taking a seven foot tall dog on a walk doesn't
+          help either. A god passing by asks if you want to contribute to a local charity, and you see another
+          god offering tours of 'Valhalla, the greatest city above the world!'
+        `,
+      },
+      {
+        story: `
+          You find yourself in a land covered in a perpetual haze, with a deep red sky casting an eerie glow
+          over the landscape. Alien and oppressive, it's unlike anywhere you've ever been; it feels more
+          claustrophobic here than in the shrouded thickets of the forest or the deepest caves of Mt. Olympus.
+          This is the shadow realm, a place of such natural hostility that it hurts just to stand here and look
+          at it - it's like the haze is reaching inside your mind and suppressing your thoughts. One thing it
+          can't suppress, though, is the intense feeling of familiarity at your immediate surroundings. The
+          trees may be gnarled and the dirt may be dusty and ashen, but you've walked this road thousands of
+          times - you could recognize the outskirts of Beginnersville in your sleep. It's not Beginnersville you
+          see off in the distance though. In its place, you find only a desecrated ruin of a village, dominated
+          by a massive dark spire sitting in the dead center of town.
+        `,
+      },
+      {
+        story: `
+          Shadow realm or not, there are enough things that haven't changed that you still lean on your
+          established routine. Right down to the part where you have to get some supplies to brave the jungle
+          just outside the small town, from a local trader. Too bad this one is quite selectively deaf to your
+          attempts at haggling, but hey. You've gotten good enough at budgeting and scrounging up coins that
+          you could pay him in the end. Turning your eyes to the narrow trail through the dense jungle before you,
+          you set foot among the wild trees, noting the ruins among the tree-trunks. You wonder if this place
+          has always been a jungle...
+        `,
+      },
+      {
+        story: `
+          Learning the finer points of alchemy, of the subtle rules underpinning the "simple" brewing of potions
+          had been a long, exhausting trial, but since you have nothing but time on your hands, you have become
+          an expert by any standard. As you let a bundle of herbs soak in a mana geyser, you double-check your
+          notes and prepare your equipment. The brew itself is finicky but finally, you fill a bottle with the
+          fruits of your Great Work. The Loop Potion, the exact same brew that got you into this situation.
+          ...Reflecting for a moment, you wonder if there was much of a point to all of this. Not like making
+          more of the stuff will get you out of the loops.
+        `,
+      },
+      {
+        story: `
+          Exploring the jungle took quite a lot of time, and you just barely manage to make your way to the
+          other side before the imposing gate among the trees closes. You mentally take note that you're on a
+          time limit if you want to make it here on future loops, and that the pattern of the "normal" world
+          still holds: On the other side of the jungle lies a small-ish city that proudly identifies itself as
+          "Commerceville, the heart of trade!" according to the statue along the way to the city gates. While
+          just wandering is liable to get you in trouble with some of the townsfolk, there is a helpful tourist
+          guide willing to show you around for a "reasonable" sum. Even if the guide looks a little too eager to
+          lead you down the city's many narrow alleyways, you can't deny that learning about the Thieves guild
+          was worth the risk to get there. Finally, at the end of the tour, you learn that your guide also works
+          for the tax collectors and really can't stay to chat. At least your guide was nice enough to show you
+          to the Bank. There is an imposing hooded figure leaning against a wall of the bank, maybe they can
+          tell you something more...
+        `,
+      },
+      {
+        story: `
+          You can't help but chuckle as you make your way out of the Bank's "Big Shot" office, keys to the
+          entirety of Commerceville in hand. Sure, the loan wasn't cheap and you'd probably get into a lot of
+          trouble if you'd stick around for the first payment, but there's no way your mana reserves will last
+          that long. Looking ahead, you blink at the first blatant difference between this world and the normal
+          one: There is no Mt. Olympus. Instead, there is a large, wide valley with the ruins of a tower in the
+          middle of it. It takes a bit of Doing, but you eventually find a stone covered in familiar runic
+          script: "Children of the land! We, the seven guardian deities, challenge you! Find us, fight us, and
+          claim the throne of the gods!" ...Oh well, time for a bit of deicide. The "throne of the gods" sounds
+          like just the kind of thing that could break you out of the loops, and they did issue a challenge
+          for anyone to find. Step one will be to reach them.
+        `,
+      },
+      {
+        story: `
+          You've done it! You've bested the gods themselves and restored time to its rightful flow. You can stop
+          looping at any moment. But, then again, you could keep going. There's always time later... Thanks for
+          playing my fan mod of Idle Loops! Big shout-out to the wonderful Stop_Sign for creating this amazing
+          game and Omsi for all the Omsi version. You both have inspired me more than you can imagine. Hope
+          everyone had fun! <3
+          --Lloyd
+        `,
+      },
+    ],
+  },
 } as const;
