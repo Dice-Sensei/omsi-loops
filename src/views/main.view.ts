@@ -2167,30 +2167,6 @@ export class View {
 
   // when you mouseover Story
   updateStory(num) {
-    document.getElementById('newStory').style.display = 'none';
-    if (num <= 0) {
-      num = 0;
-      document.getElementById('storyLeft').style.visibility = 'hidden';
-    } else {
-      document.getElementById('storyLeft').style.visibility = '';
-    }
-
-    if (num >= vals.storyMax) {
-      num = vals.storyMax;
-      document.getElementById('storyRight').style.visibility = 'hidden';
-    } else {
-      document.getElementById('storyRight').style.visibility = '';
-    }
-    //Hard coded story count - need to fix this
-    for (let i = 0; i <= 12; i++) {
-      const storyDiv = document.getElementById(`story${i}`);
-      if (storyDiv) {
-        storyDiv.style.display = 'none';
-      }
-    }
-    vals.storyShowing = num;
-    document.getElementById('storyPage').textContent = String(vals.storyShowing + 1);
-    document.getElementById(`story${num}`).style.display = 'inline-block';
   }
 
   changeStatView() {

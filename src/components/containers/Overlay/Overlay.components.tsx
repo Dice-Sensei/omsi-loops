@@ -51,7 +51,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
   return (
     <Show when={overlay().isShown()}>
       <Portal mount={overlays}>
-        <div ref={overlay().contentRef} {...props}>
+        <div ref={overlay().contentRef} {...props} id={overlay().id}>
           {props.children}
           <OverlayArrow />
         </div>

@@ -1,13 +1,15 @@
-import { createUniqueId, mergeProps, onCleanup, onMount, ParentProps } from 'solid-js';
+import { mergeProps, onCleanup, onMount, ParentProps } from 'solid-js';
 import { Overlay, OverlayProps } from '../Overlay.tsx';
 import { selectOverlay } from '../createOverlay.ts';
 import { OverlayContentProps, OverlayTriggerProps } from '../Overlay.components.tsx';
 import cx from 'clsx';
 import { ButtonIcon } from '../../../buttons/Button/ButtonIcon.tsx';
 import { createContext } from '../../../../signals/createContext.tsx';
+import { useOverlayId } from '../Overlay.context.tsx';
 
 const [usePopover, PopoverProvider] = createContext(() => {
-  const overlay = selectOverlay();
+  const id = useOverlayId();
+  const overlay = selectOverlay(id);
 
   const handleEscape = (event: KeyboardEvent) => {
     if (event.key !== 'Escape') return;
@@ -16,8 +18,8 @@ const [usePopover, PopoverProvider] = createContext(() => {
   };
 
   const handleDismiss = (event: MouseEvent) => {
+    if (event.composedPath().includes(overlay().contentRef.active)) return;
     event.stopImmediatePropagation();
-    if (overlay().contentRef.active.contains(event.target as Node)) return;
     close();
   };
 
@@ -60,7 +62,7 @@ const Content = (props: ParentProps) => {
     overlay().triggerRef.active.removeEventListener('click', toggle);
   });
 
-  return <>{props.children}</>;
+  return props.children;
 };
 
 interface PopoverProps extends OverlayProps {

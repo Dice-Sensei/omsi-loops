@@ -19,6 +19,7 @@ export interface OverlayState {
   contentRef: Reference<HTMLElement>;
   triggerRef: Reference<HTMLElement>;
   arrowRef: Reference<HTMLElement>;
+  id: string;
 }
 
 export const createOverlay = (options: OverlayOptions) => {
@@ -79,6 +80,7 @@ export const createOverlay = (options: OverlayOptions) => {
     arrowRef,
     triggerRef,
     contentRef,
+    id: options.id,
   });
 
   onCleanup(() => removeOverlay(options));

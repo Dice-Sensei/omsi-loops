@@ -30,14 +30,10 @@ export const setActions = () => {
       cap.onchange = () => updateBuffCaps();
     }
 
-    const storyControl = document.getElementById('story_control')!;
-    storyControl.onmouseover = () => view.updateStory(vals.storyShowing);
-    storyControl.onfocus = () => view.updateStory(vals.storyShowing);
-
-    const storyLeft = document.getElementById('storyLeft')!;
-    storyLeft.onclick = () => view.updateStory(vals.storyShowing - 1);
-    const storyRight = document.getElementById('storyRight')!;
-    storyRight.onclick = () => view.updateStory(vals.storyShowing + 1);
+    // const storyLeft = document.getElementById('storyLeft')!;
+    // storyLeft.onclick = () => view.updateStory(vals.storyShowing - 1);
+    // const storyRight = document.getElementById('storyRight')!;
+    // storyRight.onclick = () => view.updateStory(vals.storyShowing + 1);
 
     for (const stat of statList) {
       const id = `stat${stat}`;
