@@ -811,8 +811,8 @@ export class View {
     document.getElementById('effectiveTime').textContent = `${formatTime(driverVals.effectiveTime)}`;
   }
   updateResource(resource) {
-    const element = document.getElementById(`${resource}Div`, false, false);
-    if (element) element.style.display = resources[resource] ? 'inline-block' : 'none';
+    // const element = document.getElementById(`${resource}Div`, false, false);
+    // if (element) element.style.display = resources[resource] ? 'inline-block' : 'none';
 
     if (resource === 'supplies') {
       document.getElementById('suppliesCost').textContent = String(towns[0].suppliesCost);

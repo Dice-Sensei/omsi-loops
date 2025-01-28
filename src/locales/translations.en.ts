@@ -1480,4 +1480,122 @@ export const translationsEn = {
       },
     ],
   },
+  resources: {
+    power: {
+      name: 'Power',
+      description: 'Power of gods.',
+    },
+    mana: {
+      name: 'Mana',
+      description: 'Your main resource. The higher your mana, the more you can do before reset.',
+    },
+    gold: {
+      name: 'Gold',
+      description: 'Coins to buy mana crystals and other items with.',
+    },
+    reputation: {
+      name: 'Reputation',
+      description: 'The influence you have over the people in town.',
+    },
+    herbs: {
+      name: 'Herbs',
+      description: "The beneficial plants you've found.",
+    },
+    hides: {
+      name: 'Hides',
+      description: 'Results of successful hunting.',
+    },
+    potions: {
+      name: 'Potions',
+      description: 'Rare, but not complex. Worth some money.',
+    },
+    teamMembers: {
+      name: 'Team Members',
+      description: "You know their personalities and fighting style. They don't know your name.",
+    },
+    armor: {
+      name: 'Armor',
+      description: 'Crafted by your own hand, it protects you from dangers.',
+    },
+    blood: {
+      name: 'Blood',
+      description: 'The lifeblood of your body.',
+    },
+    artifacts: {
+      name: 'Artifacts',
+      description: "Various old rings, bracelets, amulets, and pendants. They look like they're worth a pretty penny.",
+    },
+    favors: {
+      name: 'Favors',
+      description: "You've been generous to important people.",
+    },
+    enchantments: {
+      name: 'Enchanted Armor',
+      description: 'Divinely blessed weapons and armor, like a hero of legend.',
+    },
+    houses: {
+      name: 'Houses',
+      description: 'A place to call home.',
+    },
+    pylons: {
+      name: 'Pylons',
+      description: 'Lingering fragments from the destroyed pylon.',
+    },
+    zombies: {
+      name: 'Zombies',
+      description: 'A shambling pile of deceased flesh. Super gross.',
+    },
+    maps: {
+      name: 'Maps',
+      description: "A cartographer's kit that can be used to survey areas and discover new secrets.",
+    },
+    finishedMaps: {
+      name: 'Finished Maps',
+      description:
+        "You've mapped out some part of the world. The Explorer's guild would happily buy this knowledge off of you.",
+    },
+    hearts: {
+      name: 'Hearts',
+      description: "The still-beating heart of your target. The Assassin's guild will reward you for this.",
+    },
+    glasses: {
+      name: 'Glasses',
+      description: 'Woah, trees have so many leaves on them.',
+    },
+    supplies: {
+      name: 'Supplies',
+      description: 'Needed to go to the next town.',
+    },
+    pickaxe: {
+      name: 'Pickaxe',
+      description: "It's heavy, but you can make use of it.",
+    },
+    loopingPotion: {
+      name: 'Looping Potion',
+      description:
+        "It's a potion made with the very same formula that got you into this mess. Why exactly did you make this?",
+    },
+    citizenship: {
+      name: 'Citizenship',
+      description: "You're one of Valhalla's proud citizens now, giving you the right to fight in their honor.",
+    },
+    pegasus: {
+      name: 'Pegasus',
+      description: 'A horse with great angelic wings. It can run across clouds as easily as dirt.',
+    },
+    key: {
+      name: 'Key',
+      description: 'Needed to go to the next town.',
+    },
+    temporalStone: {
+      name: 'Temporal Stone',
+      description: 'A strange rock that seems unaffected by the time loops.',
+    },
+    modifiers: {
+      resetable: {
+        name: 'Resetable',
+        description: 'Resets when the loop restarts.',
+      },
+    },
+  },
 } as const;
