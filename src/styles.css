@@ -678,9 +678,7 @@ input, textarea, select {
 #statViewSelector {
   grid-area: selector;
 }
-#radarChart {
-  grid-area: stats;
-}
+
 #statsContainer {
   grid-area: stats;
   --max-bar-value: 100; /* default, 1-10 in first 75% of bar */
@@ -739,39 +737,8 @@ input, textarea, select {
   margin-right: 7px;
 }
 
-/* Radar stat view */
-#statsWindow[data-view='radar'] {
-  & #statsContainer {
-    position: absolute;
-    /* This sets scale+origin for matching the svg's viewBox using % */
-    inset: 50% 25% 25% 50%;
-    pointer-events: none;
-    & > * {
-      pointer-events: initial;
-    }
-  }
-
-  & .statContainer {
-    width: 40px;
-    margin: -20px 0 0 -20px;
-    padding-top: 20px;
-    position: absolute;
-  }
-
-  & .statContainer > .statLabelContainer {
-    display: none;
-  }
-
-  & #skillList {
-    margin-top: -25px;
-  }
-}
-
 /* Regular stat view */
 #statsWindow[data-view='regular'] {
-  & #radarChart {
-    display: none;
-  }
   & #statsContainer {
     margin: 15px 0;
     display: grid;
@@ -2811,25 +2778,6 @@ ul.koviko {
     transition-delay: 0s;
     transition-duration: 0.1s;
   }
-}
-
-.radar-chart .axis path,
-.radar-chart .scaleLine path {
-  stroke: var(--graph-axis-color);
-  stroke-width: 1px;
-  fill: none;
-}
-.radar-chart .axis text,
-.radar-chart .scaleLine text {
-  fill: var(--graph-text-color);
-  text-anchor: middle;
-  font-size: 0.9rem;
-}
-
-.radar-chart .legend text {
-  fill: var(--graph-text-color);
-  font-size: 0.8rem;
-  dominant-baseline: central;
 }
 
 g.dataset[data-dataset='mana_cost_reduction'] {

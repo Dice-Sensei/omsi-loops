@@ -47,7 +47,6 @@ import { setActionAmount } from '../values.ts';
 let curTime = Date.now();
 let gameTicksLeft = 0; // actually milliseconds, not ticks
 let refund = false;
-let radarUpdateTime = 0;
 let lastSave = Date.now();
 
 export function getSpeedMult(zone = vals.curTown) {
@@ -125,7 +124,6 @@ export function animationTick(animationTime) {
 export function tick() {
   const newTime = Date.now();
   gameTicksLeft += newTime - curTime;
-  if (document.getElementById('radarStats')?.checked) radarUpdateTime += newTime - curTime;
   const delta = newTime - curTime;
   curTime = newTime;
 
@@ -238,11 +236,6 @@ export function executeGameTicks(deadline) {
       prepareRestart();
       break; // don't span loops within tick()
     }
-  }
-
-  if (radarUpdateTime > 100) {
-    view.updateStatGraphNeeded = true;
-    radarUpdateTime %= 100;
   }
 
   if (!gameIsStopped && baseManaToBurn * bonusSpeed >= 10) {

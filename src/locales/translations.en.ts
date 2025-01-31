@@ -1264,10 +1264,6 @@ export const translationsEn = {
       graph_legend:
         `Click the legend to show/hide each. Upon freshly starting, Levels and Talent won't change much. Hover Stats for more info.`,
     },
-    view: {
-      regular: 'Regular View',
-      radar: 'Radar Chart',
-    },
   },
   time_controls: {
     play_button: 'Play',

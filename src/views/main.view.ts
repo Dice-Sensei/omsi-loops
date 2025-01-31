@@ -2157,18 +2157,10 @@ export class View {
     }
   }
 
-  // when you mouseover Story
-  updateStory(num) {
+  updateStory() {
   }
 
   changeStatView() {
-    const statsWindow = document.getElementById('statsWindow');
-    if (document.getElementById('regularStats').checked) {
-      statsWindow.dataset.view = 'regular';
-    } else {
-      statsWindow.dataset.view = 'radar';
-      this.statGraph.update();
-    }
   }
 
   createTravelMenu() {
