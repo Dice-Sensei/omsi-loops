@@ -34,7 +34,6 @@ import { isBuffName, saveUISettings, vals } from '../original/saving.ts';
 
 import $ from 'jquery';
 import * as d3 from 'd3';
-import { StatGraph } from '../original/stats-graph.ts';
 import { Localization } from '../original/localization.ts';
 import { KeyboardKey } from '../modules/hotkeys/keyboard.hotkeys.ts';
 import { getPrestigeCost, getPrestigeCurrentBonus, prestigeValues } from '../original/prestige.ts';
@@ -165,8 +164,6 @@ export class View {
       townInfos[i] = document.getElementById(`townInfo${i}`);
     }
 
-    this.statGraph = new StatGraph();
-
     this.createTravelMenu();
     this.createStats();
     this.updateStats();
@@ -240,78 +237,6 @@ export class View {
   }
 
   createStats() {
-    if (this.statGraph.initalized) return;
-
-    this.statGraph.init(document.getElementById('statsContainer'));
-    const totalContainer = document.getElementById('totalStatContainer');
-    for (const stat of statList) {
-      const axisTip = this.statGraph.getAxisTip(stat);
-      totalContainer.insertAdjacentHTML(
-        'beforebegin',
-        `<div id='stat${stat}' class='statContainer showthat stat-${stat}' style='left:${axisTip[0]}%;top:${
-          axisTip[1] + 3
-        }%;'>
-                <div class='statLabelContainer'>
-                    <div class='medium bold stat-name long-form' style='margin-left:18px;margin-top:5px;'>${
-          Localization.txt(`stats>${stat}>long_form`)
-        }</div>
-                    <div class='medium bold stat-name short-form' style='margin-left:18px;margin-top:5px;'>${
-          Localization.txt(`stats>${stat}>short_form`)
-        }</div>
-                    <div class='medium statNum stat-soulstone' style='color:var(--stat-soulstone-color);' id='stat${stat}ss'></div>
-                    <div class=' statNum stat-talent'></div>
-                    <div class='medium statNum stat-talent statBarWrapper'>
-                        <div class='thinProgressBarLower tiny talentBar'><div class='statBar statTalentBar' id='stat${stat}TalentBar'></div></div>
-                        <div class='label' id='stat${stat}Talent'>0</div>
-                    </div>
-                    <div class='medium statNum stat-level statBarWrapper'>
-                        <div class='thinProgressBarLower tiny expBar'><div class='statBar statLevelBar' id='stat${stat}LevelBar'></div></div>
-                        <div class='label bold' id='stat${stat}Level'>0</div>
-                    </div>
-                </div>
-                <div class='statBars'>
-                    <div class='thinProgressBarUpper expBar'><div class='statBar statLevelLogBar logBar' id='stat${stat}LevelLogBar'></div></div>
-                    <div class='thinProgressBarLower talentBar'><div class='statBar statTalentLogBar logBar' id='stat${stat}TalentLogBar'></div></div>
-                    <div class='thinProgressBarLower soulstoneBar'><div class='statBar statSoulstoneLogBar logBar' id='stat${stat}SoulstoneLogBar'></div></div>
-                </div>
-                <div class='showthis' id='stat${stat}Tooltip' style='width:225px;'>
-                    <div class='medium bold'>${Localization.txt(`stats>${stat}>long_form`)}</div><br>${
-          Localization.txt(`stats>${stat}>blurb`)
-        }
-                    <br>
-                    <div class='medium bold'>${
-          Localization.txt('stats>tooltip>level')
-        }:</div> <div id='stat${stat}Level2'></div>
-                    <br>
-                    <div class='medium bold'>${Localization.txt('stats>tooltip>level_exp')}:</div>
-                    <div id='stat${stat}LevelExp'></div>/<div id='stat${stat}LevelExpNeeded'></div>
-                    <div class='statTooltipPerc'>(<div id='stat${stat}LevelProgress'></div>%)</div>
-                    <br>
-                    <div class='medium bold'>${Localization.txt('stats>tooltip>talent')}:</div>
-                    <div id='stat${stat}Talent2'></div>
-                    <br>
-                    <div class='medium bold'>${Localization.txt('stats>tooltip>talent_exp')}:</div>
-                    <div id='stat${stat}TalentExp'></div>/<div id='stat${stat}TalentExpNeeded'></div>
-                    <div class='statTooltipPerc'>(<div id='stat${stat}TalentProgress'></div>%)</div>
-                    <br>
-                    <div class='medium bold'>${Localization.txt('stats>tooltip>talent_multiplier')}:</div>
-                    x<div id='stat${stat}TalentMult'></div>
-                    <br>
-                    <div id='ss${stat}Container' class='ssContainer'>
-                        <div class='bold'>${
-          Localization.txt('stats>tooltip>soulstone')
-        }:</div> <div id='ss${stat}'></div><br>
-                        <div class='medium bold'>${
-          Localization.txt('stats>tooltip>soulstone_multiplier')
-        }:</div> x<div id='stat${stat}SSBonus'></div>
-                    </div><br>
-                    <div class='medium bold'>${
-          Localization.txt('stats>tooltip>total_multiplier')
-        }:</div> x<div id='stat${stat}TotalMult'></div>
-                </div>
-            </div>`,
-      );
-    }
   }
 
   // requests are properties, where the key is the function name,
@@ -376,7 +301,6 @@ export class View {
     this.handleUpdateRequests();
 
     if (dungeonShowing !== undefined) this.updateSoulstoneChance(dungeonShowing);
-    if (this.updateStatGraphNeeded) this.statGraph.update();
     this.updateTime();
   }
 
@@ -482,8 +406,6 @@ export class View {
     if (stat !== undefined) this.updateStat(stat);
   }
 
-  updateStatGraphNeeded = false;
-
   updateStat(stat) {
     const level = getLevel(stat);
     const talent = getTalent(stat);
@@ -579,7 +501,6 @@ export class View {
     const statsContainer = document.getElementById('statsContainer');
     if (skipAnimation) {
       statsContainer.classList.remove('animate-logBars');
-      this.statGraph.update(true);
     }
     statsContainer.style.setProperty('--max-bar-value', String(maxValue));
     if (!statsContainer.classList.contains('animate-logBars')) {

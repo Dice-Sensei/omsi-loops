@@ -1202,66 +1202,72 @@ export const translationsEn = {
   },
   stats: {
     title: 'Stats',
-    dex: {
-      blurb: 'Know your body.',
-      long_form: 'Dexterity',
-      short_form: 'Dex',
-    },
-    str: {
-      blurb: 'Train your body.',
-      long_form: 'Strength',
-      short_form: 'Str',
-    },
-    con: {
-      blurb: 'Just a little longer. Just a little more.',
-      long_form: 'Constitution',
-      short_form: 'Con',
-    },
-    spd: {
-      blurb: 'Gotta go fast.',
-      long_form: 'Speed',
-      short_form: 'Spd',
-    },
-    cha: {
-      blurb: 'Conversation is a battle.',
-      long_form: 'Charisma',
-      short_form: 'Cha',
-    },
-    int: {
-      blurb: 'Learning to learn.',
-      long_form: 'Intelligence',
-      short_form: 'Int',
-    },
-    luck: {
-      blurb: 'Opportunity favors the fortunate.',
-      long_form: 'Luck',
-      short_form: 'Luck',
-    },
-    soul: {
-      blurb: 'You are the captain.',
-      long_form: 'Soul',
-      short_form: 'Soul',
+    attributes: {
+      dexterity: {
+        blurb: 'Know your body.',
+        name: 'Dexterity',
+        abbreviation: 'Dex',
+      },
+      strength: {
+        blurb: 'Train your body.',
+        name: 'Strength',
+        abbreviation: 'Str',
+      },
+      constitution: {
+        blurb: 'Just a little longer. Just a little more.',
+        name: 'Constitution',
+        abbreviation: 'Con',
+      },
+      speed: {
+        blurb: 'Gotta go fast.',
+        name: 'Speed',
+        abbreviation: 'Spd',
+      },
+      charisma: {
+        blurb: 'Conversation is a battle.',
+        name: 'Charisma',
+        abbreviation: 'Cha',
+      },
+      perception: {
+        blurb: "You see what others don't.",
+        name: 'Perception',
+        abbreviation: 'Per',
+      },
+      intelligence: {
+        blurb: 'Learning to learn.',
+        name: 'Intelligence',
+        abbreviation: 'Int',
+      },
+      luck: {
+        blurb: 'Opportunity favors the fortunate.',
+        name: 'Luck',
+        abbreviation: 'Luck',
+      },
+      soul: {
+        blurb: 'You are the captain.',
+        name: 'Soul',
+        abbreviation: 'Soul',
+      },
     },
     total: {
       blurb: 'It all adds up.',
       singular: 'Total',
       plural: 'Totals',
     },
-    tooltip: {
+    tooltips: {
       level: 'Level',
-      level_exp: 'Level Exp',
-      exp: 'Exp',
+      levelExperience: 'Level Exp',
+      experience: 'Exp',
       talent: 'Talent',
-      talent_exp: 'Talent Exp',
-      talent_multiplier: 'Talent Mult',
+      talentExperience: 'Talent Exp',
+      talentMultiplier: 'Talent Mult',
       soulstone: 'Soulstones',
-      soulstone_multiplier: 'Soulstone Mult',
-      total_multiplier: 'Total Mult',
-      bonus_xp: 'Bonus XP',
-      mana_cost_reduction: 'Mana Cost Reduction',
+      soulstoneMultiplier: 'Soulstone Mult',
+      totalMultiplier: 'Total Mult',
+      manaCostReduction: 'Mana Cost Reduction',
       explanation:
         `Each stat level reduces the relevant part of an action's mana cost by a percentage. Talent exp gain is equal to 1% of stat exp gain, and persists through loops. Talent multiplies xp gain by (1+(talentLevel)^0.4/3). XP gain towards a stat per action is (original mana / actual mana) * (talent bonus) per tick. Total Mult is the product of your talent and soulstone bonuses. e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%. This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>. If your <div class="bold">Cha</div> is level 20 when the action is started, the bonus would be x1.2 so it'd be 640 / 1.2 = 533.33 Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~87% of the original mana cost. The action would give (800/694)*(1+(talent)^0.4/3) level exp per mana for the 694 mana.`,
-      graph_legend:
+      graphLegend:
         `Click the legend to show/hide each. Upon freshly starting, Levels and Talent won't change much. Hover Stats for more info.`,
     },
   },

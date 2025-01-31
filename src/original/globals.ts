@@ -72,7 +72,7 @@ export const buffList = /** @type {const} */ ([
   'PrestigeBartering',
   'PrestigeExpOverflow',
 ]);
-export const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'];
+export const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'] as const;
 
 export const hearts = [];
 export const resources = {
