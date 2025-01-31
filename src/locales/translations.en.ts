@@ -1204,55 +1204,55 @@ export const translationsEn = {
     title: 'Stats',
     attributes: {
       dexterity: {
-        blurb: 'Know your body.',
         name: 'Dexterity',
         abbreviation: 'Dex',
+        description: 'Know your body.',
       },
       strength: {
-        blurb: 'Train your body.',
         name: 'Strength',
         abbreviation: 'Str',
+        description: 'Train your body.',
       },
       constitution: {
-        blurb: 'Just a little longer. Just a little more.',
         name: 'Constitution',
         abbreviation: 'Con',
+        description: 'Just a little longer. Just a little more.',
       },
       speed: {
-        blurb: 'Gotta go fast.',
         name: 'Speed',
         abbreviation: 'Spd',
+        description: 'Gotta go fast.',
       },
       charisma: {
-        blurb: 'Conversation is a battle.',
         name: 'Charisma',
         abbreviation: 'Cha',
+        description: 'Conversation is a battle.',
       },
       perception: {
-        blurb: "You see what others don't.",
         name: 'Perception',
         abbreviation: 'Per',
+        description: "You see what others don't.",
       },
       intelligence: {
-        blurb: 'Learning to learn.',
         name: 'Intelligence',
         abbreviation: 'Int',
+        description: 'Learning to learn.',
       },
       luck: {
-        blurb: 'Opportunity favors the fortunate.',
         name: 'Luck',
         abbreviation: 'Luck',
+        description: 'Opportunity favors the fortunate.',
       },
       soul: {
-        blurb: 'You are the captain.',
         name: 'Soul',
         abbreviation: 'Soul',
+        description: 'You are the captain.',
       },
     },
     total: {
-      blurb: 'It all adds up.',
       singular: 'Total',
       plural: 'Totals',
+      description: 'It all adds up.',
     },
     tooltips: {
       level: 'Level',

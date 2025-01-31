@@ -1,9 +1,7 @@
-import { createEffect, createMemo } from 'solid-js';
+import { createMemo } from 'solid-js';
 import { Tooltip } from '../../components/containers/Overlay/primitives/Tooltip.tsx';
 import { et } from '../../locales/translations.utils.ts';
 import { statList } from '../../original/globals.ts';
-import { Localization } from '../../original/localization.ts';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
 import { view } from '../../views/main.view.ts';
 
 const t = et('stats');
@@ -18,7 +16,7 @@ const statToName = {
   Per: 'perception',
   Luck: 'luck',
   Soul: 'soul',
-};
+} as const;
 
 export const Stats = () => {
   const templates = createMemo(() => {
@@ -73,7 +71,7 @@ export const Stats = () => {
           <div class='showthis' id={`stat${stat}Tooltip`} style='width:225px;'>
             <div class='medium bold'>{t(`attributes.${name}.name`)}</div>
             <br />
-            {t(`attributes.${name}.blurb`)}
+            {t(`attributes.${name}.description`)}
             <br />
             <div class='medium bold'>{t('tooltips.level')}:</div>
             <div id={`stat${stat}Level2`} />
