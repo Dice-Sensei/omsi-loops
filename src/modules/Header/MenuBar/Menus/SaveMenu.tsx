@@ -12,7 +12,6 @@ import { saveTextFile } from '../../../../utils/saveTextFile.tsx';
 import { createRef, Reference } from '../../../../signals/createRef.ts';
 import { maybe } from '../../../../utils/maybe.tsx';
 import { Base64 } from '../../../../utils/Base64.ts';
-import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
 import { HorizontalBar } from '../../../../components/flow/HorizontalBar/HorizontalBar.tsx';
 import { MenuOption } from './MenuOption.tsx';
 

@@ -4,7 +4,7 @@ import { t } from '../../locales/translations.utils.ts';
 import { MenuBar } from './MenuBar/MenuBar.tsx';
 import { TimeBar } from './TimeBar/TimeBar.tsx';
 import { setOption, vals } from '../../original/saving.ts';
-import { view } from '../../views/main.view.ts';
+import { formatTime, view } from '../../views/main.view.ts';
 import { Popover } from '../../components/containers/Overlay/primitives/Popover.tsx';
 import { clamp } from '../../original/helpers.ts';
 import { ButtonIcon } from '../../components/buttons/Button/ButtonIcon.tsx';
@@ -12,6 +12,9 @@ import { Button } from '../../components/buttons/Button/Button.tsx';
 import { createIntervalSignal } from '../../signals/createInterval.ts';
 import { Icon } from '../../components/buttons/Button/Icon.tsx';
 import { Resources } from './Resources.tsx';
+import { isBonusActive, manualRestart, performGamePause } from '../../original/driver.ts';
+import { Tooltip } from '../../components/containers/Overlay/primitives/Tooltip.tsx';
+import { CheckboxField } from '../../components/forms/CheckboxField.tsx';
 
 const createStoryControls = () => {
   const [index, setIndex] = createSignal(0);
@@ -48,25 +51,33 @@ const StoryOption = () => {
 };
 
 const Controls = () => {
+  const [bonus] = createIntervalSignal({
+    seconds: formatTime(vals.totalOfflineMs / 1000),
+    isActive: isBonusActive(),
+  }, () => ({
+    seconds: formatTime(vals.totalOfflineMs / 1000),
+    isActive: isBonusActive(),
+  }));
+
   return (
     <div>
-      <div>
-        <button id='pausePlay' class='button control'>Play</button>
-        <button id='manualRestart' class='button showthat control'>
-          Restart
-          <div class='showthis' style='color:var(--default-color);width:230px;'>
-            Resets the loop. Not a hard reset.
-          </div>
-        </button>
-        <input
-          id='bonusIsActiveInput'
-          type='checkbox'
-          onchange={() => setOption('bonusIsActive', !vals.options.bonusIsActive)}
-        >
-        </input>
-        <button id='toggleOfflineButton' class='button showthat control'>
-          Bonus Seconds
-          <div class='showthis' id='bonusText' style='max-width:500px;color:var(--default-color);'>
+      <div class='flex gap-2'>
+        <Button onClick={() => performGamePause()}>
+          Play/Pause
+        </Button>
+        <Tooltip>
+          <Tooltip.Trigger>
+            <Button onClick={() => manualRestart()}>Restart</Button>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Resets the loop. Not a hard reset.</Tooltip.Content>
+        </Tooltip>
+        <Tooltip>
+          <Tooltip.Trigger>
+            <Button onClick={() => setOption('bonusIsActive', !vals.options.bonusIsActive)}>
+              Activate bonus
+            </Button>
+          </Tooltip.Trigger>
+          <Tooltip.Content>
             <p>While this bonus is on, you get 19 extra seconds per second (20x game speed).</p>
             <p>
               You can adjust this speed or set a different speed for while this tab is in the background in the Extras
@@ -74,43 +85,35 @@ const Controls = () => {
             </p>
             <p>Accrue 1 bonus second per second when paused or offline. (capped at 1 month per offline period)</p>
             <p>
-              Bonus is <span class='bold' id='isBonusOn'>ON</span>
+              Bonus is <span class='bold'>{bonus().isActive ? 'ON' : 'OFF'}</span>
             </p>
             <p>
-              <span class='bold'>Total Bonus Seconds</span> <span id='bonusSeconds'>16d 8h 12m 27s</span>
+              <span class='bold'>Total Bonus Seconds</span>
+              <span>{bonus().seconds}</span>
             </p>
-          </div>
-        </button>
+          </Tooltip.Content>
+        </Tooltip>
         <StoryOption />
       </div>
-      <div>
-        <div class='control'>
-          <input
-            type='checkbox'
-            id='pauseBeforeRestartInput'
-            onChange={({ target: { checked } }) => setOption('pauseBeforeRestart', checked)}
-          >
-          </input>
-          <label for='pauseBeforeRestartInput'>Pause before restart</label>
-        </div>
-        <div class='control'>
-          <input
-            type='checkbox'
-            id='pauseOnFailedLoopInput'
-            onChange={({ target: { checked } }) => setOption('pauseOnFailedLoop', checked)}
-          >
-          </input>
-          <label for='pauseOnFailedLoopInput'>Pause on failed loop</label>
-        </div>
-        <div class='control'>
-          <input
-            type='checkbox'
-            id='pauseOnCompleteInput'
-            onChange={({ target: { checked } }) => setOption('pauseOnComplete', checked)}
-          >
-          </input>
-          <label for='pauseOnCompleteInput'>Pause on progress complete</label>
-        </div>
+      <div class='flex gap-2'>
+        <CheckboxField
+          onChange={(value) => setOption('pauseBeforeRestart', value)}
+          value={vals.options.pauseBeforeRestart}
+        >
+          Pause before restart
+        </CheckboxField>
+        <CheckboxField
+          onChange={(value) => setOption('pauseOnFailedLoop', value)}
+          value={vals.options.pauseOnFailedLoop}
+        >
+          Pause on failed loop
+        </CheckboxField>
+        <CheckboxField
+          onChange={(value) => setOption('pauseOnComplete', value)}
+          value={vals.options.pauseOnComplete}
+        >
+          Pause on progress complete
+        </CheckboxField>
       </div>
     </div>
   );

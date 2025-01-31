@@ -281,7 +281,7 @@ export function stopGame() {
   view.requestUpdate('updateCurrentActionBar', actions.currentPos);
   view.update();
   document.title = '*PAUSED* Idle Loops';
-  document.getElementById('pausePlay').textContent = Localization.txt('time_controls>play_button');
+
   if (needsDataSnapshots()) {
     Data.updateSnapshot('stop', 'base');
   }
@@ -303,9 +303,6 @@ export function performGamePause(ping?: boolean, message?: string) {
     clearPauseNotification();
   }
   document.title = gameIsStopped ? '*PAUSED* Idle Loops' : 'Idle Loops';
-  document.getElementById('pausePlay').textContent = Localization.txt(
-    `time_controls>${gameIsStopped ? 'play_button' : 'pause_button'}`,
-  );
   if (
     !gameIsStopped && (vals.shouldRestart || vals.timer >= vals.timeNeeded)
   ) {
@@ -813,15 +810,9 @@ export function toggleOffline() {
     bonusSpeed = 5;
     bonusActive = true;
     checkExtraSpeed();
-    document.getElementById('isBonusOn').textContent = Localization.txt(
-      'time_controls>bonus_seconds>state>on',
-    );
   } else {
     bonusSpeed = 1;
     bonusActive = false;
-    document.getElementById('isBonusOn').textContent = Localization.txt(
-      'time_controls>bonus_seconds>state>off',
-    );
   }
   setOption('bonusIsActive', bonusActive, true);
   view.requestUpdate('updateTime', null);

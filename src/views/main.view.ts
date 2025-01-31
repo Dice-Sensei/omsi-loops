@@ -726,17 +726,9 @@ export class View {
   }
 
   updateTime() {
-    document.getElementById('timer').textContent = `${
-      intToString(
-        vals.timeNeeded - vals.timer,
-        vals.options.fractionalMana ? 2 : 1,
-        true,
-      )
-    } | ${formatTime((vals.timeNeeded - vals.timer) / 50 / getActualGameSpeed())}`;
     this.adjustGoldCost({ varName: 'Wells', cost: Action.ManaWell.goldCost() });
   }
   updateOffline() {
-    document.getElementById('bonusSeconds').textContent = formatTime(vals.totalOfflineMs / 1000);
     const returnTimeButton = document.getElementById('returnTimeButton');
     if (returnTimeButton instanceof HTMLButtonElement) {
       returnTimeButton.disabled = vals.totalOfflineMs < 86400_000;
