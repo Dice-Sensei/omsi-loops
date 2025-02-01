@@ -519,7 +519,6 @@ export class View {
 
   updateSkill(skill) {
     if (skills[skill].levelExp.level === 0) {
-      document.getElementById(`skill${skill}Container`).style.display = 'none';
       return;
     }
     let container = document.getElementById(`skill${skill}Container`);
@@ -628,7 +627,6 @@ export class View {
 
   updateBuff(buff) {
     if (buffs[buff].amt === 0) {
-      document.getElementById(`buff${buff}Container`).style.display = 'none';
       return;
     }
     let container = document.getElementById(`buff${buff}Container`);
@@ -1285,9 +1283,7 @@ export class View {
       vals.totalActionList.filter((action) => action.finish.toString().includes('handleSkillExp'))
         .filter((action) => action.unlocked()).length > 0
     ) {
-      document.getElementById('skillList').style.display = '';
     } else {
-      document.getElementById('skillList').style.display = 'none';
     }
     if (
       vals.totalActionList.filter((action) => action.finish.toString().includes('updateBuff')).filter(
@@ -1295,9 +1291,7 @@ export class View {
         ).length > 0 ||
       prestigeValues['completedAnyPrestige']
     ) {
-      document.getElementById('buffList').style.display = '';
     } else {
-      document.getElementById('buffList').style.display = 'none';
     }
   }
 

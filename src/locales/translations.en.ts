@@ -1200,8 +1200,19 @@ export const translationsEn = {
     hideActions: 'Hide actions',
     undoLastAction: 'Undo last action',
   },
-  stats: {
+  statistics: {
     title: 'Stats',
+    sections: {
+      attributes: {
+        title: 'Attributes',
+      },
+      skills: {
+        title: 'Skills',
+      },
+      buffs: {
+        title: 'Buffs',
+      },
+    },
     attributes: {
       dexterity: {
         name: 'Dexterity',
@@ -1249,12 +1260,216 @@ export const translationsEn = {
         description: 'You are the captain.',
       },
     },
+    skills: {
+      soloCombat: {
+        name: 'Self combat',
+        description:
+          'Self Combat = (Combat skill + Pyromancy skill * 5) * (1 + (armor + 3 * enchanted armor) * Crafting Guild Multiplier / 5)',
+      },
+      teamCombat: {
+        name: 'Team combat',
+        description:
+          'Team Combat = Self Combat + (Combat Skill + Restoration skill * 4) * (Team Members / 2) * Adventure Guild Multiplier * Leadership Bonus + Dark Magic Skill * Zombies / 2 * Dark Ritual / 100.',
+      },
+      combat: {
+        name: 'Combat',
+        description: 'Fight for your lives.',
+      },
+      magic: {
+        name: 'Magic',
+        description: 'Control the aether to cast and conjure.',
+      },
+      practical: {
+        name: 'Practical Magic',
+        description: 'Mage Hand, Prestidigitation, Detect Magic, and other useful tricks to help out.',
+        explaination:
+          'Smash Pots and Wild Mana costs are reduced to the original / (1 + level / 100) (rounded up). The following actions get 1% more gold per level in their level range (rounded down). 1-200 Pick Locks 101-300 Short Quests 201-400 Long Quests Currently multiplying costs by <div id="skillBonusPractical"></div>x.',
+      },
+      alchemy: {
+        name: 'Alchemy',
+        description: "Brewing potions is hard work! It's a good thing you found a teacher.",
+        explaination:
+          'The Magic teacher in Beginnersville adores alchemists. +1% Magic exp gain from the Mage Lessons action (rounded down) per level.',
+      },
+      dark: {
+        name: 'Dark Magic',
+        description: 'Use various dark arts to help you harvest mana.',
+        explaination:
+          'Multiply the mana gain from Smash Pots and Wild Mana by (1 + level / 60) ^ 0.25 (rounded down). Currently granting {{skillBonusDark}}x mana gains.',
+      },
+      crafting: {
+        name: 'Crafting',
+        description: 'The skill of using your hands and creativity when doing physical work.',
+      },
+      chronomancy: {
+        name: 'Chronomancy',
+        description: 'Harness the magic of time to, well, speed up time.',
+        explaination:
+          'Actions in all zones are (1 + level / 60) ^ 0.25 times faster.<br> Currently granting {{skillBonusChronomancy}}x speed.',
+      },
+      pyromancy: {
+        name: 'Pyromancy',
+        description: 'Fireball, Fire Bolt, Fire Shield, Burning Rays, just a veritable assortment of flaming fun!',
+        explaination: 'Increases self combat with 5x the efficiency of the combat skill.',
+      },
+      restoration: {
+        name: 'Restoration',
+        description: "From healing cantrips to mass resurrection, you'll be sure to make good use of these spells.",
+        explaination:
+          'Increases team combat with 4x the efficiency of the combat skill and improves the Heal the Sick action.',
+      },
+      spatiomancy: {
+        name: 'Spatiomancy',
+        description: 'Who knew bending reality to your will could be so useful!',
+        explaination: `
+            Mana Geyser and Mana Well are reduced to the original / (1 + level / 100).
+            Houses to build increased by 1% per level from 1 - 500.
+            The following actions are increased by 0.5% per level in their level range.
+            101-300 Locked houses
+            201-400 Short quests to finish
+            301-500 Long quests to finish
+            401-600 Animals in the forest
+            501-700 Herbs to gather
+            601-800 Possible suckers
+            701-900 Soulstones to mine
+            801-1000 Artifacts to take
+            901-1100 People to ask for donations
+            1001-1200 Buildings to check for pylons
+            1101-1300 Pockets to pick
+            1201-1400 Warehouses to rob
+            1301-1500 Insurance companies to defraud
+            Currently multiplying costs by {{skillBonusSpatiomancy}}x.
+        `,
+      },
+      mercantilism: {
+        name: 'Mercantilism',
+        description: 'Smooth talk your way to better rates with the mana merchants.',
+        explaination:
+          'Multiply the mana gain from Buy Mana by (1 + level / 60) ^ 0.25 (rounded down).<br> Currently granting {{skillBonusMercantilism}}x mana gains.',
+      },
+      divine: {
+        name: 'Divine Favor',
+        description: 'The gods have answered your prayers and given you their blessing.',
+        explaination:
+          'Increases soulstones gained from actions by (1 + level / 60) ^ 0.25.<br> Currently granting {{skillBonusDivine}}x soulstone gains.',
+      },
+      commune: {
+        name: 'Communion',
+        description: 'Your blood sacrifices to dark beings makes it easier to communicate with them.',
+        explaination:
+          'Dark Ritual soulstone costs are reduced to the original / (1 + level / 100).<br> Currently multiplying costs by {{skillBonusCommune}}x.',
+      },
+      wunderkind: {
+        name: 'Wunderkind',
+        description: 'Even with your eyes closed, you still see the glow of the totem.',
+        explaination:
+          'Doubles the initial stat gain of Imbue Body<br> Talent exp gain is increased by (1 + level / 60) ^ 0.25.<br> Currently granting {{skillBonusWunderkind}}x talent exp.',
+      },
+      gluttony: {
+        name: 'Gluttony',
+        description: 'The insatiable hunger of the jungle has started to rub off on you.',
+        explaination:
+          'Great Feast soulstone costs are reduced to the original / (1 + level / 100).<br> Currently multiplying costs by {{skillBonusGluttony}}x.',
+      },
+      thievery: {
+        name: 'Thievery',
+        description: "Allows you to redistribute wealth. Other people's wealth.",
+        explaination:
+          'Increases gold gain from Pick Locks, Gamble, and Thieving Guild actions by (1 + level / 60) ^ 0.25.<br> Currently granting {{skillBonusThievery}}x increased gold.',
+      },
+      leadership: {
+        name: 'Leadership',
+        description: "You're ready to start your own cult!",
+        explaination:
+          "Increases the number of followers you can recruit by 1 for every 100 levels. Increases your followers' contributions to team combat by (1 + level / 60) ^ 0.25.<br> Currently granting {{skillBonusLeadership}}x increased follower strength.",
+      },
+      assassination: {
+        name: 'Assassination',
+        description: 'Nothing is true. Everything is permitted.',
+        explaination:
+          'Increases progress of assassination actions, reduces the reputation penalty of assassination, and reduces the difficulty scaling of trials by original / (1 + level / 2000).<br> Currently multiplying trial difficulty by {{skillBonusAssassin}}x.',
+      },
+    },
+    buffs: {
+      ritual: {
+        name: 'Dark Ritual',
+        description:
+          'The witch appreciates your dedication to the dark arts. +1% to Dark Magic exp gain from the Dark Magic action (rounded down) per ritual.',
+        explaination: 'Actions are: 10% faster in Beginnersville per ritual from 1-20',
+      },
+      mindImbuement: {
+        name: 'Imbue Mind',
+        description: 'Using power from soulstones, you can increase your mental prowess.',
+        explaination: 'Increases the max amount of times you can do each stat training action by 1 per level.',
+      },
+      bodyImbuement: {
+        name: 'Imbue Body',
+        description: 'By sacrificing your accumulated talent, you can permanently improve yourself.',
+        explaination: 'At the start of a new loop, all stats begin at Imbue Body level.',
+      },
+      greatFeast: {
+        name: 'Great Feast',
+        description:
+          "That feast was so filling that it manages to keep you well satiated through your loops! That's some impressive magic.",
+        explaination: 'Combat (from all sources) is increased by 5% per level.',
+      },
+      aspirant: {
+        name: 'Aspirant',
+        description: 'Reaching new heights in the spire fills your mind and soul with vigor and clarity.',
+        explaination: 'Talent exp gain is increased by 1% per level.',
+      },
+      heroism: {
+        name: 'Heroism',
+        description: 'Completing the Trial fills you with determination.',
+        explaination: 'Combat, Pyromancy, and Restoration Skill Exp gain increased by 2% per level.',
+      },
+      soulImbuement: {
+        name: 'Imbue Soul',
+        description: '(Incomplete) Sacrifice everything for the ultimate power.',
+        explaination:
+          'Increases the exp multiplier of training actions by 100% and raises all action speeds by 50% per level.',
+      },
+      prestigePhysical: {
+        name: 'Prestige - Physical',
+        description: 'Increases Experience gain of all Physical stats (Dex, Str, Con, Spd, Per) by 20% per level.',
+        explaination: 'Currently granting {{skillBonusPrestigePhysical}}x increased experience gain.',
+      },
+      prestigeMental: {
+        name: 'Prestige - Mental',
+        description: 'Increases Experience gain of all Mental stats (Cha, Int, Soul, Luck) by 20% per level.',
+        explaination: 'Currently granting {{skillBonusPrestigeMental}}x increased experience gain.',
+      },
+      prestigeCombat: {
+        name: 'Prestige - Combat',
+        description: 'Increases Self and Team Combat by 20% per level.',
+        explaination: 'Currently granting {{skillBonusPrestigeCombat}}x increased combat.',
+      },
+      prestigeSpatiomancy: {
+        name: 'Prestige - Spatiomancy',
+        description: 'Increases the number of "Findables" per zone by 10% per level.',
+      },
+      prestigeChronomancy: {
+        name: 'Prestige - Chronomancy',
+        description: 'Increases speed of all zones by a multiplier of 5% per level.',
+      },
+      prestigeBartering: {
+        name: 'Prestige - Bartering',
+        description: 'Increases received from merchants by 10% per level.',
+      },
+      prestigeExpOverflow: {
+        name: 'Prestige - Experience Overflow',
+        description: 'Gives (1.00222^n-1) times the normal amount of experience as extra, given to each stat.',
+      },
+    },
     total: {
       singular: 'Total',
       plural: 'Totals',
       description: 'It all adds up.',
     },
+
     tooltips: {
+      notRestarting: 'Does not reset on loop restart',
+      combat: 'Combat',
       level: 'Level',
       levelExperience: 'Level Exp',
       experience: 'Exp',
