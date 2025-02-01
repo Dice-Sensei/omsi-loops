@@ -717,11 +717,6 @@ input, textarea, select {
 }
 
 .buffContainer {
-  display: none;
-  width: 100%;
-  position: relative;
-  justify-content: flex-start;
-  align-items: center;
 }
 
 .buffNameContainer {
@@ -729,12 +724,6 @@ input, textarea, select {
 }
 
 .buffNumContainer {
-  flex-direction: row;
-  text-align: right;
-  font-size: 1rem;
-  justify-content: flex-end;
-  flex: 1;
-  margin-right: 7px;
 }
 
 /* Regular stat view */

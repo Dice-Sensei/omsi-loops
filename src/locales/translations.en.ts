@@ -1393,9 +1393,21 @@ export const translationsEn = {
     buffs: {
       ritual: {
         name: 'Dark Ritual',
-        description:
-          'The witch appreciates your dedication to the dark arts. +1% to Dark Magic exp gain from the Dark Magic action (rounded down) per ritual.',
-        explaination: 'Actions are: 10% faster in Beginnersville per ritual from 1-20',
+        description: 'The witch appreciates your dedication to the dark arts.',
+        explaination: `
+          +1% to Dark Magic exp gain from the Dark Magic action (rounded down) per ritual.
+          Actions are: 
+          10% faster in Beginnersville per ritual from 1-20
+          5% faster in the Forest Path per ritual from 21-40
+          2.5% faster in Merchanton per ritual from 41-60
+          1.5% faster in Mt. Olympus per ritual from 61-80
+          1.0% faster in Valhalla per ritual from 81-100
+          0.5% faster in Startington per ritual from 101-150
+          0.5% faster in Jungle Path per ritual from 151-200
+          0.5% faster in Commerceville per ritual from 201-250
+          0.5% faster in Valley of Olympus per ritual from 251-300
+          0.1% faster globally per ritual from 301-666
+        `,
       },
       mindImbuement: {
         name: 'Imbue Mind',

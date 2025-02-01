@@ -621,27 +621,24 @@ export class View {
   }
 
   showBuff(buff) {
-    buffShowing = buff;
-    if (buff !== undefined) this.updateBuff(buff);
+    // buffShowing = buff;
+    // if (buff !== undefined) this.updateBuff(buff);
   }
 
   updateBuff(buff) {
-    if (buffs[buff].amt === 0) {
-      return;
-    }
-    let container = document.getElementById(`buff${buff}Container`);
-    container.style.display = 'flex';
-    document.getElementById(`buff${buff}Level`).textContent = `${getBuffLevel(buff)}/`;
-    if (buff === 'Imbuement') {
-      this.updateTrainingLimits();
-    }
-    this.adjustTooltipPosition(container.querySelector('div.showthis'));
+    // if (buffs[buff].amt === 0) {
+    // return;
+    // }
+    // document.getElementById(`buff${buff}Level`).textContent = `${getBuffLevel(buff)}/`;
+    // if (buff === 'Imbuement') {
+    // this.updateTrainingLimits();
+    // }
   }
 
   updateBuffs() {
-    for (const buff of buffList) {
-      this.updateBuff(buff);
-    }
+    // for (const buff of buffList) {
+    // this.updateBuff(buff);
+    // }
   }
 
   updateTime() {
@@ -2098,12 +2095,6 @@ export class View {
   }
 
   adjustDarkRitualText() {
-    let DRdesc = document.getElementById('DRText');
-    DRdesc.innerHTML = `Actions are:<br>`;
-    vals.townsUnlocked.forEach((townNum) => {
-      DRdesc.innerHTML += DarkRitualDescription[townNum];
-    });
-    if (getBuffLevel('Ritual') > 200) DRdesc.innerHTML += DarkRitualDescription[9];
   }
 
   highlightIncompleteActions() {

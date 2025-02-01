@@ -18,130 +18,134 @@ const statToName = {
   Soul: 'soul',
 } as const;
 
+const Attribute = (props: { stat: typeof statList[number] }) => {
+  const name = statToName[props.stat];
+  const stat = props.stat;
+
+  return (
+    <div id={`stat${stat}`} class={`statContainer showthat stat-${stat}`}>
+      <div class='statLabelContainer'>
+        <div class='medium bold stat-name long-form' style='margin-left:18px;margin-top:5px;'>
+          {t(`attributes.${name}.name`)}
+        </div>
+        <div class='medium bold stat-name short-form' style='margin-left:18px;margin-top:5px;'>
+          {t(`attributes.${name}.abbreviation`)}
+        </div>
+        <div
+          class='medium statNum stat-soulstone'
+          style='color:var(--stat-soulstone-color);'
+          id={`stat${stat}ss`}
+        />
+        <div class='statNum stat-talent' />
+        <div class='medium statNum stat-talent statBarWrapper'>
+          <div class='thinProgressBarLower tiny talentBar'>
+            <div class='statBar statTalentBar' id={`stat${stat}TalentBar`} />
+          </div>
+          <div class='label' id={`stat${stat}Talent`}>
+            0
+          </div>
+        </div>
+        <div class='medium statNum stat-level statBarWrapper'>
+          <div class='thinProgressBarLower tiny expBar'>
+            <div class='statBar statLevelBar' id={`stat${stat}LevelBar`} />
+          </div>
+          <div class='label bold' id={`stat${stat}Level`}>
+            0
+          </div>
+        </div>
+      </div>
+      <div class='statBars'>
+        <div class='thinProgressBarUpper expBar'>
+          <div class='statBar statLevelLogBar logBar' id={`stat${stat}LevelLogBar`}></div>
+        </div>
+        <div class='thinProgressBarLower talentBar'>
+          <div class='statBar statTalentLogBar logBar' id={`stat${stat}TalentLogBar`}></div>
+        </div>
+        <div class='thinProgressBarLower soulstoneBar'>
+          <div class='statBar statSoulstoneLogBar logBar' id={`stat${stat}SoulstoneLogBar`}></div>
+        </div>
+      </div>
+      <div class='showthis' id={`stat${stat}Tooltip`} style='width:225px;'>
+        <div class='medium bold'>{t(`attributes.${name}.name`)}</div>
+        <br />
+        {t(`attributes.${name}.description`)}
+        <br />
+        <div class='medium bold'>{t('tooltips.level')}:</div>
+        <div id={`stat${stat}Level2`} />
+        <br />
+        <div class='medium bold'>{t('tooltips.levelExperience')}:</div>
+
+        <div id={`stat${stat}LevelExp`}></div>/<div id={`stat${stat}LevelExpNeeded`}></div>
+        <div class='statTooltipPerc'>
+          (<div id={`stat${stat}LevelProgress`}></div>%)
+        </div>
+        <br />
+        <div class='medium bold'>{t('tooltips.talent')}:</div>
+        <div id={`stat${stat}Talent2`} />
+        <br />
+        <div class='medium bold'>{t('tooltips.talentExperience')}:</div>
+
+        <div id={`stat${stat}TalentExp`}></div>/<div id={`stat${stat}TalentExpNeeded`}></div>
+        <div class='statTooltipPerc'>
+          (<div id={`stat${stat}TalentProgress`}></div>%)
+        </div>
+        <br />
+        <div class='medium bold'>{t('tooltips.talentMultiplier')}:</div>
+        x<div id={`stat${stat}TalentMult`} />
+        <br />
+        <div id={`ss${stat}Container`} class='ssContainer'>
+          <div class='bold'>{t('tooltips.soulstone')}:</div>
+          <div id={`ss${stat}`} />
+          <br />
+          <div class='medium bold'>{t('tooltips.soulstoneMultiplier')}:</div>
+          x<div id={`stat${stat}SSBonus`} />
+        </div>
+        <br />
+        <div class='medium bold'>{t('tooltips.totalMultiplier')}:</div>
+        x<div id={`stat${stat}TotalMult`} />
+      </div>
+    </div>
+  );
+};
+
+const AttributeTotal = () => {
+  return (
+    <div class='statContainer stat-total showthat' id='totalStatContainer'>
+      <div class='statLabelContainer'>
+        <div class='medium bold stat-name'>{t('total.singular')}</div>
+        <div class='medium statNum stat-soulstone' style='color: var(--stat-soulstone-color)' id='stattotalss'>
+        </div>
+        <div class='medium statNum stat-talent' id='stattotalTalent'>0</div>
+        <div class='medium statNum stat-level' id='stattotalLevel'>0</div>
+      </div>
+      <div class='showthis' id='stattotalTooltip'>
+        <div class='medium bold'>{t('total.plural')}</div>
+        <br></br>
+        <div>{t('total.description')}</div>
+        <br></br>
+        <div class='medium bold colon-after'>{t('tooltips.level')}</div>
+        <div id='stattotalLevel2'></div>
+
+        <br></br>
+        <div class='medium bold colon-after'>{t('tooltips.talent')}</div>
+        <div id='stattotalTalent2'></div>
+        <br></br>
+        <div id='sstotalContainer' class='ssContainer'>
+          <div class='bold colon-after'>{t('tooltips.soulstone')}</div>
+          <div id='sstotal'></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AttributeList = () => {
   return (
     <div id='statsContainer'>
       <For each={statList}>
-        {(stat) => {
-          const name = statToName[stat];
-
-          return (
-            <div id={`stat${stat}`} class={`statContainer showthat stat-${stat}`}>
-              <div class='statLabelContainer'>
-                <div class='medium bold stat-name long-form' style='margin-left:18px;margin-top:5px;'>
-                  {t(`attributes.${name}.name`)}
-                </div>
-                <div class='medium bold stat-name short-form' style='margin-left:18px;margin-top:5px;'>
-                  {t(`attributes.${name}.abbreviation`)}
-                </div>
-                <div
-                  class='medium statNum stat-soulstone'
-                  style='color:var(--stat-soulstone-color);'
-                  id={`stat${stat}ss`}
-                />
-                <div class='statNum stat-talent' />
-                <div class='medium statNum stat-talent statBarWrapper'>
-                  <div class='thinProgressBarLower tiny talentBar'>
-                    <div class='statBar statTalentBar' id={`stat${stat}TalentBar`} />
-                  </div>
-                  <div class='label' id={`stat${stat}Talent`}>
-                    0
-                  </div>
-                </div>
-                <div class='medium statNum stat-level statBarWrapper'>
-                  <div class='thinProgressBarLower tiny expBar'>
-                    <div class='statBar statLevelBar' id={`stat${stat}LevelBar`} />
-                  </div>
-                  <div class='label bold' id={`stat${stat}Level`}>
-                    0
-                  </div>
-                </div>
-              </div>
-              <div class='statBars'>
-                <div class='thinProgressBarUpper expBar'>
-                  <div class='statBar statLevelLogBar logBar' id={`stat${stat}LevelLogBar`}></div>
-                </div>
-                <div class='thinProgressBarLower talentBar'>
-                  <div class='statBar statTalentLogBar logBar' id={`stat${stat}TalentLogBar`}></div>
-                </div>
-                <div class='thinProgressBarLower soulstoneBar'>
-                  <div class='statBar statSoulstoneLogBar logBar' id={`stat${stat}SoulstoneLogBar`}></div>
-                </div>
-              </div>
-              <div class='showthis' id={`stat${stat}Tooltip`} style='width:225px;'>
-                <div class='medium bold'>{t(`attributes.${name}.name`)}</div>
-                <br />
-                {t(`attributes.${name}.description`)}
-                <br />
-                <div class='medium bold'>{t('tooltips.level')}:</div>
-                <div id={`stat${stat}Level2`} />
-                <br />
-                <div class='medium bold'>{t('tooltips.levelExperience')}:</div>
-
-                <div id={`stat${stat}LevelExp`}></div>/<div id={`stat${stat}LevelExpNeeded`}></div>
-                <div class='statTooltipPerc'>
-                  (<div id={`stat${stat}LevelProgress`}></div>%)
-                </div>
-                <br />
-                <div class='medium bold'>{t('tooltips.talent')}:</div>
-                <div id={`stat${stat}Talent2`} />
-                <br />
-                <div class='medium bold'>{t('tooltips.talentExperience')}:</div>
-
-                <div id={`stat${stat}TalentExp`}></div>/<div id={`stat${stat}TalentExpNeeded`}></div>
-                <div class='statTooltipPerc'>
-                  (<div id={`stat${stat}TalentProgress`}></div>%)
-                </div>
-                <br />
-                <div class='medium bold'>{t('tooltips.talentMultiplier')}:</div>
-                x<div id={`stat${stat}TalentMult`} />
-                <br />
-                <div id={`ss${stat}Container`} class='ssContainer'>
-                  <div class='bold'>{t('tooltips.soulstone')}:</div>
-                  <div id={`ss${stat}`} />
-                  <br />
-                  <div class='medium bold'>{t('tooltips.soulstoneMultiplier')}:</div>
-                  x<div id={`stat${stat}SSBonus`} />
-                </div>
-                <br />
-                <div class='medium bold'>{t('tooltips.totalMultiplier')}:</div>
-                x<div id={`stat${stat}TotalMult`} />
-              </div>
-            </div>
-          );
-        }}
+        {(stat) => <Attribute stat={stat} />}
       </For>
-      <div class='statContainer stat-total showthat' id='totalStatContainer'>
-        <div class='statLabelContainer'>
-          <div
-            class='medium bold stat-name'
-            style='margin-left: 18px; margin-top: 5px'
-          >
-            {t('total.singular')}
-          </div>
-          <div class='medium statNum stat-soulstone' style='color: var(--stat-soulstone-color)' id='stattotalss'>
-          </div>
-          <div class='medium statNum stat-talent' id='stattotalTalent'>0</div>
-          <div class='medium statNum stat-level' id='stattotalLevel'>0</div>
-        </div>
-        <div class='showthis' id='stattotalTooltip'>
-          <div class='medium bold'>{t('total.plural')}</div>
-          <br></br>
-          <div>{t('total.description')}</div>
-          <br></br>
-          <div class='medium bold colon-after'>{t('tooltips.level')}</div>
-          <div id='stattotalLevel2'></div>
-
-          <br></br>
-          <div class='medium bold colon-after'>{t('tooltips.talent')}</div>
-          <div id='stattotalTalent2'></div>
-          <br></br>
-          <div id='sstotalContainer' class='ssContainer'>
-            <div class='bold colon-after'>{t('tooltips.soulstone')}</div>
-            <div id='sstotal'></div>
-          </div>
-        </div>
-      </div>
+      <AttributeTotal />
     </div>
   );
 };
@@ -645,6 +649,33 @@ const SkillList = () => {
   );
 };
 
+interface BuffLocale {
+  name: string;
+  description: string;
+  explaination?: string;
+}
+
+const IntegerBuff = (props: { id: string; icon: string; locale: BuffLocale }) => (
+  <Tooltip>
+    <Tooltip.Trigger>
+      <div id={props.id} class='flex gap-1 items-center'>
+        <img class='w-5 h-5' src={`icons/${props.icon}.svg`}></img>
+        <div class='font-bold'>{props.locale.name}</div>
+      </div>
+      <div>
+        <span id={`buff${props.id}Level`}>0</span>
+        <span>/</span>
+        <input type='number' id={`buff${props.id}Cap`} value='666' />
+      </div>
+    </Tooltip.Trigger>
+    <Tooltip.Content>
+      <span>{props.locale.description}</span>
+      <br></br>
+      <span>{props.locale.explaination}</span>
+    </Tooltip.Content>
+  </Tooltip>
+);
+
 const BuffList = () => {
   return (
     <div id='buffList'>
@@ -653,216 +684,25 @@ const BuffList = () => {
         <div class='showthis'>{t('tooltips.notRestarting')}</div>
       </div>
       <br></br>
-      <div id='buffsContainer' style='display:flex;flex-direction:column'>
-        <div class='buffContainer showthat' id='buffRitualContainer'>
-          <img class='buffIcon' src='icons/darkRitual.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.ritual.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.ritual.description')}
-            </span>
-            <br></br>
-            <div id='DRText'>{t('buffs.ritual.explaination')}</div>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffRitualLevel'>0/</div>
-          <input type='number' id='buffRitualCap' class='buffmaxinput' value='666'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffImbuementContainer'>
-          <img class='buffIcon' src='icons/imbueMind.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.mindImbuement.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.mindImbuement.description')}
-              <br></br>
-              {t('buffs.mindImbuement.explaination')}
-            </span>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffImbuementLevel'>0/</div>
-          <input type='number' id='buffImbuementCap' class='buffmaxinput' value='500'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffImbuement2Container'>
-          <img class='buffIcon' src='icons/imbueBody.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.bodyImbuement.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.bodyImbuement.description')}
-              <br></br>
-              {t('buffs.bodyImbuement.explaination')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffImbuement2Level'>0/</div>
-          <input type='number' id='buffImbuement2Cap' class='buffmaxinput' value='500'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffFeastContainer'>
-          <img class='buffIcon' src='icons/greatFeast.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.greatFeast.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.greatFeast.description')}
-              <br></br>
-              {t('buffs.greatFeast.explaination')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffFeastLevel'>0/</div>
-          <input type='number' id='buffFeastCap' class='buffmaxinput' value='100'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffAspirantContainer'>
-          <img class='buffIcon' src='icons/aspirant.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.aspirant.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.aspirant.description')}
-              <br></br>
-              {t('buffs.aspirant.explaination')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffAspirantLevel'>0/</div>
-          <input type='number' id='buffAspirantCap' class='buffmaxinput' value='20'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffHeroismContainer'>
-          <img class='buffIcon' src='icons/heroism.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.heroism.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.heroism.description')}
-              <br></br>
-              {t('buffs.heroism.explaination')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffHeroismLevel'>0/</div>
-          <input type='number' id='buffHeroismCap' class='buffmaxinput' value='50'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffImbuement3Container'>
-          <img class='buffIcon' src='icons/imbueSoul.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.soulImbuement.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.soulImbuement.description')}
-              <br></br>
-              {t('buffs.soulImbuement.explaination')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffImbuement3Level'>0/</div>
-          <input type='number' id='buffImbuement3Cap' class='buffmaxinput' value='7'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffPrestigePhysicalContainer'>
-          <img class='buffIcon' src='icons/prestige-Physical.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.prestigePhysical.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.prestigePhysical.description')}
-              <br></br>
-              {t('buffs.prestigePhysical.explaination')}
-            </span>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffPrestigePhysicalLevel'>0/</div>
-          <input type='number' id='buffPrestigePhysicalCap' class='buffmaxinput' value='100'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffPrestigeMentalContainer'>
-          <img class='buffIcon' src='icons/prestige-Mental.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.prestigeMental.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.prestigeMental.description')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffPrestigeMentalLevel'>0/</div>
-          <input type='number' id='buffPrestigeMentalCap' class='buffmaxinput' value='100'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffPrestigeCombatContainer'>
-          <img class='buffIcon' src='icons/prestige-Combat.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.prestigeCombat.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.prestigeCombat.description')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffPrestigeCombatLevel'>0/</div>
-          <input type='number' id='buffPrestigeCombatCap' class='buffmaxinput' value='100'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffPrestigeSpatiomancyContainer'>
-          <img class='buffIcon' src='icons/prestige-Spatiomancy.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.prestigeSpatiomancy.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.prestigeSpatiomancy.description')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffPrestigeSpatiomancyLevel'>0/</div>
-          <input type='number' id='buffPrestigeSpatiomancyCap' class='buffmaxinput' value='100'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffPrestigeChronomancyContainer'>
-          <img class='buffIcon' src='icons/prestige-Chronomancy.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.prestigeChronomancy.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.prestigeChronomancy.description')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffPrestigeChronomancyLevel'>0/</div>
-          <input type='number' id='buffPrestigeChronomancyCap' class='buffmaxinput' value='100'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffPrestigeBarteringContainer'>
-          <img class='buffIcon' src='icons/prestige-Bartering.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.prestigeBartering.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.prestigeBartering.description')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffPrestigeBarteringLevel'>0/</div>
-          <input type='number' id='buffPrestigeBarteringCap' class='buffmaxinput' value='100'></input>
-        </div>
-        <div class='buffContainer showthat' id='buffPrestigeExpOverflowContainer'>
-          <img class='buffIcon' src='icons/prestige-ExperienceOverflow.svg'></img>
-          <div class='skillLabel medium bold'>{t('buffs.prestigeExpOverflow.name')}</div>
-          <div class='showthis'>
-            <span>
-              {t('buffs.prestigeExpOverflow.description')}
-            </span>
-            <br></br>
-          </div>
-        </div>
-        <div class='buffNumContainer'>
-          <div id='buffPrestigeExpOverflowLevel'>0/</div>
-          <input type='number' id='buffPrestigeExpOverflowCap' class='buffmaxinput' value='100'></input>
-        </div>
+      <div class='flex flex-col gap-0.5'>
+        <IntegerBuff locale={t('buffs.ritual')} icon='darkRitual' id='Ritual' />
+        <IntegerBuff locale={t('buffs.mindImbuement')} icon='imbueMind' id='Imbuement' />
+        <IntegerBuff locale={t('buffs.bodyImbuement')} icon='imbueBody' id='Imbuement2' />
+        <IntegerBuff locale={t('buffs.greatFeast')} icon='greatFeast' id='Feast' />
+        <IntegerBuff locale={t('buffs.aspirant')} icon='aspirant' id='Aspirant' />
+        <IntegerBuff locale={t('buffs.heroism')} icon='heroism' id='Heroism' />
+        <IntegerBuff locale={t('buffs.soulImbuement')} icon='imbueSoul' id='Imbuement3' />
+        <IntegerBuff locale={t('buffs.prestigePhysical')} icon='prestige-Physical' id='PrestigePhysical' />
+        <IntegerBuff locale={t('buffs.prestigeMental')} icon='prestige-Mental' id='PrestigeMental' />
+        <IntegerBuff locale={t('buffs.prestigeCombat')} icon='prestige-Combat' id='PrestigeCombat' />
+        <IntegerBuff locale={t('buffs.prestigeSpatiomancy')} icon='prestige-Spatiomancy' id='PrestigeSpatiomancy' />
+        <IntegerBuff locale={t('buffs.prestigeChronomancy')} icon='prestige-Chronomancy' id='PrestigeChronomancy' />
+        <IntegerBuff locale={t('buffs.prestigeBartering')} icon='prestige-Bartering' id='PrestigeBartering' />
+        <IntegerBuff
+          locale={t('buffs.prestigeExpOverflow')}
+          icon='prestige-ExperienceOverflow'
+          id='PrestigeExpOverflow'
+        />
       </div>
     </div>
   );
@@ -892,7 +732,7 @@ const SectionTitle = () => (
 
 export const Stats = () => {
   return (
-    <div id='statsWindow' data-view='regular'>
+    <div id='statsWindow' data-view='regular' class='h-[400px] !overflow-y-auto'>
       <SectionTitle />
       <AttributeList />
       <SkillList />
