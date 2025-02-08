@@ -164,12 +164,9 @@ export class View {
       townInfos[i] = document.getElementById(`townInfo${i}`);
     }
 
-    this.createTravelMenu();
-    this.createStats();
-    this.updateStats();
     this.updateSkills();
+    this.createTravelMenu();
     this.adjustDarkRitualText();
-    this.updateBuffs();
     this.updateTime();
     this.updateCurrentActionsDivs();
     this.updateTotalTicks();
@@ -180,7 +177,6 @@ export class View {
     this.updateSoulstones();
     this.showTown(0);
     this.showActions(false);
-    this.updateTrainingLimits();
     this.changeStatView();
     this.adjustGoldCosts();
     this.adjustExpGains();
@@ -236,9 +232,6 @@ export class View {
     return trigger;
   }
 
-  createStats() {
-  }
-
   // requests are properties, where the key is the function name,
   // and the array items in the value are the target of the function
 
@@ -291,7 +284,7 @@ export class View {
   handleUpdateRequests() {
     for (const category in this.requests) {
       for (const target of this.requests[category]) {
-        this[category](target);
+        this[category]?.(target);
       }
       this.requests[category] = [];
     }
@@ -401,244 +394,109 @@ export class View {
     }
   }
 
-  showStat(stat) {
-    statShowing = stat;
-    if (stat !== undefined) this.updateStat(stat);
-  }
-
-  updateStat(stat) {
-    const level = getLevel(stat);
-    const talent = getTalent(stat);
-    const totalLevel = Object.values(stats).map((s) => s.statLevelExp.level).reduce((a, b) => a + b);
-    const totalTalent = Object.values(stats).map((s) => s.talentLevelExp.level).reduce((a, b) => a + b);
-    const levelPrc = `${getPrcToNextLevel(stat)}%`;
-    const talentPrc = `${getPrcToNextTalent(stat)}%`;
-
-    this.updateLevelLogBar('statsContainer', `stat${stat}LevelLogBar`, level, `stat${stat}LevelBar`, levelPrc);
-    this.updateLevelLogBar('statsContainer', `stat${stat}TalentLogBar`, talent, `stat${stat}TalentBar`, talentPrc);
-
-    document.getElementById(`stat${stat}Level`).textContent = intToString(level, 1);
-    document.getElementById(`stat${stat}Talent`).textContent = intToString(talent, 1);
-    document.getElementById(`stattotalLevel`).textContent = intToString(totalLevel, 1);
-    document.getElementById(`stattotalTalent`).textContent = intToString(totalTalent, 1);
-    document.getElementById(`stattotalLevel2`).textContent = formatNumber(totalLevel);
-    document.getElementById(`stattotalTalent2`).textContent = formatNumber(totalTalent);
-
-    if (statShowing === stat || document.getElementById(`stat${stat}LevelExp`).innerHTML === '') {
-      document.getElementById(`stat${stat}Level2`).textContent = formatNumber(level);
-      document.getElementById(`stat${stat}LevelExp`).textContent = intToString(
-        stats[stat].statLevelExp.exp,
-        1,
-      );
-      document.getElementById(`stat${stat}LevelExpNeeded`).textContent = intToString(
-        stats[stat].statLevelExp.expRequiredForNextLevel,
-        1,
-      );
-      document.getElementById(`stat${stat}LevelProgress`).textContent = intToString(levelPrc, 2);
-
-      document.getElementById(`stat${stat}Talent2`).textContent = formatNumber(talent);
-      document.getElementById(`stat${stat}TalentExp`).textContent = intToString(
-        stats[stat].talentLevelExp.exp,
-        1,
-      );
-      document.getElementById(`stat${stat}TalentExpNeeded`).textContent = intToString(
-        stats[stat].talentLevelExp.expRequiredForNextLevel,
-        1,
-      );
-      document.getElementById(`stat${stat}TalentMult`).textContent = intToString(
-        stats[stat].talentMult,
-        3,
-      );
-      document.getElementById(`stat${stat}TalentProgress`).textContent = intToString(talentPrc, 2);
-      document.getElementById(`stat${stat}TotalMult`).textContent = intToString(
-        getTotalBonusXP(stat),
-        3,
-      );
-    }
-  }
-
-  logBarScaleBase = 1.25;
-
-  getMaxLogBarScale(maxValue) {
-    return this.logBarScaleBase ** Math.ceil(Math.log(maxValue) / Math.log(this.logBarScaleBase));
-  }
-
-  /**
-   * @param {string} maxContainerId
-   * @param {string} logBarId
-   * @param {number} level
-   * @param {string} [levelBarId]
-   * @param {string} [levelPrc]
-   */
   updateLevelLogBar(maxContainerId, logBarId, level, levelBarId, levelPrc) {
-    const maxContainer = document.getElementById(maxContainerId);
-    const logLevel = level; //Math.log10(level);
-    let maxValue = parseFloat(getComputedStyle(maxContainer).getPropertyValue('--max-bar-value')) || 0;
-
-    const logBar = document.getElementById(logBarId);
-    if (level > maxValue) {
-      maxValue = this.getMaxLogBarScale(level + 1);
-      maxContainer.style.setProperty('--max-bar-value', String(maxValue));
-    }
-    logBar.style.setProperty('--bar-value', String(logLevel));
-    if (levelBarId) document.getElementById(levelBarId).style.width = levelPrc;
-  }
-
-  updateStats(skipAnimation) {
-    let maxValue = 100; // I really need to stop writing this default explicitly everywhere
-    for (const stat of statList) {
-      for (
-        const value of [
-          getLevel(stat),
-          getTalent(stat),
-          stats[stat].soulstone,
-        ]
-      ) {
-        maxValue = Math.max(value, maxValue);
-      }
-    }
-    maxValue = this.getMaxLogBarScale(maxValue);
-    const statsContainer = document.getElementById('statsContainer');
-    if (skipAnimation) {
-      statsContainer.classList.remove('animate-logBars');
-    }
-    statsContainer.style.setProperty('--max-bar-value', String(maxValue));
-    if (!statsContainer.classList.contains('animate-logBars')) {
-      requestAnimationFrame(() => statsContainer.classList.add('animate-logBars'));
-    }
-
-    for (const stat of statList) {
-      this.updateStat(stat);
-    }
   }
 
   showSkill(skill) {
-    skillShowing = skill;
-    if (skill !== undefined) this.updateSkill(skill);
   }
 
   updateSkill(skill) {
-    if (skills[skill].levelExp.level === 0) {
-      return;
-    }
-    let container = document.getElementById(`skill${skill}Container`);
-    container.style.display = 'inline-block';
-    if (skill === 'Combat' || skill === 'Pyromancy' || skill === 'Restoration') {
-      this.updateTeamCombat();
-    }
-
-    const levelPrc = getPrcToNextSkillLevel(skill);
-    document.getElementById(`skill${skill}Level`).textContent = (getSkillLevel(skill) > 9999)
-      ? toSuffix(getSkillLevel(skill))
-      : formatNumber(getSkillLevel(skill));
-    document.getElementById(`skill${skill}LevelBar`).style.width = `${levelPrc}%`;
-
-    if (skillShowing === skill) {
-      document.getElementById(`skill${skill}LevelExp`).textContent = intToString(
-        skills[skill].levelExp.exp,
-        1,
-      );
-      document.getElementById(`skill${skill}LevelExpNeeded`).textContent = intToString(
-        skills[skill].levelExp.expRequiredForNextLevel,
-        1,
-      );
-      document.getElementById(`skill${skill}LevelProgress`).textContent = intToString(levelPrc, 2);
-
-      if (skill === 'Dark') {
-        document.getElementById('skillBonusDark').textContent = intToString(
-          getSkillBonus('Dark'),
-          4,
-        );
-      } else if (skill === 'Chronomancy') {
-        document.getElementById('skillBonusChronomancy').textContent = intToString(
-          getSkillBonus('Chronomancy'),
-          4,
-        );
-      } else if (skill === 'Practical') {
-        document.getElementById('skillBonusPractical').textContent = getSkillBonus('Practical')
-          .toFixed(3).replace(
-            /(\.\d*?[1-9])0+$/gu,
-            '$1',
-          );
-      } else if (skill === 'Mercantilism') {
-        document.getElementById('skillBonusMercantilism').textContent = intToString(
-          getSkillBonus('Mercantilism'),
-          4,
-        );
-      } else if (skill === 'Spatiomancy') {
-        document.getElementById('skillBonusSpatiomancy').textContent = getSkillBonus('Spatiomancy')
-          .toFixed(3).replace(
-            /(\.\d*?[1-9])0+$/gu,
-            '$1',
-          );
-      } else if (skill === 'Divine') {
-        document.getElementById('skillBonusDivine').textContent = intToString(
-          getSkillBonus('Divine'),
-          4,
-        );
-      } else if (skill === 'Commune') {
-        document.getElementById('skillBonusCommune').textContent = getSkillBonus('Commune').toFixed(3)
-          .replace(
-            /(\.\d*?[1-9])0+$/gu,
-            '$1',
-          );
-      } else if (skill === 'Wunderkind') {
-        document.getElementById('skillBonusWunderkind').textContent = intToString(
-          getSkillBonus('Wunderkind'),
-          4,
-        );
-      } else if (skill === 'Gluttony') {
-        document.getElementById('skillBonusGluttony').textContent = getSkillBonus('Gluttony').toFixed(
-          3,
-        ).replace(
-          /(\.\d*?[1-9])0+$/gu,
-          '$1',
-        );
-      } else if (skill === 'Thievery') {
-        document.getElementById('skillBonusThievery').textContent = intToString(
-          getSkillBonus('Thievery'),
-          4,
-        );
-      } else if (skill === 'Leadership') {
-        document.getElementById('skillBonusLeadership').textContent = intToString(
-          getSkillBonus('Leadership'),
-          4,
-        );
-      } else if (skill === 'Assassin') {
-        document.getElementById('skillBonusAssassin').textContent = intToString(
-          getSkillBonus('Assassin'),
-          4,
-        );
-      }
-    }
-    this.adjustTooltipPosition(container.querySelector('div.showthis'));
+    // if (skills[skill].levelExp.level === 0) {
+    //   return;
+    // }
+    // let container = document.getElementById(`skill${skill}Container`);
+    // container.style.display = 'inline-block';
+    // if (skill === 'Combat' || skill === 'Pyromancy' || skill === 'Restoration') {
+    //   this.updateTeamCombat();
+    // }
+    // const levelPrc = getPrcToNextSkillLevel(skill);
+    // document.getElementById(`skill${skill}Level`).textContent = (getSkillLevel(skill) > 9999)
+    //   ? toSuffix(getSkillLevel(skill))
+    //   : formatNumber(getSkillLevel(skill));
+    // document.getElementById(`skill${skill}LevelBar`).style.width = `${levelPrc}%`;
+    // if (skillShowing === skill) {
+    // document.getElementById(`skill${skill}LevelExp`).textContent = intToString(
+    //   skills[skill].levelExp.exp,
+    //   1,
+    // );
+    // document.getElementById(`skill${skill}LevelExpNeeded`).textContent = intToString(
+    //   skills[skill].levelExp.expRequiredForNextLevel,
+    //   1,
+    // );
+    // document.getElementById(`skill${skill}LevelProgress`).textContent = intToString(levelPrc, 2);
+    // if (skill === 'Dark') {
+    //   document.getElementById('skillBonusDark').textContent = intToString(
+    //     getSkillBonus('Dark'),
+    //     4,
+    //   );
+    // } else if (skill === 'Chronomancy') {
+    //   document.getElementById('skillBonusChronomancy').textContent = intToString(
+    //     getSkillBonus('Chronomancy'),
+    //     4,
+    //   );
+    // } else if (skill === 'Practical') {
+    //   document.getElementById('skillBonusPractical').textContent = getSkillBonus('Practical')
+    //     .toFixed(3).replace(
+    //       /(\.\d*?[1-9])0+$/gu,
+    //       '$1',
+    //     );
+    // } else if (skill === 'Mercantilism') {
+    //   document.getElementById('skillBonusMercantilism').textContent = intToString(
+    //     getSkillBonus('Mercantilism'),
+    //     4,
+    //   );
+    // } else if (skill === 'Spatiomancy') {
+    //   document.getElementById('skillBonusSpatiomancy').textContent = getSkillBonus('Spatiomancy')
+    //     .toFixed(3).replace(
+    //       /(\.\d*?[1-9])0+$/gu,
+    //       '$1',
+    //     );
+    // } else if (skill === 'Divine') {
+    //   document.getElementById('skillBonusDivine').textContent = intToString(
+    //     getSkillBonus('Divine'),
+    //     4,
+    //   );
+    // } else if (skill === 'Commune') {
+    //   document.getElementById('skillBonusCommune').textContent = getSkillBonus('Commune').toFixed(3)
+    //     .replace(
+    //       /(\.\d*?[1-9])0+$/gu,
+    //       '$1',
+    //     );
+    // } else if (skill === 'Wunderkind') {
+    //   document.getElementById('skillBonusWunderkind').textContent = intToString(
+    //     getSkillBonus('Wunderkind'),
+    //     4,
+    //   );
+    // } else if (skill === 'Gluttony') {
+    //   document.getElementById('skillBonusGluttony').textContent = getSkillBonus('Gluttony').toFixed(
+    //     3,
+    //   ).replace(
+    //     /(\.\d*?[1-9])0+$/gu,
+    //     '$1',
+    //   );
+    // } else if (skill === 'Thievery') {
+    //   document.getElementById('skillBonusThievery').textContent = intToString(
+    //     getSkillBonus('Thievery'),
+    //     4,
+    //   );
+    // } else if (skill === 'Leadership') {
+    //   document.getElementById('skillBonusLeadership').textContent = intToString(
+    //     getSkillBonus('Leadership'),
+    //     4,
+    //   );
+    // } else if (skill === 'Assassin') {
+    //   document.getElementById('skillBonusAssassin').textContent = intToString(
+    //     getSkillBonus('Assassin'),
+    //     4,
+    //   );
+    // }
+    // }
   }
 
   updateSkills() {
     for (const skill of skillList) {
       this.updateSkill(skill);
     }
-  }
-
-  showBuff(buff) {
-    // buffShowing = buff;
-    // if (buff !== undefined) this.updateBuff(buff);
-  }
-
-  updateBuff(buff) {
-    // if (buffs[buff].amt === 0) {
-    // return;
-    // }
-    // document.getElementById(`buff${buff}Level`).textContent = `${getBuffLevel(buff)}/`;
-    // if (buff === 'Imbuement') {
-    // this.updateTrainingLimits();
-    // }
-  }
-
-  updateBuffs() {
-    // for (const buff of buffList) {
-    // this.updateBuff(buff);
-    // }
   }
 
   updateTime() {
@@ -762,21 +620,6 @@ export class View {
     }
   }
   updateTeamCombat() {
-    if (towns[2].unlocked) {
-      document.getElementById('skillSCombatContainer').style.display = 'inline-block';
-      document.getElementById('skillTCombatContainer').style.display = 'inline-block';
-      document.getElementById('skillSCombatLevel').textContent = intToString(
-        getSelfCombat(),
-        1,
-      );
-      document.getElementById('skillTCombatLevel').textContent = intToString(
-        getTeamCombat(),
-        1,
-      );
-    } else {
-      document.getElementById('skillSCombatContainer').style.display = 'none';
-      document.getElementById('skillTCombatContainer').style.display = 'none';
-    }
   }
   zoneTints = [
     'var(--zone-tint-1)', //Beginnersville
@@ -974,7 +817,7 @@ export class View {
   updateCurrentActionsDivs() {
     let totalDivText = '';
 
-    // definite leak - need to remove listeners and image
+    // definite leak - need to remove listeners and images
     for (let i = 0; i < actions.current.length; i++) {
       const action = actions.current[i];
       const actionLoops = action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops);
@@ -1996,43 +1839,6 @@ export class View {
   }
 
   updateSoulstones() {
-    let total = 0;
-    for (const stat of statList) {
-      if (stats[stat].soulstone) {
-        total += stats[stat].soulstone;
-        document.getElementById(`stat${stat}SoulstoneLogBar`).parentElement.style.display = '';
-        this.updateLevelLogBar(
-          'statsContainer',
-          `stat${stat}SoulstoneLogBar`,
-          stats[stat].soulstone,
-        );
-        document.getElementById(`ss${stat}Container`).style.display = '';
-        document.getElementById(`ss${stat}`).textContent = formatNumber(
-          stats[stat].soulstone,
-        );
-        document.getElementById(`stat${stat}SSBonus`).textContent = intToString(
-          stats[stat].soulstone ? stats[stat].soulstoneMult : 0,
-        );
-        document.getElementById(`stat${stat}ss`).textContent = intToString(
-          stats[stat].soulstone,
-          1,
-        );
-      } else {
-        document.getElementById(`stat${stat}SoulstoneLogBar`).parentElement.style.display = 'none';
-        document.getElementById(`ss${stat}Container`).style.display = 'none';
-        document.getElementById(`stat${stat}ss`).textContent = '';
-      }
-    }
-    if (total > 0) {
-      document.getElementById(`stattotalss`).style.display = '';
-      document.getElementById(`stattotalss`).textContent = intToString(total, 1);
-      document.getElementById(`sstotalContainer`).style.display = '';
-      document.getElementById(`sstotal`).textContent = formatNumber(total);
-    } else {
-      document.getElementById(`stattotalss`).style.display = 'none';
-      document.getElementById(`stattotalss`).textContent = '';
-      document.getElementById(`sstotalContainer`).style.display = 'none';
-    }
   }
 
   updateMultiPart(action) {
@@ -2054,18 +1860,6 @@ export class View {
       document.getElementById(`segmentName${i}${action.varName}`).textContent = action.getSegmentName(
         town[`${action.varName}LoopCounter`] + i,
       );
-    }
-  }
-
-  updateTrainingLimits() {
-    for (let i = 0; i < statList.length; i++) {
-      const trainingDiv = document.getElementById(`trainingLimit${statList[i]}`);
-      if (trainingDiv) {
-        trainingDiv.textContent = String(vals.trainingLimits);
-      }
-    }
-    if (getBuffLevel('Imbuement') > 0 || getBuffLevel('Imbuement3') > 0) {
-      document.getElementById('maxTraining').style.display = '';
     }
   }
 
@@ -2196,15 +1990,6 @@ export function draggedUndecorate(i) {
 }
 
 export function updateBuffCaps() {
-  for (const buff of buffList) {
-    document.getElementById(`buff${buff}Cap`).value = String(
-      Math.min(
-        parseInt(document.getElementById(`buff${buff}Cap`).value),
-        buffHardCaps[buff],
-      ),
-    );
-    buffCaps[buff] = parseInt(document.getElementById(`buff${buff}Cap`).value);
-  }
 }
 
 export const view = new View();

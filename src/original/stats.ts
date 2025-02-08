@@ -1,6 +1,17 @@
 import { Buff } from './stats.ts';
 import { Localizable } from './localizable.ts';
-import { actionLog, buffHardCaps, buffList, buffs, resources, skillList, skills, statList, stats } from './globals.ts';
+import {
+  actionLog,
+  buffCaps,
+  buffHardCaps,
+  buffList,
+  buffs,
+  resources,
+  skillList,
+  skills,
+  statList,
+  stats,
+} from './globals.ts';
 import { prestigeBonus } from './prestige.ts';
 import { actions } from './actions.ts';
 import { getAdvGuildRank, getCraftGuildRank, getXMLName } from './actionList.ts';
@@ -470,12 +481,7 @@ export function getBuffLevel(buff) {
 }
 
 export function getBuffCap(buff) {
-  // Fixme please! I need to have a storage in data space
-  const input = document.getElementById(`buff${buff}Cap`);
-  if (input instanceof HTMLInputElement) {
-    return parseInt(input.value);
-  }
-  throw Error(`buff${buff}Cap not HTMLInputElement?`);
+  return buffCaps[buff];
 }
 
 export function getRitualBonus(min, max, speed) {

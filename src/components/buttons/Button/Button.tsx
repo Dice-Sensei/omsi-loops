@@ -19,6 +19,7 @@ export const Button = (props: ButtonProps) => {
       class={cx(
         'min-h-8',
         $.variant === 'primary' && `
+        px-2
         text-slate-950
         border rounded-sm
         bg-amber-500 active:bg-amber-600 hover:bg-amber-400 

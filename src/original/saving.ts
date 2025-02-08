@@ -517,7 +517,6 @@ export function doLoad(toLoad) {
     for (const property in buffCaps) {
       if (toLoad.buffCaps.hasOwnProperty(property)) {
         buffCaps[property] = toLoad.buffCaps[property];
-        document.getElementById(`buff${property}Cap`).value = buffCaps[property];
       }
     }
   }

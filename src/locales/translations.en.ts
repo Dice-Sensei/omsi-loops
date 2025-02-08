@@ -1201,10 +1201,19 @@ export const translationsEn = {
     undoLastAction: 'Undo last action',
   },
   statistics: {
-    title: 'Stats',
     sections: {
       attributes: {
         title: 'Attributes',
+        description: `
+          Each stat level reduces the relevant part of an action's mana cost by a percentage. Talent exp gain is equal to 1%
+          of stat exp gain, and persists through loops. Talent multiplies xp gain by (1+(talentLevel)^0.4/3). XP gain
+          towards a stat per action is (original mana / actual mana) * (talent bonus) per tick. Total Mult is the product of
+          your talent and soulstone bonuses. e.g. Meet People costs 800 mana and has a breakdown of
+          Int 10% Cha 80% Soul 10%. This effectively means 80 of the mana is controlled by Int, another 80 by Soul, and the remaining 640 by Cha. If your Cha
+          is level 20 when the action is started, the bonus would be x1.2 so it'd be 640 / 1.2 = 533.33 Adding back the 160
+          from Soul and Int, the total mana the action takes (rounded up) is now 694, so ~87% of the original mana
+          cost. The action would give (800/694)*(1+(talent)^0.4/3) level exp per mana for the 694 mana.
+        `,
       },
       skills: {
         title: 'Skills',
@@ -1283,7 +1292,7 @@ export const translationsEn = {
         name: 'Practical Magic',
         description: 'Mage Hand, Prestidigitation, Detect Magic, and other useful tricks to help out.',
         explaination:
-          'Smash Pots and Wild Mana costs are reduced to the original / (1 + level / 100) (rounded up). The following actions get 1% more gold per level in their level range (rounded down). 1-200 Pick Locks 101-300 Short Quests 201-400 Long Quests Currently multiplying costs by <div id="skillBonusPractical"></div>x.',
+          'Smash Pots and Wild Mana costs are reduced to the original / (1 + level / 100) (rounded up). The following actions get 1% more gold per level in their level range (rounded down). 1-200 Pick Locks 101-300 Short Quests 201-400 Long Quests Currently multiplying costs by {{bonus}}x.',
       },
       alchemy: {
         name: 'Alchemy',
@@ -1295,7 +1304,7 @@ export const translationsEn = {
         name: 'Dark Magic',
         description: 'Use various dark arts to help you harvest mana.',
         explaination:
-          'Multiply the mana gain from Smash Pots and Wild Mana by (1 + level / 60) ^ 0.25 (rounded down). Currently granting {{skillBonusDark}}x mana gains.',
+          'Multiply the mana gain from Smash Pots and Wild Mana by (1 + level / 60) ^ 0.25 (rounded down). Currently granting {{bonus}}x mana gains.',
       },
       crafting: {
         name: 'Crafting',
@@ -1305,7 +1314,7 @@ export const translationsEn = {
         name: 'Chronomancy',
         description: 'Harness the magic of time to, well, speed up time.',
         explaination:
-          'Actions in all zones are (1 + level / 60) ^ 0.25 times faster.<br> Currently granting {{skillBonusChronomancy}}x speed.',
+          'Actions in all zones are (1 + level / 60) ^ 0.25 times faster.<br> Currently granting {{bonus}}x speed.',
       },
       pyromancy: {
         name: 'Pyromancy',
@@ -1338,56 +1347,56 @@ export const translationsEn = {
             1101-1300 Pockets to pick
             1201-1400 Warehouses to rob
             1301-1500 Insurance companies to defraud
-            Currently multiplying costs by {{skillBonusSpatiomancy}}x.
+            Currently multiplying costs by {{bonus}}x.
         `,
       },
       mercantilism: {
         name: 'Mercantilism',
         description: 'Smooth talk your way to better rates with the mana merchants.',
         explaination:
-          'Multiply the mana gain from Buy Mana by (1 + level / 60) ^ 0.25 (rounded down).<br> Currently granting {{skillBonusMercantilism}}x mana gains.',
+          'Multiply the mana gain from Buy Mana by (1 + level / 60) ^ 0.25 (rounded down).<br> Currently granting {{bonus}}x mana gains.',
       },
       divine: {
         name: 'Divine Favor',
         description: 'The gods have answered your prayers and given you their blessing.',
         explaination:
-          'Increases soulstones gained from actions by (1 + level / 60) ^ 0.25.<br> Currently granting {{skillBonusDivine}}x soulstone gains.',
+          'Increases soulstones gained from actions by (1 + level / 60) ^ 0.25.<br> Currently granting {{bonus}}x soulstone gains.',
       },
       commune: {
         name: 'Communion',
         description: 'Your blood sacrifices to dark beings makes it easier to communicate with them.',
         explaination:
-          'Dark Ritual soulstone costs are reduced to the original / (1 + level / 100).<br> Currently multiplying costs by {{skillBonusCommune}}x.',
+          'Dark Ritual soulstone costs are reduced to the original / (1 + level / 100).<br> Currently multiplying costs by {{bonus}}x.',
       },
       wunderkind: {
         name: 'Wunderkind',
         description: 'Even with your eyes closed, you still see the glow of the totem.',
         explaination:
-          'Doubles the initial stat gain of Imbue Body<br> Talent exp gain is increased by (1 + level / 60) ^ 0.25.<br> Currently granting {{skillBonusWunderkind}}x talent exp.',
+          'Doubles the initial stat gain of Imbue Body<br> Talent exp gain is increased by (1 + level / 60) ^ 0.25.<br> Currently granting {{bonus}}x talent exp.',
       },
       gluttony: {
         name: 'Gluttony',
         description: 'The insatiable hunger of the jungle has started to rub off on you.',
         explaination:
-          'Great Feast soulstone costs are reduced to the original / (1 + level / 100).<br> Currently multiplying costs by {{skillBonusGluttony}}x.',
+          'Great Feast soulstone costs are reduced to the original / (1 + level / 100).<br> Currently multiplying costs by {{bonus}}x.',
       },
       thievery: {
         name: 'Thievery',
         description: "Allows you to redistribute wealth. Other people's wealth.",
         explaination:
-          'Increases gold gain from Pick Locks, Gamble, and Thieving Guild actions by (1 + level / 60) ^ 0.25.<br> Currently granting {{skillBonusThievery}}x increased gold.',
+          'Increases gold gain from Pick Locks, Gamble, and Thieving Guild actions by (1 + level / 60) ^ 0.25.<br> Currently granting {{bonus}}x increased gold.',
       },
       leadership: {
         name: 'Leadership',
         description: "You're ready to start your own cult!",
         explaination:
-          "Increases the number of followers you can recruit by 1 for every 100 levels. Increases your followers' contributions to team combat by (1 + level / 60) ^ 0.25.<br> Currently granting {{skillBonusLeadership}}x increased follower strength.",
+          "Increases the number of followers you can recruit by 1 for every 100 levels. Increases your followers' contributions to team combat by (1 + level / 60) ^ 0.25.<br> Currently granting {{bonus}}x increased follower strength.",
       },
       assassination: {
         name: 'Assassination',
         description: 'Nothing is true. Everything is permitted.',
         explaination:
-          'Increases progress of assassination actions, reduces the reputation penalty of assassination, and reduces the difficulty scaling of trials by original / (1 + level / 2000).<br> Currently multiplying trial difficulty by {{skillBonusAssassin}}x.',
+          'Increases progress of assassination actions, reduces the reputation penalty of assassination, and reduces the difficulty scaling of trials by original / (1 + level / 2000).<br> Currently multiplying trial difficulty by {{bonus}}x.',
       },
     },
     buffs: {
@@ -1478,7 +1487,6 @@ export const translationsEn = {
       plural: 'Totals',
       description: 'It all adds up.',
     },
-
     tooltips: {
       notRestarting: 'Does not reset on loop restart',
       combat: 'Combat',
@@ -1491,11 +1499,6 @@ export const translationsEn = {
       soulstone: 'Soulstones',
       soulstoneMultiplier: 'Soulstone Mult',
       totalMultiplier: 'Total Mult',
-      manaCostReduction: 'Mana Cost Reduction',
-      explanation:
-        `Each stat level reduces the relevant part of an action's mana cost by a percentage. Talent exp gain is equal to 1% of stat exp gain, and persists through loops. Talent multiplies xp gain by (1+(talentLevel)^0.4/3). XP gain towards a stat per action is (original mana / actual mana) * (talent bonus) per tick. Total Mult is the product of your talent and soulstone bonuses. e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%. This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>. If your <div class="bold">Cha</div> is level 20 when the action is started, the bonus would be x1.2 so it'd be 640 / 1.2 = 533.33 Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~87% of the original mana cost. The action would give (800/694)*(1+(talent)^0.4/3) level exp per mana for the 694 mana.`,
-      graphLegend:
-        `Click the legend to show/hide each. Upon freshly starting, Levels and Talent won't change much. Hover Stats for more info.`,
     },
   },
   time_controls: {
