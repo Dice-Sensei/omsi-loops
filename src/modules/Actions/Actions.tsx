@@ -16,30 +16,22 @@ export const Actions = () => {
         <div class='showthis'>
           <i class='actionIcon far fa-circle'></i>
           <span class='localized' data-locale='actions>tooltip>icons>circle'></span>
-          <br></br>
           <i class='actionIcon fas fa-plus'></i>
           <span class='localized' data-locale='actions>tooltip>icons>plus'></span>
-          <br></br>
           <i class='actionIcon fas fa-minus'></i>
           <span class='localized' data-locale='actions>tooltip>icons>minus'></span>
-          <br></br>
           <i class='actionIcon fas fa-arrows-alt-h'></i>
           <span class='localized' data-locale='actions>tooltip>icons>arrows_h'></span>
-          <br></br>
           <i class='actionIcon fas fa-sort-up'></i>
           <span class='localized' data-locale='actions>tooltip>icons>sort_up'></span>
-          <br></br>
           <i class='actionIcon fas fa-sort-down'></i>
           <span class='localized' data-locale='actions>tooltip>icons>sort_down'></span>
-          <br></br>
           <i class='actionIcon far fa-check-circle'></i>
           <span style='margin-left: -2px'>/</span>
           <i class='actionIcon far fa-times-circle'></i>
           <span class='localized' data-locale='actions>tooltip>icons>circles'></span>
-          <br></br>
           <i class='actionIcon fas fa-times'></i>
           <span class='localized' data-locale='actions>tooltip>icons>times'></span>
-          <br></br>
           <span class='localized' data-locale='actions>tooltip>list_explanation'></span>
         </div>
       </div>
@@ -83,7 +75,6 @@ export const Actions = () => {
             data-locale='actions>tooltip>current_list_active'
           >
           </label>
-          <br></br>
           <input
             type='checkbox'
             id='repeatLastActionInput'
@@ -97,7 +88,6 @@ export const Actions = () => {
             data-locale='actions>tooltip>repeat_last_action'
           >
           </label>
-          <br></br>
           <input
             type='checkbox'
             id='addActionsToTopInput'
@@ -130,7 +120,6 @@ export const Actions = () => {
               >
                 Loadout 1
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load2'
@@ -139,7 +128,6 @@ export const Actions = () => {
               >
                 Loadout 2
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load3'
@@ -148,7 +136,6 @@ export const Actions = () => {
               >
                 Loadout 3
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load4'
@@ -157,7 +144,6 @@ export const Actions = () => {
               >
                 Loadout 4
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load5'
@@ -166,7 +152,6 @@ export const Actions = () => {
               >
                 Loadout 5
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load6'
@@ -175,7 +160,6 @@ export const Actions = () => {
               >
                 Loadout 6
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load7'
@@ -184,7 +168,6 @@ export const Actions = () => {
               >
                 Loadout 7
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load8'
@@ -193,7 +176,6 @@ export const Actions = () => {
               >
                 Loadout 8
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load9'
@@ -202,7 +184,6 @@ export const Actions = () => {
               >
                 Loadout 9
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load10'
@@ -211,7 +192,6 @@ export const Actions = () => {
               >
                 Loadout 10
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load11'
@@ -220,7 +200,6 @@ export const Actions = () => {
               >
                 Loadout 11
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load12'
@@ -229,7 +208,6 @@ export const Actions = () => {
               >
                 Loadout 12
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load13'
@@ -238,7 +216,6 @@ export const Actions = () => {
               >
                 Loadout 13
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load14'
@@ -247,7 +224,6 @@ export const Actions = () => {
               >
                 Loadout 14
               </button>
-              <br></br>
               <button
                 class='loadoutbutton unused'
                 id='load15'
@@ -256,7 +232,6 @@ export const Actions = () => {
               >
                 Loadout 15
               </button>
-              <br></br>
               <button
                 class='loadoutbutton localized'
                 style='margin-bottom: 5px; margin-top: 3px'
@@ -271,7 +246,6 @@ export const Actions = () => {
                 data-locale='actions>tooltip>load_loadout'
               >
               </button>
-              <br></br>
               <input
                 id='renameLoadout'
                 value='Loadout Name'

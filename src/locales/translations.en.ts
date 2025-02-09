@@ -1671,6 +1671,18 @@ export const translationsEn = {
     },
   },
   actionList: {
+    tooltips: {
+      actionExplaination: `
+        Mana cost is based on ratio of stat %s.
+        Gained exp is proportional too.
+        Stat/Talent exp is gained every tick.
+        Skill exp is gained upon action completion unless otherwise specified.
+        Actions will target unchecked objects before known lootable objects.
+      `,
+      actionOptions: 'Action options',
+      actionStories: 'Action stories',
+      addAtCap: 'Add action at cap',
+    },
     actions: {
       clearAll: 'Clear list',
       clearDisabled: 'Clear disabled',

@@ -1120,17 +1120,17 @@ export class View {
   showTown(townNum) {
     if (!towns[townNum].unlocked()) return;
 
-    if (townNum === 0) {
-      document.getElementById('townViewLeft').style.visibility = 'hidden';
-    } else {
-      document.getElementById('townViewLeft').style.visibility = '';
-    }
+    // if (townNum === 0) {
+    //   document.getElementById('townViewLeft').style.visibility = 'hidden';
+    // } else {
+    //   document.getElementById('townViewLeft').style.visibility = '';
+    // }
 
-    if (townNum === Math.max(...vals.townsUnlocked)) {
-      document.getElementById('townViewRight').style.visibility = 'hidden';
-    } else {
-      document.getElementById('townViewRight').style.visibility = '';
-    }
+    // if (townNum === Math.max(...vals.townsUnlocked)) {
+    //   document.getElementById('townViewRight').style.visibility = 'hidden';
+    // } else {
+    //   document.getElementById('townViewRight').style.visibility = '';
+    // }
 
     for (let i = 0; i < actionOptionsTown.length; i++) {
       actionOptionsTown[i].style.display = 'none';
@@ -1142,34 +1142,32 @@ export class View {
     townInfos[townNum].style.display = '';
     $('#TownSelect').val(townNum);
 
-    document.getElementById('shortTownColumn').classList.remove(
-      `zone-${vals.townshowing + 1}`,
-    );
-    document.getElementById('shortTownColumn').classList.add(`zone-${townNum + 1}`);
-    document.getElementById('townDesc').textContent = Localization.txt(`towns>town${townNum}>desc`);
+    // document.getElementById('shortTownColumn').classList.remove(`zone-${vals.townshowing + 1}`);
+    // document.getElementById('shortTownColumn').classList.add(`zone-${townNum + 1}`);
+    // document.getElementById('townDesc').textContent = Localization.txt(`towns>town${townNum}>desc`);
     vals.townshowing = townNum;
   }
 
   showActions(stories) {
-    for (let i = 0; i < actionOptionsTown.length; i++) {
-      actionOptionsTown[i].style.display = 'none';
-      actionStoriesTown[i].style.display = 'none';
-    }
+    // for (let i = 0; i < actionOptionsTown.length; i++) {
+    //   actionOptionsTown[i].style.display = 'none';
+    //   actionStoriesTown[i].style.display = 'none';
+    // }
 
-    if (stories) {
-      document.getElementById('actionsViewLeft').style.visibility = '';
-      document.getElementById('actionsViewRight').style.visibility = 'hidden';
-      actionStoriesTown[vals.townshowing].style.display = '';
-    } else {
-      document.getElementById('actionsViewLeft').style.visibility = 'hidden';
-      document.getElementById('actionsViewRight').style.visibility = '';
-      actionOptionsTown[vals.townshowing].style.display = '';
-    }
+    // if (stories) {
+    //   document.getElementById('actionsViewLeft').style.visibility = '';
+    //   document.getElementById('actionsViewRight').style.visibility = 'hidden';
+    //   actionStoriesTown[vals.townshowing].style.display = '';
+    // } else {
+    //   document.getElementById('actionsViewLeft').style.visibility = 'hidden';
+    //   document.getElementById('actionsViewRight').style.visibility = '';
+    //   actionOptionsTown[vals.townshowing].style.display = '';
+    // }
 
-    document.getElementById('actionsTitle').textContent = Localization.txt(
-      `actions>title${stories ? '_stories' : ''}`,
-    );
-    vals.actionStoriesShowing = stories;
+    // document.getElementById('actionsTitle').textContent = Localization.txt(
+    //   `actions>title${stories ? '_stories' : ''}`,
+    // );
+    // vals.actionStoriesShowing = stories;
   }
 
   toggleHiding() {

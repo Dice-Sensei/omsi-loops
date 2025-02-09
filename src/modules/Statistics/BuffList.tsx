@@ -30,7 +30,6 @@ const IntegerBuff = (props: { id: string; icon: string; locale: BuffLocale }) =>
       </Tooltip.Trigger>
       <Tooltip.Content>
         <span>{props.locale.description}</span>
-        <br></br>
         <span>{props.locale.explaination}</span>
       </Tooltip.Content>
     </Tooltip>

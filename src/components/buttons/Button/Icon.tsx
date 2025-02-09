@@ -184,6 +184,59 @@ const ExclamationTriangleSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
   </svg>
 );
 
+const EyeSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+    <circle
+      cx='12'
+      cy='12'
+      r='3'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
+const EyeSlashSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M2 2L22 22'
+      stroke='currentColor'
+      stroke-width='2'
+    />
+    <path
+      d='M6.71 6.7C3.93 8.67 2 12 2 12s4 8 11 8c1.94 0 3.7-.48 5.23-1.27M9.9 4.24C10.55 4.07 11.26 4 12 4c7 0 11 8 11 8s-.81 1.41-2.2 2.98'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+    <path
+      d='M13.7 13.7a3 3 0 1 1-4.4-4.4'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
 const icons = {
   close: XSvg,
   chevronDown: ChevronDownSvg,
@@ -195,6 +248,8 @@ const icons = {
   arrowLeft: ArrowLeftSvg,
   arrowRight: ArrowRightSvg,
   warning: ExclamationTriangleSvg,
+  eye: EyeSvg,
+  eyeSlash: EyeSlashSvg,
 } satisfies Record<string, ValidComponent>;
 
 export type IconName = keyof typeof icons;
