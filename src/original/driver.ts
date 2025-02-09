@@ -518,9 +518,6 @@ export function unlockTown(townNum) {
   if (!towns[townNum].unlocked()) {
     vals.townsUnlocked.push(townNum);
     vals.townsUnlocked.sort();
-    // refresh current
-    view.showTown(townNum);
-    view.requestUpdate('updateTravelMenu', null);
   }
   let cNum = vals.challengeSave.challengeMode;
   if (cNum !== 0) {

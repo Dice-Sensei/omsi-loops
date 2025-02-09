@@ -95,33 +95,16 @@ export class View {
   initalize() {
     curActionsDiv = document.getElementById('curActionsList');
     nextActionsDiv = document.getElementById('nextActionsList');
+
     actionOptionsTown = [];
-    for (let i = 0; i <= 8; i++) {
-      const element = document.getElementById(`actionOptionsTown${i}`);
-      if (!element) continue;
-
-      const actionDiv = document.createElement('div');
-      actionDiv.classList.add('actionDiv');
-      element.append(actionDiv);
-
-      const travelDiv = document.createElement('div');
-      travelDiv.classList.add('travelDiv');
-      element.append(travelDiv);
-
-      actionOptionsTown[i] = element;
-    }
-
     actionStoriesTown = [];
-    for (let i = 0; i <= 8; i++) {
-      actionStoriesTown[i] = document.getElementById(`actionStoriesTown${i}`);
-    }
-
     townInfos = [];
     for (let i = 0; i <= 8; i++) {
+      actionOptionsTown[i] = document.getElementById(`actionOptionsTown${i}`);
+      actionStoriesTown[i] = document.getElementById(`actionStoriesTown${i}`);
       townInfos[i] = document.getElementById(`townInfo${i}`);
     }
 
-    this.createTravelMenu();
     this.updateTime();
     this.updateCurrentActionsDivs();
     this.updateTotalTicks();
@@ -130,7 +113,6 @@ export class View {
     this.updateProgressActions();
     this.updateLockedHidden();
     this.showTown(0);
-    this.changeStatView();
     this.adjustGoldCosts();
     this.adjustExpGains();
     this.updateLoadoutNames();
@@ -166,7 +148,6 @@ export class View {
     updateCurrentActionLoops: [],
     updateActionTooltips: [],
     updateLockedHidden: [],
-    updateTravelMenu: [],
     adjustManaCost: [],
     adjustGoldCost: [],
     adjustGoldCosts: [],
@@ -800,36 +781,9 @@ export class View {
   }
 
   showTown(townNum) {
-    if (!towns[townNum].unlocked()) return;
-
-    for (let i = 0; i < actionOptionsTown.length; i++) {
-      actionOptionsTown[i].style.display = 'none';
-      actionStoriesTown[i].style.display = 'none';
-      townInfos[i].style.display = 'none';
-    }
-
-    if (vals.actionStoriesShowing) actionStoriesTown[townNum].style.display = '';
-    else actionOptionsTown[townNum].style.display = '';
-
-    townInfos[townNum].style.display = '';
-    $('#TownSelect').val(townNum);
-
-    vals.townShowing = townNum;
-  }
-
-  toggleHiding() {
-    document.documentElement.classList.toggle('editing-hidden-vars');
   }
 
   toggleHidden(varName: string, force?: boolean) {
-    const isHidden = towns[vals.townShowing].hiddenVars.has(varName);
-    if ((isHidden && force !== true) || force === false) {
-      towns[vals.townShowing].hiddenVars.delete(varName);
-      document.getElementById(`infoContainer${varName}`).classList.remove('user-hidden');
-    } else if (!isHidden || force === true) {
-      towns[vals.townShowing].hiddenVars.add(varName);
-      document.getElementById(`infoContainer${varName}`).classList.add('user-hidden');
-    }
   }
 
   updateRegular(updateInfo) {
@@ -1422,31 +1376,6 @@ export class View {
       document.getElementById(`segmentName${i}${action.varName}`).textContent = action.getSegmentName(
         town[`${action.varName}LoopCounter`] + i,
       );
-    }
-  }
-
-  updateStory() {
-  }
-
-  changeStatView() {
-  }
-
-  createTravelMenu() {
-    let travelMenu = $('#TownSelect');
-    travelMenu.empty();
-    townNames.forEach((town, index) => {
-      travelMenu.append(`"<option value=${index} class='zone-${index + 1}' hidden=''>${town}</option>`);
-    });
-    travelMenu.change(function () {
-      view.showTown(Number($(this).val()));
-    });
-    this.updateTravelMenu();
-  }
-
-  updateTravelMenu() {
-    let travelOptions = $('#TownSelect').children();
-    for (let i = 0; i < travelOptions.length; i++) {
-      travelOptions[i].hidden = !vals.townsUnlocked.includes(i);
     }
   }
 
