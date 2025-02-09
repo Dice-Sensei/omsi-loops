@@ -11,7 +11,7 @@ export const ActionLogView = () => {
       <span class='font-bold w-full text-center'>
         {t('actionLog.title')}
       </span>
-      <Button variant='text' class='font-xs italic' onClick={() => actionLog.loadHistory(5)}>
+      <Button variant='text' class='font-xs italic'>
         {t('actionLog.actions.loadPrevious')}
       </Button>
       <ul class='flex flex-col gap-0.5'>

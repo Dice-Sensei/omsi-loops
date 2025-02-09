@@ -559,7 +559,6 @@ export function doLoad(toLoad) {
 
   if (toLoad.actionLog !== undefined) {
     actionLog.load(toLoad.actionLog);
-    actionLog.loadRecent();
   } else {
     actionLog.initialize();
   }

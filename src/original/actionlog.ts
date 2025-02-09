@@ -47,15 +47,6 @@ export class ActionLog {
     }
   }
 
-  loadHistory(count) {
-  }
-
-  loadHistoryBackTo(index) {
-  }
-
-  loadRecent() {
-  }
-
   addOrUpdateEntry(entry) {
     for (let i = this.entries.length - 1; i >= 0; i--) {
       const other = this.entries[i];
@@ -120,15 +111,6 @@ class ActionLogEntry {
     return false;
   }
 
-  /** @type {HTMLElement} */
-  #element;
-  get element() {
-    return this.#element ??= this.createElement();
-  }
-  set element(value) {
-    this.#element = value;
-  }
-
   /** @param {[type: ActionLogEntryTypeName, ...unknown[]]} data @returns {ActionLogEntryInstance | null} */
   static create(data) {
     if (!Array.isArray(data)) return null;
@@ -159,18 +141,7 @@ class ActionLogEntry {
     this.loop = typeof loop === 'number' && loop >= 0 ? loop : vals.currentLoop;
     return rest;
   }
-  createElement() {
-    const div = document.createElement('div');
-    div.innerHTML = `<li class="actionLogEntry" data-type="${this.type}" data-${
-      this.repeatable ? 'repeatable' : 'unique'
-    }="${this.repeatable ? 'repeatable' : 'unique'}">${this.format(this.getText())}</li>`;
-    return /** @type {HTMLElement} */ (div.children[0]);
-  }
-  updateElement() {
-    if (this.#element) {
-      this.#element.innerHTML = this.format(this.getText());
-    }
-  }
+
   /** @type {(text: string) => string} */
   format(text) {
     let lastText = null;
@@ -193,7 +164,7 @@ class ActionLogEntry {
   }
 
   /** @returns {string} */
-  getText() {
+  abstract getText() {
     throw new Error('Method not implemented.');
   }
 }
