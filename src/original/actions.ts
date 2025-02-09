@@ -268,7 +268,6 @@ export class Actions {
     this.currentAction = null;
     vals.curTown = 0;
     towns[0].suppliesCost = 300;
-    view.requestUpdate('updateResource', 'supplies');
     vals.curAdvGuildSegment = 0;
     vals.curCraftGuildSegment = 0;
     vals.curWizCollegeSegment = 0;

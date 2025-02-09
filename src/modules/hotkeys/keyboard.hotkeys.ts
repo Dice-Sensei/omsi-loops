@@ -16,13 +16,7 @@ import {
 } from '../../original/driver.ts';
 import { actionAmount, setActionAmount } from '../../values.ts';
 import { KeyboardKey } from './KeyboardKey.ts';
-
-function moveToTown(townNum: number | undefined): void {
-  if (townNum === undefined) return;
-  if (!vals.townsUnlocked.includes(townNum)) return;
-
-  view.showTown(townNum);
-}
+import { ActionControlsNs, TownControlsNs } from '../Towns/Towns.tsx';
 
 export const createKeyboardHotkeys = () => {
   Keyboard
@@ -160,54 +154,46 @@ export const createKeyboardHotkeys = () => {
       combination: 'shift+c',
     }, {
       onDown: {
-        fn: () => KeyboardKey.setShift(true),
+        fn: KeyboardKey.toggleShiftOn,
         description: t('shortcuts.toggleShiftKeyOn'),
       },
       onUp: {
-        fn: () => KeyboardKey.setShift(false),
+        fn: KeyboardKey.toggleShiftOff,
         description: t('shortcuts.toggleShiftKeyOff'),
       },
       combination: 'shift',
     }, {
       onDown: {
-        fn: () => KeyboardKey.setControl(true),
+        fn: KeyboardKey.toggleControlOn,
         description: t('shortcuts.toggleControlKeyOn'),
       },
       onUp: {
-        fn: () => KeyboardKey.setControl(false),
+        fn: KeyboardKey.toggleControlOff,
         description: t('shortcuts.toggleControlKeyOff'),
       },
       combination: ['ctrl', 'command'],
     }, {
       onDown: {
-        fn: () =>
-          moveToTown(
-            vals
-              .townsUnlocked[vals.townsUnlocked.indexOf(vals.townShowing) + 1],
-          ),
+        fn: TownControlsNs.selectNext,
         description: t('shortcuts.moveToNextTown'),
       },
       combination: ['right', 'd'],
     }, {
       onDown: {
-        fn: () =>
-          moveToTown(
-            vals
-              .townsUnlocked[vals.townsUnlocked.indexOf(vals.townShowing) - 1],
-          ),
+        fn: TownControlsNs.selectPrevious,
         description: t('shortcuts.moveToPreviousTown'),
       },
       combination: ['left', 'a'],
     }, {
       onDown: {
-        fn: () => view.showActions(true),
+        fn: ActionControlsNs.toggleOptions,
         description: t('shortcuts.showActions'),
       },
       combination: ['shift+right', 'shift+d'],
     }, {
       onDown: {
-        fn: () => view.showActions(false),
-        description: t('shortcuts.hideActions'),
+        fn: ActionControlsNs.toggleStories,
+        description: t('shortcuts.showStories'),
       },
       combination: ['shift+left', 'shift+a'],
     }, {

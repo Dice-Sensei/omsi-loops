@@ -1,50 +1,59 @@
-import { createMemo, createSignal, Match, Show, Switch } from 'solid-js';
+import { createSignal, Match, Show, Switch } from 'solid-js';
 import { ButtonIcon } from '../../components/buttons/Button/ButtonIcon.tsx';
 import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
 import { t } from '../../locales/translations.utils.ts';
 import { vals } from '../../original/saving.ts';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
 import { view } from '../../views/main.view.ts';
 import { KeyboardKey } from '../hotkeys/KeyboardKey.ts';
 
-const TownControls = () => {
-  const [values] = createIntervalSignal({
-    townShowing: vals.townShowing as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8,
-    canMoveLeft: vals.townShowing > Math.min(...vals.townsUnlocked),
-    canMoveRight: vals.townShowing < Math.max(...vals.townsUnlocked),
-  }, () => ({
-    townShowing: vals.townShowing as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8,
-    canMoveLeft: vals.townShowing > Math.min(...vals.townsUnlocked),
-    canMoveRight: vals.townShowing < Math.max(...vals.townsUnlocked),
-  }));
+export namespace TownControlsNs {
+  type TownIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
-  const canMoveLeft = createMemo(() => values().canMoveLeft);
-  const canMoveRight = createMemo(() => values().canMoveRight);
-  const moveLeft = () => view.showTown(vals.townsUnlocked[vals.townsUnlocked.indexOf(vals.townShowing) - 1]);
-  const moveRight = () => view.showTown(vals.townsUnlocked[vals.townsUnlocked.indexOf(vals.townShowing) + 1]);
+  export const [index, setIndex] = createSignal<TownIndex>(0);
+  export const canSelectPrevious = () => index() > 0;
+  export const canSelectNext = () => index() < vals.townsUnlocked.length - 1;
+
+  export const selectPrevious = () => {
+    if (!canSelectPrevious()) return;
+    setIndex(index() - 1 as TownIndex);
+  };
+
+  export const selectNext = () => {
+    if (!canSelectNext()) return;
+    setIndex(index() + 1 as TownIndex);
+  };
+}
+
+const TownControls = () => {
+  const { index, canSelectPrevious, canSelectNext, selectPrevious, selectNext } = TownControlsNs;
 
   return (
     <div class='h-12 relative flex items-center justify-center gap-4 bg-amber-300 border-amber-500 border-b'>
-      <ButtonIcon disabled={canMoveLeft()} name='chevronLeft' onClick={moveLeft} />
-      <Label label={t(`towns.town${values().townShowing}.desc`)}>
+      <ButtonIcon disabled={canSelectPrevious()} name='chevronLeft' onClick={selectPrevious} />
+      <Label label={t(`towns.town${index()}.desc`)}>
         <select class='font-medium h-8 w-48 px-2 rounded-sm border-amber-500 border' id='TownSelect' />
       </Label>
-      <ButtonIcon disabled={canMoveRight()} name='chevronRight' onClick={moveRight} />
+      <ButtonIcon disabled={canSelectNext()} name='chevronRight' onClick={selectNext} />
       <ButtonIcon name='eyeSlash' class='absolute right-2' onClick={() => view.toggleHiding()}></ButtonIcon>
     </div>
   );
 };
 
-const ActionControls = () => {
+export namespace ActionControlsNs {
   enum Mode {
     Options = 'options',
     Stories = 'stories',
   }
+
   const [showMode, setShowMode] = createSignal<Mode>(Mode.Options);
-  const isOptions = createMemo(() => showMode() === Mode.Options);
-  const isStories = createMemo(() => showMode() === Mode.Stories);
-  const toggleOptions = () => setShowMode(isOptions() ? Mode.Stories : Mode.Options);
-  const toggleStories = () => setShowMode(isStories() ? Mode.Options : Mode.Stories);
+  export const isOptions = () => showMode() === Mode.Options;
+  export const isStories = () => showMode() === Mode.Stories;
+  export const toggleOptions = () => setShowMode(isOptions() ? Mode.Stories : Mode.Options);
+  export const toggleStories = () => setShowMode(isStories() ? Mode.Options : Mode.Stories);
+}
+
+const ActionControls = () => {
+  const { isOptions, isStories, toggleOptions, toggleStories } = ActionControlsNs;
 
   return (
     <Label label={t('actionList.tooltips.actionExplaination')}>
@@ -93,9 +102,7 @@ export const Towns = () => {
         <div id='actionOptionsTown7' class='actionOptions'></div>
         <div id='actionOptionsTown8' class='actionOptions'></div>
         <Show when={KeyboardKey.shift()}>
-          <div>
-            * {t('actionList.tooltips.addAtCap')}
-          </div>
+          <div>* {t('actionList.tooltips.addAtCap')}</div>
         </Show>
       </div>
       <div id='townActions'>

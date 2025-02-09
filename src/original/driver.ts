@@ -429,21 +429,12 @@ export function addMana(amount) {
 }
 
 export function addResource(resource, amount) {
-  console.log({ resource, amount });
-
   if (Number.isFinite(amount)) resources[resource] += amount;
   else resources[resource] = amount;
-
-  view.requestUpdate('updateResource', resource);
-
-  if (resource === 'teamMembers' || resource === 'armor' || resource === 'zombie') {
-    view.requestUpdate('updateTeamCombat', null);
-  }
 }
 
 export function resetResource(resource) {
   resources[resource] = resourcesTemplate[resource];
-  view.requestUpdate('updateResource', resource);
 }
 
 export function resetResources() {
@@ -452,8 +443,6 @@ export function resetResources() {
   if (getExploreProgress() >= 100 || prestigeValues['completedAnyPrestige']) {
     addResource('glasses', true);
   }
-
-  view.requestUpdate('updateResources', null);
 }
 
 export function selectLoadout(num) {

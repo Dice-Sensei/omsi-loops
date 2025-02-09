@@ -130,45 +130,19 @@ export class View {
     this.updateProgressActions();
     this.updateLockedHidden();
     this.showTown(0);
-    this.showActions(false);
     this.changeStatView();
     this.adjustGoldCosts();
     this.adjustExpGains();
-    this.updateTeamCombat();
     this.updateLoadoutNames();
     this.updateTrials();
-    if (vals.storyMax >= 12) {
-      setInterval(() => {
-        view.updateStories();
-        view.updateLockedHidden();
-      }, 20000);
-    } else {
-      setInterval(() => {
-        view.updateStories();
-        view.updateLockedHidden();
-      }, 2000);
-    }
+
+    setInterval(() => {
+      view.updateStories();
+      view.updateLockedHidden();
+    }, 2000);
+
     adjustAll();
     this.updateActionTooltips();
-    this.initActionLog();
-    document.body.removeEventListener('mouseover', this.mouseoverHandler);
-    document.body.addEventListener('mouseover', this.mouseoverHandler, { passive: true });
-    document.body.removeEventListener('focusin', this.mouseoverHandler);
-    document.body.addEventListener('focusin', this.mouseoverHandler, { passive: true });
-    globalThis.addEventListener('modifierkeychange', this.modifierkeychangeHandler);
-
-    this.tooltipTriggerMap = new WeakMap();
-    this.mouseoverCount = 0;
-  }
-
-  getClosestTrigger(element) {
-    let trigger = this.tooltipTriggerMap.get(element);
-    if (trigger == null) {
-      trigger = element.closest('.showthat,.showthatO,.showthat,.contains-popover,.showthatloadout,.showthatstory') ||
-        false;
-      this.tooltipTriggerMap.set(element, trigger);
-    }
-    return trigger;
   }
 
   requests = {
@@ -186,17 +160,13 @@ export class View {
     updateTotals: [],
     updateStories: [],
     updateGlobalStory: [],
-    updateActionLogEntry: [],
     updateCurrentActionBar: [],
     updateCurrentActionsDivs: [],
     updateTotalTicks: [],
     updateCurrentActionLoops: [],
-    updateResource: [],
-    updateResources: [],
     updateActionTooltips: [],
     updateLockedHidden: [],
     updateTravelMenu: [],
-    updateTeamCombat: [],
     adjustManaCost: [],
     adjustGoldCost: [],
     adjustGoldCosts: [],
@@ -313,8 +283,6 @@ export class View {
       const varName = town.progressVars.find((v) => v.startsWith('Survey'));
       this.updateGlobalSurvey(varName, town);
     }
-  }
-  updateTeamCombat() {
   }
   zoneTints = [
     'var(--zone-tint-1)', //Beginnersville
@@ -650,17 +618,9 @@ export class View {
     }
   }
 
-  actionLogClearHTML;
-
-  actionLogObserver;
-  initActionLog() {
-  }
-
   recordScrollPosition() {
     const { scrollTop, scrollHeight, clientHeight } = this;
     this.lastScroll = { scrollTop, scrollHeight, clientHeight };
-  }
-  updateActionLogEntry() {
   }
 
   mouseoverAction(index, isShowing) {
@@ -842,23 +802,12 @@ export class View {
   showTown(townNum) {
     if (!towns[townNum].unlocked()) return;
 
-    // if (townNum === 0) {
-    //   document.getElementById('townViewLeft').style.visibility = 'hidden';
-    // } else {
-    //   document.getElementById('townViewLeft').style.visibility = '';
-    // }
-
-    // if (townNum === Math.max(...vals.townsUnlocked)) {
-    //   document.getElementById('townViewRight').style.visibility = 'hidden';
-    // } else {
-    //   document.getElementById('townViewRight').style.visibility = '';
-    // }
-
     for (let i = 0; i < actionOptionsTown.length; i++) {
       actionOptionsTown[i].style.display = 'none';
       actionStoriesTown[i].style.display = 'none';
       townInfos[i].style.display = 'none';
     }
+
     if (vals.actionStoriesShowing) actionStoriesTown[townNum].style.display = '';
     else actionOptionsTown[townNum].style.display = '';
 
@@ -866,28 +815,6 @@ export class View {
     $('#TownSelect').val(townNum);
 
     vals.townShowing = townNum;
-  }
-
-  showActions(stories) {
-    // for (let i = 0; i < actionOptionsTown.length; i++) {
-    //   actionOptionsTown[i].style.display = 'none';
-    //   actionStoriesTown[i].style.display = 'none';
-    // }
-
-    // if (stories) {
-    //   document.getElementById('actionsViewLeft').style.visibility = '';
-    //   document.getElementById('actionsViewRight').style.visibility = 'hidden';
-    //   actionStoriesTown[vals.townShowing].style.display = '';
-    // } else {
-    //   document.getElementById('actionsViewLeft').style.visibility = 'hidden';
-    //   document.getElementById('actionsViewRight').style.visibility = '';
-    //   actionOptionsTown[vals.townShowing].style.display = '';
-    // }
-
-    // document.getElementById('actionsTitle').textContent = Localization.txt(
-    //   `actions>title${stories ? '_stories' : ''}`,
-    // );
-    // vals.actionStoriesShowing = stories;
   }
 
   toggleHiding() {

@@ -1021,7 +1021,7 @@ export const translationsEn = {
     moveToNextTown: 'Move to next town',
     moveToPreviousTown: 'Move to previous town',
     showActions: 'Show actions',
-    hideActions: 'Hide actions',
+    showStories: 'Show stories',
     undoLastAction: 'Undo last action',
   },
   statistics: {
