@@ -15,33 +15,13 @@ import {
   toggleOffline,
 } from '../../original/driver.ts';
 import { actionAmount, setActionAmount } from '../../values.ts';
+import { KeyboardKey } from './KeyboardKey.ts';
 
-export function setShiftKey(value: boolean): void {
-  if (KeyboardKey.shift === value) return;
-  KeyboardKey.shift = value;
-
-  document.documentElement.classList.toggle('shift-key-pressed', value);
-  globalThis.dispatchEvent(new Event('modifierkeychange'));
-}
-
-export function setControlKey(value: boolean): void {
-  if (KeyboardKey.control === value) return;
-  KeyboardKey.control = value;
-
-  document.documentElement.classList.toggle('control-key-pressed', value);
-  globalThis.dispatchEvent(new Event('modifierkeychange'));
-}
-
-export function moveToTown(townNum: number | undefined): void {
+function moveToTown(townNum: number | undefined): void {
   if (townNum === undefined) return;
   if (!vals.townsUnlocked.includes(townNum)) return;
 
   view.showTown(townNum);
-}
-
-export namespace KeyboardKey {
-  export let shift = false;
-  export let control = false;
 }
 
 export const createKeyboardHotkeys = () => {
@@ -180,21 +160,21 @@ export const createKeyboardHotkeys = () => {
       combination: 'shift+c',
     }, {
       onDown: {
-        fn: () => setShiftKey(true),
+        fn: () => KeyboardKey.setShift(true),
         description: t('shortcuts.toggleShiftKeyOn'),
       },
       onUp: {
-        fn: () => setShiftKey(false),
+        fn: () => KeyboardKey.setShift(false),
         description: t('shortcuts.toggleShiftKeyOff'),
       },
       combination: 'shift',
     }, {
       onDown: {
-        fn: () => setControlKey(true),
+        fn: () => KeyboardKey.setControl(true),
         description: t('shortcuts.toggleControlKeyOn'),
       },
       onUp: {
-        fn: () => setControlKey(false),
+        fn: () => KeyboardKey.setControl(false),
         description: t('shortcuts.toggleControlKeyOff'),
       },
       combination: ['ctrl', 'command'],
@@ -243,9 +223,6 @@ export const createKeyboardHotkeys = () => {
     }]);
 
   Listeners.add('focus', () => {
-    setShiftKey(false);
-    setControlKey(false);
-
     checkExtraSpeed();
   });
 

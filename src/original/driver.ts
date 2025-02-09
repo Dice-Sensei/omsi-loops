@@ -35,7 +35,7 @@ import {
   vals,
 } from './saving.ts';
 import { Data } from './data.ts';
-import { KeyboardKey } from '../modules/hotkeys/keyboard.hotkeys.ts';
+import { KeyboardKey } from '../modules/hotkeys/KeyboardKey.ts';
 import { Localization } from './localization.ts';
 import { beep, clamp, copyArray, Mana } from './helpers.ts';
 import { actions, actionStory, getNumOnList, markActionsComplete } from './actions.ts';
@@ -410,9 +410,9 @@ export function addActionToList(name, townNum, isTravelAction?: boolean, insertA
         } else {
           const index = actions.addAction(name, addAmount, insertAtIndex);
           view.requestUpdate('highlightAction', index);
-          if (KeyboardKey.shift && hasLimit(name)) {
+          if (KeyboardKey.shift() && hasLimit(name)) {
             capAmount(index, townNum);
-          } else if (KeyboardKey.shift && isTraining(name)) {
+          } else if (KeyboardKey.shift() && isTraining(name)) {
             capTraining(index);
           }
         }
@@ -524,7 +524,7 @@ export function loadList() {
   view.adjustDarkRitualText();
 }
 export function clearList() {
-  actions.clearActions(KeyboardKey.shiftDown ? ((a) => (a.disabled || a.loops === 0)) : null);
+  actions.clearActions(KeyboardKey.shift() ? ((a) => (a.disabled || a.loops === 0)) : null);
   view.updateNextActions();
 }
 export function unlockTown(townNum) {

@@ -1670,4 +1670,10 @@ export const translationsEn = {
       loadPrevious: 'Load previous entries...',
     },
   },
+  actionList: {
+    actions: {
+      clearAll: 'Clear list',
+      clearDisabled: 'Clear disabled',
+    },
+  },
 } as const;

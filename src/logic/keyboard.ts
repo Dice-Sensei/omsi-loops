@@ -1,3 +1,4 @@
+import { shift } from '@floating-ui/dom';
 import { Listeners } from './listeners.ts';
 
 export namespace Keyboard {
@@ -60,11 +61,7 @@ export namespace Keyboard {
         attach({
           handler: async (event: KeyboardEvent) => {
             if (!repeatable && event.repeat) return;
-            if (useShift && !event.shiftKey) return;
-            if (useControl && !event.ctrlKey) return;
-            if (useAlt && !event.altKey) return;
-            if (useMeta && !event.metaKey) return;
-            if (useKey && key !== event.key) return;
+            if (useKey && key !== event.key.toLowerCase()) return;
 
             await onUp.fn(event);
           },

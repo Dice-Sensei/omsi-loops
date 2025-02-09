@@ -35,7 +35,7 @@ import { isBuffName, saveUISettings, vals } from '../original/saving.ts';
 import $ from 'jquery';
 import * as d3 from 'd3';
 import { Localization } from '../original/localization.ts';
-import { KeyboardKey } from '../modules/hotkeys/keyboard.hotkeys.ts';
+import { KeyboardKey } from '../modules/hotkeys/KeyboardKey.ts';
 import { getPrestigeCost, getPrestigeCurrentBonus, prestigeValues } from '../original/prestige.ts';
 import { camelize, formatNumber, intToString, intToStringRound, toSuffix } from '../original/helpers.ts';
 import { getNumOnList } from '../original/actions.ts';
@@ -193,20 +193,6 @@ export class View {
 
     this.tooltipTriggerMap = new WeakMap();
     this.mouseoverCount = 0;
-  }
-
-  constructor() {
-    this.mouseoverHandler = this.mouseoverHandler.bind(this);
-    this.modifierkeychangeHandler = this.modifierkeychangeHandler.bind(this);
-  }
-
-  mouseoverHandler() {
-  }
-
-  modifierkeychangeHandler() {
-    document.getElementById('clearList').textContent = KeyboardKey.shift
-      ? Localization.txt('actions>tooltip>clear_disabled')
-      : Localization.txt('actions>tooltip>clear_list');
   }
 
   getClosestTrigger(element) {

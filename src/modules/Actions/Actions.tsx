@@ -4,6 +4,7 @@ import { t } from '../../locales/translations.utils.ts';
 import { capAllTraining, clearList, loadList, nameList, saveList, selectLoadout } from '../../original/driver.ts';
 import { setOption } from '../../original/saving.ts';
 import { actionAmount, setActionAmount } from '../../values.ts';
+import { KeyboardKey } from '../hotkeys/KeyboardKey.ts';
 
 export const Actions = () => {
   return (
@@ -115,14 +116,9 @@ export const Actions = () => {
             data-locale='actions>tooltip>max_training'
           >
           </button>
-          <button
-            id='clearList'
-            class='button localized'
-            style='margin-right: 0px'
-            onClick={() => clearList()}
-            data-locale='actions>tooltip>clear_list'
-          >
-          </button>
+          <Button onClick={() => clearList()}>
+            {KeyboardKey.shift() ? t('actionList.actions.clearAll') : t('actionList.actions.clearDisabled')}
+          </Button>
           <div tabindex='0' class='showthatloadout'>
             Manage Loadouts
             <div class='showthisloadout'>
