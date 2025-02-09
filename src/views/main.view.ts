@@ -770,9 +770,6 @@ export class View {
     }
   }
 
-  toggleHidden(varName: string, force?: boolean) {
-  }
-
   updateRegular(updateInfo) {
     const varName = updateInfo.name;
     const index = updateInfo.index;
@@ -859,13 +856,6 @@ export class View {
     progressDiv.id = `infoContainer${action.varName}${varSuffix}`;
     progressDiv.style.display = '';
     progressDiv.innerHTML = totalDivText;
-
-    requestAnimationFrame(() => {
-      const id = `${action.varName}${varSuffix}`;
-
-      const hidevarButton = document.getElementById(`hideVarButton${id}`) as HTMLDivElement;
-      hidevarButton.onclick = () => view.toggleHidden(id);
-    });
 
     townInfos[action.townNum].appendChild(progressDiv);
     if (towns[action.townNum].hiddenVars.has(`${action.varName}${varSuffix}`)) {
@@ -1172,16 +1162,7 @@ export class View {
     infoDiv.style.display = '';
     infoDiv.innerHTML = totalInfoText;
 
-    requestAnimationFrame(() => {
-      const hidevarButton = document.getElementById(`hideVarButton${action.varName}`) as HTMLDivElement;
-
-      hidevarButton.onclick = () => view.toggleHidden(`${action.varName}`);
-    });
-
     townInfos[action.townNum].appendChild(infoDiv);
-    if (towns[action.townNum].hiddenVars.has(action.varName)) {
-      infoDiv.classList.add('user-hidden');
-    }
   }
 
   createMultiPartPBar(action) {
@@ -1228,9 +1209,6 @@ export class View {
     progressDiv.innerHTML = totalDivText;
 
     requestAnimationFrame(() => {
-      const hidevarButton = document.getElementById(`hideVarButton${action.varName}`) as HTMLDivElement;
-      hidevarButton.onclick = () => view.toggleHidden(`${action.varName}`);
-
       const completedInfo = document.getElementById(`completedInfo${action.varName}`) as HTMLDivElement;
       if (action.varName === 'SDungeon') {
         completedInfo.onmouseover = () => view.showDungeon(0);
@@ -1245,9 +1223,6 @@ export class View {
     });
 
     townInfos[action.townNum].appendChild(progressDiv);
-    if (towns[action.townNum].hiddenVars.has(action.varName)) {
-      progressDiv.firstElementChild.classList.add('user-hidden');
-    }
   }
 
   updateMultiPartActions() {
