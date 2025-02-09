@@ -946,63 +946,13 @@ export class View {
 
   actionLogObserver;
   initActionLog() {
-    const log = document.getElementById('actionLog');
-    this.actionLogClearHTML ??= log.innerHTML;
-    this.actionLogObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target !== log) continue;
-        // console.log(entry,entry.target,log,log.scrollTop,log.scrollHeight,log.clientHeight,log.lastScroll);
-        // check the most recent position of the scroll bottom
-        const { scrollTop, scrollHeight, clientHeight, lastScroll } = log;
-        const lastScrollBottom = lastScroll
-          ? lastScroll.scrollHeight - (lastScroll.scrollTop + lastScroll.clientHeight)
-          : 0;
-        // check the current position
-        const scrollBottom = scrollHeight - (scrollTop + clientHeight);
-        // shift by that delta
-        log.scrollTop += scrollBottom - lastScrollBottom;
-      }
-    });
-    this.actionLogObserver.observe(log);
-    log.addEventListener('scroll', this.recordScrollPosition, { passive: true });
-    log.addEventListener('scrollend', this.recordScrollPosition, { passive: true });
   }
 
   recordScrollPosition() {
     const { scrollTop, scrollHeight, clientHeight } = this;
     this.lastScroll = { scrollTop, scrollHeight, clientHeight };
   }
-  updateActionLogEntry(index) {
-    const log = document.getElementById('actionLog');
-    this.actionLogClearHTML ??= log.innerHTML;
-    if (index === 'clear') {
-      log.innerHTML = this.actionLogClearHTML; // nuke it, dot it
-    }
-    const entry = actionLog.getEntry(index);
-    if (actionLog.hasPrevious()) {
-      log.classList.add('hasPrevious');
-    } else {
-      log.classList.remove('hasPrevious');
-    }
-    if (!entry) return;
-    let element = document.getElementById(`actionLogEntry${index}`);
-    if (element) {
-      entry.element = element;
-      entry.updateElement();
-    } else {
-      element = entry.createElement();
-      element.id = `actionLogEntry${index}`;
-      element.style.order = index;
-
-      const nextEntry = document.getElementById(`actionLogEntry${index + 1}`);
-      log.insertBefore(element, nextEntry ?? document.getElementById('actionLogLatest'));
-    }
-    if ((actionLog.firstNewOrUpdatedEntry ?? Infinity) <= index) {
-      element.classList.add('highlight');
-      // this is just causing problems right now. disable, it's not all that important if scroll anchors work properly
-      // element.scrollIntoView({block: "nearest", inline: "nearest", behavior: "auto"});
-      setTimeout(() => element.classList.remove('highlight'), 1);
-    }
+  updateActionLogEntry() {
   }
 
   mouseoverAction(index, isShowing) {

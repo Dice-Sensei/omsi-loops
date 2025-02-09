@@ -1661,4 +1661,13 @@ export const translationsEn = {
       },
     ],
   },
+  actionLog: {
+    title: 'Action Log',
+    messages: {
+      latest: 'End of log',
+    },
+    actions: {
+      loadPrevious: 'Load previous entries...',
+    },
+  },
 } as const;

@@ -1,59 +1,28 @@
 import { vals } from './saving.ts';
-import { view } from '../views/main.view.ts';
 import { Localization } from './localization.ts';
 import { extractStrings, formatNumber, intToString, restoreStrings } from './helpers.ts';
 import { getActionPrototype, getXMLName, townNames } from './actionList.ts';
 import { Buff } from './stats.ts';
 
 export class ActionLog {
-  /** @type {ActionLogEntry[]} */
   entries = [];
-  /** @type {Record<string, UniqueLogEntry>} */
   #uniqueEntries = {};
-  /** @type {number | null} */
-  firstNewOrUpdatedEntry = null;
-  /** @type {number | null} */
-  earliestShownEntry = null;
 
-  /**
-   * @template {ActionLogEntry} T
-   * @param {T} entry
-   * @param {boolean} init
-   * @returns {T}
-   */
-  addEntry(entry, init) {
+  addEntry(entry) {
     if (entry instanceof UniqueLogEntry) {
-      if (entry.key in this.#uniqueEntries) return /** @type {any} */ (this.#uniqueEntries[entry.key]);
+      if (entry.key in this.#uniqueEntries) return this.#uniqueEntries[entry.key];
       this.#uniqueEntries[entry.key] = entry;
     }
+
     if (entry.entryIndex === null) {
       entry.entryIndex = this.entries.length;
       this.entries.push(entry);
     }
-    if (!init && vals.options.actionLog) {
-      this.firstNewOrUpdatedEntry = Math.min(this.firstNewOrUpdatedEntry ?? Infinity, entry.entryIndex);
-      this.earliestShownEntry ??= entry.entryIndex;
-      if (this.earliestShownEntry > entry.entryIndex + 1) {
-        this.loadHistoryBackTo(entry.entryIndex + 1);
-      }
-      view.requestUpdate('updateActionLogEntry', entry.entryIndex);
-    }
+
     return entry;
   }
 
-  hasPrevious() {
-    if (this.entries.length === 0) return false;
-    return this.earliestShownEntry == null || this.earliestShownEntry > 0;
-  }
-
   getEntry(index) {
-    if (index === 'clear') {
-      this.firstNewOrUpdatedEntry = null;
-      this.earliestShownEntry = null;
-      return null;
-    } else if (index < (this.earliestShownEntry ?? Infinity)) {
-      this.earliestShownEntry = index;
-    }
     return this.entries[index];
   }
 
@@ -64,62 +33,41 @@ export class ActionLog {
   initialize() {
     this.entries = [];
     this.#uniqueEntries = {};
-    this.firstNewOrUpdatedEntry = null;
-    this.earliestShownEntry = null;
-    view.requestUpdate('updateActionLogEntry', 'clear');
   }
 
-  /** @param {unknown} data  */
   load(data) {
     this.initialize();
+
     if (!Array.isArray(data)) return;
+
     for (const entryData of restoreStrings(data)) {
       const entry = ActionLogEntry.create(entryData);
-      if (entry) {
-        this.addOrUpdateEntry(entry, true);
-      }
+
+      if (entry) this.addOrUpdateEntry(entry);
     }
   }
 
   loadHistory(count) {
-    this.earliestShownEntry ??= this.entries.length;
-    this.loadHistoryBackTo(this.earliestShownEntry - count);
   }
 
   loadHistoryBackTo(index) {
-    this.earliestShownEntry ??= this.entries.length;
-    while (this.earliestShownEntry > Math.max(0, index)) {
-      view.requestUpdate('updateActionLogEntry', --this.earliestShownEntry);
-    }
   }
 
   loadRecent() {
-    this.earliestShownEntry ??= this.entries.length;
-    while (
-      this.earliestShownEntry > 0 &&
-      (this.entries[this.earliestShownEntry - 1].repeatable || this.earliestShownEntry > this.entries.length - 3)
-    ) {
-      view.requestUpdate('updateActionLogEntry', --this.earliestShownEntry);
-    }
   }
 
-  /**
-   * @template {ActionLogEntry} T
-   * @param {T} entry
-   * @param {boolean} init
-   * @returns {T}
-   */
-  addOrUpdateEntry(entry, init) {
+  addOrUpdateEntry(entry) {
     for (let i = this.entries.length - 1; i >= 0; i--) {
       const other = this.entries[i];
       if (other instanceof RepeatableLogEntry && other.canMerge(entry)) {
         other.merge(entry);
-        return this.addEntry(other, init);
+        return this.addEntry(other);
       } else if (!other.repeatable) {
         break;
       }
     }
-    return this.addEntry(entry, init);
+
+    return this.addEntry(entry);
   }
 
   addActionStory(action, storyindex, init) {
@@ -132,22 +80,19 @@ export class ActionLog {
     this.addEntry(entry, false);
   }
 
-  /** @type {(action: Action, stat: StatName, count: number, init?: boolean) => void} */
-  addSoulstones(action, stat, count, init = false) {
+  addSoulstones(action, stat, count) {
     const entry = new SoulstoneEntry(action).addSoulstones(stat, count);
-    this.addOrUpdateEntry(entry, init);
+    this.addOrUpdateEntry(entry);
   }
 
-  /** @type {(action: Action, skill: SkillName, toLevel: number, fromLevel?: number, init?: boolean) => void} */
-  addSkillLevel(action, skill, toLevel, fromLevel, init) {
+  addSkillLevel(action, skill, toLevel, fromLevel) {
     const entry = new SkillEntry(action, skill, toLevel, fromLevel);
-    this.addOrUpdateEntry(entry, init);
+    this.addOrUpdateEntry(entry);
   }
 
-  /** @type {(action: Action, buff: BuffName, toAmt: number, fromAmt: number, spendType?:BuffEntry["statSpendType"], statsSpent?: SoulstoneEntry["stones"]) => void} */
   addBuff(action, buff, toAmt, fromAmt, spendType, statsSpent) {
     const entry = new BuffEntry(action, buff, toAmt, fromAmt, undefined, statsSpent, spendType);
-    this.addOrUpdateEntry(entry, false);
+    this.addOrUpdateEntry(entry);
   }
 }
 

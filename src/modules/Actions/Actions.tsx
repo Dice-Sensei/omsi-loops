@@ -295,8 +295,7 @@ export const Actions = () => {
             id='predictorTrackedStatInput'
             class='button'
             onchange={({ target: { value } }) => setOption('predictorTrackedStat', value)}
-          >
-          </select>
+          />
         </div>
       </div>
     </div>

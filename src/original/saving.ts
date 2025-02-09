@@ -222,7 +222,7 @@ const optionValueHandlers = {
     if (!init) recalcInterval(value);
   },
   actionLog(value, init) {
-    document.getElementById('actionLogContainer').style.display = value ? '' : 'none';
+    // document.getElementById('actionLogContainer').style.display = value ? '' : 'none';
   },
   predictor(value, init) {
     localStorage['loadPredictor'] = value || '';
