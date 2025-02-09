@@ -1,4 +1,3 @@
-import { Show } from 'solid-js';
 import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
 import { et } from '../../locales/translations.utils.ts';
 import { resources, towns } from '../../original/globals.ts';
