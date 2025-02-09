@@ -4,7 +4,6 @@ import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
 import { et } from '../../locales/translations.utils.ts';
 import { getPrcToNextSkillLevel, getSelfCombat, getSkillLevel, getTeamCombat } from '../../original/stats.ts';
 import { createIntervalSignal } from '../../signals/createInterval.ts';
-import { view } from '../../views/main.view.ts';
 import { skills } from '../../original/globals.ts';
 
 const t = et('statistics');

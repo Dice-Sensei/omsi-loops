@@ -79,20 +79,7 @@ import {
 } from '../original/driver.ts';
 import { Koviko } from '../original/predictor.ts';
 
-const DarkRitualDescription = [
-  `10% faster in Beginnersville per ritual from 1-20<br>`,
-  `5% faster in the Forest Path per ritual from 21-40<br>`,
-  `2.5% faster in Merchanton per ritual from 41-60<br>`,
-  `1.5% faster in Mt. Olympus per ritual from 61-80<br>`,
-  `1.0% faster in Valhalla per ritual from 81-100<br>`,
-  `0.5% faster in Startington per ritual from 101-150<br>`,
-  `0.5% faster in Jungle Path per ritual from 151-200<br>`,
-  `0.5% faster in Commerceville per ritual from 201-250<br>`,
-  `0.5% faster in Valley of Olympus per ritual from 251-300<br>`,
-  `0.1% faster globally per ritual from 301-666`,
-];
-
-export function formatTime(seconds) {
+export function formatTime(seconds: number) {
   if (seconds > 300) {
     let second = Math.floor(seconds % 60);
     let minute = Math.floor(seconds / 60 % 60);
@@ -580,16 +567,16 @@ export class View {
     // const element = document.getElementById(`${resource}Div`, false, false);
     // if (element) element.style.display = resources[resource] ? 'inline-block' : 'none';
 
-    if (resource === 'supplies') {
-      document.getElementById('suppliesCost').textContent = String(towns[0].suppliesCost);
-    }
-    if (resource === 'teamMembers') {
-      document.getElementById('teamCost').textContent = `${(resources.teamMembers + 1) * 100}`;
-    }
+    // if (resource === 'supplies') {
+    //   document.getElementById('suppliesCost').textContent = towns[0].suppliesCost;
+    // }
+    // if (resource === 'teamMembers') {
+    //   document.getElementById('teamCost').textContent = `${(resources.teamMembers + 1) * 100}`;
+    // }
 
-    if (Number.isFinite(resources[resource])) {
-      document.getElementById(resource).textContent = resources[resource];
-    }
+    // if (Number.isFinite(resources[resource])) {
+    //   document.getElementById(resource).textContent = resources[resource];
+    // }
   }
   updateResources() {
     for (const resource in resources) this.updateResource(resource);
@@ -1139,7 +1126,7 @@ export class View {
     actionLog.addGlobalStory(num);
   }
 
-  updateStories(init) {
+  updateStories(init: boolean) {
     // several ms cost per run. run once every 2000ms on an interval
     for (const action of vals.totalActionList) {
       if (action.storyReqs !== undefined) {

@@ -931,182 +931,6 @@ export const translationsEn = {
       action_log: 'Log',
       stats: 'Stats',
     },
-    tracked_resources: {
-      reset_on_restart_txt: 'Resets when the loop restarts.',
-      resources: {
-        power: {
-          label: 'Divine Power',
-          title: '<img src="icons/power.svg" class="smallIcon">',
-          desc: 'Powers of the gods.',
-          initially_hidden: true,
-        },
-        timer: {
-          label: 'Mana',
-          title: 'Mana:',
-          desc: 'Your main resource. The higher your mana, the more you can do before reset.',
-          no_reset_on_restart: true,
-        },
-        gold: {
-          label: 'Gold',
-          title: 'Gold:',
-          desc: 'Coins to buy mana crystals and other items with.',
-        },
-        reputation: {
-          label: 'Reputation',
-          title: 'Reputation:',
-          desc: 'The influence you have over the people in town.',
-          initially_hidden: true,
-        },
-        herbs: {
-          label: 'Herbs',
-          title: 'Herbs:',
-          desc: "The beneficial plants you've found.",
-          initially_hidden: true,
-        },
-        hide: {
-          label: 'Hide',
-          title: 'Hide:',
-          desc: 'Results of successful hunting.',
-          initially_hidden: true,
-        },
-        potions: {
-          label: 'Potions',
-          title: 'Potions:',
-          desc: 'Rare, but not complex. Worth some money.',
-          initially_hidden: true,
-        },
-        teamMembers: {
-          label: 'Team Members',
-          title: 'Team Members:',
-          desc: "You know their personalities and fighting style. They don't know your name.",
-          initially_hidden: true,
-        },
-        armor: {
-          label: 'Armor',
-          title: 'Armor:',
-          desc: 'Crafted by your own hand, it protects you from dangers.',
-          initially_hidden: true,
-        },
-        blood: {
-          label: 'Blood',
-          title: 'Blood:',
-          desc: 'Regaled for its regenerative properties.',
-          initially_hidden: true,
-        },
-        artifacts: {
-          label: 'Artifacts',
-          title: 'Artifacts:',
-          desc: "Various old rings, bracelets, amulets, and pendants. They look like they're worth a pretty penny.",
-          initially_hidden: true,
-        },
-        favors: {
-          label: 'Favors',
-          title: 'Favors:',
-          desc: "You've been generous to important people.",
-          initially_hidden: true,
-        },
-        enchantments: {
-          label: 'Enchanted Armor',
-          title: 'Enchanted Armor:',
-          desc: 'Divinely blessed weapons and armor, like a hero of legend.',
-          initially_hidden: true,
-        },
-        houses: {
-          label: 'Houses',
-          title: 'Houses:',
-          desc: 'Property constructed in Valhalla. You can collect taxes from tenants.',
-          initially_hidden: true,
-        },
-        pylons: {
-          label: 'Pylons',
-          title: 'Pylons:',
-          desc: 'Lingering fragments from the destroyed pylon.',
-          initially_hidden: true,
-        },
-        zombie: {
-          label: 'Zombies',
-          title: 'Zombies:',
-          desc: 'A shambling pile of deceased flesh. Super gross.',
-          initially_hidden: true,
-        },
-        map: {
-          label: 'Maps',
-          title: 'Maps:',
-          desc: "A cartographer's kit that can be used to survey areas and discover new secrets.",
-          initially_hidden: true,
-        },
-        completedMap: {
-          label: 'Finished Maps',
-          title: 'Finished Maps:',
-          desc:
-            "You've mapped out some part of the world. The Explorer's guild would happily buy this knowledge off of you.",
-          initially_hidden: true,
-        },
-        heart: {
-          label: 'Beating Hearts',
-          title: '<img src="icons/heart.svg" class="smallIcon">',
-          desc: "The still-beating heart of your target. The Assassin's guild will reward you for this.",
-          initially_hidden: true,
-        },
-        glasses: {
-          label: 'Glasses',
-          title: '<img src="icons/buyGlasses.svg" class="smallIcon">',
-          desc: 'Woah, trees have so many leaves on them.',
-          initially_hidden: true,
-          no_count: true,
-        },
-        supplies: {
-          label: 'Travel Supplies',
-          title: '<img src="icons/buySupplies.svg" class="smallIcon">',
-          desc: 'Needed to go to the next town.',
-          initially_hidden: true,
-          no_count: true,
-        },
-        pickaxe: {
-          label: 'Pickaxe',
-          title: '<img src="icons/buyPickaxe.svg" class="smallIcon">',
-          desc: "It's heavy, but you can make use of it.",
-          initially_hidden: true,
-          no_count: true,
-        },
-        loopingPotion: {
-          label: 'Looping Potion',
-          title: '<img src="icons/loopingPotion.svg" class="smallIcon">',
-          desc:
-            "It's a potion made with the very same formula that got you into this mess. Why exactly did you make this?",
-          initially_hidden: true,
-          no_count: true,
-        },
-        citizenship: {
-          label: 'Valhalla Citizenship',
-          title: '<img src="icons/seekCitizenship.svg" class="smallIcon">',
-          desc: "You're one of Valhalla's proud citizens now, giving you the right to fight in their honor.",
-          initially_hidden: true,
-          no_count: true,
-        },
-        pegasus: {
-          label: 'Pegasus',
-          title: '<img src="icons/pegasus.svg" class="smallIcon">',
-          desc: 'A horse with great angelic wings. It can run across clouds as easily as dirt.',
-          initially_hidden: true,
-          no_count: true,
-        },
-        key: {
-          label: 'Commerceville Key',
-          title: '<img src="icons/purchaseKey.svg" class="smallIcon">',
-          desc: 'Needed to go to the next town.',
-          initially_hidden: true,
-          no_count: true,
-        },
-        stone: {
-          label: 'Temporal Stone',
-          title: '<img src="icons/temporalStone.svg" class="smallIcon">',
-          desc: 'A strange rock that seems unaffected by the time loops.',
-          initially_hidden: true,
-          no_count: true,
-        },
-      },
-    },
   },
   towns: {
     town0: {
@@ -1202,8 +1026,23 @@ export const translationsEn = {
   },
   statistics: {
     sections: {
+      resources: {
+        sections: {
+          consumables: {
+            title: 'Consumable',
+            description: 'Temporary resources that can be used to execute actions.',
+          },
+          tools: {
+            title: 'Tools',
+            description: 'Permanent items that can be used to help you on the way.',
+          },
+        },
+        title: 'Resources',
+        description: 'Your resources.',
+      },
       attributes: {
         title: 'Attributes',
+
         description: `
           Each stat level reduces the relevant part of an action's mana cost by a percentage. Talent exp gain is equal to 1%
           of stat exp gain, and persists through loops. Talent multiplies xp gain by (1+(talentLevel)^0.4/3). XP gain
@@ -1220,6 +1059,119 @@ export const translationsEn = {
       },
       buffs: {
         title: 'Buffs',
+      },
+    },
+    resources: {
+      power: {
+        name: 'Power',
+        description: 'Power of gods.',
+      },
+      mana: {
+        name: 'Mana',
+        description: 'Your main resource. The higher your mana, the more you can do before reset.',
+      },
+      gold: {
+        name: 'Gold',
+        description: 'Coins to buy mana crystals and other items with.',
+      },
+      reputation: {
+        name: 'Reputation',
+        description: 'The influence you have over the people in town.',
+      },
+      herbs: {
+        name: 'Herbs',
+        description: "The beneficial plants you've found.",
+      },
+      hides: {
+        name: 'Hides',
+        description: 'Results of successful hunting.',
+      },
+      potions: {
+        name: 'Potions',
+        description: 'Rare, but not complex. Worth some money.',
+      },
+      teamMembers: {
+        name: 'Team Members',
+        description: "You know their personalities and fighting style. They don't know your name.",
+      },
+      armor: {
+        name: 'Armor',
+        description: 'Crafted by your own hand, it protects you from dangers.',
+      },
+      blood: {
+        name: 'Blood',
+        description: 'The lifeblood of your body.',
+      },
+      artifacts: {
+        name: 'Artifacts',
+        description:
+          "Various old rings, bracelets, amulets, and pendants. They look like they're worth a pretty penny.",
+      },
+      favors: {
+        name: 'Favors',
+        description: "You've been generous to important people.",
+      },
+      enchantments: {
+        name: 'Enchanted Armor',
+        description: 'Divinely blessed weapons and armor, like a hero of legend.',
+      },
+      houses: {
+        name: 'Houses',
+        description: 'A place to call home.',
+      },
+      pylons: {
+        name: 'Pylons',
+        description: 'Lingering fragments from the destroyed pylon.',
+      },
+      zombies: {
+        name: 'Zombies',
+        description: 'A shambling pile of deceased flesh. Super gross.',
+      },
+      maps: {
+        name: 'Maps',
+        description: "A cartographer's kit that can be used to survey areas and discover new secrets.",
+      },
+      finishedMaps: {
+        name: 'Finished Maps',
+        description:
+          "You've mapped out some part of the world. The Explorer's guild would happily buy this knowledge off of you.",
+      },
+      hearts: {
+        name: 'Hearts',
+        description: "The still-beating heart of your target. The Assassin's guild will reward you for this.",
+      },
+      glasses: {
+        name: 'Glasses',
+        description: 'Woah, trees have so many leaves on them.',
+      },
+      supplies: {
+        name: 'Supplies',
+        description: 'Needed to go to the next town.',
+      },
+      pickaxe: {
+        name: 'Pickaxe',
+        description: "It's heavy, but you can make use of it.",
+      },
+      loopingPotion: {
+        name: 'Looping Potion',
+        description:
+          "It's a potion made with the very same formula that got you into this mess. Why exactly did you make this?",
+      },
+      citizenship: {
+        name: 'Citizenship',
+        description: "You're one of Valhalla's proud citizens now, giving you the right to fight in their honor.",
+      },
+      pegasus: {
+        name: 'Pegasus',
+        description: 'A horse with great angelic wings. It can run across clouds as easily as dirt.',
+      },
+      key: {
+        name: 'Key',
+        description: 'Needed to go to the next town.',
+      },
+      temporalStone: {
+        name: 'Temporal Stone',
+        description: 'A strange rock that seems unaffected by the time loops.',
       },
     },
     attributes: {
@@ -1539,9 +1491,6 @@ export const translationsEn = {
       lag_warning: 'Lag detected! Current effective game speed is {lagSpeed}x.',
     },
   },
-  tracked_resources: {
-    reset_on_restart_txt: 'Resets when the loop restarts.',
-  },
   modals: {
     welcome: {
       title: 'Introduction',
@@ -1711,123 +1660,5 @@ export const translationsEn = {
         `,
       },
     ],
-  },
-  resources: {
-    power: {
-      name: 'Power',
-      description: 'Power of gods.',
-    },
-    mana: {
-      name: 'Mana',
-      description: 'Your main resource. The higher your mana, the more you can do before reset.',
-    },
-    gold: {
-      name: 'Gold',
-      description: 'Coins to buy mana crystals and other items with.',
-    },
-    reputation: {
-      name: 'Reputation',
-      description: 'The influence you have over the people in town.',
-    },
-    herbs: {
-      name: 'Herbs',
-      description: "The beneficial plants you've found.",
-    },
-    hides: {
-      name: 'Hides',
-      description: 'Results of successful hunting.',
-    },
-    potions: {
-      name: 'Potions',
-      description: 'Rare, but not complex. Worth some money.',
-    },
-    teamMembers: {
-      name: 'Team Members',
-      description: "You know their personalities and fighting style. They don't know your name.",
-    },
-    armor: {
-      name: 'Armor',
-      description: 'Crafted by your own hand, it protects you from dangers.',
-    },
-    blood: {
-      name: 'Blood',
-      description: 'The lifeblood of your body.',
-    },
-    artifacts: {
-      name: 'Artifacts',
-      description: "Various old rings, bracelets, amulets, and pendants. They look like they're worth a pretty penny.",
-    },
-    favors: {
-      name: 'Favors',
-      description: "You've been generous to important people.",
-    },
-    enchantments: {
-      name: 'Enchanted Armor',
-      description: 'Divinely blessed weapons and armor, like a hero of legend.',
-    },
-    houses: {
-      name: 'Houses',
-      description: 'A place to call home.',
-    },
-    pylons: {
-      name: 'Pylons',
-      description: 'Lingering fragments from the destroyed pylon.',
-    },
-    zombies: {
-      name: 'Zombies',
-      description: 'A shambling pile of deceased flesh. Super gross.',
-    },
-    maps: {
-      name: 'Maps',
-      description: "A cartographer's kit that can be used to survey areas and discover new secrets.",
-    },
-    finishedMaps: {
-      name: 'Finished Maps',
-      description:
-        "You've mapped out some part of the world. The Explorer's guild would happily buy this knowledge off of you.",
-    },
-    hearts: {
-      name: 'Hearts',
-      description: "The still-beating heart of your target. The Assassin's guild will reward you for this.",
-    },
-    glasses: {
-      name: 'Glasses',
-      description: 'Woah, trees have so many leaves on them.',
-    },
-    supplies: {
-      name: 'Supplies',
-      description: 'Needed to go to the next town.',
-    },
-    pickaxe: {
-      name: 'Pickaxe',
-      description: "It's heavy, but you can make use of it.",
-    },
-    loopingPotion: {
-      name: 'Looping Potion',
-      description:
-        "It's a potion made with the very same formula that got you into this mess. Why exactly did you make this?",
-    },
-    citizenship: {
-      name: 'Citizenship',
-      description: "You're one of Valhalla's proud citizens now, giving you the right to fight in their honor.",
-    },
-    pegasus: {
-      name: 'Pegasus',
-      description: 'A horse with great angelic wings. It can run across clouds as easily as dirt.',
-    },
-    key: {
-      name: 'Key',
-      description: 'Needed to go to the next town.',
-    },
-    temporalStone: {
-      name: 'Temporal Stone',
-      description: 'A strange rock that seems unaffected by the time loops.',
-    },
-    modifiers: {
-      resetable: {
-        name: 'Resetable',
-        description: 'Resets when the loop restarts.',
-      },
-    },
   },
 } as const;

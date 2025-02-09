@@ -8,7 +8,7 @@ import { HorizontalBar } from '../../components/flow/HorizontalBar/HorizontalBar
 import { et } from '../../locales/translations.utils.ts';
 import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
 
-export const t = et('statistics');
+const t = et('statistics');
 
 const statToName = {
   Cha: 'charisma',

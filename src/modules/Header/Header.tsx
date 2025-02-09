@@ -11,7 +11,7 @@ import { ButtonIcon } from '../../components/buttons/Button/ButtonIcon.tsx';
 import { Button } from '../../components/buttons/Button/Button.tsx';
 import { createIntervalSignal } from '../../signals/createInterval.ts';
 import { Icon } from '../../components/buttons/Button/Icon.tsx';
-import { Resources } from './Resources.tsx';
+import { ResourceList } from '../Statistics/ResourceList.tsx';
 import { isBonusActive, manualRestart, performGamePause } from '../../original/driver.ts';
 import { Tooltip } from '../../components/containers/Overlay/primitives/Tooltip.tsx';
 import { CheckboxField } from '../../components/forms/CheckboxField.tsx';
@@ -50,7 +50,7 @@ const StoryOption = () => {
   );
 };
 
-const Controls = () => {
+const Controls = (props: { class?: string }) => {
   const [bonus] = createIntervalSignal({
     seconds: formatTime(vals.totalOfflineMs / 1000),
     isActive: isBonusActive(),
@@ -60,7 +60,7 @@ const Controls = () => {
   }));
 
   return (
-    <div>
+    <div class={props.class}>
       <div class='flex gap-2'>
         <Button onClick={() => performGamePause()}>
           Play/Pause
@@ -124,8 +124,7 @@ export const Header = () => (
     <TimeBar />
     <div class='grid grid-cols-3 gap-2'>
       <MenuBar />
-      <Controls />
-      <Resources />
+      <Controls class='col-span-2' />
     </div>
   </header>
 );
