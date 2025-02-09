@@ -809,9 +809,7 @@ export function doLoad(toLoad) {
     vals.totals.actions = toLoad.totals.actions === undefined ? 0 : toLoad.totals.actions;
   } else vals.totals = { time: 0, effectiveTime: 0, borrowedTime: 0, loops: 0, actions: 0 };
   vals.currentLoop = vals.totals.loops;
-  view.updateTotals();
   console.log('Updating prestige values from load');
-  view.updatePrestigeValues();
 
   // capped at 1 month of gain
   addOffline(Math.min(Math.floor(Date.now() - Date.parse(toLoad.date)), 2678400000));

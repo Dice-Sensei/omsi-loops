@@ -316,7 +316,6 @@ export function loopEnd() {
     vals.totals.time += driverVals.timeCounter;
     vals.totals.effectiveTime += driverVals.effectiveTime;
     vals.totals.loops++;
-    view.requestUpdate('updateTotals', null);
     const loopCompletedActions = actions.current.slice(0, actions.currentPos);
     if (
       actions.current[actions.currentPos] !== undefined &&
@@ -734,16 +733,12 @@ export function removeAction(actionId) {
 export function borrowTime() {
   addOffline(86400_000);
   vals.totals.borrowedTime += 86400;
-  view.requestUpdate('updateOffline', null);
-  view.requestUpdate('updateTotals', null);
 }
 
 export function returnTime() {
   if (vals.totalOfflineMs >= 86400_000) {
     addOffline(-86400_000);
     vals.totals.borrowedTime -= 86400;
-    view.requestUpdate('updateOffline', null);
-    view.requestUpdate('updateTotals', null);
   }
 }
 
@@ -753,7 +748,6 @@ export function updateLag(manaSpent) {
   if (manaSpent === 0) { // cancel lag display
     if (driverVals.lagSpeed !== 0) {
       driverVals.lagSpeed = 0;
-      view.requestUpdate('updateBonusText', null);
     }
     return;
   }
@@ -769,7 +763,6 @@ export function updateLag(manaSpent) {
   const now = performance.now();
   const measuredSpeed = lagSpent / (now - lagStart) * 1000 / driverVals.baseManaPerSecond;
   driverVals.lagSpeed = measuredSpeed;
-  view.requestUpdate('updateBonusText', null);
 }
 
 export function addOffline(num) {
@@ -781,7 +774,6 @@ export function addOffline(num) {
     if (vals.totalOfflineMs < 0) {
       vals.totalOfflineMs = 0;
     }
-    view.requestUpdate('updateOffline', null);
   }
 }
 
@@ -806,7 +798,6 @@ export function isBonusActive() {
 }
 
 export function checkExtraSpeed() {
-  view.requestUpdate('updateBonusText', null);
   if (
     typeof vals.options.speedIncreaseBackground === 'number' &&
     !isNaN(vals.options.speedIncreaseBackground) &&

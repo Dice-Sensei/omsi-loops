@@ -112,7 +112,6 @@ export class View {
     this.createTownActions();
     this.updateProgressActions();
     this.updateLockedHidden();
-    this.showTown(0);
     this.adjustGoldCosts();
     this.adjustExpGains();
     this.updateLoadoutNames();
@@ -137,9 +136,6 @@ export class View {
     updateMultiPartActions: [],
     updateNextActions: [],
     updateTime: [],
-    updateOffline: [],
-    updateBonusText: [],
-    updateTotals: [],
     updateStories: [],
     updateGlobalStory: [],
     updateCurrentActionBar: [],
@@ -179,12 +175,6 @@ export class View {
 
   updateTime() {
     this.adjustGoldCost({ varName: 'Wells', cost: Action.ManaWell.goldCost() });
-  }
-  updateOffline() {
-    const returnTimeButton = document.getElementById('returnTimeButton');
-    if (returnTimeButton instanceof HTMLButtonElement) {
-      returnTimeButton.disabled = vals.totalOfflineMs < 86400_000;
-    }
   }
 
   getBonusReplacement(lhs, op, rhs) {
@@ -778,9 +768,6 @@ export class View {
         }
       }
     }
-  }
-
-  showTown(townNum) {
   }
 
   toggleHidden(varName: string, force?: boolean) {
@@ -1394,12 +1381,6 @@ export class View {
     actionDivs.forEach((div) => {
       div.classList.remove('actionHighlight');
     });
-  }
-
-  updateTotals() {
-  }
-
-  updatePrestigeValues() {
   }
 }
 
