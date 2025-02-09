@@ -558,14 +558,6 @@ main, #actionLogContainer, #timeControlsMain, #timeControlsOptions {
   mix-blend-mode: overlay;
 }
 
-input, label {
-  cursor: pointer;
-}
-input, textarea, select {
-  background: var(--input-background);
-  color: var(--input-color);
-  border-color: var(--input-border);
-}
 
 .buffmaxinput {
   top: 0px;

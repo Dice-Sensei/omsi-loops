@@ -113,7 +113,7 @@ const ProgressCircle = () => {
 
   let hoverTimeoutId: number;
   onMount(() => {
-    hoverTimeoutId = setTimeout(enableAnchor, 1000);
+    hoverTimeoutId = setTimeout(enableAnchor, 3000);
   });
 
   onCleanup(() => {

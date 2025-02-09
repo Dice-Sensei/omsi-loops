@@ -18,21 +18,18 @@ const TownControls = () => {
     canMoveRight: vals.townShowing < Math.max(...vals.townsUnlocked),
   }));
 
+  const canMoveLeft = createMemo(() => values().canMoveLeft);
+  const canMoveRight = createMemo(() => values().canMoveRight);
+  const moveLeft = () => view.showTown(vals.townsUnlocked[vals.townsUnlocked.indexOf(vals.townShowing) - 1]);
+  const moveRight = () => view.showTown(vals.townsUnlocked[vals.townsUnlocked.indexOf(vals.townShowing) + 1]);
+
   return (
     <div class='h-12 relative flex items-center justify-center gap-4 bg-amber-300 border-amber-500 border-b'>
-      <ButtonIcon
-        disabled={values().canMoveLeft}
-        name='chevronLeft'
-        onClick={() => view.showTown(vals.townsUnlocked[vals.townsUnlocked.indexOf(vals.townShowing) - 1])}
-      />
+      <ButtonIcon disabled={canMoveLeft()} name='chevronLeft' onClick={moveLeft} />
       <Label label={t(`towns.town${values().townShowing}.desc`)}>
-        <select class='font-medium w-48' id='TownSelect' />
+        <select class='font-medium h-8 w-48 px-2 rounded-sm border-amber-500 border' id='TownSelect' />
       </Label>
-      <ButtonIcon
-        disabled={values().canMoveRight}
-        name='chevronRight'
-        onClick={() => view.showTown(vals.townsUnlocked[vals.townsUnlocked.indexOf(vals.townShowing) + 1])}
-      />
+      <ButtonIcon disabled={canMoveRight()} name='chevronRight' onClick={moveRight} />
       <ButtonIcon name='eyeSlash' class='absolute right-2' onClick={() => view.toggleHiding()}></ButtonIcon>
     </div>
   );
