@@ -374,7 +374,6 @@ export function performGameRestart() {
   for (let i = 0; i < towns.length; i++) {
     towns[i].restart();
   }
-  view.requestUpdate('updateSkills');
   actions.restart();
   view.requestUpdate('updateCurrentActionsDivs');
   view.requestUpdate('updateTrials', null);
@@ -521,7 +520,6 @@ export function loadList() {
     actions.appendActionRecords(vals.loadouts[vals.curLoadout]);
   }
   view.updateNextActions();
-  view.adjustDarkRitualText();
 }
 export function clearList() {
   actions.clearActions(KeyboardKey.shift() ? ((a) => (a.disabled || a.loops === 0)) : null);

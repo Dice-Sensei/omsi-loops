@@ -540,7 +540,6 @@ export function addSkillExp(name, amount) {
   if (oldLevel !== newLevel) {
     actionLog.addSkillLevel(actions.currentAction, name, newLevel, oldLevel);
   }
-  view.requestUpdate('updateSkill', name);
 }
 
 export function handleSkillExp(list) {
@@ -582,7 +581,6 @@ export function addBuffAmt(name, amount, action, spendType, statsSpent) {
       statsSpent,
     );
   }
-  view.requestUpdate('updateBuff', name);
 }
 
 const talentMultiplierCache = {
@@ -618,7 +616,6 @@ export function addExp(name, amount) {
   let talentGain = amount * getTalentMultiplier();
   stats[name].talentLevelExp.addExp(talentGain);
   vals.totalTalent += talentGain;
-  view.requestUpdate('updateStat', name);
 }
 
 export function restartStats() {
@@ -627,7 +624,6 @@ export function restartStats() {
       stats[statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2') * 2);
     } else stats[statList[i]].statLevelExp.setLevel(getBuffLevel('Imbuement2'));
   }
-  view.requestUpdate('updateStats', true);
 }
 
 export function getTotalBonusXP(statName) {

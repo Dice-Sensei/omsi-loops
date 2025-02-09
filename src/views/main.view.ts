@@ -1,17 +1,4 @@
-import {
-  Buff,
-  getBuffLevel,
-  getLevel,
-  getPrcToNextLevel,
-  getPrcToNextSkillLevel,
-  getPrcToNextTalent,
-  getSelfCombat,
-  getSkillBonus,
-  getSkillLevel,
-  getTalent,
-  getTeamCombat,
-  getTotalBonusXP,
-} from '../original/stats.ts';
+import { Buff } from '../original/stats.ts';
 import {
   Action,
   actionsWithGoldCost,
@@ -30,29 +17,16 @@ import {
   townNames,
   translateClassNames,
 } from '../original/actionList.ts';
-import { isBuffName, saveUISettings, vals } from '../original/saving.ts';
+import { isBuffName, vals } from '../original/saving.ts';
 
 import $ from 'jquery';
 import * as d3 from 'd3';
 import { Localization } from '../original/localization.ts';
-import { KeyboardKey } from '../modules/hotkeys/KeyboardKey.ts';
-import { getPrestigeCost, getPrestigeCurrentBonus, prestigeValues } from '../original/prestige.ts';
+import { prestigeValues } from '../original/prestige.ts';
 import { camelize, formatNumber, intToString, intToStringRound, toSuffix } from '../original/helpers.ts';
 import { getNumOnList } from '../original/actions.ts';
 import { actions } from '../original/actions.ts';
-import {
-  actionLog,
-  buffCaps,
-  buffHardCaps,
-  buffList,
-  buffs,
-  resources,
-  skillList,
-  skills,
-  statList,
-  stats,
-  towns,
-} from '../original/globals.ts';
+import { actionLog, resources, skillList, statList, stats, towns } from '../original/globals.ts';
 import {
   addActionToList,
   addLoop,
@@ -61,7 +35,6 @@ import {
   collapse,
   disableAction,
   driverVals,
-  getActualGameSpeed,
   handleDirectActionDragEnd,
   handleDirectActionDragStart,
   handleDragDrop,
@@ -109,9 +82,6 @@ export function formatTime(seconds: number) {
   );
 }
 
-let statShowing;
-let skillShowing;
-let buffShowing;
 let curActionShowing;
 let dungeonShowing;
 
@@ -151,9 +121,7 @@ export class View {
       townInfos[i] = document.getElementById(`townInfo${i}`);
     }
 
-    this.updateSkills();
     this.createTravelMenu();
-    this.adjustDarkRitualText();
     this.updateTime();
     this.updateCurrentActionsDivs();
     this.updateTotalTicks();
@@ -161,7 +129,6 @@ export class View {
     this.createTownActions();
     this.updateProgressActions();
     this.updateLockedHidden();
-    this.updateSoulstones();
     this.showTown(0);
     this.showActions(false);
     this.changeStatView();
@@ -169,7 +136,6 @@ export class View {
     this.adjustExpGains();
     this.updateTeamCombat();
     this.updateLoadoutNames();
-    this.updateResources();
     this.updateTrials();
     if (vals.storyMax >= 12) {
       setInterval(() => {
@@ -205,15 +171,7 @@ export class View {
     return trigger;
   }
 
-  // requests are properties, where the key is the function name,
-  // and the array items in the value are the target of the function
-
   requests = {
-    updateStats: [],
-    updateStat: [],
-    updateSkill: [],
-    updateSkills: [],
-    updateBuff: [],
     updateTrialInfo: [],
     updateTrials: [],
     updateRegular: [],
@@ -233,7 +191,6 @@ export class View {
     updateCurrentActionsDivs: [],
     updateTotalTicks: [],
     updateCurrentActionLoops: [],
-    updateSoulstones: [],
     updateResource: [],
     updateResources: [],
     updateActionTooltips: [],
@@ -249,7 +206,6 @@ export class View {
     highlightAction: [],
   };
 
-  // requesting an update will call that update on the next view.update tick (based off player set UPS)
   requestUpdate(category, target) {
     if (!this.requests[category].includes(target)) this.requests[category].push(target);
   }
@@ -270,208 +226,6 @@ export class View {
     this.updateTime();
   }
 
-  adjustTooltipPosition(tooltipDiv) {
-  }
-
-  /**
-   * @param {HTMLElement} tooltip
-   * @param {Element} trigger
-   * @param {Node} eventTarget
-   */
-  fixTooltipPosition(tooltip, trigger, eventTarget, delayedCall = false) {
-    if (tooltip.contains(eventTarget)) {
-      // console.log("Not fixing tooltip while cursor is inside",{tooltip,trigger,event});
-      return;
-    }
-    if (!trigger.parentElement) {
-      // trigger has been removed from document, abort
-      return;
-    }
-    const triggerRect = trigger.getBoundingClientRect();
-    const tooltipRect = tooltip.getBoundingClientRect();
-    const viewportRect = {
-      // document.documentElement.getBoundingClientRect();
-      top: 0,
-      left: 0,
-      right: globalThis.innerWidth,
-      bottom: globalThis.innerHeight,
-    };
-    const viewportMargins = {
-      top: triggerRect.top - viewportRect.top,
-      right: viewportRect.right - triggerRect.right,
-      bottom: viewportRect.bottom - triggerRect.bottom,
-      left: triggerRect.left - viewportRect.left,
-    };
-    const triggerParentStyle = getComputedStyle(trigger.parentElement);
-    const wantsSidePosition = triggerParentStyle.display === 'flex' && triggerParentStyle.flexDirection === 'column';
-
-    // We prefer to display tooltips above or below the trigger, except in the action list and the changelog
-    let displayOverUnder = true;
-    if (tooltipRect.height > Math.max(viewportMargins.top, viewportMargins.bottom)) displayOverUnder = false;
-    if (wantsSidePosition && tooltipRect.width <= Math.max(viewportMargins.left, viewportMargins.right)) {
-      displayOverUnder = false;
-    }
-
-    const targetPos = {
-      x: 0,
-      y: 0,
-    };
-
-    if (displayOverUnder) {
-      targetPos.y = viewportMargins.top > viewportMargins.bottom
-        ? triggerRect.top - tooltipRect.height
-        : triggerRect.bottom;
-      targetPos.x = viewportMargins.left > viewportMargins.right && tooltipRect.width > triggerRect.width
-        ? triggerRect.right - tooltipRect.width
-        : triggerRect.left;
-    } else {
-      targetPos.x = viewportMargins.left > viewportMargins.right
-        ? triggerRect.left - tooltipRect.width
-        : triggerRect.right;
-      targetPos.y = viewportMargins.top > viewportMargins.bottom
-        ? triggerRect.bottom - tooltipRect.height
-        : triggerRect.top;
-    }
-
-    // check all bounds and nudge the tooltip back onto the screen if necessary, favoring the
-    // top and left edges. don't trust the trbl on tooltipRect, since adjusting those isn't in spec.
-    targetPos.x = Math.min(targetPos.x, viewportRect.right - tooltipRect.width);
-    targetPos.y = Math.min(targetPos.y, viewportRect.bottom - tooltipRect.height);
-    targetPos.x = Math.max(targetPos.x, viewportRect.left);
-    targetPos.y = Math.max(targetPos.y, viewportRect.top);
-
-    // console.log("Fixing tooltip:",{tooltip,tooltipRect,trigger,triggerRect,event});
-
-    // Now, check and see if we can do a nudge (valid rect, currently fixed) or if we have to do initial position
-    const curLeft = parseFloat(tooltip.style.left);
-    const curTop = parseFloat(tooltip.style.top);
-    if (
-      tooltip.style.position === 'fixed' && isFinite(curLeft) && isFinite(curTop) && tooltipRect.width > 0 &&
-      tooltipRect.height > 0
-    ) {
-      // simple nudge
-      tooltip.style.left = `${curLeft + targetPos.x - tooltipRect.x}px`;
-      tooltip.style.top = `${curTop + targetPos.y - tooltipRect.y}px`;
-    } else {
-      // initial positioning
-      tooltip.style.position = 'fixed';
-      tooltip.style.left = `${targetPos.x - viewportRect.left}px`;
-      tooltip.style.top = `${targetPos.y - viewportRect.top}px`;
-      tooltip.style.right = 'auto';
-      tooltip.style.bottom = 'auto';
-      tooltip.style.margin = '0';
-      if (!delayedCall) {
-        // queue up a nudge ASAP, but avoid infinite recursion
-        requestAnimationFrame(() => this.fixTooltipPosition(tooltip, trigger, eventTarget, true));
-      }
-    }
-  }
-
-  updateLevelLogBar(maxContainerId, logBarId, level, levelBarId, levelPrc) {
-  }
-
-  showSkill(skill) {
-  }
-
-  updateSkill(skill) {
-    // if (skills[skill].levelExp.level === 0) {
-    //   return;
-    // }
-    // let container = document.getElementById(`skill${skill}Container`);
-    // container.style.display = 'inline-block';
-    // if (skill === 'Combat' || skill === 'Pyromancy' || skill === 'Restoration') {
-    //   this.updateTeamCombat();
-    // }
-    // const levelPrc = getPrcToNextSkillLevel(skill);
-    // document.getElementById(`skill${skill}Level`).textContent = (getSkillLevel(skill) > 9999)
-    //   ? toSuffix(getSkillLevel(skill))
-    //   : formatNumber(getSkillLevel(skill));
-    // document.getElementById(`skill${skill}LevelBar`).style.width = `${levelPrc}%`;
-    // if (skillShowing === skill) {
-    // document.getElementById(`skill${skill}LevelExp`).textContent = intToString(
-    //   skills[skill].levelExp.exp,
-    //   1,
-    // );
-    // document.getElementById(`skill${skill}LevelExpNeeded`).textContent = intToString(
-    //   skills[skill].levelExp.expRequiredForNextLevel,
-    //   1,
-    // );
-    // document.getElementById(`skill${skill}LevelProgress`).textContent = intToString(levelPrc, 2);
-    // if (skill === 'Dark') {
-    //   document.getElementById('skillBonusDark').textContent = intToString(
-    //     getSkillBonus('Dark'),
-    //     4,
-    //   );
-    // } else if (skill === 'Chronomancy') {
-    //   document.getElementById('skillBonusChronomancy').textContent = intToString(
-    //     getSkillBonus('Chronomancy'),
-    //     4,
-    //   );
-    // } else if (skill === 'Practical') {
-    //   document.getElementById('skillBonusPractical').textContent = getSkillBonus('Practical')
-    //     .toFixed(3).replace(
-    //       /(\.\d*?[1-9])0+$/gu,
-    //       '$1',
-    //     );
-    // } else if (skill === 'Mercantilism') {
-    //   document.getElementById('skillBonusMercantilism').textContent = intToString(
-    //     getSkillBonus('Mercantilism'),
-    //     4,
-    //   );
-    // } else if (skill === 'Spatiomancy') {
-    //   document.getElementById('skillBonusSpatiomancy').textContent = getSkillBonus('Spatiomancy')
-    //     .toFixed(3).replace(
-    //       /(\.\d*?[1-9])0+$/gu,
-    //       '$1',
-    //     );
-    // } else if (skill === 'Divine') {
-    //   document.getElementById('skillBonusDivine').textContent = intToString(
-    //     getSkillBonus('Divine'),
-    //     4,
-    //   );
-    // } else if (skill === 'Commune') {
-    //   document.getElementById('skillBonusCommune').textContent = getSkillBonus('Commune').toFixed(3)
-    //     .replace(
-    //       /(\.\d*?[1-9])0+$/gu,
-    //       '$1',
-    //     );
-    // } else if (skill === 'Wunderkind') {
-    //   document.getElementById('skillBonusWunderkind').textContent = intToString(
-    //     getSkillBonus('Wunderkind'),
-    //     4,
-    //   );
-    // } else if (skill === 'Gluttony') {
-    //   document.getElementById('skillBonusGluttony').textContent = getSkillBonus('Gluttony').toFixed(
-    //     3,
-    //   ).replace(
-    //     /(\.\d*?[1-9])0+$/gu,
-    //     '$1',
-    //   );
-    // } else if (skill === 'Thievery') {
-    //   document.getElementById('skillBonusThievery').textContent = intToString(
-    //     getSkillBonus('Thievery'),
-    //     4,
-    //   );
-    // } else if (skill === 'Leadership') {
-    //   document.getElementById('skillBonusLeadership').textContent = intToString(
-    //     getSkillBonus('Leadership'),
-    //     4,
-    //   );
-    // } else if (skill === 'Assassin') {
-    //   document.getElementById('skillBonusAssassin').textContent = intToString(
-    //     getSkillBonus('Assassin'),
-    //     4,
-    //   );
-    // }
-    // }
-  }
-
-  updateSkills() {
-    for (const skill of skillList) {
-      this.updateSkill(skill);
-    }
-  }
-
   updateTime() {
     this.adjustGoldCost({ varName: 'Wells', cost: Action.ManaWell.goldCost() });
   }
@@ -480,20 +234,6 @@ export class View {
     if (returnTimeButton instanceof HTMLButtonElement) {
       returnTimeButton.disabled = vals.totalOfflineMs < 86400_000;
     }
-  }
-  updateBonusText() {
-    const element = document.getElementById('bonusText');
-    if (!element) return;
-    element.innerHTML = this.getBonusText() ?? '';
-  }
-  getBonusText() {
-    let text = Localization.txt('time_controls>bonus_seconds>main_text');
-    let lastText = null;
-    while (lastText !== text) {
-      lastText = text;
-      text = text?.replace(/{([^+{}-]*)([+-]?)(.*?)}/g, (_str, lhs, op, rhs) => this.getBonusReplacement(lhs, op, rhs));
-    }
-    return text;
   }
 
   getBonusReplacement(lhs, op, rhs) {
@@ -548,24 +288,6 @@ export class View {
       formatTime(driverVals.timeCounter)
     }`;
     document.getElementById('effectiveTime').textContent = `${formatTime(driverVals.effectiveTime)}`;
-  }
-  updateResource(resource) {
-    // const element = document.getElementById(`${resource}Div`, false, false);
-    // if (element) element.style.display = resources[resource] ? 'inline-block' : 'none';
-
-    // if (resource === 'supplies') {
-    //   document.getElementById('suppliesCost').textContent = towns[0].suppliesCost;
-    // }
-    // if (resource === 'teamMembers') {
-    //   document.getElementById('teamCost').textContent = `${(resources.teamMembers + 1) * 100}`;
-    // }
-
-    // if (Number.isFinite(resources[resource])) {
-    //   document.getElementById(resource).textContent = resources[resource];
-    // }
-  }
-  updateResources() {
-    for (const resource in resources) this.updateResource(resource);
   }
   updateActionTooltips() {
     document.getElementById('goldInvested').textContent = intToStringRound(
@@ -1062,7 +784,7 @@ export class View {
     actionLog.addGlobalStory(num);
   }
 
-  updateStories(init: boolean) {
+  updateStories(init: boolean = false) {
     // several ms cost per run. run once every 2000ms on an interval
     for (const action of vals.totalActionList) {
       if (action.storyReqs !== undefined) {
@@ -1139,13 +861,11 @@ export class View {
     }
     if (vals.actionStoriesShowing) actionStoriesTown[townNum].style.display = '';
     else actionOptionsTown[townNum].style.display = '';
+
     townInfos[townNum].style.display = '';
     $('#TownSelect').val(townNum);
 
-    // document.getElementById('shortTownColumn').classList.remove(`zone-${vals.townshowing + 1}`);
-    // document.getElementById('shortTownColumn').classList.add(`zone-${townNum + 1}`);
-    // document.getElementById('townDesc').textContent = Localization.txt(`towns>town${townNum}>desc`);
-    vals.townshowing = townNum;
+    vals.townShowing = townNum;
   }
 
   showActions(stories) {
@@ -1157,11 +877,11 @@ export class View {
     // if (stories) {
     //   document.getElementById('actionsViewLeft').style.visibility = '';
     //   document.getElementById('actionsViewRight').style.visibility = 'hidden';
-    //   actionStoriesTown[vals.townshowing].style.display = '';
+    //   actionStoriesTown[vals.townShowing].style.display = '';
     // } else {
     //   document.getElementById('actionsViewLeft').style.visibility = 'hidden';
     //   document.getElementById('actionsViewRight').style.visibility = '';
-    //   actionOptionsTown[vals.townshowing].style.display = '';
+    //   actionOptionsTown[vals.townShowing].style.display = '';
     // }
 
     // document.getElementById('actionsTitle').textContent = Localization.txt(
@@ -1175,12 +895,12 @@ export class View {
   }
 
   toggleHidden(varName: string, force?: boolean) {
-    const isHidden = towns[vals.townshowing].hiddenVars.has(varName);
+    const isHidden = towns[vals.townShowing].hiddenVars.has(varName);
     if ((isHidden && force !== true) || force === false) {
-      towns[vals.townshowing].hiddenVars.delete(varName);
+      towns[vals.townShowing].hiddenVars.delete(varName);
       document.getElementById(`infoContainer${varName}`).classList.remove('user-hidden');
     } else if (!isHidden || force === true) {
-      towns[vals.townshowing].hiddenVars.add(varName);
+      towns[vals.townShowing].hiddenVars.add(varName);
       document.getElementById(`infoContainer${varName}`).classList.add('user-hidden');
     }
   }
@@ -1517,9 +1237,6 @@ export class View {
   }
 
   updateAction(action) {
-    if (action === undefined) return;
-    let container = document.getElementById(`container${action}`);
-    this.adjustTooltipPosition(container.querySelector('div.showthis'));
   }
 
   adjustManaCost(actionName) {
@@ -1759,9 +1476,6 @@ export class View {
     }
   }
 
-  updateSoulstones() {
-  }
-
   updateMultiPart(action) {
     const town = towns[action.townNum];
     document.getElementById(`multiPartName${action.varName}`).textContent = action.getPartName();
@@ -1807,9 +1521,6 @@ export class View {
     for (let i = 0; i < travelOptions.length; i++) {
       travelOptions[i].hidden = !vals.townsUnlocked.includes(i);
     }
-  }
-
-  adjustDarkRitualText() {
   }
 
   highlightIncompleteActions() {
@@ -1908,9 +1619,6 @@ export function draggedUndecorate(i) {
     document.getElementById(`nextActionContainer${i}`).classList.remove('draggedAction');
   }
   showActionIcons();
-}
-
-export function updateBuffCaps() {
 }
 
 export const view = new View();

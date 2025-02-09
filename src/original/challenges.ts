@@ -63,7 +63,6 @@ const setupManaBurn = () => {
     for (let i = 0; i < towns.length; i++) {
       towns[i].restart();
     }
-    view.requestUpdate('updateSkills');
     actions.restart();
     view.requestUpdate('updateCurrentActionsDivs');
     view.requestUpdate('updateTrials', null);

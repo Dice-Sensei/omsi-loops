@@ -1793,7 +1793,6 @@ DungeonAction.prototype.finishDungeon = function finishDungeon(floorNum) {
     const countToAdd = Math.floor(Math.pow(10, dungeonNum) * getSkillBonus('Divine'));
     stats[statToAdd].soulstone = (stats[statToAdd].soulstone ?? 0) + countToAdd;
     floor.ssChance *= 0.98;
-    view.requestUpdate('updateSoulstones', null);
     actionLog.addSoulstones(this, statToAdd, countToAdd);
     return true;
   }
@@ -2831,7 +2830,6 @@ Action.DarkRitual = new MultipartAction('Dark Ritual', {
   loopsFinished() {
     const spent = sacrificeSoulstones(this.goldCost());
     addBuffAmt('Ritual', 1, this, 'soulstone', spent);
-    view.requestUpdate('updateSoulstones', null);
     view.requestUpdate('adjustGoldCost', { varName: 'DarkRitual', cost: this.goldCost() });
   },
   getPartName() {
@@ -2847,7 +2845,6 @@ Action.DarkRitual = new MultipartAction('Dark Ritual', {
     return Math.ceil(50 * (getBuffLevel('Ritual') + 1) * getSkillBonus('Commune'));
   },
   finish() {
-    view.requestUpdate('updateBuff', 'Ritual');
     view.requestUpdate('adjustExpGain', Action.DarkMagic);
     if (towns[1].DarkRitualLoopCounter >= 0) {
       setStoryFlag('darkRitualThirdSegmentReached');
@@ -3965,7 +3962,6 @@ Action.HeroesTrial = new TrialAction('Heroes Trial', 0, {
   },
   finish() {
     handleSkillExp(this.skills);
-    view.requestUpdate('updateBuff', 'Heroism');
   },
 });
 
@@ -4402,7 +4398,6 @@ Action.MineSoulstones = new Action('Mine Soulstones', {
       const countToAdd = Math.floor(getSkillBonus('Divine'));
       stats[statToAdd].soulstone += countToAdd;
       actionLog.addSoulstones(this, statToAdd, countToAdd);
-      view.requestUpdate('updateSoulstones', null);
     });
   },
 });
@@ -4611,7 +4606,6 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
     const spent = sacrificeSoulstones(this.goldCost());
     vals.trainingLimits++;
     addBuffAmt('Imbuement', 1, this, 'soulstone', spent);
-    view.requestUpdate('updateSoulstones', null);
     view.requestUpdate('adjustGoldCost', { varName: 'ImbueMind', cost: this.goldCost() });
   },
   getPartName() {
@@ -4627,7 +4621,6 @@ Action.ImbueMind = new MultipartAction('Imbue Mind', {
     return 20 * (getBuffLevel('Imbuement') + 1);
   },
   finish() {
-    view.requestUpdate('updateBuff', 'Imbuement');
     if (vals.options.autoMaxTraining) capAllTraining();
     if (towns[3].ImbueMindLoopCounter >= 0) {
       setStoryFlag('imbueMindThirdSegmentReached');
@@ -4699,7 +4692,6 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
       stats[stat].talentLevelExp.setLevel(targetTalentLevel);
       spent[stat] = currentTalentLevel - targetTalentLevel;
     }
-    view.updateStats();
     addBuffAmt('Imbuement2', 1, this, 'talent', spent);
     view.requestUpdate('adjustGoldCost', { varName: 'ImbueBody', cost: this.goldCost() });
   },
@@ -4716,7 +4708,6 @@ Action.ImbueBody = new MultipartAction('Imbue Body', {
     return getBuffLevel('Imbuement2') + 1;
   },
   finish() {
-    view.requestUpdate('updateBuff', 'Imbuement2');
   },
 });
 
@@ -5984,7 +5975,6 @@ Action.GreatFeast = new MultipartAction('Great Feast', {
   loopsFinished() {
     const spent = sacrificeSoulstones(this.goldCost());
     addBuffAmt('Feast', 1, this, 'soulstone', spent);
-    view.requestUpdate('updateSoulstones', null);
     view.requestUpdate('adjustGoldCost', { varName: 'GreatFeast', cost: this.goldCost() });
   },
   getPartName() {
@@ -6000,7 +5990,6 @@ Action.GreatFeast = new MultipartAction('Great Feast', {
     return Math.ceil(5000 * (getBuffLevel('Feast') + 1) * getSkillBonus('Gluttony'));
   },
   finish() {
-    view.requestUpdate('updateBuff', 'Feast');
   },
 });
 
@@ -6354,7 +6343,6 @@ Action.TheSpire = new DungeonAction('The Spire', 2, {
   },
   finish() {
     handleSkillExp(this.skills);
-    view.requestUpdate('updateBuff', 'Aspirant');
     setStoryFlag('spireAttempted');
     if (resources.pylons >= 10) setStoryFlag('spire10Pylons');
     if (resources.pylons >= 25) setStoryFlag('spire20Pylons');
@@ -7918,15 +7906,11 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
     for (const stat of statList) {
       stats[stat].talentLevelExp.setLevel(0);
       stats[stat].soulstone = 0;
-      view.requestUpdate('updateStat', stat);
     }
     buffs['Imbuement'].amt = 0;
     buffs['Imbuement2'].amt = 0;
     vals.trainingLimits = 10;
     addBuffAmt('Imbuement3', 1, this, 'imbuement3');
-    view.updateBuffs();
-    view.updateStats();
-    view.requestUpdate('updateSoulstones', null);
   },
   getPartName() {
     return 'Imbue Soul';
@@ -7938,8 +7922,6 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
     return getBuffLevel('Imbuement') > 499 && getBuffLevel('Imbuement2') > 499;
   },
   finish() {
-    view.requestUpdate('updateBuff', 'Imbuement3');
-
     capAllTraining();
     adjustTrainingExpMult();
   },
