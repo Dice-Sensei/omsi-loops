@@ -26,21 +26,17 @@ import { prestigeValues } from '../original/prestige.ts';
 import { camelize, formatNumber, intToString, intToStringRound, toSuffix } from '../original/helpers.ts';
 import { getNumOnList } from '../original/actions.ts';
 import { actions } from '../original/actions.ts';
-import { actionLog, resources, skillList, statList, stats, towns } from '../original/globals.ts';
+import { actionLog, resources, statList, stats, towns } from '../original/globals.ts';
 import {
-  addActionToList,
   addLoop,
   adjustAll,
   capAction,
   collapse,
   disableAction,
   driverVals,
-  handleDirectActionDragEnd,
-  handleDirectActionDragStart,
   handleDragDrop,
   handleDragOver,
   handleDragStart,
-  hideNotification,
   isBonusActive,
   moveDown,
   moveUp,
@@ -87,23 +83,16 @@ let dungeonShowing;
 
 let curActionsDiv;
 let nextActionsDiv;
-let actionOptionsTown;
 
 export class View {
   initalize() {
     curActionsDiv = document.getElementById('curActionsList');
     nextActionsDiv = document.getElementById('nextActionsList');
 
-    actionOptionsTown = [];
-    for (let i = 0; i <= 8; i++) {
-      actionOptionsTown[i] = document.getElementById(`actionOptionsTown${i}`);
-    }
-
     this.updateTime();
     this.updateCurrentActionsDivs();
     this.updateTotalTicks();
     this.updateAddAmount(1);
-    this.createTownActions();
     this.updateProgressActions();
     this.updateLockedHidden();
     this.adjustGoldCosts();
@@ -649,6 +638,7 @@ export class View {
       const actionDiv = document.getElementById(`container${action.varName}`);
       const infoDiv = document.getElementById(`infoContainer${action.varName}`);
       const storyDiv = document.getElementById(`storyContainer${action.varName}`);
+
       if (action.allowed && getNumOnList(action.name) >= action.allowed()) {
         actionDiv.classList.add('capped');
       } else if (action.unlocked()) {
@@ -799,219 +789,6 @@ export class View {
       document.getElementById(`load${i + 1}`).textContent = vals.loadoutnames[i];
     }
     document.getElementById('renameLoadout').value = vals.loadoutnames[vals.curLoadout - 1];
-  }
-
-  createTownActions() {
-    if (actionOptionsTown[0].querySelector('.actionOrTravelContainer')) return;
-    for (const action of towns.flatMap((t) => t.totalActionList)) {
-      this.createTownAction(action);
-    }
-    for (const varName of towns.flatMap((t) => t.allVarNames)) {
-      const action = vals.totalActionList.find((a) => a.varName === varName);
-      if (isActionOfType(action, 'limited')) this.createTownInfo(action);
-      if (isActionOfType(action, 'progress')) {
-        if (action.name.startsWith('Survey')) this.createGlobalSurveyProgress(action);
-        this.createActionProgress(action);
-      }
-      if (isActionOfType(action, 'multipart')) this.createMultiPartPBar(action);
-    }
-    if (vals.options.highlightNew) this.highlightIncompleteActions();
-  }
-
-  createGlobalSurveyProgress(action) {
-  }
-
-  createActionProgress(action, varSuffix = '', label, includeExpBar = true) {
-  }
-
-  createTownAction(action) {
-    let actionStats = '';
-    let actionSkills = '';
-    let skillDetails = '';
-    let lockedStats = '';
-    let lockedSkills = '';
-    const pieSlices = [];
-    const gradientStops = [];
-    const statEntries = Object.entries(action.stats);
-    // sort high to low, then by statname index
-    statEntries.sort((
-      [aStat, aRatio],
-      [bStat, bRatio],
-    ) => ((bRatio - aRatio) ||
-      (statList.indexOf(aStat) - statList.indexOf(bStat)))
-    );
-    let totalRatio = 0;
-    let gradientOffset = 0;
-    let lastArcPoint = [0, -1]; // start at 12 o'clock
-    for (const [stat, ratio] of statEntries) {
-      const statLabel = Localization.txt(`stats>${stat}>short_form`);
-      actionStats += `<dt class='stat-${stat}'>${statLabel}</dt> <dd class='stat-${stat}'>${ratio * 100}%</dd>`;
-      const startRatio = totalRatio;
-      totalRatio += ratio;
-      if (totalRatio >= 0.999 && totalRatio <= 1.001) totalRatio = 1;
-      const midRatio = (startRatio + totalRatio) / 2;
-      const angle = Math.PI * 2 * totalRatio;
-      const arcPoint = [Math.sin(angle), -Math.cos(angle)];
-      pieSlices.push(
-        `<path class='pie-slice stat-${stat}' d='M0,0 L${lastArcPoint.join()} A1,1 0,${
-          ratio >= 0.5 ? 1 : 0
-        },1 ${arcPoint.join()} Z' />`,
-      );
-      if (gradientStops.length === 0) {
-        gradientOffset = midRatio;
-        gradientStops.push(
-          `from ${gradientOffset}turn`,
-          `var(--stat-${stat}-color) calc(${gradientOffset}turn * var(--pie-ratio))`,
-        );
-      } else {
-        gradientStops.push(
-          `var(--stat-${stat}-color) calc(${midRatio - gradientOffset}turn - (${
-            ratio / 2
-          }turn * var(--pie-ratio))) calc(${midRatio - gradientOffset}turn + (${ratio / 2}turn * var(--pie-ratio)))`,
-        );
-      }
-      lastArcPoint = arcPoint;
-    }
-    // this is *almost* always true (but not always)
-    if (statEntries.length > 0) {
-      gradientStops.push(
-        `var(--stat-${statEntries[0][0]}-color) calc(1turn - (${gradientOffset}turn * var(--pie-ratio)))`,
-      );
-      const highestRatio = statEntries[0][1];
-      lockedStats = `(${
-        statEntries.map((
-          [stat, ratio],
-        ) => [
-          ratio === highestRatio,
-          stat,
-          Localization.txt(`stats>${stat}>short_form`),
-        ])
-          .map(([isHighestStat, stat, label]) =>
-            `<span class='${isHighestStat ? 'bold' : ''} stat-${stat} stat-color'>${label}</span>`
-          )
-          .join(', ')
-      })`;
-    }
-    const statPie = statEntries.length === 0 ? '' : `
-                <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-${action.varName}'>
-                    <g id='stat-pie-${action.varName}-g'>
-                        ${pieSlices.join('')}
-                    </g>
-                </svg>
-                <div class='stat-pie mask' style='background:conic-gradient(${gradientStops.join()})'></div>`;
-    if (action.skills !== undefined) {
-      const skillKeyNames = Object.keys(action.skills);
-      const l = skillList.length;
-      for (let i = 0; i < l; i++) {
-        for (const skill of skillKeyNames) {
-          if (skillList[i] === skill) {
-            const xmlName = getXMLName(skill);
-            const skillLabel = `${Localization.txt(`skills>${xmlName}>label`)} ${
-              Localization.txt('stats>tooltip>exp')
-            }`;
-            actionSkills += `<div class='bold'>${skillLabel}:</div><span id='expGain${action.varName}${skill}'></span>`;
-            if (action.teachesSkill(skill)) {
-              const learnSkill = `<div class='bold'>${Localization.txt('actions>tooltip>learn_skill')}:</div>`;
-              lockedSkills += `${learnSkill} <span>${Localization.txt(`skills>${xmlName}>label`)}</span>`;
-              skillDetails += `<hr>
-                                ${learnSkill} <div class='bold underline'>${
-                Localization.txt(`skills>${xmlName}>label`)
-              }</div>
-                                <i>${Localization.txt(`skills>${xmlName}>desc`)}</i>`;
-              if (Localization.txtsObj(`skills>${xmlName}>desc2`)?.length > 0) {
-                skillDetails += `${Localization.txt(`skills>${xmlName}>desc2`).replace(/\s*Currently.*(?:|$)/sgi, '')}`; // ugh
-              }
-            }
-          }
-        }
-      }
-    }
-    if (isBuffName(action.grantsBuff)) {
-      const xmlName = getXMLName(Buff.fullNames[action.grantsBuff]);
-      const grantsBuff = `<div class='bold'>${Localization.txt('actions>tooltip>grants_buff')}:</div>`;
-      lockedSkills += `${grantsBuff} <span>${Localization.txt(`buffs>${xmlName}>label`)}</span>`;
-      skillDetails += `<hr>
-                ${grantsBuff} <div class='bold underline'>${Localization.txt(`buffs>${xmlName}>label`)}</div>
-                <i>${Localization.txt(`buffs>${xmlName}>desc`)}</i>`;
-    }
-    let extraImage = '';
-    const extraImagePositions = [
-      'margin-top:17px;margin-left:5px;',
-      'margin-top:17px;margin-left:-55px;',
-      'margin-top:0px;margin-left:-55px;',
-      'margin-top:0px;margin-left:5px;',
-    ];
-    if (action.affectedBy) {
-      for (let i = 0; i < action.affectedBy.length; i++) {
-        extraImage += `<img src='icons/${
-          camelize(action.affectedBy[i])
-        }.svg' class='smallIcon' draggable='false' style='position:absolute;${extraImagePositions[i]}'>`;
-      }
-    }
-    const isTravel = getTravelNum(action.name) != 0;
-    const divClass = `${isTravel ? 'travelContainer' : 'actionContainer'} ${
-      isTraining(action.name) || hasLimit(action.name) ? 'cappableActionContainer' : ''
-    }`;
-    const imageName = action.name.startsWith('Assassin') ? 'assassin' : camelize(action.name);
-    const unlockConditions = /\s*Unlocked (.*?)(?:|$)/is.exec(
-      `${action.tooltip}${action.goldCost === undefined ? '' : action.tooltip2}`,
-    )?.[1]; // I hate this but wygd
-    const lockedText = unlockConditions
-      ? `${Localization.txt('actions>tooltip>locked_tooltip')}Will unlock ${unlockConditions}`
-      : `${action.tooltip}${action.goldCost === undefined ? '' : action.tooltip2}`;
-    const totalDivText = `<button
-                id='container${action.varName}'
-                class='${divClass} actionOrTravelContainer ${action.type}ActionContainer showthat'
-                draggable='true'
-            >
-                <label>${action.label}</label>
-                <div style='position:relative'>
-                    <img src='icons/${imageName}.svg' class='superLargeIcon' draggable='false'>${extraImage}
-                </div>
-                ${statPie}
-                <div class='showthis when-unlocked' draggable='false'>
-                    ${action.tooltip}<span id='goldCost${action.varName}'></span>
-                    ${(action.goldCost === undefined) ? '' : action.tooltip2}
-                    
-                    ${actionSkills}
-                    <div class='bold'>${
-      Localization.txt('actions>tooltip>mana_cost')
-    }:</div> <div id='manaCost${action.varName}'>${formatNumber(action.manaCost())}</div>
-                    <dl class='action-stats'>${actionStats}</dl>
-                    <div class='bold'>${
-      Localization.txt('actions>tooltip>exp_multiplier')
-    }:</div><div id='expMult${action.varName}'>${action.expMult * 100}</div>%
-                    ${skillDetails}
-                </div>
-                <div class='showthis when-locked' draggable='false'>
-                    ${lockedText}
-                    
-                    ${lockedSkills}
-                    ${lockedStats}
-                </div>
-            </button>`;
-
-    const actionsDiv = document.createElement('div');
-    actionsDiv.innerHTML = totalDivText;
-
-    requestAnimationFrame(() => {
-      const container = document.getElementById(`container${action.varName}`) as HTMLButtonElement;
-
-      container.ondragover = () => handleDragOver(event);
-      container.ondragstart = () =>
-        handleDirectActionDragStart(event, action.name, action.townNum, action.varName, false);
-      container.ondragend = () => handleDirectActionDragEnd(action.varName);
-      container.onclick = () => addActionToList(action.name, action.townNum);
-      container.onmouseover = () => view.updateAction(action.varName);
-      container.onmouseout = () => view.updateAction(undefined);
-    });
-
-    actionOptionsTown[action.townNum].querySelector(`:scope > .${isTravel ? 'travelDiv' : 'actionDiv'}`).appendChild(
-      actionsDiv,
-    );
-  }
-
-  updateAction(action) {
   }
 
   adjustManaCost(actionName) {
