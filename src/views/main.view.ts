@@ -88,7 +88,6 @@ let dungeonShowing;
 let curActionsDiv;
 let nextActionsDiv;
 let actionOptionsTown;
-let actionStoriesTown;
 
 export class View {
   initalize() {
@@ -96,11 +95,8 @@ export class View {
     nextActionsDiv = document.getElementById('nextActionsList');
 
     actionOptionsTown = [];
-    actionStoriesTown = [];
-    townInfos = [];
     for (let i = 0; i <= 8; i++) {
       actionOptionsTown[i] = document.getElementById(`actionOptionsTown${i}`);
-      actionStoriesTown[i] = document.getElementById(`actionStoriesTown${i}`);
     }
 
     this.updateTime();
