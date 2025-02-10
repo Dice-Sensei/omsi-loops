@@ -89,7 +89,6 @@ let curActionsDiv;
 let nextActionsDiv;
 let actionOptionsTown;
 let actionStoriesTown;
-let townInfos;
 
 export class View {
   initalize() {
@@ -102,7 +101,6 @@ export class View {
     for (let i = 0; i <= 8; i++) {
       actionOptionsTown[i] = document.getElementById(`actionOptionsTown${i}`);
       actionStoriesTown[i] = document.getElementById(`actionStoriesTown${i}`);
-      townInfos[i] = document.getElementById(`townInfo${i}`);
     }
 
     this.updateTime();
@@ -475,22 +473,20 @@ export class View {
     for (let i = 0; i < actions.current.length; i++) {
       const action = actions.current[i];
       totalDivText += `<div id='actionTooltip${i}' style='display:none;padding-left:10px;width:90%'>` +
-        `<div style='text-align:center;width:100%'>${action.label}</div><br><br>` +
-        `<b>${Localization.txt('actions>current_action>mana_original')}</b> <div id='action${i}ManaOrig'></div><br>` +
-        `<b>${Localization.txt('actions>current_action>mana_used')}</b> <div id='action${i}ManaUsed'></div><br>` +
-        `<b>${Localization.txt('actions>current_action>last_mana')}</b> <div id='action${i}LastMana'></div><br>` +
-        `<b>${Localization.txt('actions>current_action>mana_remaining')}</b> <div id='action${i}Remaining'></div><br>` +
-        `<b>${
-          Localization.txt('actions>current_action>gold_remaining')
-        }</b> <div id='action${i}GoldRemaining'></div><br>` +
-        `<b>${Localization.txt('actions>current_action>time_spent')}</b> <div id='action${i}TimeSpent'></div><br>` +
+        `<div style='text-align:center;width:100%'>${action.label}</div>` +
+        `<b>${Localization.txt('actions>current_action>mana_original')}</b> <div id='action${i}ManaOrig'></div>` +
+        `<b>${Localization.txt('actions>current_action>mana_used')}</b> <div id='action${i}ManaUsed'></div>` +
+        `<b>${Localization.txt('actions>current_action>last_mana')}</b> <div id='action${i}LastMana'></div>` +
+        `<b>${Localization.txt('actions>current_action>mana_remaining')}</b> <div id='action${i}Remaining'></div>` +
+        `<b>${Localization.txt('actions>current_action>gold_remaining')}</b> <div id='action${i}GoldRemaining'></div>` +
+        `<b>${Localization.txt('actions>current_action>time_spent')}</b> <div id='action${i}TimeSpent'></div>` +
         `<b>${
           Localization.txt('actions>current_action>total_time_elapsed')
-        }</b> <div id='action${i}TotalTimeElapsed'></div><br>` +
-        `<br>` +
+        }</b> <div id='action${i}TotalTimeElapsed'></div>` +
+        `` +
         `<div id='action${i}ExpGain'></div>` +
         `<div id='action${i}HasFailed' style='display:none'>` +
-        `<b>${Localization.txt('actions>current_action>failed_attempts')}</b> <div id='action${i}Failed'></div><br>` +
+        `<b>${Localization.txt('actions>current_action>failed_attempts')}</b> <div id='action${i}Failed'></div>` +
         `<b>${Localization.txt('actions>current_action>error')}</b> <div id='action${i}Error'></div>` +
         `</div>` +
         `</div>`;
@@ -582,7 +578,7 @@ export class View {
         if (action[`statExp${stat}`]) {
           statExpGain += `<div class='bold'>${Localization.txt(`stats>${stat}>short_form`)}:</div> ${
             intToString(action[`statExp${stat}`], 2)
-          }<br>`;
+          }`;
         }
       }
       expGainDiv.innerHTML = statExpGain;
@@ -751,8 +747,8 @@ export class View {
             storyTooltipText += '</p>\n';
           }
 
-          if (document.getElementById(divName).children[2].innerHTML !== storyTooltipText) {
-            document.getElementById(divName).children[2].innerHTML = storyTooltipText;
+          if (document.getElementById(divName).children[1].innerHTML !== storyTooltipText) {
+            document.getElementById(divName).children[1].innerHTML = storyTooltipText;
             if (!init) {
               showNotification(divName);
               if (!vals.unreadActionStories.includes(divName)) {
@@ -827,40 +823,9 @@ export class View {
   }
 
   createGlobalSurveyProgress(action) {
-    this.createActionProgress(action, 'Global', action.labelGlobal, true);
   }
 
   createActionProgress(action, varSuffix = '', label, includeExpBar = true) {
-    const totalDivText = `<div class='townStatContainer showthat'>
-            <div class='bold townLabel'>${label ?? action.labelDone}</div>
-            <div class='progressValue' id='prc${action.varName}${varSuffix}'>5</div><div class='percentSign'>%</div>
-            <div class='progressBars'>
-                ${
-      includeExpBar
-        ? `<div class='thinProgressBarUpper'><div id='expBar${action.varName}${varSuffix}' class='statBar townExpBar'></div></div>`
-        : ''
-    }
-                <div class='thinProgressBarLower'><div id='bar${action.varName}${varSuffix}' class='statBar townBar'></div></div>
-            </div>
-
-            <div class='showthis'>
-                ${Localization.txt('actions>tooltip>higher_done_percent_benefic')}<br>
-                <div class='bold'>${
-      Localization.txt('actions>tooltip>progress_label')
-    }</div><div id='progress${action.varName}${varSuffix}'></div>%
-            </div>
-            <div id='hideVarButton${action.varName}${varSuffix}' class='hideVarButton far'></div>
-        </div>`;
-    const progressDiv = document.createElement('div');
-    progressDiv.className = 'townContainer progressType';
-    progressDiv.id = `infoContainer${action.varName}${varSuffix}`;
-    progressDiv.style.display = '';
-    progressDiv.innerHTML = totalDivText;
-
-    townInfos[action.townNum].appendChild(progressDiv);
-    if (towns[action.townNum].hiddenVars.has(`${action.varName}${varSuffix}`)) {
-      progressDiv.classList.add('user-hidden');
-    }
   }
 
   createTownAction(action) {
@@ -929,7 +894,7 @@ export class View {
             `<span class='${isHighestStat ? 'bold' : ''} stat-${stat} stat-color'>${label}</span>`
           )
           .join(', ')
-      })<br>`;
+      })`;
     }
     const statPie = statEntries.length === 0 ? '' : `
                 <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-${action.varName}'>
@@ -948,20 +913,17 @@ export class View {
             const skillLabel = `${Localization.txt(`skills>${xmlName}>label`)} ${
               Localization.txt('stats>tooltip>exp')
             }`;
-            actionSkills +=
-              `<div class='bold'>${skillLabel}:</div><span id='expGain${action.varName}${skill}'></span><br>`;
+            actionSkills += `<div class='bold'>${skillLabel}:</div><span id='expGain${action.varName}${skill}'></span>`;
             if (action.teachesSkill(skill)) {
               const learnSkill = `<div class='bold'>${Localization.txt('actions>tooltip>learn_skill')}:</div>`;
-              lockedSkills += `${learnSkill} <span>${Localization.txt(`skills>${xmlName}>label`)}</span><br>`;
+              lockedSkills += `${learnSkill} <span>${Localization.txt(`skills>${xmlName}>label`)}</span>`;
               skillDetails += `<hr>
                                 ${learnSkill} <div class='bold underline'>${
                 Localization.txt(`skills>${xmlName}>label`)
-              }</div><br>
-                                <i>${Localization.txt(`skills>${xmlName}>desc`)}</i><br>`;
+              }</div>
+                                <i>${Localization.txt(`skills>${xmlName}>desc`)}</i>`;
               if (Localization.txtsObj(`skills>${xmlName}>desc2`)?.length > 0) {
-                skillDetails += `${
-                  Localization.txt(`skills>${xmlName}>desc2`).replace(/<br>\s*Currently.*(?:<br>|$)/sgi, '')
-                }<br>`; // ugh
+                skillDetails += `${Localization.txt(`skills>${xmlName}>desc2`).replace(/\s*Currently.*(?:|$)/sgi, '')}`; // ugh
               }
             }
           }
@@ -971,10 +933,10 @@ export class View {
     if (isBuffName(action.grantsBuff)) {
       const xmlName = getXMLName(Buff.fullNames[action.grantsBuff]);
       const grantsBuff = `<div class='bold'>${Localization.txt('actions>tooltip>grants_buff')}:</div>`;
-      lockedSkills += `${grantsBuff} <span>${Localization.txt(`buffs>${xmlName}>label`)}</span><br>`;
+      lockedSkills += `${grantsBuff} <span>${Localization.txt(`buffs>${xmlName}>label`)}</span>`;
       skillDetails += `<hr>
-                ${grantsBuff} <div class='bold underline'>${Localization.txt(`buffs>${xmlName}>label`)}</div><br>
-                <i>${Localization.txt(`buffs>${xmlName}>desc`)}</i><br>`;
+                ${grantsBuff} <div class='bold underline'>${Localization.txt(`buffs>${xmlName}>label`)}</div>
+                <i>${Localization.txt(`buffs>${xmlName}>desc`)}</i>`;
     }
     let extraImage = '';
     const extraImagePositions = [
@@ -995,18 +957,18 @@ export class View {
       isTraining(action.name) || hasLimit(action.name) ? 'cappableActionContainer' : ''
     }`;
     const imageName = action.name.startsWith('Assassin') ? 'assassin' : camelize(action.name);
-    const unlockConditions = /<br>\s*Unlocked (.*?)(?:<br>|$)/is.exec(
+    const unlockConditions = /\s*Unlocked (.*?)(?:|$)/is.exec(
       `${action.tooltip}${action.goldCost === undefined ? '' : action.tooltip2}`,
     )?.[1]; // I hate this but wygd
     const lockedText = unlockConditions
-      ? `${Localization.txt('actions>tooltip>locked_tooltip')}<br>Will unlock ${unlockConditions}`
+      ? `${Localization.txt('actions>tooltip>locked_tooltip')}Will unlock ${unlockConditions}`
       : `${action.tooltip}${action.goldCost === undefined ? '' : action.tooltip2}`;
     const totalDivText = `<button
                 id='container${action.varName}'
                 class='${divClass} actionOrTravelContainer ${action.type}ActionContainer showthat'
                 draggable='true'
             >
-                <label>${action.label}</label><br>
+                <label>${action.label}</label>
                 <div style='position:relative'>
                     <img src='icons/${imageName}.svg' class='superLargeIcon' draggable='false'>${extraImage}
                 </div>
@@ -1014,20 +976,20 @@ export class View {
                 <div class='showthis when-unlocked' draggable='false'>
                     ${action.tooltip}<span id='goldCost${action.varName}'></span>
                     ${(action.goldCost === undefined) ? '' : action.tooltip2}
-                    <br>
+                    
                     ${actionSkills}
                     <div class='bold'>${
       Localization.txt('actions>tooltip>mana_cost')
-    }:</div> <div id='manaCost${action.varName}'>${formatNumber(action.manaCost())}</div><br>
+    }:</div> <div id='manaCost${action.varName}'>${formatNumber(action.manaCost())}</div>
                     <dl class='action-stats'>${actionStats}</dl>
                     <div class='bold'>${
       Localization.txt('actions>tooltip>exp_multiplier')
-    }:</div><div id='expMult${action.varName}'>${action.expMult * 100}</div>%<br>
+    }:</div><div id='expMult${action.varName}'>${action.expMult * 100}</div>%
                     ${skillDetails}
                 </div>
                 <div class='showthis when-locked' draggable='false'>
                     ${lockedText}
-                    <br>
+                    
                     ${lockedSkills}
                     ${lockedStats}
                 </div>
@@ -1072,7 +1034,7 @@ export class View {
 
       const storyDivText =
         `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false'>${action.label}
-                    <br>
+                    
                     <div style='position:relative'>
                         <img src='icons/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>
                         <div id='storyContainer${action.varName}Notification' class='notification storyNotification'></div>
@@ -1143,86 +1105,9 @@ export class View {
   }
 
   createTownInfo(action) {
-    const totalInfoText = `
-            <div class='townInfoContainer showthat'>
-                <div class='bold townLabel'>${action.labelDone}</div>
-                <div class='numeric goodTemp' id='goodTemp${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
-                <div class='numeric good' id='good${action.varName}'>0</div> <i class='fa fa-arrow-left'></i>
-                <div class='numeric unchecked' id='unchecked${action.varName}'>0</div>
-                <input type='checkbox' id='searchToggler${action.varName}' style='margin-left:10px;'>
-                <label for='searchToggler${action.varName}'> Lootable first</label>
-                <div class='showthis'>${action.infoText()}</div>
-                <div id='hideVarButton${action.varName}' class='hideVarButton far'></div>
-            </div><br>
-    `;
-
-    const infoDiv = document.createElement('div');
-    infoDiv.className = 'townContainer infoType';
-    infoDiv.id = `infoContainer${action.varName}`;
-    infoDiv.style.display = '';
-    infoDiv.innerHTML = totalInfoText;
-
-    townInfos[action.townNum].appendChild(infoDiv);
   }
 
   createMultiPartPBar(action) {
-    let pbars = '';
-    const width = `style='width:calc(${91 / action.segments}% - 4px)'`;
-    const varName = action.varName;
-    for (let i = 0; i < action.segments; i++) {
-      pbars += `<div class='thickProgressBar showthat' ${width}>
-                        <div id='expBar${i}${varName}' class='segmentBar'></div>
-                        <div class='showthis' id='tooltip${i}${varName}'>
-                            <div id='segmentName${i}${varName}'></div><br>
-                            <div class='bold'>Main Stat</div> <div id='mainStat${i}${varName}'></div><br>
-                            <div class='bold'>Progress</div> <div id='progress${i}${varName}'></div> / <div id='progressNeeded${i}${varName}'></div>
-                        </div>
-                    </div>`;
-    }
-    const completedTooltip = action.completedTooltip ? action.completedTooltip() : '';
-
-    const totalDivText = `
-            <div class='townStatContainer' id='infoContainer${varName}'>
-                <div class='multipartLabel'>
-                    <div class='flexMargin'></div>
-                    <div class='bold townLabel' id='multiPartName${varName}'></div>
-                    <div id='completedInfo${varName}' class='completedInfo showthat'>
-                        <div class='bold'>${action.labelDone}</div>
-                        <div id='completed${varName}'></div>
-                        ${
-      completedTooltip === '' ? '' : `<div class='showthis' id='completedContainer${varName}'>
-                            ${completedTooltip}
-                        </div>`
-    }
-                    </div>
-                    <div class='flexMargin'></div>
-                </div>
-                <div class='multipartBars'>
-                    ${pbars}
-                </div>
-                <div id='hideVarButton${action.varName}' class='hideVarButton far'></div>
-            </div>`;
-
-    const progressDiv = document.createElement('div');
-    progressDiv.className = 'townContainer multipartType';
-    progressDiv.style.display = '';
-    progressDiv.innerHTML = totalDivText;
-
-    requestAnimationFrame(() => {
-      const completedInfo = document.getElementById(`completedInfo${action.varName}`) as HTMLDivElement;
-      if (action.varName === 'SDungeon') {
-        completedInfo.onmouseover = () => view.showDungeon(0);
-        completedInfo.onmouseout = () => view.showDungeon(undefined);
-      } else if (action.varName === 'LDungeon') {
-        completedInfo.onmouseover = () => view.showDungeon(1);
-        completedInfo.onmouseout = () => view.showDungeon(undefined);
-      } else if (action.varName === 'TheSpire') {
-        completedInfo.onmouseover = () => view.showDungeon(2);
-        completedInfo.onmouseout = () => view.showDungeon(undefined);
-      }
-    });
-
-    townInfos[action.townNum].appendChild(progressDiv);
   }
 
   updateMultiPartActions() {
