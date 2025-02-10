@@ -16,7 +16,8 @@ import {
 } from '../../original/driver.ts';
 import { actionAmount, setActionAmount } from '../../values.ts';
 import { KeyboardKey } from './KeyboardKey.ts';
-import { ActionControlsNs, TownControlsNs } from '../Towns/Towns.tsx';
+import { TownControlsNs } from '../Towns/TownControls.tsx';
+import { ActionControlsNs } from '../Towns/ActionControls.tsx';
 
 export const createKeyboardHotkeys = () => {
   Keyboard
