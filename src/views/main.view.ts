@@ -1013,47 +1013,6 @@ export class View {
     actionOptionsTown[action.townNum].querySelector(`:scope > .${isTravel ? 'travelDiv' : 'actionDiv'}`).appendChild(
       actionsDiv,
     );
-
-    if (action.storyReqs !== undefined) {
-      let storyTooltipText = '';
-      let lastInBranch = false;
-
-      for (const { num: storyId, conditionHTML, text } of action.getStoryTexts()) {
-        storyTooltipText += '<p>';
-        if (action.storyReqs(storyId)) {
-          storyTooltipText += conditionHTML + text;
-          lastInBranch = false;
-        } else if (lastInBranch) {
-          storyTooltipText += '<b>???:</b> ???';
-        } else {
-          storyTooltipText += `${conditionHTML} ???`;
-          lastInBranch = true;
-        }
-        storyTooltipText += '</p>';
-      }
-
-      const storyDivText =
-        `<div id='storyContainer${action.varName}' tabindex='0' class='storyContainer showthatstory' draggable='false'>${action.label}
-                    
-                    <div style='position:relative'>
-                        <img src='icons/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>
-                        <div id='storyContainer${action.varName}Notification' class='notification storyNotification'></div>
-                    </div>
-                    <div class='showthisstory' draggable='false'>
-                        ${storyTooltipText}
-                    </div>
-                </div>`;
-
-      const storyDiv = document.createElement('div');
-      storyDiv.innerHTML = storyDivText;
-
-      requestAnimationFrame(() => {
-        const container = document.getElementById(`storyContainer${action.varName}`) as HTMLDivElement;
-        container.onmouseover = () => hideNotification(`storyContainer${action.varName}`);
-      });
-
-      actionStoriesTown[action.townNum].appendChild(storyDiv);
-    }
   }
 
   updateAction(action) {
