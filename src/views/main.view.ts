@@ -640,20 +640,22 @@ export class View {
       const storyDiv = document.getElementById(`storyContainer${action.varName}`);
 
       if (action.allowed && getNumOnList(action.name) >= action.allowed()) {
-        actionDiv.classList.add('capped');
+        // actionDiv.classList.add('capped');
       } else if (action.unlocked()) {
         if (infoDiv) {
           infoDiv.classList.remove('hidden');
+
           if (action.varName.startsWith('Survey')) {
             document.getElementById(`infoContainer${action.varName}Global`).classList.remove('hidden');
           }
         }
         // actionDiv.classList.remove('locked');
-        actionDiv.classList.remove('capped');
+        // actionDiv.classList.remove('capped');
       } else {
         // actionDiv.classList.add('locked');
         if (infoDiv) {
           infoDiv.classList.add('hidden');
+
           if (action.varName.startsWith('Survey')) {
             document.getElementById(`infoContainer${action.varName}Global`).classList.add('hidden');
           }
@@ -663,10 +665,10 @@ export class View {
         infoDiv.classList.remove('hidden');
       }
       if (action.visible()) {
-        actionDiv.classList.remove('hidden');
+        // actionDiv.classList.remove('hidden');
         if (storyDiv !== null) storyDiv.classList.remove('hidden');
       } else {
-        actionDiv.classList.add('hidden');
+        // actionDiv.classList.add('hidden');
         if (storyDiv !== null) storyDiv.classList.add('hidden');
       }
       if (storyDiv !== null) {
