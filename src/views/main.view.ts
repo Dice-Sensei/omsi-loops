@@ -648,10 +648,10 @@ export class View {
             document.getElementById(`infoContainer${action.varName}Global`).classList.remove('hidden');
           }
         }
-        actionDiv.classList.remove('locked');
+        // actionDiv.classList.remove('locked');
         actionDiv.classList.remove('capped');
       } else {
-        actionDiv.classList.add('locked');
+        // actionDiv.classList.add('locked');
         if (infoDiv) {
           infoDiv.classList.add('hidden');
           if (action.varName.startsWith('Survey')) {

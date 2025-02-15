@@ -1,28 +1,28 @@
 import { Localization } from './localization.ts';
 
 export class Localizable {
-  #txtsObj;
-  #rootPath;
-  #lib;
+  _txtsObj;
+  _rootPath;
+  _lib;
 
   get rootPath() {
-    return this.#rootPath;
+    return this._rootPath;
   }
   get lib() {
-    return this.#lib;
+    return this._lib;
   }
   get txtsObj() {
-    return this.#txtsObj ??= Localization.txtsObj(this.#rootPath, this.#lib);
+    return this._txtsObj ??= Localization.txtsObj(this._rootPath, this._lib);
   }
 
   constructor(rootPath, lib) {
-    this.#rootPath = rootPath;
-    this.#lib = lib;
+    this._rootPath = rootPath;
+    this._lib = lib;
   }
 
   memoize(property, subPath = `>${property}`) {
     let value = this.txtsObj.find(subPath).text();
-    if (!value) value = Localization.txt(this.#rootPath + subPath, this.#lib);
+    if (!value) value = Localization.txt(this._rootPath + subPath, this._lib);
 
     Object.defineProperty(this, property, { value, configurable: true });
 

@@ -5,10 +5,23 @@ export const createInterval = (fn: () => Promise<unknown> | unknown, ms: number)
   onCleanup(() => clearInterval(id));
 };
 
-export const createIntervalSignal = <T>(initial: T, fn: (previous: T) => T, ms: number = 10): Signal<T> => {
+export const createIntervalSignal = <T>(
+  initial: T,
+  fn: (previous: T) => T,
+  compare: (a: T, b: T) => boolean = Object.is,
+  ms: number = 10,
+): Signal<T> => {
   const [value, setValue] = createSignal<T>(initial);
 
-  createInterval(() => setValue(fn), ms);
+  createInterval(() => {
+    setValue((value) => {
+      const previous = value;
+      const next = fn(previous);
+
+      if (compare(previous, next)) return previous;
+      return next;
+    });
+  }, ms);
 
   return [value, setValue];
 };

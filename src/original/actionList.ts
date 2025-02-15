@@ -353,10 +353,10 @@ export class Action extends Localizable {
     return exp > 0;
   }
 
-  getStoryTexts(rawStoriesDataForAction = this.txtsObj[0].children) {
+  getStoryTexts(rawStoriesDataForAction = this.txtsObj?.[0]?.children) {
     const storyTexts = [];
 
-    for (const rawStoryData of rawStoriesDataForAction) {
+    for (const rawStoryData of rawStoriesDataForAction ?? []) {
       if (rawStoryData.nodeName.startsWith('story_')) {
         const num = parseInt(rawStoryData.nodeName.replace('story_', ''));
         const [conditionHTML, text] = rawStoryData.textContent.split('⮀');

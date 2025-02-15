@@ -1,4 +1,4 @@
-import { createEffect, Show } from 'solid-js';
+import { createEffect, createMemo, Show } from 'solid-js';
 import { t } from '../../locales/translations.utils.ts';
 import { KeyboardKey } from '../hotkeys/KeyboardKey.ts';
 import {
@@ -8,6 +8,252 @@ import {
   handleDragOver,
 } from '../../original/driver.ts';
 import { towns } from '../../original/globals.ts';
+import { For } from '../../components/flow/For/For.tsx';
+import { createIntervalSignal } from '../../signals/createInterval.ts';
+import { Tooltip } from '../../components/containers/Overlay/primitives/Tooltip.tsx';
+import { translateClassNames } from '../../original/actionList.ts';
+import cx from 'clsx';
+import { camelize } from '../../original/helpers.ts';
+import { Button } from '../../components/buttons/Button/Button.tsx';
+import { getNumOnList } from '../../original/actions.ts';
+
+interface PieChartProps {
+  stats: { name: string; percentage: number }[];
+  class?: string;
+}
+
+const PieChart = (props: PieChartProps) => {
+  const paths = createMemo(() => {
+    let total = 0;
+
+    for (let i = 0; i < props.stats.length; ++i) {
+      total += props.stats[i].percentage;
+    }
+
+    const paths: string[] = [];
+    let angleOffset = 0;
+
+    for (let i = 0; i < props.stats.length; ++i) {
+      const percentage = props.stats[i].percentage / total;
+      const angle = percentage * 2 * Math.PI;
+
+      const ax = Math.sin(angleOffset);
+      const ay = -Math.cos(angleOffset);
+      const bx = Math.sin(angleOffset + angle);
+      const by = -Math.cos(angleOffset + angle);
+      angleOffset += angle;
+
+      paths.push(`M0,0 L${ax},${ay} A1,1 0,${angle > Math.PI ? 1 : 0},1 ${bx},${by} Z`);
+    }
+
+    return paths;
+  });
+
+  return (
+    <svg viewBox='-1 -1 2 2' class={cx('stat-pie', props.class)}>
+      <g>
+        <For each={paths()}>
+          {(path, index) => (
+            <path
+              class={`pie-slice stat-${statNameMap[props.stats[index()].name]}`}
+              d={path}
+            />
+          )}
+        </For>
+      </g>
+    </svg>
+  );
+};
+const statNameMap = {
+  speed: 'Spd',
+  constitution: 'Con',
+  perception: 'Per',
+  charisma: 'Cha',
+  luck: 'Luck',
+  intelligence: 'Int',
+  soul: 'Soul',
+  strength: 'Str',
+  dexterity: 'Dex',
+} as const;
+const nameStatMap = {
+  Spd: 'speed',
+  Con: 'constitution',
+  Per: 'perception',
+  Cha: 'charisma',
+  Luck: 'luck',
+  Int: 'intelligence',
+  Soul: 'soul',
+  Str: 'strength',
+  Dex: 'dexterity',
+} as const;
+
+interface ActionCardProps {
+  action: string;
+}
+
+const ActionCard = (props: ActionCardProps) => {
+  const action = translateClassNames(props.action);
+
+  const [values] = createIntervalSignal({
+    experienceMultiplier: 100,
+    stats: [],
+    manaCost: 0,
+    manaGain: 0,
+    affectedBy: [],
+    limit: Infinity,
+    src: '',
+    isUnlocked: true,
+    isVisible: true,
+    isCapped: false,
+    total: 0,
+    name: '',
+    tooltip1: '',
+    tooltip2: '',
+    id: '',
+  }, () => ({
+    experienceMultiplier: action.expMult + 1,
+    stats: Object.entries(action.stats).map(([name, value]) => ({
+      name: nameStatMap[name],
+      percentage: value * 100,
+    })),
+    src: action.imageName ? `icons/${action.imageName}.svg` : '',
+    manaGain: action.cost?.() ?? 0,
+    manaCost: action.manaCost(),
+    isUnlocked: action.unlocked(),
+    isVisible: action.visible(),
+    limit: action.allowed?.() ?? Infinity,
+    affectedBy: action.affectedBy ?? [],
+    total: action.affectedBy?.length ?? 0,
+    name: action.name,
+    tooltip1: action.tooltip,
+    tooltip2: action.tooltip2,
+    id: action.varName,
+    isCapped: action.allowed !== undefined ? action.allowed() >= getNumOnList(action.name) : false,
+  }), (a, b) => (a.experienceMultiplier === b.experienceMultiplier &&
+    a.stats.every((stat, index) =>
+      stat.percentage === b.stats[index].percentage && stat.name === b.stats[index].name
+    ) &&
+    a.src === b.src &&
+    a.manaGain === b.manaGain &&
+    a.manaCost === b.manaCost &&
+    a.isUnlocked === b.isUnlocked &&
+    a.isVisible === b.isVisible &&
+    a.isCapped === b.isCapped &&
+    a.limit === b.limit &&
+    a.affectedBy === b.affectedBy &&
+    a.total === b.total &&
+    a.name === b.name &&
+    a.tooltip1 === b.tooltip1 &&
+    a.tooltip2 === b.tooltip2));
+
+  const state = createMemo(() => {
+    if (!values().isUnlocked) return 'locked';
+    if (values().isCapped) return 'capped';
+    return 'unlocked';
+  });
+
+  return (
+    <Tooltip>
+      <Tooltip.Trigger>
+        <Button
+          id={`container${action.varName}`}
+          variant='text'
+          class={cx(
+            `
+          border transition-all 
+          py-1 px-2
+          flex flex-col
+          w-full h-full
+          `,
+            state() === 'unlocked' && 'hover:bg-amber-100 border-amber-600 hover:border-amber-700 active:bg-amber-400',
+            state() === 'locked' &&
+              'border-red-600 hover:border-red-700 bg-red-100 hover:bg-red-300 !text-red-900 hover:text-red-950',
+            state() === 'capped' &&
+              'bg-gray-300 border-gray-600 hover:border-gray-700 !text-gray-900 hover:text-gray-950',
+          )}
+          disabled={state() === 'locked' || state() === 'capped'}
+        >
+          <span class='text-sm text-center'>{action.name}</span>
+          <div class='grid grid-cols-3 w-full'>
+            <div class='flex self-end w-8 h-8'>
+              <PieChart stats={values().stats} class='self-end w-6 h-6 hover:w-8 hover:h-8 transition-all' />
+            </div>
+            <img
+              src={values().src}
+              class='col-start-2 w-10 h-10 object-contain'
+            />
+            <For each={values().affectedBy} as='div' class='grid grid-cols-2 gap-1 w-full'>
+              {(affectedBy) => (
+                <img
+                  src={`icons/${camelize(affectedBy)}.svg`}
+                  class={cx(
+                    'w-5 h-5 object-contain place-self-end',
+                    values().total === 1 && 'col-start-2',
+                  )}
+                />
+              )}
+            </For>
+          </div>
+        </Button>
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        <Show when={values().isUnlocked}>
+          <div class='flex flex-col gap-2'>
+            <span>{values().tooltip1}</span>
+            <span>{values().tooltip2}</span>
+          </div>
+          <div class='grid grid-cols-[auto_1fr] gap-x-2'>
+            <span class='font-medium'>Mana Cost:</span>
+            <span id={`manaCost${values().id}`}>{values().manaCost}</span>
+            <span class='font-medium'>Mana Gain:</span>
+            <span id={`goldCost${values().id}`}>{values().manaGain}</span>
+            <span class='font-medium'>Exp Multiplier:</span>
+            <span>{values().experienceMultiplier}%</span>
+          </div>
+          <For each={values().stats} as='div' class='grid grid-cols-[auto_1fr_auto_1fr_auto_1fr] gap-0.5'>
+            {(stat) => {
+              const abbr = statNameMap[stat.name];
+
+              return (
+                <>
+                  <div class='w-12'>
+                    <span class={`font-medium stat-color stat-${abbr}`}>{abbr}</span>
+                    <span>:</span>
+                  </div>
+                  <span>{stat.percentage}%</span>
+                </>
+              );
+            }}
+          </For>
+        </Show>
+        <Show when={!values().isUnlocked}>
+          <div class='flex flex-col gap-2'>
+            <span>{values().tooltip1}</span>
+            <span>{values().tooltip2}</span>
+          </div>
+          <div>
+            <span>(</span>
+            <For each={values().stats}>
+              {(stat, index) => {
+                const abbr = statNameMap[stat.name];
+
+                return (
+                  <>
+                    <span class={`font-medium stat-color stat-${abbr}`}>{abbr}</span>
+                    <Show when={index() !== values().stats.length - 1}>
+                      <span>{', '}</span>
+                    </Show>
+                  </>
+                );
+              }}
+            </For>
+            <span>)</span>
+          </div>
+        </Show>
+      </Tooltip.Content>
+    </Tooltip>
+  );
+};
 
 export const TownOptions = () => {
   createEffect(() => {
@@ -26,198 +272,11 @@ export const TownOptions = () => {
 
   return (
     <div class='grid grid-cols-4 gap-2'>
-      <div>
-        <div>
-          <div>
-            <button
-              id='containerWander'
-              class='actionContainer actionOrTravelContainer progressActionContainer showthat'
-              draggable='true'
-            >
-              <label>Wander</label>
-              <div style='position:relative'>
-                <img src='icons/wander.svg' class='superLargeIcon' draggable='false' />
-                <img
-                  src='icons/buyGlasses.svg'
-                  class='smallIcon'
-                  draggable='false'
-                  style='position:absolute;margin-top:17px;margin-left:5px;'
-                />
-              </div>
-
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Wander'>
-                <g id='stat-pie-Wander-g'>
-                  <path class='pie-slice stat-Spd' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
-                  </path>
-                  <path
-                    class='pie-slice stat-Con'
-                    d='M0,0 L0.9510565162951536,0.30901699437494734 A1,1 0,0,1 1.2246467991473532e-16,1 Z'
-                  >
-                  </path>
-                  <path
-                    class='pie-slice stat-Per'
-                    d='M0,0 L1.2246467991473532e-16,1 A1,1 0,0,1 -0.9510565162951535,0.30901699437494756 Z'
-                  >
-                  </path>
-                  <path
-                    class='pie-slice stat-Cha'
-                    d='M0,0 L-0.9510565162951535,0.30901699437494756 A1,1 0,0,1 -0.587785252292474,-0.8090169943749468 Z'
-                  >
-                  </path>
-                  <path
-                    class='pie-slice stat-Luck'
-                    d='M0,0 L-0.587785252292474,-0.8090169943749468 A1,1 0,0,1 -2.4492935982947064e-16,-1 Z'
-                  >
-                  </path>
-                </g>
-              </svg>
-              <div
-                class='stat-pie mask'
-                style='background:conic-gradient(from 0.15turn,var(--stat-Spd-color) calc(0.15turn * var(--pie-ratio)),var(--stat-Con-color) calc(0.25turn - (0.1turn * var(--pie-ratio))) calc(0.25turn + (0.1turn * var(--pie-ratio))),var(--stat-Per-color) calc(0.44999999999999996turn - (0.1turn * var(--pie-ratio))) calc(0.44999999999999996turn + (0.1turn * var(--pie-ratio))),var(--stat-Cha-color) calc(0.6499999999999999turn - (0.1turn * var(--pie-ratio))) calc(0.6499999999999999turn + (0.1turn * var(--pie-ratio))),var(--stat-Luck-color) calc(0.7999999999999999turn - (0.05turn * var(--pie-ratio))) calc(0.7999999999999999turn + (0.05turn * var(--pie-ratio))),var(--stat-Spd-color) calc(1turn - (0.15turn * var(--pie-ratio))))'
-              >
-              </div>
-              <div class='showthis when-unlocked' draggable='false'>
-                Explore the town, look for hidden areas and treasures.<span id='goldCostWander'></span>
-
-                <div class='bold'>Mana Cost:</div> <div id='manaCostWander'>250</div>
-                <dl class='action-stats'>
-                  <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
-                  <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
-                  <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
-                  <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>20%</dd>
-                  <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
-                </dl>
-                <div class='bold'>Exp Multiplier:</div>
-                <div id='expMultWander'>100</div>%
-              </div>
-              <div class='showthis when-locked' draggable='false'>
-                Explore the town, look for hidden areas and treasures.
-
-                (<span class='bold stat-Spd stat-color'>Spd</span>, <span class=' stat-Con stat-color'>Con</span>,
-                <span class=' stat-Per stat-color'>Per</span>, <span class=' stat-Cha stat-color'>Cha</span>,
-                <span class=' stat-Luck stat-color'>Luck</span>)
-              </div>
-            </button>
-          </div>
-          <div>
-            <button
-              id='containerPots'
-              class='actionContainer cappableActionContainer actionOrTravelContainer limitedActionContainer showthat'
-              draggable='true'
-            >
-              <label>Smash Pots</label>
-              <div style='position:relative'>
-                <img src='icons/smashPots.svg' class='superLargeIcon' draggable='false' />
-              </div>
-
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Pots'>
-                <g id='stat-pie-Pots-g'>
-                  <path class='pie-slice stat-Spd' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
-                  </path>
-                  <path
-                    class='pie-slice stat-Str'
-                    d='M0,0 L-0.587785252292473,0.8090169943749475 A1,1 0,0,1 -0.9510565162951536,-0.30901699437494723 Z'
-                  >
-                  </path>
-                  <path
-                    class='pie-slice stat-Per'
-                    d='M0,0 L-0.9510565162951536,-0.30901699437494723 A1,1 0,0,1 -2.4492935982947064e-16,-1 Z'
-                  >
-                  </path>
-                </g>
-              </svg>
-              <div
-                class='stat-pie mask'
-                style='background:conic-gradient(from 0.3turn,var(--stat-Spd-color) calc(0.3turn * var(--pie-ratio)),var(--stat-Str-color) calc(0.39999999999999997turn - (0.1turn * var(--pie-ratio))) calc(0.39999999999999997turn + (0.1turn * var(--pie-ratio))),var(--stat-Per-color) calc(0.6000000000000001turn - (0.1turn * var(--pie-ratio))) calc(0.6000000000000001turn + (0.1turn * var(--pie-ratio))),var(--stat-Spd-color) calc(1turn - (0.3turn * var(--pie-ratio))))'
-              >
-              </div>
-              <div class='showthis when-unlocked' draggable='false'>
-                They're just sitting there, unbroken, full of potential.Pots with mana in them have
-                <span id='goldCostPots'>100</span>
-
-                mana.Every 10 pots have mana.
-
-                <div class='bold'>Mana Cost:</div> <div id='manaCostPots'>50</div>
-                <dl class='action-stats'>
-                  <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>60%</dd>
-                  <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>20%</dd>
-                  <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
-                </dl>
-                <div class='bold'>Exp Multiplier:</div>
-                <div id='expMultPots'>100</div>%
-              </div>
-              <div class='showthis when-locked' draggable='false'>
-                They're just sitting there, unbroken, full of potential.Pots with mana in them have
-
-                mana.Every 10 pots have mana.
-
-                (<span class='bold stat-Spd stat-color'>Spd</span>, <span class=' stat-Str stat-color'>Str</span>,
-                <span class=' stat-Per stat-color'>Per</span>)
-              </div>
-            </button>
-          </div>
-          <div>
-            <button
-              id='containerLocks'
-              class='actionContainer cappableActionContainer actionOrTravelContainer limitedActionContainer showthat actionHighlight locked'
-              draggable='true'
-            >
-              <label>Pick Locks</label>
-              <div style='position:relative'>
-                <img src='icons/pickLocks.svg' class='superLargeIcon' draggable='false' />
-              </div>
-
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Locks'>
-                <g id='stat-pie-Locks-g'>
-                  <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
-                  <path
-                    class='pie-slice stat-Per'
-                    d='M0,0 L1.2246467991473532e-16,1 A1,1 0,0,1 -0.9510565162951536,-0.30901699437494723 Z'
-                  >
-                  </path>
-                  <path
-                    class='pie-slice stat-Spd'
-                    d='M0,0 L-0.9510565162951536,-0.30901699437494723 A1,1 0,0,1 -0.5877852522924734,-0.8090169943749473 Z'
-                  >
-                  </path>
-                  <path
-                    class='pie-slice stat-Luck'
-                    d='M0,0 L-0.5877852522924734,-0.8090169943749473 A1,1 0,0,1 -2.4492935982947064e-16,-1 Z'
-                  >
-                  </path>
-                </g>
-              </svg>
-              <div
-                class='stat-pie mask'
-                style='background:conic-gradient(from 0.25turn,var(--stat-Dex-color) calc(0.25turn * var(--pie-ratio)),var(--stat-Per-color) calc(0.4turn - (0.15turn * var(--pie-ratio))) calc(0.4turn + (0.15turn * var(--pie-ratio))),var(--stat-Spd-color) calc(0.6000000000000001turn - (0.05turn * var(--pie-ratio))) calc(0.6000000000000001turn + (0.05turn * var(--pie-ratio))),var(--stat-Luck-color) calc(0.7turn - (0.05turn * var(--pie-ratio))) calc(0.7turn + (0.05turn * var(--pie-ratio))),var(--stat-Dex-color) calc(1turn - (0.25turn * var(--pie-ratio))))'
-              >
-              </div>
-              <div class='showthis when-unlocked' draggable='false'>
-                Don't worry; they won't remember.Houses with valuables in them have
-                <span id='goldCostLocks'>10</span>
-
-                gold.Every 10 houses have gold.Unlocked at 20% Explored.
-
-                <div class='bold'>Mana Cost:</div> <div id='manaCostLocks'>400</div>
-                <dl class='action-stats'>
-                  <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>50%</dd>
-                  <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
-                  <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>10%</dd>
-                  <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
-                </dl>
-                <div class='bold'>Exp Multiplier:</div>
-                <div id='expMultLocks'>100</div>%
-              </div>
-              <div class='showthis when-locked' draggable='false'>
-                Don't worry; they won't remember.Houses with valuables in them have
-
-                gold.Every 10 houses have gold.Unlocked at 20% Explored.
-
-                (<span class='bold stat-Dex stat-color'>Dex</span>, <span class=' stat-Per stat-color'>Per</span>,
-                <span class=' stat-Spd stat-color'>Spd</span>, <span class=' stat-Luck stat-color'>Luck</span>)
-              </div>
-            </button>
-          </div>
+      <div class='flex flex-col border border-black rounded-sm'>
+        <div class='grid grid-cols-2 gap-2 p-2'>
+          <ActionCard action='Wander' />
+          <ActionCard action='Smash Pots' />
+          <ActionCard action='Pick Locks' />
           <div>
             <button
               id='containerBuyGlasses'
@@ -229,8 +288,8 @@ export const TownOptions = () => {
                 <img src='icons/buyGlasses.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-BuyGlasses'>
-                <g id='stat-pie-BuyGlasses-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -252,7 +311,7 @@ export const TownOptions = () => {
                 <span id='goldCostBuyGlasses'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostBuyGlasses'>50</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>70%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                 </dl>
@@ -292,7 +351,7 @@ export const TownOptions = () => {
                 <span id='goldCostFoundGlasses'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostFoundGlasses'>0</div>
-                <dl class='action-stats'></dl>
+                <dl></dl>
                 <div class='bold'>Exp Multiplier:</div>
                 <div id='expMultFoundGlasses'>0</div>%
               </div>
@@ -314,8 +373,8 @@ export const TownOptions = () => {
                 <img src='icons/buyManaZ1.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-BuyManaZ1'>
-                <g id='stat-pie-BuyManaZ1-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -342,7 +401,7 @@ export const TownOptions = () => {
                 mana. Buys all the mana you can.Unlocked at 20% Explored.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostBuyManaZ1'>100</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>70%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
@@ -371,8 +430,8 @@ export const TownOptions = () => {
                 <img src='icons/meetPeople.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Met'>
-                <g id='stat-pie-Met-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -397,7 +456,7 @@ export const TownOptions = () => {
                 <span id='goldCostMet'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostMet'>800</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>80%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>10%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -424,8 +483,8 @@ export const TownOptions = () => {
                 <img src='icons/trainStrength.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-TrainStrength'>
-                <g id='stat-pie-TrainStrength-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -446,7 +505,7 @@ export const TownOptions = () => {
                 <span id='goldCostTrainStrength'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostTrainStrength'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>80%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                 </dl>
@@ -472,8 +531,8 @@ export const TownOptions = () => {
                 <img src='icons/shortQuest.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SQuests'>
-                <g id='stat-pie-SQuests-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -515,7 +574,7 @@ export const TownOptions = () => {
                 gold as a reward.Every 5 Short Quests have loot.Unlocked at 5% People Met.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSQuests'>600</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>30%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -548,8 +607,8 @@ export const TownOptions = () => {
                 <img src='icons/investigate.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Secrets'>
-                <g id='stat-pie-Secrets-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -579,7 +638,7 @@ export const TownOptions = () => {
                 <span id='goldCostSecrets'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSecrets'>1,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>40%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -607,8 +666,8 @@ export const TownOptions = () => {
                 <img src='icons/longQuest.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-LQuests'>
-                <g id='stat-pie-LQuests-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -640,7 +699,7 @@ export const TownOptions = () => {
                 gold and 1 reputation as a reward.Every 5 Long Quests have loot.Unlocked at 10% Investigated.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostLQuests'>1,500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>40%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -670,8 +729,8 @@ export const TownOptions = () => {
                 <img src='icons/throwParty.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-ThrowParty'>
-                <g id='stat-pie-ThrowParty-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -692,7 +751,7 @@ export const TownOptions = () => {
                 <span id='goldCostThrowParty'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostThrowParty'>1,600</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>80%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>20%</dd>
                 </dl>
@@ -718,8 +777,8 @@ export const TownOptions = () => {
                 <img src='icons/warriorLessons.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-WarriorLessons'>
-                <g id='stat-pie-WarriorLessons-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Dex'
@@ -746,7 +805,7 @@ export const TownOptions = () => {
                 <div class='bold'>Combat Exp:</div>
                 <span id='expGainWarriorLessonsCombat'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostWarriorLessons'>1,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>50%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
@@ -778,8 +837,8 @@ export const TownOptions = () => {
                 <img src='icons/mageLessons.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-MageLessons'>
-                <g id='stat-pie-MageLessons-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Per'
@@ -806,7 +865,7 @@ export const TownOptions = () => {
                 <div class='bold'>Magic Exp:</div>
                 <span id='expGainMageLessonsMagic'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostMageLessons'>1,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>50%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
@@ -838,8 +897,8 @@ export const TownOptions = () => {
                 <img src='icons/healTheSick.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Heal'>
-                <g id='stat-pie-Heal-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Soul' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -875,7 +934,7 @@ export const TownOptions = () => {
                 <div class='bold'>Magic Exp:</div>
                 <span id='expGainHealMagic'>10</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostHeal'>2,500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>40%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>20%</dd>
@@ -908,8 +967,8 @@ export const TownOptions = () => {
                 <img src='icons/fightMonsters.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Fight'>
-                <g id='stat-pie-Fight-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -945,7 +1004,7 @@ export const TownOptions = () => {
                 <div class='bold'>Combat Exp:</div>
                 <span id='expGainFightCombat'>10</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostFight'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
@@ -978,8 +1037,8 @@ export const TownOptions = () => {
                 <img src='icons/smallDungeon.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SDungeon'>
-                <g id='stat-pie-SDungeon-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -1023,7 +1082,7 @@ export const TownOptions = () => {
                 <div class='bold'>Magic Exp:</div>
                 <span id='expGainSDungeonMagic'>5</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSDungeon'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>10%</dd>
@@ -1058,8 +1117,8 @@ export const TownOptions = () => {
                 <img src='icons/buySupplies.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-BuySupplies'>
-                <g id='stat-pie-BuySupplies-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -1085,7 +1144,7 @@ export const TownOptions = () => {
                 <span id='goldCostBuySupplies'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostBuySupplies'>200</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>80%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -1114,8 +1173,8 @@ export const TownOptions = () => {
                 <img src='icons/haggle.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Haggle'>
-                <g id='stat-pie-Haggle-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -1141,7 +1200,7 @@ export const TownOptions = () => {
                 <span id='goldCostHaggle'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostHaggle'>100</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>80%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -1170,8 +1229,8 @@ export const TownOptions = () => {
                 <img src='icons/surveyZ0.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SurveyZ0'>
-                <g id='stat-pie-SurveyZ0-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -1205,7 +1264,7 @@ export const TownOptions = () => {
                 <span id='goldCostSurveyZ0'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSurveyZ0'>10,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -1237,8 +1296,8 @@ export const TownOptions = () => {
                 <img src='icons/assassin.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-AssassinZ0'>
-                <g id='stat-pie-AssassinZ0-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -1277,7 +1336,7 @@ export const TownOptions = () => {
                 <span id='goldCostAssassinZ0'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostAssassinZ0'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -1311,8 +1370,8 @@ export const TownOptions = () => {
                 <img src='icons/map.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Map'>
-                <g id='stat-pie-Map-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -1339,7 +1398,7 @@ export const TownOptions = () => {
                 gold each.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostMap'>200</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>80%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -1371,8 +1430,8 @@ export const TownOptions = () => {
                 <img src='icons/startJourney.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-StartJourney'>
-                <g id='stat-pie-StartJourney-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -1399,7 +1458,7 @@ export const TownOptions = () => {
                 <span id='goldCostStartJourney'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostStartJourney'>1,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
@@ -1428,8 +1487,8 @@ export const TownOptions = () => {
                 <img src='icons/hitchRide.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-HitchRide'>
-                <g id='stat-pie-HitchRide-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Cha'
@@ -1450,7 +1509,7 @@ export const TownOptions = () => {
                 <span id='goldCostHitchRide'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostHitchRide'>1</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>50%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>50%</dd>
                 </dl>
@@ -1477,8 +1536,8 @@ export const TownOptions = () => {
                 <img src='icons/openRift.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-OpenRift'>
-                <g id='stat-pie-OpenRift-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Soul' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -1507,7 +1566,7 @@ export const TownOptions = () => {
                 <div class='bold'>Dark Magic Exp:</div>
                 <span id='expGainOpenRiftDark'>1000</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostOpenRift'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>70%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
@@ -1547,8 +1606,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Forest'>
-                <g id='stat-pie-Forest-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -1578,7 +1637,7 @@ export const TownOptions = () => {
                 <span id='goldCostForest'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostForest'>400</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -1606,8 +1665,8 @@ export const TownOptions = () => {
                 <img src='icons/wildMana.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-WildMana'>
-                <g id='stat-pie-WildMana-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -1635,7 +1694,7 @@ export const TownOptions = () => {
                 mana.Every 10 mana spots have good mana.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostWildMana'>150</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>60%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>20%</dd>
@@ -1665,8 +1724,8 @@ export const TownOptions = () => {
                 <img src='icons/gatherHerbs.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Herbs'>
-                <g id='stat-pie-Herbs-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -1692,7 +1751,7 @@ export const TownOptions = () => {
                 <span id='goldCostHerbs'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostHerbs'>200</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>40%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>30%</dd>
@@ -1720,8 +1779,8 @@ export const TownOptions = () => {
                 <img src='icons/hunt.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Hunt'>
-                <g id='stat-pie-Hunt-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Spd' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -1751,7 +1810,7 @@ export const TownOptions = () => {
                 <span id='goldCostHunt'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostHunt'>800</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>40%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>20%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
@@ -1779,8 +1838,8 @@ export const TownOptions = () => {
                 <img src='icons/sitByWaterfall.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SitByWaterfall'>
-                <g id='stat-pie-SitByWaterfall-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path
                     class='pie-slice stat-Soul'
                     d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'
@@ -1804,7 +1863,7 @@ export const TownOptions = () => {
                 <span id='goldCostSitByWaterfall'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSitByWaterfall'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>80%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                 </dl>
@@ -1830,8 +1889,8 @@ export const TownOptions = () => {
                 <img src='icons/oldShortcut.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Shortcut'>
-                <g id='stat-pie-Shortcut-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -1863,7 +1922,7 @@ export const TownOptions = () => {
                 <span id='goldCostShortcut'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostShortcut'>800</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>40%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -1893,8 +1952,8 @@ export const TownOptions = () => {
                 <img src='icons/talkToHermit.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Hermit'>
-                <g id='stat-pie-Hermit-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Cha'
@@ -1921,7 +1980,7 @@ export const TownOptions = () => {
                 <span id='goldCostHermit'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostHermit'>1,200</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>50%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>30%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>20%</dd>
@@ -1951,8 +2010,8 @@ export const TownOptions = () => {
                 <img src='icons/practicalMagic.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-PracticalMagic'>
-                <g id='stat-pie-PracticalMagic-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Per'
@@ -1979,7 +2038,7 @@ export const TownOptions = () => {
                 <div class='bold'>Practical Magic Exp:</div>
                 <span id='expGainPracticalMagicPractical'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostPracticalMagic'>4,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>50%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
@@ -2014,8 +2073,8 @@ export const TownOptions = () => {
                 <img src='icons/learnAlchemy.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-LearnAlchemy'>
-                <g id='stat-pie-LearnAlchemy-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -2046,7 +2105,7 @@ export const TownOptions = () => {
                 <div class='bold'>Alchemy Exp:</div>
                 <span id='expGainLearnAlchemyAlchemy'>50</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostLearnAlchemy'>5,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>60%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>10%</dd>
@@ -2081,8 +2140,8 @@ export const TownOptions = () => {
                 <img src='icons/brewPotions.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-BrewPotions'>
-                <g id='stat-pie-BrewPotions-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -2113,7 +2172,7 @@ export const TownOptions = () => {
                 <div class='bold'>Alchemy Exp:</div>
                 <span id='expGainBrewPotionsAlchemy'>25</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostBrewPotions'>4,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>60%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
@@ -2142,8 +2201,8 @@ export const TownOptions = () => {
                 <img src='icons/trainDexterity.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-TrainDexterity'>
-                <g id='stat-pie-TrainDexterity-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -2164,7 +2223,7 @@ export const TownOptions = () => {
                 <span id='goldCostTrainDexterity'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostTrainDexterity'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>80%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                 </dl>
@@ -2190,8 +2249,8 @@ export const TownOptions = () => {
                 <img src='icons/trainSpeed.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-TrainSpeed'>
-                <g id='stat-pie-TrainSpeed-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Spd' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -2213,7 +2272,7 @@ export const TownOptions = () => {
                 <span id='goldCostTrainSpeed'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostTrainSpeed'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>80%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                 </dl>
@@ -2246,8 +2305,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Flowers'>
-                <g id='stat-pie-Flowers-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -2273,7 +2332,7 @@ export const TownOptions = () => {
                 <span id='goldCostFlowers'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostFlowers'>300</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>70%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>10%</dd>
@@ -2307,8 +2366,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-BirdWatching'>
-                <g id='stat-pie-BirdWatching-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -2330,7 +2389,7 @@ export const TownOptions = () => {
                 <span id='goldCostBirdWatching'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostBirdWatching'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>80%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                 </dl>
@@ -2357,8 +2416,8 @@ export const TownOptions = () => {
                 <img src='icons/clearThicket.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Thicket'>
-                <g id='stat-pie-Thicket-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -2395,7 +2454,7 @@ export const TownOptions = () => {
                 <span id='goldCostThicket'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostThicket'>500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>20%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
@@ -2427,8 +2486,8 @@ export const TownOptions = () => {
                 <img src='icons/talkToWitch.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Witch'>
-                <g id='stat-pie-Witch-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Soul' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Cha'
@@ -2453,7 +2512,7 @@ export const TownOptions = () => {
                 <span id='goldCostWitch'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostWitch'>1,500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>50%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>30%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
@@ -2482,8 +2541,8 @@ export const TownOptions = () => {
                 <img src='icons/darkMagic.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-DarkMagic'>
-                <g id='stat-pie-DarkMagic-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Soul'
@@ -2510,7 +2569,7 @@ export const TownOptions = () => {
                 <div class='bold'>Dark Magic Exp:</div>
                 <span id='expGainDarkMagicDark'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostDarkMagic'>6,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>50%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
@@ -2544,8 +2603,8 @@ export const TownOptions = () => {
                 <img src='icons/darkRitual.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-DarkRitual'>
-                <g id='stat-pie-DarkRitual-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path
                     class='pie-slice stat-Soul'
                     d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'
@@ -2579,7 +2638,7 @@ export const TownOptions = () => {
                 soulstones.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostDarkRitual'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>80%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>10%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>10%</dd>
@@ -2620,8 +2679,8 @@ export const TownOptions = () => {
                 <img src='icons/surveyZ1.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SurveyZ1'>
-                <g id='stat-pie-SurveyZ1-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -2655,7 +2714,7 @@ export const TownOptions = () => {
                 <span id='goldCostSurveyZ1'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSurveyZ1'>20,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -2693,8 +2752,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-RuinsZ1'>
-                <g id='stat-pie-RuinsZ1-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -2725,7 +2784,7 @@ export const TownOptions = () => {
                 <span id='goldCostRuinsZ1'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostRuinsZ1'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -2760,8 +2819,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-StonesZ1'>
-                <g id='stat-pie-StonesZ1-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -2785,7 +2844,7 @@ export const TownOptions = () => {
                 <span id='goldCostStonesZ1'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostStonesZ1'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>60%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>40%</dd>
                 </dl>
@@ -2814,8 +2873,8 @@ export const TownOptions = () => {
                 <img src='icons/assassin.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-AssassinZ1'>
-                <g id='stat-pie-AssassinZ1-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -2854,7 +2913,7 @@ export const TownOptions = () => {
                 <span id='goldCostAssassinZ1'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostAssassinZ1'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -2890,8 +2949,8 @@ export const TownOptions = () => {
                 <img src='icons/continueOn.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-ContinueOn'>
-                <g id='stat-pie-ContinueOn-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -2916,7 +2975,7 @@ export const TownOptions = () => {
                 <span id='goldCostContinueOn'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostContinueOn'>8,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>40%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -2954,8 +3013,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-City'>
-                <g id='stat-pie-City-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Spd' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -2990,7 +3049,7 @@ export const TownOptions = () => {
                 <span id='goldCostCity'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostCity'>750</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>20%</dd>
@@ -3021,8 +3080,8 @@ export const TownOptions = () => {
                 <img src='icons/gamble.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Gamble'>
-                <g id='stat-pie-Gamble-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path
                     class='pie-slice stat-Luck'
                     d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'
@@ -3047,7 +3106,7 @@ export const TownOptions = () => {
                 <span id='goldCostGamble'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostGamble'>1,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>80%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>20%</dd>
                 </dl>
@@ -3074,8 +3133,8 @@ export const TownOptions = () => {
                 <img src='icons/getDrunk.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Drunk'>
-                <g id='stat-pie-Drunk-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Con'
@@ -3105,7 +3164,7 @@ export const TownOptions = () => {
                 <span id='goldCostDrunk'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostDrunk'>1,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>50%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>20%</dd>
@@ -3134,8 +3193,8 @@ export const TownOptions = () => {
                 <img src='icons/buyManaZ3.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-BuyManaZ3'>
-                <g id='stat-pie-BuyManaZ3-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -3162,7 +3221,7 @@ export const TownOptions = () => {
                 mana. Buys all the mana you can.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostBuyManaZ3'>100</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>70%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
@@ -3191,8 +3250,8 @@ export const TownOptions = () => {
                 <img src='icons/sellPotions.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SellPotions'>
-                <g id='stat-pie-SellPotions-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -3217,7 +3276,7 @@ export const TownOptions = () => {
                 <span id='goldCostSellPotions'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSellPotions'>1,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>70%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
@@ -3244,8 +3303,8 @@ export const TownOptions = () => {
                 <img src='icons/adventureGuild.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-AdvGuild'>
-                <g id='stat-pie-AdvGuild-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -3273,7 +3332,7 @@ export const TownOptions = () => {
                 <span id='goldCostAdvGuild'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostAdvGuild'>3,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>40%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
@@ -3309,8 +3368,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-GatherTeam'>
-                <g id='stat-pie-GatherTeam-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Per'
@@ -3343,7 +3402,7 @@ export const TownOptions = () => {
                 <span id='goldCostGatherTeam'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostGatherTeam'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>50%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
@@ -3381,8 +3440,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-LDungeon'>
-                <g id='stat-pie-LDungeon-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -3424,7 +3483,7 @@ export const TownOptions = () => {
                 <div class='bold'>Magic Exp:</div>
                 <span id='expGainLDungeonMagic'>15</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostLDungeon'>6,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>30%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>20%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>20%</dd>
@@ -3457,8 +3516,8 @@ export const TownOptions = () => {
                 <img src='icons/craftingGuild.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-CraftGuild'>
-                <g id='stat-pie-CraftGuild-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -3489,7 +3548,7 @@ export const TownOptions = () => {
                 <div class='bold'>Crafting Exp:</div>
                 <span id='expGainCraftGuildCrafting'>50</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostCraftGuild'>3,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>40%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
@@ -3524,8 +3583,8 @@ export const TownOptions = () => {
                 <img src='icons/craftArmor.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-CraftArmor'>
-                <g id='stat-pie-CraftArmor-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -3556,7 +3615,7 @@ export const TownOptions = () => {
                 <span id='goldCostCraftArmor'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostCraftArmor'>1,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>30%</dd>
@@ -3592,8 +3651,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Apprentice'>
-                <g id='stat-pie-Apprentice-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -3622,7 +3681,7 @@ export const TownOptions = () => {
                 <div class='bold'>Crafting Exp:</div>
                 <span id='expGainApprenticeCrafting'>10</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostApprentice'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>40%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>40%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>20%</dd>
@@ -3662,8 +3721,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Mason'>
-                <g id='stat-pie-Mason-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Cha'
@@ -3691,7 +3750,7 @@ export const TownOptions = () => {
                 <div class='bold'>Crafting Exp:</div>
                 <span id='expGainMasonCrafting'>20</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostMason'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>50%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>30%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>20%</dd>
@@ -3730,8 +3789,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Architect'>
-                <g id='stat-pie-Architect-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -3760,7 +3819,7 @@ export const TownOptions = () => {
                 <div class='bold'>Crafting Exp:</div>
                 <span id='expGainArchitectCrafting'>40</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostArchitect'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>60%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>20%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>20%</dd>
@@ -3799,8 +3858,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-ReadBooks'>
-                <g id='stat-pie-ReadBooks-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -3822,7 +3881,7 @@ export const TownOptions = () => {
                 <span id='goldCostReadBooks'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostReadBooks'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>80%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>20%</dd>
                 </dl>
@@ -3849,8 +3908,8 @@ export const TownOptions = () => {
                 <img src='icons/buyPickaxe.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-BuyPickaxe'>
-                <g id='stat-pie-BuyPickaxe-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -3877,7 +3936,7 @@ export const TownOptions = () => {
                 <span id='goldCostBuyPickaxe'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostBuyPickaxe'>3,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>80%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>10%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>10%</dd>
@@ -3912,8 +3971,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-HTrial'>
-                <g id='stat-pie-HTrial-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.6374239897486896,-0.7705132427757893 Z'>
                   </path>
                   <path
@@ -3974,7 +4033,7 @@ export const TownOptions = () => {
                 <div class='bold'>Restoration Exp:</div>
                 <span id='expGainHTrialRestoration'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostHTrial'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>11%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>11%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>11%</dd>
@@ -4032,8 +4091,8 @@ export const TownOptions = () => {
                 <img src='icons/surveyZ2.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SurveyZ2'>
-                <g id='stat-pie-SurveyZ2-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -4067,7 +4126,7 @@ export const TownOptions = () => {
                 <span id='goldCostSurveyZ2'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSurveyZ2'>30,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -4099,8 +4158,8 @@ export const TownOptions = () => {
                 <img src='icons/assassin.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-AssassinZ2'>
-                <g id='stat-pie-AssassinZ2-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -4139,7 +4198,7 @@ export const TownOptions = () => {
                 <span id='goldCostAssassinZ2'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostAssassinZ2'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -4175,8 +4234,8 @@ export const TownOptions = () => {
                 <img src='icons/startTrek.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-StartTrek'>
-                <g id='stat-pie-StartTrek-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -4201,7 +4260,7 @@ export const TownOptions = () => {
                 <span id='goldCostStartTrek'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostStartTrek'>12,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>70%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>10%</dd>
@@ -4228,8 +4287,8 @@ export const TownOptions = () => {
                 <img src='icons/underworld.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Underworld'>
-                <g id='stat-pie-Underworld-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Cha'
@@ -4251,7 +4310,7 @@ export const TownOptions = () => {
                 gold.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostUnderworld'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>50%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>50%</dd>
                 </dl>
@@ -4288,8 +4347,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Mountain'>
-                <g id='stat-pie-Mountain-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -4325,7 +4384,7 @@ export const TownOptions = () => {
                 <span id='goldCostMountain'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostMountain'>800</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>40%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -4362,8 +4421,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Geysers'>
-                <g id='stat-pie-Geysers-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -4389,7 +4448,7 @@ export const TownOptions = () => {
                 <span id='goldCostGeysers'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostGeysers'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>60%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>10%</dd>
@@ -4423,8 +4482,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Runes'>
-                <g id='stat-pie-Runes-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -4446,7 +4505,7 @@ export const TownOptions = () => {
                 <span id='goldCostRunes'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostRunes'>1,200</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>70%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                 </dl>
@@ -4473,8 +4532,8 @@ export const TownOptions = () => {
                 <img src='icons/chronomancy.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Chronomancy'>
-                <g id='stat-pie-Chronomancy-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -4503,7 +4562,7 @@ export const TownOptions = () => {
                 <div class='bold'>Chronomancy Exp:</div>
                 <span id='expGainChronomancyChronomancy'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostChronomancy'>10,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>60%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -4537,8 +4596,8 @@ export const TownOptions = () => {
                 <img src='icons/loopingPotion.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-LoopingPotion'>
-                <g id='stat-pie-LoopingPotion-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -4567,7 +4626,7 @@ export const TownOptions = () => {
                 <div class='bold'>Alchemy Exp:</div>
                 <span id='expGainLoopingPotionAlchemy'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostLoopingPotion'>30,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>70%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>20%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -4596,8 +4655,8 @@ export const TownOptions = () => {
                 <img src='icons/pyromancy.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Pyromancy'>
-                <g id='stat-pie-Pyromancy-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -4626,7 +4685,7 @@ export const TownOptions = () => {
                 <div class='bold'>Pyromancy Exp:</div>
                 <span id='expGainPyromancyPyromancy'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostPyromancy'>14,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>70%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -4661,8 +4720,8 @@ export const TownOptions = () => {
                 <img src='icons/exploreCavern.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Cavern'>
-                <g id='stat-pie-Cavern-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -4698,7 +4757,7 @@ export const TownOptions = () => {
                 <span id='goldCostCavern'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostCavern'>1,500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
@@ -4736,8 +4795,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-MineSoulstones'>
-                <g id='stat-pie-MineSoulstones-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -4763,7 +4822,7 @@ export const TownOptions = () => {
                 <span id='goldCostMineSoulstones'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostMineSoulstones'>5,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>60%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>10%</dd>
@@ -4791,8 +4850,8 @@ export const TownOptions = () => {
                 <img src='icons/huntTrolls.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-HuntTrolls'>
-                <g id='stat-pie-HuntTrolls-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -4833,7 +4892,7 @@ export const TownOptions = () => {
                 <div class='bold'>Combat Exp:</div>
                 <span id='expGainHuntTrollsCombat'>1000</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostHuntTrolls'>8,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
@@ -4868,8 +4927,8 @@ export const TownOptions = () => {
                 <img src='icons/checkWalls.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Illusions'>
-                <g id='stat-pie-Illusions-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -4901,7 +4960,7 @@ export const TownOptions = () => {
                 <span id='goldCostIllusions'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostIllusions'>3,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>40%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>10%</dd>
@@ -4932,8 +4991,8 @@ export const TownOptions = () => {
                 <img src='icons/takeArtifacts.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Artifacts'>
-                <g id='stat-pie-Artifacts-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -4960,7 +5019,7 @@ export const TownOptions = () => {
                 <span id='goldCostArtifacts'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostArtifacts'>1,500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>60%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
@@ -4989,8 +5048,8 @@ export const TownOptions = () => {
                 <img src='icons/imbueMind.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-ImbueMind'>
-                <g id='stat-pie-ImbueMind-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -5023,7 +5082,7 @@ export const TownOptions = () => {
                 soulstones.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostImbueMind'>500,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>80%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>10%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>10%</dd>
@@ -5065,8 +5124,8 @@ export const TownOptions = () => {
                 <img src='icons/imbueBody.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-ImbueBody'>
-                <g id='stat-pie-ImbueBody-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -5096,7 +5155,7 @@ export const TownOptions = () => {
                 levels of talent from each stat.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostImbueBody'>500,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>80%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>10%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>10%</dd>
@@ -5135,8 +5194,8 @@ export const TownOptions = () => {
                 <img src='icons/surveyZ3.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SurveyZ3'>
-                <g id='stat-pie-SurveyZ3-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -5170,7 +5229,7 @@ export const TownOptions = () => {
                 <span id='goldCostSurveyZ3'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSurveyZ3'>40,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -5208,8 +5267,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-RuinsZ3'>
-                <g id='stat-pie-RuinsZ3-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -5240,7 +5299,7 @@ export const TownOptions = () => {
                 <span id='goldCostRuinsZ3'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostRuinsZ3'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -5275,8 +5334,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-StonesZ3'>
-                <g id='stat-pie-StonesZ3-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -5300,7 +5359,7 @@ export const TownOptions = () => {
                 <span id='goldCostStonesZ3'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostStonesZ3'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>60%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>40%</dd>
                 </dl>
@@ -5329,8 +5388,8 @@ export const TownOptions = () => {
                 <img src='icons/assassin.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-AssassinZ3'>
-                <g id='stat-pie-AssassinZ3-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -5369,7 +5428,7 @@ export const TownOptions = () => {
                 <span id='goldCostAssassinZ3'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostAssassinZ3'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -5405,8 +5464,8 @@ export const TownOptions = () => {
                 <img src='icons/faceJudgement.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-FaceJudgement'>
-                <g id='stat-pie-FaceJudgement-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Soul' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Cha'
@@ -5432,7 +5491,7 @@ export const TownOptions = () => {
                 <span id='goldCostFaceJudgement'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostFaceJudgement'>30,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>50%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>30%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>20%</dd>
@@ -5462,8 +5521,8 @@ export const TownOptions = () => {
                 <img src='icons/guru.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Guru'>
-                <g id='stat-pie-Guru-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Soul'
@@ -5485,7 +5544,7 @@ export const TownOptions = () => {
                 <span id='goldCostGuru'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostGuru'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>50%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>50%</dd>
                 </dl>
@@ -5523,8 +5582,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Tour'>
-                <g id='stat-pie-Tour-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -5560,7 +5619,7 @@ export const TownOptions = () => {
                 <span id='goldCostTour'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostTour'>2,500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
@@ -5592,8 +5651,8 @@ export const TownOptions = () => {
                 <img src='icons/canvass.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Canvassed'>
-                <g id='stat-pie-Canvassed-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Spd'
@@ -5624,7 +5683,7 @@ export const TownOptions = () => {
                 <span id='goldCostCanvassed'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostCanvassed'>4,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>50%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>20%</dd>
@@ -5654,8 +5713,8 @@ export const TownOptions = () => {
                 <img src='icons/donate.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Donate'>
-                <g id='stat-pie-Donate-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -5686,7 +5745,7 @@ export const TownOptions = () => {
                 <span id='goldCostDonate'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostDonate'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -5715,8 +5774,8 @@ export const TownOptions = () => {
                 <img src='icons/acceptDonations.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Donations'>
-                <g id='stat-pie-Donations-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Luck' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -5749,7 +5808,7 @@ export const TownOptions = () => {
                 <span id='goldCostDonations'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostDonations'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>20%</dd>
@@ -5781,8 +5840,8 @@ export const TownOptions = () => {
                 <img src='icons/tidyUp.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Tidy'>
-                <g id='stat-pie-Tidy-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -5814,7 +5873,7 @@ export const TownOptions = () => {
                 <span id='goldCostTidy'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostTidy'>10,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>20%</dd>
@@ -5845,8 +5904,8 @@ export const TownOptions = () => {
                 <img src='icons/buyManaZ5.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-BuyManaZ5'>
-                <g id='stat-pie-BuyManaZ5-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -5873,7 +5932,7 @@ export const TownOptions = () => {
                 mana. Buys all the mana you can.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostBuyManaZ5'>100</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>70%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
@@ -5902,8 +5961,8 @@ export const TownOptions = () => {
                 <img src='icons/sellArtifact.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SellArtifact'>
-                <g id='stat-pie-SellArtifact-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -5934,7 +5993,7 @@ export const TownOptions = () => {
                 <span id='goldCostSellArtifact'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSellArtifact'>500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>40%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>20%</dd>
@@ -5963,8 +6022,8 @@ export const TownOptions = () => {
                 <img src='icons/giftArtifact.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-GiftArtifact'>
-                <g id='stat-pie-GiftArtifact-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -5990,7 +6049,7 @@ export const TownOptions = () => {
                 <span id='goldCostGiftArtifact'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostGiftArtifact'>500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>60%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>30%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -6019,8 +6078,8 @@ export const TownOptions = () => {
                 <img src='icons/mercantilism.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Mercantilism'>
-                <g id='stat-pie-Mercantilism-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -6049,7 +6108,7 @@ export const TownOptions = () => {
                 <div class='bold'>Mercantilism Exp:</div>
                 <span id='expGainMercantilismMercantilism'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostMercantilism'>10,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>70%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -6083,8 +6142,8 @@ export const TownOptions = () => {
                 <img src='icons/charmSchool.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-CharmSchool'>
-                <g id='stat-pie-CharmSchool-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -6105,7 +6164,7 @@ export const TownOptions = () => {
                 <span id='goldCostCharmSchool'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostCharmSchool'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>80%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                 </dl>
@@ -6131,8 +6190,8 @@ export const TownOptions = () => {
                 <img src='icons/oracle.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Oracle'>
-                <g id='stat-pie-Oracle-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path
                     class='pie-slice stat-Luck'
                     d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'
@@ -6156,7 +6215,7 @@ export const TownOptions = () => {
                 <span id='goldCostOracle'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostOracle'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>80%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>20%</dd>
                 </dl>
@@ -6182,8 +6241,8 @@ export const TownOptions = () => {
                 <img src='icons/enchantArmor.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-EnchantArmor'>
-                <g id='stat-pie-EnchantArmor-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -6212,7 +6271,7 @@ export const TownOptions = () => {
                 <div class='bold'>Crafting Exp:</div>
                 <span id='expGainEnchantArmorCrafting'>50</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostEnchantArmor'>1,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>60%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>20%</dd>
@@ -6245,8 +6304,8 @@ export const TownOptions = () => {
                 <img src='icons/wizardCollege.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-wizCollege'>
-                <g id='stat-pie-wizCollege-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Soul'
@@ -6274,7 +6333,7 @@ export const TownOptions = () => {
                 <span id='goldCostwizCollege'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostwizCollege'>10,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>50%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>30%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>20%</dd>
@@ -6312,8 +6371,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Restoration'>
-                <g id='stat-pie-Restoration-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Soul'
@@ -6341,7 +6400,7 @@ export const TownOptions = () => {
                 <div class='bold'>Restoration Exp:</div>
                 <span id='expGainRestorationRestoration'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostRestoration'>15,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>50%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
@@ -6384,8 +6443,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Spatiomancy'>
-                <g id='stat-pie-Spatiomancy-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -6419,7 +6478,7 @@ export const TownOptions = () => {
                 <div class='bold'>Spatiomancy Exp:</div>
                 <span id='expGainSpatiomancySpatiomancy'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSpatiomancy'>20,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>60%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>10%</dd>
@@ -6459,8 +6518,8 @@ export const TownOptions = () => {
                 <img src='icons/seekCitizenship.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Citizen'>
-                <g id='stat-pie-Citizen-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Int'
@@ -6490,7 +6549,7 @@ export const TownOptions = () => {
                 <span id='goldCostCitizen'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostCitizen'>1,500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>50%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>20%</dd>
@@ -6525,8 +6584,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-BuildHousing'>
-                <g id='stat-pie-BuildHousing-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -6559,7 +6618,7 @@ export const TownOptions = () => {
                 <div class='bold'>Crafting Exp:</div>
                 <span id='expGainBuildHousingCrafting'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostBuildHousing'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>20%</dd>
@@ -6598,8 +6657,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-CollectTaxes'>
-                <g id='stat-pie-CollectTaxes-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -6630,7 +6689,7 @@ export const TownOptions = () => {
                 <span id='goldCostCollectTaxes'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostCollectTaxes'>10,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -6659,8 +6718,8 @@ export const TownOptions = () => {
                 <img src='icons/pegasus.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Pegasus'>
-                <g id='stat-pie-Pegasus-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -6694,7 +6753,7 @@ export const TownOptions = () => {
                 <span id='goldCostPegasus'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostPegasus'>3,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>30%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>30%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>20%</dd>
@@ -6733,8 +6792,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-FightFrostGiants'>
-                <g id='stat-pie-FightFrostGiants-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Con'
@@ -6763,7 +6822,7 @@ export const TownOptions = () => {
                 <div class='bold'>Combat Exp:</div>
                 <span id='expGainFightFrostGiantsCombat'>1500</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostFightFrostGiants'>20,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>50%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -6799,8 +6858,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SeekBlessing'>
-                <g id='stat-pie-SeekBlessing-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Luck'
@@ -6823,7 +6882,7 @@ export const TownOptions = () => {
                 <div class='bold'>Divine Favor Exp:</div>
                 <span id='expGainSeekBlessingDivine'>50</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSeekBlessing'>1,000,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>50%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>50%</dd>
                 </dl>
@@ -6855,8 +6914,8 @@ export const TownOptions = () => {
                 <img src='icons/greatFeast.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-GreatFeast'>
-                <g id='stat-pie-GreatFeast-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path
                     class='pie-slice stat-Soul'
                     d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'
@@ -6891,7 +6950,7 @@ export const TownOptions = () => {
                 soulstones.Unlocked at 100% of city toured.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostGreatFeast'>5,000,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>80%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>10%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>10%</dd>
@@ -6933,8 +6992,8 @@ export const TownOptions = () => {
                 <img src='icons/surveyZ4.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SurveyZ4'>
-                <g id='stat-pie-SurveyZ4-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -6968,7 +7027,7 @@ export const TownOptions = () => {
                 <span id='goldCostSurveyZ4'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSurveyZ4'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -7000,8 +7059,8 @@ export const TownOptions = () => {
                 <img src='icons/assassin.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-AssassinZ4'>
-                <g id='stat-pie-AssassinZ4-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -7040,7 +7099,7 @@ export const TownOptions = () => {
                 <span id='goldCostAssassinZ4'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostAssassinZ4'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -7076,8 +7135,8 @@ export const TownOptions = () => {
                 <img src='icons/fallFromGrace.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-FallFromGrace'>
-                <g id='stat-pie-FallFromGrace-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -7110,7 +7169,7 @@ export const TownOptions = () => {
                 <span id='goldCostFallFromGrace'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostFallFromGrace'>30,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>40%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -7152,8 +7211,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Meander'>
-                <g id='stat-pie-Meander-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Spd' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -7190,7 +7249,7 @@ export const TownOptions = () => {
                 <span id='goldCostMeander'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostMeander'>2,500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -7222,8 +7281,8 @@ export const TownOptions = () => {
                 <img src='icons/manaWell.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Wells'>
-                <g id='stat-pie-Wells-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -7252,7 +7311,7 @@ export const TownOptions = () => {
                 mana. Every 100 wells still has mana. Unlocked with 2% town meandered.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostWells'>2,500</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>60%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>10%</dd>
@@ -7283,8 +7342,8 @@ export const TownOptions = () => {
                 <img src='icons/destroyPylons.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Pylons'>
-                <g id='stat-pie-Pylons-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -7311,7 +7370,7 @@ export const TownOptions = () => {
                 <span id='goldCostPylons'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostPylons'>10,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>40%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>30%</dd>
@@ -7340,8 +7399,8 @@ export const TownOptions = () => {
                 <img src='icons/raiseZombie.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-RaiseZombie'>
-                <g id='stat-pie-RaiseZombie-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -7371,7 +7430,7 @@ export const TownOptions = () => {
                 <div class='bold'>Dark Magic Exp:</div>
                 <span id='expGainRaiseZombieDark'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostRaiseZombie'>10,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>40%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>30%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>30%</dd>
@@ -7401,8 +7460,8 @@ export const TownOptions = () => {
                 <img src='icons/darkSacrifice.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-DarkSacrifice'>
-                <g id='stat-pie-DarkSacrifice-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path
                     class='pie-slice stat-Soul'
                     d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'
@@ -7428,7 +7487,7 @@ export const TownOptions = () => {
                 <div class='bold'>Communion Exp:</div>
                 <span id='expGainDarkSacrificeCommune'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostDarkSacrifice'>20,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>80%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                 </dl>
@@ -7465,8 +7524,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-TheSpire'>
-                <g id='stat-pie-TheSpire-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951535,-0.30901699437494745 Z'>
                   </path>
                   <path
@@ -7517,7 +7576,7 @@ export const TownOptions = () => {
                 <div class='bold'>Combat Exp:</div>
                 <span id='expGainTheSpireCombat'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostTheSpire'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>20%</dd>
@@ -7562,8 +7621,8 @@ export const TownOptions = () => {
                 <img src='icons/purchaseSupplies.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-PurchaseSupplies'>
-                <g id='stat-pie-PurchaseSupplies-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -7589,7 +7648,7 @@ export const TownOptions = () => {
                 <span id='goldCostPurchaseSupplies'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostPurchaseSupplies'>2,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>80%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -7624,8 +7683,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-DeadTrial'>
-                <g id='stat-pie-DeadTrial-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,0,1 1,-6.123233995736766e-17 Z'></path>
                   <path
                     class='pie-slice stat-Int'
@@ -7657,7 +7716,7 @@ export const TownOptions = () => {
                 <span id='goldCostDeadTrial'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostDeadTrial'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>25%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>25%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>25%</dd>
@@ -7690,8 +7749,8 @@ export const TownOptions = () => {
                 <img src='icons/surveyZ5.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SurveyZ5'>
-                <g id='stat-pie-SurveyZ5-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -7725,7 +7784,7 @@ export const TownOptions = () => {
                 <span id='goldCostSurveyZ5'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSurveyZ5'>60,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -7763,8 +7822,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-RuinsZ5'>
-                <g id='stat-pie-RuinsZ5-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -7795,7 +7854,7 @@ export const TownOptions = () => {
                 <span id='goldCostRuinsZ5'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostRuinsZ5'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -7830,8 +7889,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-StonesZ5'>
-                <g id='stat-pie-StonesZ5-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -7855,7 +7914,7 @@ export const TownOptions = () => {
                 <span id='goldCostStonesZ5'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostStonesZ5'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>60%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>40%</dd>
                 </dl>
@@ -7884,8 +7943,8 @@ export const TownOptions = () => {
                 <img src='icons/assassin.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-AssassinZ5'>
-                <g id='stat-pie-AssassinZ5-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -7924,7 +7983,7 @@ export const TownOptions = () => {
                 <span id='goldCostAssassinZ5'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostAssassinZ5'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -7960,8 +8019,8 @@ export const TownOptions = () => {
                 <img src='icons/journeyForth.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-JourneyForth'>
-                <g id='stat-pie-JourneyForth-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -7987,7 +8046,7 @@ export const TownOptions = () => {
                 <span id='goldCostJourneyForth'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostJourneyForth'>20,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
@@ -8025,8 +8084,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-ExploreJungle'>
-                <g id='stat-pie-ExploreJungle-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Spd' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -8062,7 +8121,7 @@ export const TownOptions = () => {
                 <span id='goldCostExploreJungle'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostExploreJungle'>25,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -8093,8 +8152,8 @@ export const TownOptions = () => {
                 <img src='icons/fightJungleMonsters.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-FightJungleMonsters'>
-                <g id='stat-pie-FightJungleMonsters-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -8123,7 +8182,7 @@ export const TownOptions = () => {
                 <div class='bold'>Combat Exp:</div>
                 <span id='expGainFightJungleMonstersCombat'>2000</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostFightJungleMonsters'>30,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>30%</dd>
@@ -8152,8 +8211,8 @@ export const TownOptions = () => {
                 <img src='icons/rescueSurvivors.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Rescue'>
-                <g id='stat-pie-Rescue-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -8188,7 +8247,7 @@ export const TownOptions = () => {
                 <div class='bold'>Restoration Exp:</div>
                 <span id='expGainRescueRestoration'>25</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostRescue'>25,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -8226,8 +8285,8 @@ export const TownOptions = () => {
                 <img src='icons/prepareBuffet.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-PrepareBuffet'>
-                <g id='stat-pie-PrepareBuffet-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -8258,7 +8317,7 @@ export const TownOptions = () => {
                 <div class='bold'>Gluttony Exp:</div>
                 <span id='expGainPrepareBuffetGluttony'>5</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostPrepareBuffet'>30,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>60%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>10%</dd>
@@ -8297,8 +8356,8 @@ export const TownOptions = () => {
                 <img src='icons/totem.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Totem'>
-                <g id='stat-pie-Totem-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Soul' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Con'
@@ -8327,7 +8386,7 @@ export const TownOptions = () => {
                 <div class='bold'>Wunderkind Exp:</div>
                 <span id='expGainTotemWunderkind'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostTotem'>30,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>50%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -8363,8 +8422,8 @@ export const TownOptions = () => {
                 <img src='icons/surveyZ6.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SurveyZ6'>
-                <g id='stat-pie-SurveyZ6-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -8398,7 +8457,7 @@ export const TownOptions = () => {
                 <span id='goldCostSurveyZ6'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSurveyZ6'>70,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -8436,8 +8495,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-RuinsZ6'>
-                <g id='stat-pie-RuinsZ6-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -8468,7 +8527,7 @@ export const TownOptions = () => {
                 <span id='goldCostRuinsZ6'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostRuinsZ6'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -8503,8 +8562,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-StonesZ6'>
-                <g id='stat-pie-StonesZ6-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,1,1 -0.587785252292473,0.8090169943749475 Z'>
                   </path>
                   <path
@@ -8528,7 +8587,7 @@ export const TownOptions = () => {
                 <span id='goldCostStonesZ6'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostStonesZ6'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>60%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>40%</dd>
                 </dl>
@@ -8557,8 +8616,8 @@ export const TownOptions = () => {
                 <img src='icons/assassin.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-AssassinZ6'>
-                <g id='stat-pie-AssassinZ6-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -8597,7 +8656,7 @@ export const TownOptions = () => {
                 <span id='goldCostAssassinZ6'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostAssassinZ6'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -8633,8 +8692,8 @@ export const TownOptions = () => {
                 <img src='icons/escape.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Escape'>
-                <g id='stat-pie-Escape-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Spd' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -8656,7 +8715,7 @@ export const TownOptions = () => {
                 <span id='goldCostEscape'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostEscape'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>80%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>20%</dd>
                 </dl>
@@ -8683,8 +8742,8 @@ export const TownOptions = () => {
                 <img src='icons/openPortal.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-OpenPortal'>
-                <g id='stat-pie-OpenPortal-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Soul' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951535,0.30901699437494756 Z'>
                   </path>
                   <path
@@ -8715,7 +8774,7 @@ export const TownOptions = () => {
                 <div class='bold'>Restoration Exp:</div>
                 <span id='expGainOpenPortalRestoration'>2500</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostOpenPortal'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>70%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
@@ -8764,8 +8823,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Excursion'>
-                <g id='stat-pie-Excursion-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Spd' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -8802,7 +8861,7 @@ export const TownOptions = () => {
                 gold.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostExcursion'>25,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -8833,8 +8892,8 @@ export const TownOptions = () => {
                 <img src='icons/explorersGuild.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-ExplorersGuild'>
-                <g id='stat-pie-ExplorersGuild-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -8871,7 +8930,7 @@ export const TownOptions = () => {
                 <span id='goldCostExplorersGuild'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostExplorersGuild'>65,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>30%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
@@ -8907,8 +8966,8 @@ export const TownOptions = () => {
                 <img src='icons/thievesGuild.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-ThievesGuild'>
-                <g id='stat-pie-ThievesGuild-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -8942,7 +9001,7 @@ export const TownOptions = () => {
                 <div class='bold'>Thievery Exp:</div>
                 <span id='expGainThievesGuildThievery'>50</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostThievesGuild'>75,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
@@ -8991,8 +9050,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-PickPockets'>
-                <g id='stat-pie-PickPockets-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -9022,7 +9081,7 @@ export const TownOptions = () => {
                 <div class='bold'>Thievery Exp:</div>
                 <span id='expGainPickPocketsThievery'>10</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostPickPockets'>20,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>40%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>20%</dd>
@@ -9059,8 +9118,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-RobWarehouse'>
-                <g id='stat-pie-RobWarehouse-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -9095,7 +9154,7 @@ export const TownOptions = () => {
                 <div class='bold'>Thievery Exp:</div>
                 <span id='expGainRobWarehouseThievery'>20</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostRobWarehouse'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>20%</dd>
@@ -9137,8 +9196,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-InsuranceFraud'>
-                <g id='stat-pie-InsuranceFraud-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Int' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -9173,7 +9232,7 @@ export const TownOptions = () => {
                 <div class='bold'>Thievery Exp:</div>
                 <span id='expGainInsuranceFraudThievery'>40</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostInsuranceFraud'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Int'>Int</dt> <dd class='stat-Int'>30%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>30%</dd>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>20%</dd>
@@ -9210,8 +9269,8 @@ export const TownOptions = () => {
                 <img src='icons/guildAssassin.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-GuildAssassin'>
-                <g id='stat-pie-GuildAssassin-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -9246,7 +9305,7 @@ export const TownOptions = () => {
                 <div class='bold'>Assassination Exp:</div>
                 <span id='expGainGuildAssassinAssassin'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostGuildAssassin'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>40%</dd>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>30%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>20%</dd>
@@ -9283,8 +9342,8 @@ export const TownOptions = () => {
                 <img src='icons/invest.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Invest'>
-                <g id='stat-pie-Invest-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -9312,7 +9371,7 @@ export const TownOptions = () => {
                 <div class='bold'>Mercantilism Exp:</div>
                 <span id='expGainInvestMercantilism'>100</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostInvest'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
@@ -9345,8 +9404,8 @@ export const TownOptions = () => {
                 <img src='icons/collectInterest.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-CollectInterest'>
-                <g id='stat-pie-CollectInterest-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -9374,7 +9433,7 @@ export const TownOptions = () => {
                 <div class='bold'>Mercantilism Exp:</div>
                 <span id='expGainCollectInterestMercantilism'>50</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostCollectInterest'>1</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
@@ -9407,8 +9466,8 @@ export const TownOptions = () => {
                 <img src='icons/seminar.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-Seminar'>
-                <g id='stat-pie-Seminar-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -9437,7 +9496,7 @@ export const TownOptions = () => {
                 <div class='bold'>Leadership Exp:</div>
                 <span id='expGainSeminarLeadership'>200</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSeminar'>20,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>80%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -9472,8 +9531,8 @@ export const TownOptions = () => {
                 <img src='icons/purchaseKey.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-PurchaseKey'>
-                <g id='stat-pie-PurchaseKey-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Cha' d='M0,0 L0,-1 A1,1 0,1,1 -0.9510565162951536,-0.30901699437494723 Z'>
                   </path>
                   <path
@@ -9499,7 +9558,7 @@ export const TownOptions = () => {
                 gold.
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostPurchaseKey'>20,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Cha'>Cha</dt> <dd class='stat-Cha'>80%</dd>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>10%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>10%</dd>
@@ -9533,8 +9592,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-STrial'>
-                <g id='stat-pie-STrial-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.6374239897486896,-0.7705132427757893 Z'>
                   </path>
                   <path
@@ -9590,7 +9649,7 @@ export const TownOptions = () => {
                 <span id='goldCostSTrial'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSTrial'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>11%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>11%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>11%</dd>
@@ -9631,8 +9690,8 @@ export const TownOptions = () => {
                 <img src='icons/surveyZ7.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SurveyZ7'>
-                <g id='stat-pie-SurveyZ7-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -9666,7 +9725,7 @@ export const TownOptions = () => {
                 <span id='goldCostSurveyZ7'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSurveyZ7'>80,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -9698,8 +9757,8 @@ export const TownOptions = () => {
                 <img src='icons/assassin.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-AssassinZ7'>
-                <g id='stat-pie-AssassinZ7-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -9738,7 +9797,7 @@ export const TownOptions = () => {
                 <span id='goldCostAssassinZ7'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostAssassinZ7'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>30%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -9774,8 +9833,8 @@ export const TownOptions = () => {
                 <img src='icons/leaveCity.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-LeaveCity'>
-                <g id='stat-pie-LeaveCity-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Con' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -9800,7 +9859,7 @@ export const TownOptions = () => {
                 <span id='goldCostLeaveCity'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostLeaveCity'>100,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>40%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>30%</dd>
@@ -9831,8 +9890,8 @@ export const TownOptions = () => {
                 <img src='icons/surveyZ8.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-SurveyZ8'>
-                <g id='stat-pie-SurveyZ8-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Per' d='M0,0 L0,-1 A1,1 0,0,1 0.5877852522924732,0.8090169943749473 Z'>
                   </path>
                   <path
@@ -9866,7 +9925,7 @@ export const TownOptions = () => {
                 <span id='goldCostSurveyZ8'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostSurveyZ8'>90,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>40%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>20%</dd>
                   <dt class='stat-Spd'>Spd</dt> <dd class='stat-Spd'>20%</dd>
@@ -9898,8 +9957,8 @@ export const TownOptions = () => {
                 <img src='icons/imbueSoul.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-ImbueSoul'>
-                <g id='stat-pie-ImbueSoul-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Soul' d='M0,0 L0,-1 A1,1 0,1,1 -2.4492935982947064e-16,-1 Z'></path>
                 </g>
               </svg>
@@ -9915,7 +9974,7 @@ export const TownOptions = () => {
                 <span id='goldCostImbueSoul'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostImbueSoul'>5,000,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>100%</dd>
                 </dl>
                 <div class='bold'>Exp Multiplier:</div>
@@ -9954,8 +10013,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-BuildTower'>
-                <g id='stat-pie-BuildTower-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Str' d='M0,0 L0,-1 A1,1 0,0,1 0.9510565162951536,0.30901699437494734 Z'>
                   </path>
                   <path
@@ -9992,7 +10051,7 @@ export const TownOptions = () => {
                 <span id='goldCostBuildTower'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostBuildTower'>250,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>30%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>30%</dd>
                   <dt class='stat-Per'>Per</dt> <dd class='stat-Per'>20%</dd>
@@ -10031,8 +10090,8 @@ export const TownOptions = () => {
                 />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-GTrial'>
-                <g id='stat-pie-GTrial-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.6374239897486896,-0.7705132427757893 Z'>
                   </path>
                   <path
@@ -10094,7 +10153,7 @@ export const TownOptions = () => {
                 <div class='bold'>Restoration Exp:</div>
                 <span id='expGainGTrialRestoration'>50</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostGTrial'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>11%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>11%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>11%</dd>
@@ -10147,8 +10206,8 @@ export const TownOptions = () => {
                 <img src='icons/challengeGods.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-GFight'>
-                <g id='stat-pie-GFight-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Dex' d='M0,0 L0,-1 A1,1 0,0,1 0.6374239897486896,-0.7705132427757893 Z'>
                   </path>
                   <path
@@ -10207,7 +10266,7 @@ export const TownOptions = () => {
                 <div class='bold'>Combat Exp:</div>
                 <span id='expGainGFightCombat'>500</span>
                 <div class='bold'>Mana Cost:</div> <div id='manaCostGFight'>50,000</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Dex'>Dex</dt> <dd class='stat-Dex'>11%</dd>
                   <dt class='stat-Str'>Str</dt> <dd class='stat-Str'>11%</dd>
                   <dt class='stat-Con'>Con</dt> <dd class='stat-Con'>11%</dd>
@@ -10249,8 +10308,8 @@ export const TownOptions = () => {
                 <img src='icons/restoreTime.svg' class='superLargeIcon' draggable='false' />
               </div>
 
-              <svg viewBox='-1 -1 2 2' class='stat-pie' id='stat-pie-RestoreTime'>
-                <g id='stat-pie-RestoreTime-g'>
+              <svg viewBox='-1 -1 2 2' class='stat-pie'>
+                <g>
                   <path class='pie-slice stat-Luck' d='M0,0 L0,-1 A1,1 0,1,1 1.2246467991473532e-16,1 Z'></path>
                   <path
                     class='pie-slice stat-Soul'
@@ -10270,7 +10329,7 @@ export const TownOptions = () => {
                 <span id='goldCostRestoreTime'></span>
 
                 <div class='bold'>Mana Cost:</div> <div id='manaCostRestoreTime'>7,777,777</div>
-                <dl class='action-stats'>
+                <dl>
                   <dt class='stat-Luck'>Luck</dt> <dd class='stat-Luck'>50%</dd>
                   <dt class='stat-Soul'>Soul</dt> <dd class='stat-Soul'>50%</dd>
                 </dl>
