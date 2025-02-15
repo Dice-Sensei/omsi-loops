@@ -9703,7 +9703,3 @@ export const TownOptions = () => {
     </div>
   );
 };
-
-<Show when={KeyboardKey.shift()}>
-  <div>* {t('actionList.tooltips.addAtCap')}</div>
-</Show>;

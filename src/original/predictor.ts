@@ -19,6 +19,7 @@ import { calcSoulstoneMult, getNumOnCurList, getNumOnList } from './actions.ts';
 import { buffs, skillList, skills, statList, stats, towns } from './globals.ts';
 import { getSpeedMult } from './driver.ts';
 import { Action, getExploreProgress, getExploreSkill, translateClassNames } from './actionList.ts';
+import { t } from '../locales/translations.utils.ts';
 
 export const Koviko = {
   Prediction: class {
