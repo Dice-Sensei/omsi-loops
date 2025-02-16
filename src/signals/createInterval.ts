@@ -1,4 +1,5 @@
 import { createSignal, onCleanup, Signal } from 'solid-js';
+import { deepEqual } from 'fast-equals';
 
 export const createInterval = (fn: () => Promise<unknown> | unknown, ms: number): void => {
   const id = setInterval(fn, ms);
@@ -8,7 +9,7 @@ export const createInterval = (fn: () => Promise<unknown> | unknown, ms: number)
 export const createIntervalSignal = <T>(
   initial: T,
   fn: (previous: T) => T,
-  compare: (a: T, b: T) => boolean = Object.is,
+  compare: (a: T, b: T) => boolean = deepEqual,
   ms: number = 10,
 ): Signal<T> => {
   const [value, setValue] = createSignal<T>(initial);

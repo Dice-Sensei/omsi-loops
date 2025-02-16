@@ -4,7 +4,8 @@
     "jquery": "^3.7.1",
     "@nimir/a-path": "2.0.2",
     "solid-js": "1.9.4",
-    "@floating-ui/dom": "1.6.9"
+    "@floating-ui/dom": "1.6.9",
+    "fast-equals": "5.2.2"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",

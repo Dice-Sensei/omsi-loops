@@ -5,7 +5,7 @@ import { TownOptions } from './TownOptions.tsx';
 import { TownStories } from './TownStories.tsx';
 
 export const Towns = () => (
-  <div class='border border-amber-500 rounded-sm'>
+  <div class='border border-amber-500 rounded-sm max-h-[400px] overflow-y-auto'>
     <TownControls />
     <TownInfos />
     <ActionControls />
