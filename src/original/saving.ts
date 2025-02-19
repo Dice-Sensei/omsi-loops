@@ -27,12 +27,11 @@ import {
   checkExtraSpeed,
   isBonusActive,
   performGamePause,
-  performGameRestart,
   recalcInterval,
   showNotification,
   toggleOffline,
 } from './driver.ts';
-import { Action, ClassNameNotFoundError, getActionPrototype, getExploreProgress } from './actionList.ts';
+import { Action, getExploreProgress } from './actionList.ts';
 import { loadChallenge } from './challenges.ts';
 
 const defaultSaveName = 'idleLoops1';

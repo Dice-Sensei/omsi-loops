@@ -36,7 +36,6 @@ import {
 } from './saving.ts';
 import { Data } from './data.ts';
 import { KeyboardKey } from '../modules/hotkeys/KeyboardKey.ts';
-import { Localization } from './localization.ts';
 import { beep, clamp, copyArray, Mana } from './helpers.ts';
 import { actions, actionStory, getNumOnList, markActionsComplete } from './actions.ts';
 import { resources, resourcesTemplate, towns } from './globals.ts';
@@ -45,8 +44,8 @@ import { dragExitUndecorate, draggedDecorate } from '../views/main.view.ts';
 import { setActionAmount } from '../values.ts';
 
 let curTime = Date.now();
-let gameTicksLeft = 0; // actually milliseconds, not ticks
-let refund = false;
+// actually milliseconds, not ticks
+let gameTicksLeft = 0;
 let lastSave = Date.now();
 
 export function getSpeedMult(zone = vals.curTown) {

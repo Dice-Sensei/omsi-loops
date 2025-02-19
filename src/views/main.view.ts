@@ -280,24 +280,11 @@ export class View {
             skip: disableAction.bind(null, id),
             remove: removeAction.bind(null, id),
           };
-          const drags = {
-            ondrop: handleDragDrop,
-            ondragover: handleDragOver,
-            ondragstart: handleDragStart,
-            ondragend: draggedUndecorate.bind(null, id),
-            ondragenter: dragOverDecorate.bind(null, id),
-            ondragleave: dragExitUndecorate.bind(null, id),
-          };
 
           const container = document.createElement('div');
           container.id = `nextActionContainer${id}`;
           container.classList.add('nextActionContainer', 'small', 'showthat');
-          container.ondragover = drags.ondragover;
-          container.ondrop = drags.ondrop;
-          container.ondragstart = drags.ondragstart;
-          container.ondragend = drags.ondragend;
-          container.ondragenter = drags.ondragenter;
-          container.ondragleave = drags.ondragleave;
+
           container.draggable = true;
           container.dataset.actionId = id;
 

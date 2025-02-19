@@ -52,82 +52,14 @@ import { increaseStoryVarTo, setStoryFlag, unlockGlobalStory } from '../views/ma
 
 export class ClassNameNotFoundError extends TypeError {}
 
-/**
- * @template {string} S
- * @typedef {S extends `${infer S1} ${infer S2}` ? `${S1}${WithoutSpaces<S2>}` : S} WithoutSpaces
- */
-
-/**
- * @template {string} S
- * @param {S} name @returns {WithoutSpaces<S>}
- */
 export function withoutSpaces(name) {
-  // @ts-ignore
   return name.replace(/ /gu, '');
 }
 
-// reverse lookup
-
-// selection
-/**
- * @template {number} TN townNum
- * @template {ActionType} T type
- * @typedef {ActionOfTownAndType<TN, T>["varName"]} ActionVarOfTownAndType
- */
-/**
- * @template {number} TN townNum
- * @template {ActionType} T type
- * @typedef {Extract<AnyAction, {townNum: TN, type: T}>} ActionOfTownAndType
- */
-
-/**
- * @typedef {Action<any>|MultipartAction<any>} AnyActionType
- * @typedef {typeof Action} ActionConstructor
- * @typedef {{
- *  [K in Exclude<keyof ActionConstructor, "prototype">]: ActionConstructor[K] extends Action<any, any> ? K : never
- * }[Exclude<keyof ActionConstructor, "prototype">]} ActionId
- *
- * @typedef {ActionConstructor[ActionId]} AnyAction
- *
- * @typedef {{
- *  [K in ActionId]: string extends VarNameOf<ActionConstructor[K]> ? never : VarNameOf<ActionConstructor[K]>
- * }[ActionId]} ActionVarName
- *
- * @typedef {{
- *  [K in ActionId]: string extends ActionTypeOf<ActionConstructor[K]> ? never : ActionTypeOf<ActionConstructor[K]> extends 'limited'|'normal' ? VarNameOf<ActionConstructor[K]> : never
- * }[ActionId]} StandardActionVarName
- *
- * @typedef {{
- *  [K in ActionId]: string extends ActionTypeOf<ActionConstructor[K]> ? never : ActionTypeOf<ActionConstructor[K]> extends 'progress' ? VarNameOf<ActionConstructor[K]> : never
- * }[ActionId]} ProgressActionVarName
- *
- * @typedef {{
- *  [K in ActionId]: ActionConstructor[K] extends MultipartAction<any> ? VarNameOf<ActionConstructor[K]> : never
- * }[ActionId]} MultipartActionVarName
- *
- * @typedef {{
- *  [K in ActionId]: string extends NameOf<ActionConstructor[K]> ? never : NameOf<ActionConstructor[K]>
- * }[ActionId]} ActionName
- */
-
-/**
- * @template {ActionId|ActionName} N
- * @typedef {ActionId extends N ? AnyAction : N extends ActionId ? ActionConstructor[N] : WithoutSpaces<N> extends ActionId ? ActionConstructor[WithoutSpaces<N>] : never} LookupAction
- */
-/**
- * @template {ActionId|ActionName} N
- * @typedef {ActionId extends N ? AnyAction : N extends ActionId ? ActionConstructor[N] : WithoutSpaces<N> extends ActionId ? ActionConstructor[WithoutSpaces<N>] : false} TryLookupAction
- */
-
-/**
- * @template {ActionId|ActionName} N
- * @param {N} name @returns {TryLookupAction<N>}
- */
 export function getActionPrototype(name) {
   if (!name) return undefined;
   const nameWithoutSpaces = withoutSpaces(name);
   if (nameWithoutSpaces in Action && Action[nameWithoutSpaces] instanceof Action) {
-    // @ts-ignore
     return Action[nameWithoutSpaces];
   }
   console.warn(`error trying to create ${name}`);
@@ -135,11 +67,11 @@ export function getActionPrototype(name) {
 }
 
 export function translateClassNames(name) {
-  // construct a new action object with appropriate prototype
   const nameWithoutSpaces = withoutSpaces(name);
   if (nameWithoutSpaces in Action) {
     return Object.create(Action[nameWithoutSpaces]);
   }
+
   throw new ClassNameNotFoundError(`error trying to create ${name}`);
 }
 
@@ -173,7 +105,6 @@ export const trainingActions = [
 ];
 
 export function hasLimit(name) {
-  // @ts-ignore
   return limitedActions.includes(name);
 }
 
@@ -201,7 +132,6 @@ export function getTravelNum(name) {
 }
 
 export function isTraining(name) {
-  // @ts-ignore
   return trainingActions.includes(name);
 }
 
@@ -231,43 +161,7 @@ export const townNames = [
 // 3: limited actions. limited actions have town info for their limit, and a set of town vars for their "data"
 // 4: multipart actions. multipart actions have multiple distinct parts to get through before repeating. they also get a bonus depending on how often you complete them
 
-// type names are "normal", "progress", "limited", and "multipart".
-// define one of these in the action, and they will create any additional UI elements that are needed
-
 export const actionTypes = ['normal', 'progress', 'limited', 'multipart'];
-/**
- * @typedef {{
- *     type: ActionType,
- *     varName?: string,
- *     expMult: number,
- *     townNum: number,
- *     story?: (completed: number) => void,
- *     storyReqs?: (storyNum: number) => boolean,
- *     stats: Partial<Record<StatName, number>>,
- *     canStart?: (loopCounter?: number) => boolean,
- *     cost?: () => void,
- *     manaCost(): number,
- *     goldCost?: () => number,
- *     allowed?: () => number,
- *     visible(): boolean,
- *     unlocked(): boolean,
- *     finish(): void,
- *     skills?: Partial<Record<SkillName, number | (() => number)>>,
- *     grantsBuff?: BuffName,
- *     affectedBy?: readonly string[],
- *     progressScaling?: ProgressScalingType,
- * }} ActionExtras
- */
-
-// exp mults are default 100%, 150% for skill training actions, 200% for actions that cost a resource, 300% for actions that cost 2 resources, and 500% for actions that cost soulstones
-// todo: ^^ currently some actions are too high, but I am saving these balance changes for the z5/z6 update
-
-// actions are all sorted below by town in order
-
-/**
- * @template {string} N The name passed to the constructor
- * @template {ActionExtras} [E=ActionExtras] The extras parameter passed to the constructor
- */
 
 export class Action {
   varName;
@@ -317,16 +211,10 @@ export class Action {
 class MultipartAction extends Action {
   segments;
 
-  /**
-   * @param {N} name @param {E & ThisType<MultipartAction<N>>} extras
-   */
   constructor(name, extras) {
     super(name, extras);
     this.segments = (extras.varName === 'Fight') ? 3 : extras.loopStats.length;
   }
-
-  // lazily calculate segment names when explicitly requested (to give chance for localization
-  // code to be loaded first)
 
   get segmentNames() {
     this._segmentNames ??= Array.from(Localization.txtsObj(this._rootPath).find('>segment_names>name')).map((e) =>
@@ -389,11 +277,7 @@ class DungeonAction extends MultipartAction {
 
 class TrialAction extends MultipartAction {
   trialNum;
-  /**
-   * @param {N} name @param {number} trialNum, @param {E & ThisType<E & TrialAction<N>>} extras
-   */
   constructor(name, trialNum, extras) {
-    // @ts-ignore
     super(name, extras);
     this.trialNum = trialNum;
   }
@@ -440,7 +324,6 @@ class TrialAction extends MultipartAction {
 
 class AssassinAction extends MultipartAction {
   constructor(name, extras) {
-    // @ts-ignore
     super(name, { ...extras, ...AssassinAction.$defaults });
   }
 
@@ -503,7 +386,6 @@ class AssassinAction extends MultipartAction {
   unlocked() {
     return getSkillLevel('Assassin') > 0;
   }
-  // @ts-ignore
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
@@ -828,7 +710,6 @@ Action.SmashPots = new Action('Smash Pots', {
   unlocked() {
     return true;
   },
-  // note this name is misleading: it is used for mana and gold gain.
   goldCost() {
     return Math.floor(100 * getSkillBonus('Dark'));
   },
@@ -5755,7 +5636,6 @@ Action.SeekBlessing = new Action('Seek Blessing', {
   finish() {
     setStoryFlag('blessingSought');
     if (getFrostGiantsRank().bonus >= 10) setStoryFlag('greatBlessingSought');
-    // @ts-ignore
     this.skills.Divine = Math.floor(50 * getFrostGiantsRank().bonus);
     handleSkillExp(this.skills);
   },
@@ -6605,7 +6485,6 @@ Action.PrepareBuffet = new Action('Prepare Buffet', {
     return towns[6].getLevel('ExploreJungle') >= 20;
   },
   finish() {
-    // @ts-ignore
     this.skills.Gluttony = Math.floor(towns[6].RescueLoopCounter * 5);
     handleSkillExp(this.skills);
     setStoryFlag('buffetHeld');
@@ -7753,7 +7632,6 @@ Action.ImbueSoul = new MultipartAction('Imbue Soul', {
 export function adjustTrainingExpMult() {
   for (let actionName of trainingActions) {
     const actionProto = getActionPrototype(actionName);
-    // @ts-ignore shh we're pretending it's frozen
     actionProto.expMult = 4 + getBuffLevel('Imbuement3');
     view.adjustExpMult(actionName);
   }

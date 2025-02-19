@@ -159,7 +159,7 @@ class ActionLogEntry {
     if (key === 'loopEnd') return formatNumber(this.loop);
     if (key === 'town') return townNames[this.action?.townNum];
     if (key === 'action') return '{{ACTION LABEL!!!!}}';
-    if (key === 'header') return Localization.txt('actions>log>header');
+    if (key === 'header') return 'Loop {loop}, {action} in {town}';
     throw new Error(`Bad key ${key}`);
   }
 
@@ -205,7 +205,7 @@ class RepeatableLogEntry extends ActionLogEntry {
   /** @param {string} key  */
   getReplacement(key) {
     if (key === 'loop') {
-      return this.loop === this.loopEnd ? formatNumber(this.loop) : Localization.txt('actions>log>multiloop');
+      return this.loop === this.loopEnd ? formatNumber(this.loop) : '{loopStart}–{loopEnd}';
     }
     if (key === 'loopEnd') return formatNumber(this.loopEnd);
     return super.getReplacement(key);
@@ -254,7 +254,7 @@ class ActionStoryEntry extends UniqueLogEntry {
   }
 
   getText() {
-    return Localization.txt('actions>log>action_story');
+    return '<b>{header} ({condition}):</b> {story}';
   }
 
   getReplacement(key) {
@@ -268,7 +268,7 @@ class ActionStoryEntry extends UniqueLogEntry {
         if (key === 'story') return storyInfo.text;
       } else {
         if (key === 'condition') return '???';
-        if (key === 'story') return Localization.txt(`actions>log>action_story_not_found`);
+        if (key === 'story') return 'You remember that something happened here, but not what it was.';
       }
     }
 
@@ -301,7 +301,7 @@ class GlobalStoryEntry extends UniqueLogEntry {
   }
 
   getText() {
-    return Localization.txt('actions>log>global_story');
+    return '<b>Loop {loop}:</b> {story}';
   }
 
   getReplacement(key) {
@@ -353,13 +353,15 @@ class SoulstoneEntry extends RepeatableLogEntry {
   }
 
   getText() {
-    return Localization.txt(
-      this.count === 1
-        ? 'actions>log>soulstone'
-        : Object.keys(this.stones).length === 1
-        ? 'actions>log>soulstone_singlemulti'
-        : 'actions>log>soulstone_multi',
-    );
+    if (this.count === 1) {
+      return '<b>{header}:</b> You find a soulstone attuned to {stat_long}!';
+    }
+
+    if (Object.keys(this.stones).length === 1) {
+      return '<b>{header}:</b> You find {count} soulstones attuned to {stat_long}.';
+    }
+
+    return '<b>{header}:</b> You find {count} soulstones: {stats}';
   }
 
   getReplacement(key) {
@@ -368,9 +370,8 @@ class SoulstoneEntry extends RepeatableLogEntry {
     if (key === 'stat') return t(`stats.${Object.keys(this.stones)[0]}.short_form`);
     if (key === 'stats') {
       const strs = [];
-      const template = Localization.txt(
-        Object.keys(this.stones).length > 3 ? 'actions>log>soulstone_stat_short' : 'actions>log>soulstone_stat',
-      );
+
+      const template = Object.keys(this.stones).length > 3 ? '{count} {stat}' : '{count} of {stat_long}';
 
       for (const stat in stats) {
         if (stat in this.stones) {
@@ -465,15 +466,18 @@ class SkillEntry extends LeveledLogEntry {
   }
 
   getText() {
-    return Localization.txt(
-      this.toLevel === this.fromLevel + 1 ? 'actions>log>skill' : 'actions>log>skill_multi',
-    );
+    if (this.toLevel === this.fromLevel + 1) {
+      return '<b>{header}:</b> You attain level {toLevel} in {skill}!';
+    }
+
+    return '<b>{header}:</b> Your skill in {skill} increases from {fromLevel} to {toLevel}.';
   }
 
   getReplacement(key) {
     if (key === 'skill') {
       return Localization.txt(`skills>${getXMLName(this.name)}>label`);
     }
+
     return super.getReplacement(key);
   }
 }
