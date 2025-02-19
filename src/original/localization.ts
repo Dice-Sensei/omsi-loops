@@ -18,14 +18,6 @@ export namespace Localization {
     bundles[language] = await loadXml(language);
   }
 
-  export function populate(language: string = Localization.language) {
-    const elements = document.querySelectorAll<HTMLElement>('.localized');
-
-    for (const element of elements) {
-      element.innerHTML = Localization.txt(element.dataset.locale, language);
-    }
-  }
-
   export function change() {
     SearchParams.set(searchParam, language);
   }

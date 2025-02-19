@@ -46,7 +46,6 @@ import {
   showNotification,
   split,
 } from '../original/driver.ts';
-import { Koviko } from '../original/predictor.ts';
 
 export function formatTime(seconds: number) {
   if (seconds > 300) {
@@ -256,9 +255,6 @@ export class View {
   }
   updateNextActions() {
     const { scrollTop } = nextActionsDiv; // save the current scroll position
-    if (vals.options.predictor) {
-      Koviko.preUpdateHandler(nextActionsDiv);
-    }
 
     d3.select(nextActionsDiv)
       .selectAll('.nextActionContainer')
@@ -364,10 +360,6 @@ export class View {
 
           container.append(buttons);
 
-          const koviko = document.createElement('ul');
-          koviko.classList.add('koviko');
-          container.append(koviko);
-
           return container;
         });
       })
@@ -420,10 +412,6 @@ export class View {
           .text((action) => action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops))
       );
 
-    if (vals.options.predictor) {
-      Koviko.postUpdateHandler(actions.next, nextActionsDiv);
-    }
-    // scrolling down to see the new thing added is okay, scrolling up when you click an action button is not
     nextActionsDiv.scrollTop = Math.max(nextActionsDiv.scrollTop, scrollTop);
   }
 

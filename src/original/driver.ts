@@ -586,7 +586,6 @@ export function capAllTraining() {
   for (const [index, action] of actions.next.entries()) {
     // @ts-ignore
     if (trainingActions.includes(action.name)) {
-      //console.log("Training Action on list: " + action.name);
       capTraining(index);
     }
   }

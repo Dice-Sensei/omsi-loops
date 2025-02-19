@@ -264,18 +264,18 @@ export const Actions = () => {
                 Loadout 15
               </button>
               <button
-                class='loadoutbutton localized'
+                class='loadoutbutton'
                 style='margin-bottom: 5px; margin-top: 3px'
                 onClick={() => saveList()}
-                data-locale='actions>tooltip>save_loadout'
               >
+                Save loadout
               </button>
               <button
-                class='loadoutbutton localized'
+                class='loadoutbutton'
                 style='margin-bottom: 5px'
                 onClick={() => loadList()}
-                data-locale='actions>tooltip>load_loadout'
               >
+                Load loadout
               </button>
               <input
                 id='renameLoadout'

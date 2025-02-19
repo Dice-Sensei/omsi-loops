@@ -158,7 +158,7 @@ class ActionLogEntry {
     if (key === 'loopStart') return formatNumber(this.loop);
     if (key === 'loopEnd') return formatNumber(this.loop);
     if (key === 'town') return townNames[this.action?.townNum];
-    if (key === 'action') return this.action?.label;
+    if (key === 'action') return '{{ACTION LABEL!!!!}}';
     if (key === 'header') return Localization.txt('actions>log>header');
     throw new Error(`Bad key ${key}`);
   }

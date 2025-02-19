@@ -12,5 +12,4 @@ loadDefaults();
 
 await Localization.init();
 
-Localization.populate();
 startGame();

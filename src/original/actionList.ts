@@ -23,7 +23,6 @@ import {
 } from './prestige.ts';
 import { vals } from './saving.ts';
 import { Data } from './data.ts';
-import { Localizable } from './localizable.ts';
 import { Localization } from './localization.ts';
 import { camelize, fibonacci, numberToWords, precision3 } from './helpers.ts';
 import { getNumOnList } from './actions.ts';
@@ -49,7 +48,6 @@ import {
   resetResource,
   unlockTown,
 } from './driver.ts';
-import { vals } from './saving.ts';
 import { increaseStoryVarTo, setStoryFlag, unlockGlobalStory } from '../views/main.view.ts';
 
 export class ClassNameNotFoundError extends TypeError {}
@@ -271,89 +269,31 @@ export const actionTypes = ['normal', 'progress', 'limited', 'multipart'];
  * @template {ActionExtras} [E=ActionExtras] The extras parameter passed to the constructor
  */
 
-export class Action extends Localizable {
-  name;
-
+export class Action {
   varName;
+  _rootPath: string;
 
   /**
    * @overload @param {N} name @param {E & ThisType<Action<N>>} extras
    * @constructor
    * @param {N} name @param {E} extras
    */
-  constructor(name, extras) {
-    super(`actions>${Action.xmlNameFor(name)}`);
-    this.name = name;
+  constructor(public name: string, extras) {
+    this._rootPath = `actions>${
+      name.startsWith('Assassin') ? 'assassin' : name.startsWith('Survey') ? 'survey' : getXMLName(name)
+    }`;
+
     // many actions have to override this (in extras) for save compatibility, because the
     // varName is often used in parts of the game state
     this.varName = withoutSpaces(name);
     Object.assign(this, extras);
   }
 
-  static xmlNameFor(name) {
-    return name.startsWith('Assassin') ? 'assassin' : name.startsWith('Survey') ? 'survey' : getXMLName(name);
-  }
-
   get imageName() {
     return camelize(this.name);
   }
 
-  /* eslint-disable no-invalid-this */
-  // not all actions have tooltip2 or labelDone, but among actions that do, the XML format is
-  // always the same; these are loaded lazily once (and then they become own properties of the
-  // specific Action object)
-  get tooltip() {
-    return this.memoize('tooltip');
-  }
-  get tooltip2() {
-    return this.memoize('tooltip2');
-  }
-  get label() {
-    return this.memoize('label');
-  }
-  get labelDone() {
-    return this.memoize('labelDone', '>label_done');
-  }
-  get labelGlobal() {
-    return this.memoize('labelGlobal', '>label_global');
-  }
-
-  // static {
-  //   // listing these means they won't get stored even if memoized
-  //   Data.omitProperties(this.prototype, ['tooltip', 'tooltip2', 'label', 'labelDone', 'labelGlobal']);
-  // }
-
-  // all actions to date with info text have the same info text, so presently this is
-  // centralized here (function will not be called by the game code if info text is not
-  // applicable)
-  infoText() {
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>info_text1`)}
-                <i class='fa fa-arrow-left'></i>
-                ${Localization.txt(`actions>${getXMLName(this.name)}>info_text2`)}
-                <i class='fa fa-arrow-left'></i>
-                ${Localization.txt(`actions>${getXMLName(this.name)}>info_text3`)}
-                <br><span class='bold'>${`${
-      Localization.txt('actions>tooltip>total_found')
-    }: `}</span><div id='total${this.varName}'></div>
-                <br><span class='bold'>${`${
-      Localization.txt('actions>tooltip>total_checked')
-    }: `}</span><div id='checked${this.varName}'></div>`;
-  }
-
-  teachesSkill(skill) {
-    // if we don't give exp in the skill we don't teach it
-    if (this.skills?.[skill] === undefined) return false;
-    // if we have an unlock function and it references the skill, we don't teach it
-    if (this.unlocked?.toString().search(`getSkillLevel\\("${skill}"\\)`) >= 0) return false;
-    // if this is combat or magic and this isn't town 0, we don't teach it
-    if ((skill === 'Combat' || skill === 'Magic') && this.townNum > 0) return false;
-    // otherwise we do (as long as we actually give exp in it and it isn't zeroed out)
-    const reward = this.skills[skill];
-    const exp = typeof reward === 'function' ? reward() : reward;
-    return exp > 0;
-  }
-
-  getStoryTexts(rawStoriesDataForAction = this.txtsObj?.[0]?.children) {
+  getStoryTexts(rawStoriesDataForAction = Localization.txtsObj(this._rootPath)?.[0]?.children) {
     const storyTexts = [];
 
     for (const rawStoryData of rawStoriesDataForAction ?? []) {
@@ -374,26 +314,6 @@ export class Action extends Localizable {
   }
 }
 
-/**
- * @typedef {{
- *     loopStats: readonly StatName[],
- *     loopCost(segment: number, loopCounter?: number): number,
- *     tickProgress(offset: number, loopCounter?: number, totalCompletions?: number): number,
- *     segmentFinished?: (loopCounter?: number) => void,
- *     loopsFinished(loopCounter?: number): void,
- *     getSegmentName?: (segment: number) => string,
- *     getPartName(loopCounter?: number): string,
- *     completedTooltip?: () => string,
- * } & ActionExtras} MultipartActionExtras
- */
-
-// same as Action, but contains shared code to load segment names for multipart actions.
-// (constructor takes number of segments as a second argument)
-/**
- * @template {string} N The name passed to the constructor
- * @template {MultipartActionExtras} [E=MultipartActionExtras] The extras parameter passed to the constructor
- * @extends {Action<N,E>}
- */
 class MultipartAction extends Action {
   segments;
 
@@ -409,28 +329,28 @@ class MultipartAction extends Action {
   // code to be loaded first)
 
   get segmentNames() {
-    this._segmentNames ??= Array.from(this.txtsObj.find('>segment_names>name')).map((e) => e.textContent);
+    this._segmentNames ??= Array.from(Localization.txtsObj(this._rootPath).find('>segment_names>name')).map((e) =>
+      e.textContent
+    );
 
     return this._segmentNames;
   }
 
   get altSegmentNames() {
-    this._altSegmentNames ??= Array.from(this.txtsObj.find('>segment_alt_names>name')).map((e) => e.textContent);
+    this._altSegmentNames ??= Array.from(Localization.txtsObj(this._rootPath).find('>segment_alt_names>name')).map((
+      e,
+    ) => e.textContent);
 
     return this._altSegmentNames;
   }
 
   get segmentModifiers() {
-    this._segmentModifiers ??= Array.from(this.txtsObj.find('>segment_modifiers>segment_modifier')).map((e) =>
-      e.textContent
-    );
+    this._segmentModifiers ??= Array.from(
+      Localization.txtsObj(this._rootPath).find('>segment_modifiers>segment_modifier'),
+    ).map((e) => e.textContent);
 
     return this._segmentModifiers;
   }
-
-  // static {
-  //   Data.omitProperties(this.prototype, ['segmentNames', 'altSegmentNames', 'segmentModifiers']);
-  // }
 
   getSegmentName(segment) {
     return this.segmentNames[segment % this.segmentNames.length];
@@ -445,22 +365,6 @@ class MultipartAction extends Action {
   }
 }
 
-/**
- * @typedef {{
- *      completedTooltip(): string;
- *      getPartName(loopCounter?: number): string;
- * }} DungeonActionImpl
- * @typedef {{
- * } & Omit<MultipartActionExtras, keyof DungeonActionImpl>} DungeonActionExtras
- */
-// same as MultipartAction, but includes shared code to generate dungeon completion tooltip
-// as well as specifying 7 segments (constructor takes dungeon ID number as a second
-// argument)
-/**
- * @template {string} N The name passed to the constructor
- * @template {DungeonActionExtras} [E=DungeonActionExtras] The extras parameter passed to the constructor
- * @extends {MultipartAction<N,E&DungeonActionImpl>}
- */
 class DungeonAction extends MultipartAction {
   dungeonNum;
 
@@ -473,25 +377,6 @@ class DungeonAction extends MultipartAction {
     this.dungeonNum = dungeonNum;
   }
 
-  // @ts-ignore
-  completedTooltip() {
-    let ssDivContainer = '';
-    if (this.dungeonNum < 3) {
-      for (let i = 0; i < vals.dungeons[this.dungeonNum].length; i++) {
-        ssDivContainer += `Floor ${i + 1} |
-                                    <div class='bold'>${
-          Localization.txt(`actions>${getXMLName(this.name)}>chance_label`)
-        } </div> <div id='soulstoneChance${this.dungeonNum}_${i}'></div>% -
-                                    <div class='bold'>${
-          Localization.txt(`actions>${getXMLName(this.name)}>last_stat_label`)
-        } </div> <div id='soulstonePrevious${this.dungeonNum}_${i}'>NA</div> -
-                                    <div class='bold'>${
-          Localization.txt(`actions>${getXMLName(this.name)}>label_done`)
-        }</div> <div id='soulstoneCompleted${this.dungeonNum}_${i}'></div><br>`;
-      }
-    }
-    return Localization.txt(`actions>${getXMLName(this.name)}>completed_tooltip`) + ssDivContainer;
-  }
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`] + 0.0001) {
     const floor = Math.floor(loopCounter / this.segments + 1);
     return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
@@ -502,28 +387,6 @@ class DungeonAction extends MultipartAction {
   }
 }
 
-/**
- * @typedef {{
- *      completedTooltip(): string;
- *      getPartName(loopCounter?: number): string;
- *      currentFloor(loopCounter?: number): number;
- *      loopCost(segment: number, loopCounter?: number): number;
- *      tickProgress(offset: number, loopCounter?: number, totalCompletions?: number): number;
- *      loopsFinished(loopCounter?: number): void;
- * }} TrialActionImpl
- * @typedef {{
- *    floorReward(): void,
- *    baseProgress(): number,
- *    baseScaling: number,
- *    exponentScaling?: number,
- * } & Omit<MultipartActionExtras, keyof TrialActionImpl>} TrialActionExtras
- */
-/**
- * @template {string} N The name passed to the constructor
- * @template {TrialActionExtras} [E=TrialActionExtras] The extras parameter passed to the constructor
- * @extends {MultipartAction<N,E&TrialActionImpl>}
- * @implements {TrialActionImpl}
- */
 class TrialAction extends MultipartAction {
   trialNum;
   /**
@@ -534,12 +397,7 @@ class TrialAction extends MultipartAction {
     super(name, extras);
     this.trialNum = trialNum;
   }
-  // @ts-ignore
-  completedTooltip() {
-    return this.name + ` Highest Floor: <div id='trial${this.trialNum}HighestFloor'>0</div><br>
-        Current Floor: <div id='trial${this.trialNum}CurFloor'>0</div> - Completed <div id='trial${this.trialNum}CurFloorCompleted'>x</div> times<br>
-        Last Floor: <div id='trial${this.trialNum}LastFloor'>N/A</div> - Completed <div id='trial${this.trialNum}LastFloorCompleted'>N/A</div> times<br>`;
-  }
+
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
     const floor = Math.floor((loopCounter + 0.0001) / this.segments + 1);
     return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
@@ -565,7 +423,6 @@ class TrialAction extends MultipartAction {
   }
   loopsFinished(loopCounter) {
     const finishedFloor = this.currentFloor(loopCounter) - 1;
-    //console.log("Finished floor: " + finishedFloor + " Current Floor: " + this.currentFloor());
     vals.trials[this.trialNum][finishedFloor].completed++;
     if (
       finishedFloor > vals.trials[this.trialNum].highestFloor ||
@@ -581,39 +438,10 @@ class TrialAction extends MultipartAction {
   }
 }
 
-/**
- * @typedef {typeof AssassinAction.$defaults} AssassinActionDefaults
- * @typedef {{
- *      manaCost(): number,
- *      allowed(): number,
- *      canStart(loopCounter?: number): boolean,
- *      loopCost(segment: number, loopCounter?: number): number,
- *      tickProgress(offset: number, loopCounter?: number, totalCompletions?: number): number,
- *      getPartName(loopCounter?: number): string,
- *      loopsFinished(loopCounter?: number): void,
- *      finish(): void,
- *      visible(): boolean,
- *      unlocked(): boolean,
- *      storyReqs(storyNum: number): boolean,
- *  }} AssassinActionImpl
- * @typedef {{
- * } & Omit<MultipartActionExtras, keyof (AssassinActionDefaults & AssassinActionImpl)>} AssassinActionExtras
- */
-/**
- * @template {string} N The name passed to the constructor
- * @template {AssassinActionExtras} [E=AssassinActionExtras] The extras parameter passed to the constructor
- * @extends {MultipartAction<N,E&AssassinActionDefaults&AssassinActionImpl>}
- */
 class AssassinAction extends MultipartAction {
-  /**
-   * @param {N} name @param {E & ThisType<E & AssassinAction<N>>} extras
-   */
   constructor(name, extras) {
     // @ts-ignore
-    super(name, {
-      ...extras,
-      ...AssassinAction.$defaults,
-    });
+    super(name, { ...extras, ...AssassinAction.$defaults });
   }
 
   get imageName() {
@@ -622,7 +450,7 @@ class AssassinAction extends MultipartAction {
 
   getStoryTexts(
     rawStoriesDataForAction = Localization.txtsObj(this.name.toLowerCase().replace(/ /gu, '_'))[0].children,
-  ) { // I hate this
+  ) {
     return super.getStoryTexts(rawStoriesDataForAction);
   }
 
@@ -636,7 +464,6 @@ class AssassinAction extends MultipartAction {
   manaCost() {
     return 50000;
   }
-  // @ts-ignore
   allowed() {
     return 1;
   }
@@ -2867,7 +2694,6 @@ export function sacrificeSoulstonesBySegments(
   stonesSpent = {},
   sortedStats = Object.values(stats).sort(Stat.compareSoulstoneDescending),
 ) {
-  // console.log(`Sacrificing ${amount} soulstones in ${segments} segments from stats: ${sortedStats.map(s=>`${s.name} ${s.soulstone}`).join(", ")}`, sortedStats);
   while (amount > 0) {
     // pull off the front of the list, since its sort order may change
     const highestSoulstoneStat = sortedStats.shift();
@@ -2876,7 +2702,6 @@ export function sacrificeSoulstonesBySegments(
     stonesSpent[highestSoulstoneStat.name] ??= 0;
     stonesSpent[highestSoulstoneStat.name] += count;
     amount -= count;
-    // console.log(`Sacrificed ${count} soulstones from ${highestSoulstoneStat.name}, now ${highestSoulstoneStat.soulstone}, ${amount} remaining to sacrifice`);
     // put it back in the list in the proper place
     if (highestSoulstoneStat.soulstone <= sortedStats.at(-1).soulstone) {
       // ...which is the end if the stats were roughly in sync

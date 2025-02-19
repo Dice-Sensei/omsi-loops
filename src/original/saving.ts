@@ -34,7 +34,6 @@ import {
 } from './driver.ts';
 import { Action, ClassNameNotFoundError, getActionPrototype, getExploreProgress } from './actionList.ts';
 import { loadChallenge } from './challenges.ts';
-import { Koviko } from './predictor.ts';
 
 const defaultSaveName = 'idleLoops1';
 export const challengeSaveName = 'idleLoopsChallenge';
@@ -274,9 +273,6 @@ const optionValueHandlers = {
     }
   },
   predictorBackgroundThread(value, init) {
-    if (!value && !init) {
-      Koviko.instance.terminateWorker();
-    }
   },
 };
 

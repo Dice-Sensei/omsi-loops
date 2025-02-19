@@ -1,5 +1,3 @@
-import { Buff } from './stats.ts';
-import { Localizable } from './localizable.ts';
 import {
   actionLog,
   buffCaps,
@@ -14,8 +12,7 @@ import {
 } from './globals.ts';
 import { prestigeBonus } from './prestige.ts';
 import { actions } from './actions.ts';
-import { getAdvGuildRank, getCraftGuildRank, getXMLName } from './actionList.ts';
-import { view } from '../views/main.view.ts';
+import { getAdvGuildRank, getCraftGuildRank } from './actionList.ts';
 import { vals } from './saving.ts';
 export class LevelExp {
   level = 0;
@@ -108,8 +105,7 @@ export class LevelExp {
   }
 }
 
-export class Stat extends Localizable {
-  name;
+export class Stat {
   statLevelExp = new LevelExp();
   talentLevelExp = new LevelExp();
   soullessLevelExp = new LevelExp();
@@ -117,9 +113,7 @@ export class Stat extends Localizable {
 
   prestigeBuff;
 
-  constructor(name) {
-    super(`stats>${name}`);
-    Object.defineProperty(this, 'name', { value: name });
+  constructor(public name: string) {
     if (['Str', 'Dex', 'Con', 'Spd', 'Per'].includes(name)) {
       this.prestigeBuff = 'PrestigePhysical';
     }
@@ -131,29 +125,9 @@ export class Stat extends Localizable {
   get exp() {
     return this.statLevelExp.totalExp;
   }
-  set exp(totalExp) {
-    throw new Error(`Tried to set stat.exp to ${totalExp}, should set stat.statLevelExp.totalExp instead`);
-    // this.statLevelExp.totalExp = totalExp;
-  }
 
   get talent() {
     return this.talentLevelExp.totalExp;
-  }
-  set talent(totalExp) {
-    throw new Error(`Tried to set stat.talent to ${totalExp}, should set stat.talentLevelExp.totalExp instead`);
-    // this.talentLevelExp.totalExp = totalExp;
-  }
-
-  get blurb() {
-    return this.memoize('blurb', '>blurb');
-  }
-
-  get short_form() {
-    return this.memoize('short_form', '>short_form');
-  }
-
-  get long_form() {
-    return this.memoize('long_form', '>long_form');
   }
 
   #soulstoneCalc;
@@ -258,33 +232,16 @@ const Skill_increase = 1;
 const Skill_decrease = 2;
 const Skill_custom = 3;
 
-export class Skill extends Localizable {
-  name;
+export class Skill {
   levelExp = new LevelExp();
 
   change = 0;
 
-  constructor(name) {
-    super(`skills>${name}`);
-    Object.defineProperty(this, 'name', { value: name });
+  constructor(public name: string) {
   }
 
   get exp() {
     return this.levelExp.totalExp;
-  }
-  set exp(totalExp) {
-    throw new Error(`Tried to set skill.exp to ${totalExp}, should set skill.levelExp.totalExp instead`);
-    // this.levelExp.totalExp = totalExp;
-  }
-
-  get label() {
-    return this.memoize('label', '>label');
-  }
-  get desc() {
-    return this.memoize('desc', '>desc');
-  }
-  get desc2() {
-    return this.memoize('desc2', '>desc2');
   }
 
   toJSON() {
@@ -316,7 +273,7 @@ export class Skill extends Localizable {
   }
 }
 
-export class Buff extends Localizable {
+export class Buff {
   static fullNames = ({
     Ritual: 'Dark Ritual',
     Imbuement: 'Imbue Mind',
@@ -337,16 +294,7 @@ export class Buff extends Localizable {
   name;
   amt = 0;
 
-  get label() {
-    return this.memoize('label', '>label');
-  }
-  get desc() {
-    return this.memoize('desc', '>desc');
-  }
-
   constructor(name) {
-    super(`buffs>${getXMLName(Buff.fullNames[name])}`);
-
     Object.defineProperty(this, 'name', { value: name });
   }
 }
