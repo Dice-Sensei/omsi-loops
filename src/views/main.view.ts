@@ -90,7 +90,6 @@ export class View {
 
     this.updateTime();
     this.updateCurrentActionsDivs();
-    this.updateTotalTicks();
     this.updateAddAmount(1);
     this.updateProgressActions();
     this.updateLockedHidden();
@@ -159,55 +158,6 @@ export class View {
     this.adjustGoldCost({ varName: 'Wells', cost: Action.ManaWell.goldCost() });
   }
 
-  getBonusReplacement(lhs, op, rhs) {
-    const fgSpeed = Math.max(1, vals.options.speedIncreaseCustom);
-    const bgSpeed = !isFinite(vals.options.speedIncreaseBackground) ? -1 : vals.options.speedIncreaseBackground ?? -1;
-
-    const variables = {
-      __proto__: null,
-      get background_info() {
-        if (bgSpeed < 0 || bgSpeed === fgSpeed) {
-          return Localization.txt('time_controls>bonus_seconds>background_disabled');
-        } else if (bgSpeed === 0) {
-          return Localization.txt('time_controls>bonus_seconds>background_0x');
-        } else if (bgSpeed < 1) {
-          return Localization.txt('time_controls>bonus_seconds>background_regen');
-        } else if (bgSpeed === 1) {
-          return Localization.txt('time_controls>bonus_seconds>background_1x');
-        } else if (bgSpeed < fgSpeed) {
-          return Localization.txt('time_controls>bonus_seconds>background_slower');
-        } else {
-          return Localization.txt('time_controls>bonus_seconds>background_faster');
-        }
-      },
-      get state() {
-        return `<span class='bold' id='isBonusOn'>${
-          Localization.txt(
-            `time_controls>bonus_seconds>state>${isBonusActive() ? 'on' : 'off'}`,
-          )
-        }</span>`;
-      },
-      get counter_text() {
-        return `<span class='bold'>${Localization.txt('time_controls>bonus_seconds>counter_text')}</span>`;
-      },
-      get bonusSeconds() {
-        return `<span id='bonusSeconds'>${formatTime(vals.totalOfflineMs / 1000)}</span>`;
-      },
-      get lag_warning() {
-        return driverVals.lagSpeed > 0 ? Localization.txt('time_controls>bonus_seconds>lag_warning') : '';
-      },
-      speed: fgSpeed,
-      background_speed: bgSpeed,
-      lagSpeed: driverVals.lagSpeed,
-    };
-    const lval = variables[lhs] ?? (parseFloat(lhs) || 0);
-    const rval = variables[rhs] ?? (parseFloat(rhs) || 0);
-    return String(
-      op === '+' ? lval + rval : op === '-' ? lval - rval : lval,
-    );
-  }
-  updateTotalTicks() {
-  }
   updateActionTooltips() {
     document.getElementById('goldInvested').textContent = intToStringRound(
       vals.goldInvested,
@@ -759,7 +709,6 @@ export class View {
   }
 
   goldCosts = {};
-
   adjustGoldCost(updateInfo) {
     const varName = updateInfo.varName;
     const amount = updateInfo.cost;
@@ -787,12 +736,6 @@ export class View {
     for (const action of vals.totalActionList) {
       if (action.skills) this.adjustExpGain(action);
     }
-  }
-
-  createTownInfo(action) {
-  }
-
-  createMultiPartPBar(action) {
   }
 
   updateMultiPartActions() {
@@ -910,23 +853,6 @@ export class View {
       );
     }
   }
-
-  highlightIncompleteActions() {
-    let actionDivs = Array.from(document.getElementsByClassName('actionContainer'));
-    actionDivs.forEach((div) => {
-      let actionName = div.id.replace('container', '');
-      if (!vals.completedActions.includes(actionName)) {
-        div.classList.add('actionHighlight');
-      }
-    });
-  }
-
-  removeAllHighlights() {
-    let actionDivs = Array.from(document.getElementsByClassName('actionHighlight'));
-    actionDivs.forEach((div) => {
-      div.classList.remove('actionHighlight');
-    });
-  }
 }
 
 export function unlockGlobalStory(num) {
@@ -951,21 +877,6 @@ export function increaseStoryVarTo(name, value) {
   }
 }
 
-export function scrollToPanel(event, target) {
-  event.preventDefault();
-  const element = document.getElementById(target);
-  const main = document.getElementById('main');
-
-  if (element instanceof HTMLElement && main) {
-    main.scroll({
-      behavior: 'smooth',
-      left: element.offsetLeft,
-    });
-  }
-
-  return false;
-}
-
 export function addStatColors(theDiv, stat, forceColors = false) {
   for (const className of Array.from(theDiv.classList)) {
     if (className.startsWith('stat-') && className.slice(5) in stats) {
@@ -975,12 +886,6 @@ export function addStatColors(theDiv, stat, forceColors = false) {
   theDiv.classList.add(`stat-${stat}`, 'stat-background');
   if (forceColors) {
     theDiv.classList.add('use-stat-colors');
-  }
-}
-
-export function dragOverDecorate(i) {
-  if (document.getElementById(`nextActionContainer${i}`)) {
-    document.getElementById(`nextActionContainer${i}`).classList.add('draggedOverAction');
   }
 }
 
@@ -994,13 +899,6 @@ export function draggedDecorate(i) {
   if (document.getElementById(`nextActionContainer${i}`)) {
     document.getElementById(`nextActionContainer${i}`).classList.add('draggedAction');
   }
-}
-
-export function draggedUndecorate(i) {
-  if (document.getElementById(`nextActionContainer${i}`)) {
-    document.getElementById(`nextActionContainer${i}`).classList.remove('draggedAction');
-  }
-  showActionIcons();
 }
 
 export const view = new View();
