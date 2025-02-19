@@ -1,55 +1,95 @@
 import { Button } from '../../components/buttons/Button/Button.tsx';
+import { Icon } from '../../components/buttons/Button/Icon.tsx';
+import { Tooltip } from '../../components/containers/Overlay/primitives/Tooltip.tsx';
 import { NumberField } from '../../components/forms/NumberField.tsx';
 import { t } from '../../locales/translations.utils.ts';
+import { actions } from '../../original/actions.ts';
 import { capAllTraining, clearList, loadList, nameList, saveList, selectLoadout } from '../../original/driver.ts';
+import { formatNumber } from '../../original/helpers.ts';
 import { setOption } from '../../original/saving.ts';
+import { createIntervalSignal } from '../../signals/createInterval.ts';
 import { actionAmount, setActionAmount } from '../../values.ts';
+import { formatTime } from '../../views/main.view.ts';
 import { KeyboardKey } from '../hotkeys/KeyboardKey.ts';
+import { driverVals } from '../../original/driver.ts';
 
 export const Actions = () => {
+  const [values] = createIntervalSignal({
+    totalTicks: '0 | 0s',
+  }, () => ({
+    totalTicks: `${formatNumber(actions.completedTicks)} | ${formatTime(driverVals.timeCounter)}`,
+  }));
+
   return (
-    <div id='actionList' style='width: 100%; text-align: center'>
-      <div class='showthat'>
-        <div class='large bold localized' style='margin-right: -49px' data-locale='actions>title_list'></div>
-        <span id='predictorTotalDisplay' class='koviko'></span>
-        <span id='predictorStatisticDisplay' class='koviko'></span>
-        <div class='showthis'>
-          <i class='actionIcon far fa-circle'></i>
-          <span class='localized' data-locale='actions>tooltip>icons>circle'></span>
-          <i class='actionIcon fas fa-plus'></i>
-          <span class='localized' data-locale='actions>tooltip>icons>plus'></span>
-          <i class='actionIcon fas fa-minus'></i>
-          <span class='localized' data-locale='actions>tooltip>icons>minus'></span>
-          <i class='actionIcon fas fa-arrows-alt-h'></i>
-          <span class='localized' data-locale='actions>tooltip>icons>arrows_h'></span>
-          <i class='actionIcon fas fa-sort-up'></i>
-          <span class='localized' data-locale='actions>tooltip>icons>sort_up'></span>
-          <i class='actionIcon fas fa-sort-down'></i>
-          <span class='localized' data-locale='actions>tooltip>icons>sort_down'></span>
-          <i class='actionIcon far fa-check-circle'></i>
-          <span style='margin-left: -2px'>/</span>
-          <i class='actionIcon far fa-times-circle'></i>
-          <span class='localized' data-locale='actions>tooltip>icons>circles'></span>
-          <i class='actionIcon fas fa-times'></i>
-          <span class='localized' data-locale='actions>tooltip>icons>times'></span>
-          <span class='localized' data-locale='actions>tooltip>list_explanation'></span>
-        </div>
-      </div>
-      <div id='expandableList'>
-        <div id='curActionsListContainer'>
-          <div id='curActionsList'></div>
-          <div id='curActionsManaUsed' class='showthat'>
-            <div class='bold localized' data-locale='actions>tooltip>mana_used'></div>
-            <div id='totalTicks' style='font-size: 0.75rem'></div>
-            <div class='showthis localized' data-locale='actions>tooltip>mana_used_explanation'></div>
+    <div>
+      <Tooltip>
+        <Tooltip.Trigger>
+          <div class='font-bold'>Action list</div>
+        </Tooltip.Trigger>
+        <Tooltip.Content>
+          <div class='flex gap-2 items-center'>
+            <Icon name='circle' class='w-5 h-5' />
+            <span>cap to current max</span>
           </div>
+          <div class='flex gap-2 items-center'>
+            <Icon name='plus' class='w-5 h-5' />
+            <span>add one loop</span>
+          </div>
+          <div class='flex gap-2 items-center'>
+            <Icon name='minus' class='w-5 h-5' />
+            <span>remove one loop</span>
+          </div>
+          <div class='flex gap-2 items-center'>
+            <Icon name='split' class='w-5 h-5' />
+            <span>split action</span>
+          </div>
+          <div class='flex gap-2 items-center'>
+            <Icon name='chevronUp' class='w-5 h-5' />
+            <span>move action up</span>
+          </div>
+          <div class='flex gap-2 items-center'>
+            <Icon name='chevronDown' class='w-5 h-5' />
+            <span>move action down</span>
+          </div>
+          <div class='flex gap-2 items-center'>
+            <div class='flex gap-0.5 items-center'>
+              <Icon name='circleCheck' class='w-5 h-5' />
+              <span>/</span>
+              <Icon name='circleClose' class='w-5 h-5' />
+            </div>
+            <span>enable/disable action</span>
+          </div>
+          <div class='flex gap-2 items-center'>
+            <Icon name='close' class='w-5 h-5' />
+            <span>remove action</span>
+          </div>
+          <span>
+            drag and drop the actions to re-arrange them. The next list becomes the current list every restart. One
+            second= 50 mana (times your speed multiplier). Minimum 1 tick per action. Restarts automatically upon no
+            actions left.
+          </span>
+        </Tooltip.Content>
+      </Tooltip>
+      <div>
+        <div>
+          <div id='curActionsList'></div>
+          <Tooltip>
+            <Tooltip.Trigger>
+              <div class='flex flex-col text-center'>
+                <span class='font-medium'>mana used</span>
+                <div>{values().totalTicks}</div>
+              </div>
+            </Tooltip.Trigger>
+            <Tooltip.Content>
+              <span>Shows stat gain affecting speed.</span>
+              <span>Updates every completed action.</span>
+              <span>Accurate at the end of the run.</span>
+            </Tooltip.Content>
+          </Tooltip>
         </div>
-        <div id='nextActionsListContainer'>
+        <div>
           <div id='nextActionsList'></div>
-          <div
-            id='actionTooltipContainer'
-            style='margin-top: 10px; width: 100%; text-align: left; max-height: 357px; overflow: auto'
-          >
+          <div id='actionTooltipContainer'>
           </div>
           <div class='flex gap-2 items-center'>
             <span class='font-bold'>{t('actions.amounts.title')}</span>
@@ -60,8 +100,8 @@ export const Actions = () => {
           </div>
         </div>
       </div>
-      <div id='actionChanges' style='display: flex; text-align: left; width: 100%; margin-top: 5px'>
-        <div id='actionChangeOptions' style='width: 50%'>
+      <div>
+        <div>
           <input
             type='checkbox'
             id='keepCurrentListInput'
@@ -69,11 +109,8 @@ export const Actions = () => {
             onchange={({ target: { checked } }) => setOption('keepCurrentList', checked)}
           >
           </input>
-          <label
-            for='keepCurrentListInput'
-            class='localized'
-            data-locale='actions>tooltip>current_list_active'
-          >
+          <label for='keepCurrentListInput'>
+            Keep current list active
           </label>
           <input
             type='checkbox'
@@ -82,11 +119,8 @@ export const Actions = () => {
             onchange={({ target: { checked } }) => setOption('repeatLastAction', checked)}
           >
           </input>
-          <label
-            for='repeatLastActionInput'
-            class='localized'
-            data-locale='actions>tooltip>repeat_last_action'
-          >
+          <label for='repeatLastActionInput'>
+            Repeat last action on list
           </label>
           <input
             type='checkbox'
@@ -95,17 +129,14 @@ export const Actions = () => {
             onchange={({ target: { checked } }) => setOption('addActionsToTop', checked)}
           >
           </input>
-          <label for='addActionsToTopInput' class='localized' data-locale='actions>tooltip>add_action_top'></label>
+          <label for='addActionsToTopInput'>
+            Add action to top
+          </label>
         </div>
-        <div id='actionChangeButtons' style='margin-left: -4px; text-align: right; width: 50%'>
-          <button
-            id='maxTraining'
-            class='button localized'
-            style='margin-right: 0px; display: none'
-            onClick={() => capAllTraining()}
-            data-locale='actions>tooltip>max_training'
-          >
-          </button>
+        <div>
+          <Button onClick={() => capAllTraining()}>
+            max training
+          </Button>
           <Button onClick={() => clearList()}>
             {KeyboardKey.shift() ? t('actionList.actions.clearAll') : t('actionList.actions.clearDisabled')}
           </Button>
@@ -261,11 +292,6 @@ export const Actions = () => {
               </button>
             </div>
           </div>
-          <select
-            id='predictorTrackedStatInput'
-            class='button'
-            onchange={({ target: { value } }) => setOption('predictorTrackedStat', value)}
-          />
         </div>
       </div>
     </div>

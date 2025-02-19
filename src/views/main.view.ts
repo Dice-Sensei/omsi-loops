@@ -208,10 +208,6 @@ export class View {
     );
   }
   updateTotalTicks() {
-    document.getElementById('totalTicks').textContent = `${formatNumber(actions.completedTicks)} | ${
-      formatTime(driverVals.timeCounter)
-    }`;
-    document.getElementById('effectiveTime').textContent = `${formatTime(driverVals.effectiveTime)}`;
   }
   updateActionTooltips() {
     document.getElementById('goldInvested').textContent = intToStringRound(
@@ -477,7 +473,6 @@ export class View {
         `</div>`;
     }
 
-    document.getElementById('actionTooltipContainer').innerHTML = totalDivText;
     this.mouseoverAction(0, false);
   }
 
@@ -576,28 +571,9 @@ export class View {
   }
 
   mouseoverAction(index, isShowing) {
-    if (isShowing) curActionShowing = index;
-    else curActionShowing = undefined;
-    const div = document.getElementById(`action${index}Selected`);
-    if (div) {
-      div.style.opacity = isShowing ? '1' : '0';
-      document.getElementById(`actionTooltip${index}`).style.display = isShowing ? '' : 'none';
-    }
-    nextActionsDiv.style.display = isShowing ? 'none' : '';
-    document.getElementById('actionTooltipContainer').style.display = isShowing ? '' : 'none';
-    view.updateCurrentActionBar(index);
   }
 
   updateCurrentActionLoops(index) {
-    const action = actions.current[index];
-    if (action !== undefined) {
-      document.getElementById(`action${index}LoopsDone`).textContent = (action.loops - action.loopsLeft) > 99999
-        ? toSuffix(action.loops - action.loopsLeft)
-        : formatNumber(action.loops - action.loopsLeft);
-      document.getElementById(`action${index}Loops`).textContent = action.loops > 99999
-        ? toSuffix(action.loops)
-        : formatNumber(action.loops);
-    }
   }
 
   updateProgressAction(

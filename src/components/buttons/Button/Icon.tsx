@@ -237,6 +237,117 @@ const EyeSlashSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
   </svg>
 );
 
+const CircleSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <circle
+      cx='12'
+      cy='12'
+      r='10'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+const PlusSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M12 6L12 18M6 12L18 12'
+      stroke='currentColor'
+      stroke-width='2'
+    />
+  </svg>
+);
+
+const MinusSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M6 12L18 12'
+      stroke='currentColor'
+      stroke-width='2'
+    />
+  </svg>
+);
+
+const SplitSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M4 12L20 12M4 8L12 8M12 16L20 16'
+      stroke='currentColor'
+      stroke-width='2'
+    />
+  </svg>
+);
+
+const CircleCheckSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+    <path
+      d='M8 12L11 15L16 9'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+  </svg>
+);
+
+const CircleXSvg = (props: JSX.SvgSVGAttributes<SVGSVGElement>) => (
+  <svg
+    xmlns='http://www.w3.org/2000/svg'
+    width='24'
+    height='24'
+    viewBox='0 0 24 24'
+    {...props}
+  >
+    <path
+      d='M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z'
+      stroke='currentColor'
+      stroke-width='2'
+      fill='none'
+    />
+    <path
+      d='M9 9L15 15M9 15L15 9'
+      stroke='currentColor'
+      stroke-width='2'
+    />
+  </svg>
+);
+
 const icons = {
   close: XSvg,
   chevronDown: ChevronDownSvg,
@@ -250,6 +361,12 @@ const icons = {
   warning: ExclamationTriangleSvg,
   eye: EyeSvg,
   eyeSlash: EyeSlashSvg,
+  circle: CircleSvg,
+  plus: PlusSvg,
+  minus: MinusSvg,
+  split: SplitSvg,
+  circleCheck: CircleCheckSvg,
+  circleClose: CircleXSvg,
 } satisfies Record<string, ValidComponent>;
 
 export type IconName = keyof typeof icons;
