@@ -13,7 +13,6 @@ import {
   translateClassNames,
 } from '../original/actionList.ts';
 import { vals } from '../original/saving.ts';
-
 import * as d3 from 'd3';
 import { prestigeValues } from '../original/prestige.ts';
 import { camelize, formatNumber, intToString, intToStringRound, toSuffix } from '../original/helpers.ts';
@@ -75,12 +74,10 @@ export class View {
 
     this.updateTime();
     this.updateCurrentActionsDivs();
-    this.updateAddAmount(1);
     this.updateProgressActions();
     this.updateLockedHidden();
     this.adjustGoldCosts();
     this.adjustExpGains();
-    this.updateLoadoutNames();
     this.updateTrials();
 
     setInterval(() => {
@@ -640,32 +637,6 @@ export class View {
     );
     document.getElementById(`goodTemp${varName}`).textContent = String(town[`goodTemp${varName}`]);
     document.getElementById(`good${varName}`).textContent = String(town[`good${varName}`]);
-  }
-
-  updateAddAmount(amount) {
-    for (const elem of document.getElementsByClassName('change-amount')) {
-      elem.classList.toggle('unused', elem.textContent !== String(amount));
-    }
-  }
-
-  updateLoadout(num) {
-    for (let i = 0; i < 16; i++) {
-      const elem = document.getElementById(`load${i}`);
-      if (elem) {
-        elem.classList.add('unused');
-      }
-    }
-    const elem = document.getElementById(`load${num}`);
-    if (elem) {
-      elem.classList.remove('unused');
-    }
-  }
-
-  updateLoadoutNames() {
-    for (let i = 0; i < vals.loadoutnames.length; i++) {
-      document.getElementById(`load${i + 1}`).textContent = vals.loadoutnames[i];
-    }
-    document.getElementById('renameLoadout').value = vals.loadoutnames[vals.curLoadout - 1];
   }
 
   adjustManaCost(actionName) {

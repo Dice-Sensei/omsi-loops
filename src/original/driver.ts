@@ -444,19 +444,9 @@ export function resetResources() {
 }
 
 export function selectLoadout(num) {
-  if (vals.curLoadout === num) {
-    vals.curLoadout = 0;
-  } else {
-    vals.curLoadout = num;
-  }
-  document.getElementById('renameLoadout').value = vals.loadoutnames[vals.curLoadout - 1];
-  view.updateLoadout(vals.curLoadout);
 }
 
 export function loadLoadout(num) {
-  vals.curLoadout = num;
-  view.updateLoadout(vals.curLoadout);
-  loadList();
 }
 
 let globalCustomInput = '';
@@ -478,40 +468,14 @@ export function saveList() {
 }
 
 export function nameList(saveGame) {
-  // if the loadout has already been saved under a non-numeric name
-  // and the user tries to save under a numeric name, the loadout will
-  // be saved under an old name
-  // if both the old AND the new names are numeric, then we insist on a non-numeric name
-  if (isNaN(parseFloat(document.getElementById('renameLoadout').value))) {
-    if (document.getElementById('renameLoadout').value.length > 30) {
-      document.getElementById('renameLoadout').value = '30 Letter Max';
-    } else if (document.getElementById('renameLoadout').value !== 'Saved!') {
-      vals.loadoutnames[vals.curLoadout - 1] = document.getElementById('renameLoadout').value;
-    }
-  } else if (!isNaN(parseFloat(vals.loadoutnames[vals.curLoadout - 1]))) {
-    document.getElementById('renameLoadout').value = 'Enter a name!';
-  }
-  document.getElementById(`load${vals.curLoadout}`).textContent = vals.loadoutnames[vals.curLoadout - 1];
-  if (saveGame) performSaveGame();
 }
 
 export function loadList() {
-  if (vals.curLoadout === 0) {
-    return;
-  }
-
-  setActionAmount(actions.addAmount);
-
-  actions.clearActions();
-  if (vals.loadouts[vals.curLoadout]) {
-    actions.appendActionRecords(vals.loadouts[vals.curLoadout]);
-  }
-  view.updateNextActions();
 }
+
 export function clearList() {
-  actions.clearActions(KeyboardKey.shift() ? ((a) => (a.disabled || a.loops === 0)) : null);
-  view.updateNextActions();
 }
+
 export function unlockTown(townNum) {
   if (!towns[townNum].unlocked()) {
     vals.townsUnlocked.push(townNum);

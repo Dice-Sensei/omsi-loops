@@ -12,288 +12,175 @@ import { actionAmount, setActionAmount } from '../../values.ts';
 import { formatTime } from '../../views/main.view.ts';
 import { KeyboardKey } from '../hotkeys/KeyboardKey.ts';
 import { driverVals } from '../../original/driver.ts';
+import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
+import { CheckboxField } from '../../components/forms/CheckboxField.tsx';
+import { For, Show } from 'solid-js';
+import cx from 'clsx';
+import { TextField } from '../../components/forms/TextField.tsx';
+import { createSignal } from 'solid-js';
 
-export const Actions = () => {
-  const [values] = createIntervalSignal({
-    totalTicks: '0 | 0s',
-  }, () => ({
-    totalTicks: `${formatNumber(actions.completedTicks)} | ${formatTime(driverVals.timeCounter)}`,
-  }));
-
+const ActionsOptions = () => {
   return (
-    <div>
-      <Tooltip>
-        <Tooltip.Trigger>
-          <div class='font-bold'>Action list</div>
-        </Tooltip.Trigger>
-        <Tooltip.Content>
-          <div class='flex gap-2 items-center'>
-            <Icon name='circle' class='w-5 h-5' />
-            <span>cap to current max</span>
-          </div>
-          <div class='flex gap-2 items-center'>
-            <Icon name='plus' class='w-5 h-5' />
-            <span>add one loop</span>
-          </div>
-          <div class='flex gap-2 items-center'>
-            <Icon name='minus' class='w-5 h-5' />
-            <span>remove one loop</span>
-          </div>
-          <div class='flex gap-2 items-center'>
-            <Icon name='split' class='w-5 h-5' />
-            <span>split action</span>
-          </div>
-          <div class='flex gap-2 items-center'>
-            <Icon name='chevronUp' class='w-5 h-5' />
-            <span>move action up</span>
-          </div>
-          <div class='flex gap-2 items-center'>
-            <Icon name='chevronDown' class='w-5 h-5' />
-            <span>move action down</span>
-          </div>
-          <div class='flex gap-2 items-center'>
-            <div class='flex gap-0.5 items-center'>
-              <Icon name='circleCheck' class='w-5 h-5' />
-              <span>/</span>
-              <Icon name='circleClose' class='w-5 h-5' />
-            </div>
-            <span>enable/disable action</span>
-          </div>
-          <div class='flex gap-2 items-center'>
-            <Icon name='close' class='w-5 h-5' />
-            <span>remove action</span>
-          </div>
-          <span>
-            drag and drop the actions to re-arrange them. The next list becomes the current list every restart. One
-            second= 50 mana (times your speed multiplier). Minimum 1 tick per action. Restarts automatically upon no
-            actions left.
-          </span>
-        </Tooltip.Content>
-      </Tooltip>
-      <div>
-        <div>
-          <div id='curActionsList'></div>
-          <Tooltip>
-            <Tooltip.Trigger>
-              <div class='flex flex-col text-center'>
-                <span class='font-medium'>mana used</span>
-                <div>{values().totalTicks}</div>
-              </div>
-            </Tooltip.Trigger>
-            <Tooltip.Content>
-              <span>Shows stat gain affecting speed.</span>
-              <span>Updates every completed action.</span>
-              <span>Accurate at the end of the run.</span>
-            </Tooltip.Content>
-          </Tooltip>
-        </div>
-        <div>
-          <div id='nextActionsList'></div>
-          <div id='actionTooltipContainer'>
-          </div>
-          <div class='flex gap-2 items-center'>
-            <span class='font-bold'>{t('actions.amounts.title')}</span>
-            <Button class='w-8' onClick={() => setActionAmount(1)}>1</Button>
-            <Button class='w-8' onClick={() => setActionAmount(5)}>5</Button>
-            <Button class='w-8' onClick={() => setActionAmount(10)}>10</Button>
-            <NumberField id='actionAmount' value={actionAmount()} onChange={setActionAmount} />
-          </div>
-        </div>
-      </div>
-      <div>
-        <div>
-          <input
-            type='checkbox'
-            id='keepCurrentListInput'
-            class='checkbox'
-            onchange={({ target: { checked } }) => setOption('keepCurrentList', checked)}
-          >
-          </input>
-          <label for='keepCurrentListInput'>
-            Keep current list active
-          </label>
-          <input
-            type='checkbox'
-            id='repeatLastActionInput'
-            class='checkbox'
-            onchange={({ target: { checked } }) => setOption('repeatLastAction', checked)}
-          >
-          </input>
-          <label for='repeatLastActionInput'>
-            Repeat last action on list
-          </label>
-          <input
-            type='checkbox'
-            id='addActionsToTopInput'
-            class='checkbox'
-            onchange={({ target: { checked } }) => setOption('addActionsToTop', checked)}
-          >
-          </input>
-          <label for='addActionsToTopInput'>
-            Add action to top
-          </label>
-        </div>
-        <div>
-          <Button onClick={() => capAllTraining()}>
-            max training
-          </Button>
-          <Button onClick={() => clearList()}>
-            {KeyboardKey.shift() ? t('actionList.actions.clearAll') : t('actionList.actions.clearDisabled')}
-          </Button>
-          <div tabindex='0' class='showthatloadout'>
-            Manage Loadouts
-            <div class='showthisloadout'>
-              <button
-                class='loadoutbutton unused'
-                id='load1'
-                onClick={() => selectLoadout(1)}
-                style='width: 200px'
-              >
-                Loadout 1
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load2'
-                onClick={() => selectLoadout(2)}
-                style='width: 200px'
-              >
-                Loadout 2
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load3'
-                onClick={() => selectLoadout(3)}
-                style='width: 200px'
-              >
-                Loadout 3
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load4'
-                onClick={() => selectLoadout(4)}
-                style='width: 200px'
-              >
-                Loadout 4
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load5'
-                onClick={() => selectLoadout(5)}
-                style='width: 200px'
-              >
-                Loadout 5
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load6'
-                onClick={() => selectLoadout(6)}
-                style='width: 200px'
-              >
-                Loadout 6
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load7'
-                onClick={() => selectLoadout(7)}
-                style='width: 200px'
-              >
-                Loadout 7
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load8'
-                onClick={() => selectLoadout(8)}
-                style='width: 200px'
-              >
-                Loadout 8
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load9'
-                onClick={() => selectLoadout(9)}
-                style='width: 200px'
-              >
-                Loadout 9
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load10'
-                onClick={() => selectLoadout(10)}
-                style='width: 200px'
-              >
-                Loadout 10
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load11'
-                onClick={() => selectLoadout(11)}
-                style='width: 200px'
-              >
-                Loadout 11
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load12'
-                onClick={() => selectLoadout(12)}
-                style='width: 200px'
-              >
-                Loadout 12
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load13'
-                onClick={() => selectLoadout(13)}
-                style='width: 200px'
-              >
-                Loadout 13
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load14'
-                onClick={() => selectLoadout(14)}
-                style='width: 200px'
-              >
-                Loadout 14
-              </button>
-              <button
-                class='loadoutbutton unused'
-                id='load15'
-                onClick={() => selectLoadout(15)}
-                style='width: 200px'
-              >
-                Loadout 15
-              </button>
-              <button
-                class='loadoutbutton'
-                style='margin-bottom: 5px; margin-top: 3px'
-                onClick={() => saveList()}
-              >
-                Save loadout
-              </button>
-              <button
-                class='loadoutbutton'
-                style='margin-bottom: 5px'
-                onClick={() => loadList()}
-              >
-                Load loadout
-              </button>
-              <input
-                id='renameLoadout'
-                value='Loadout Name'
-                style='width: 100px; height: 16px; border: 1px solid var(--input-border); margin-left: 5px; margin-bottom: 2px'
-              >
-              </input>
-              <button
-                class='loadoutbutton'
-                style='margin-bottom: 5px; margin-top: 3px; margin-right: -4px'
-                onClick={() => nameList(true)}
-              >
-                Rename
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class='flex gap-2'>
+      <CheckboxField value={false} onChange={(value) => setOption('keepCurrentList', value)}>
+        {t('actions.list.options.keepCurrentList')}
+      </CheckboxField>
+      <CheckboxField value={false} onChange={(value) => setOption('repeatLastAction', value)}>
+        {t('actions.list.options.repeatLastList')}
+      </CheckboxField>
+      <CheckboxField value={false} onChange={(value) => setOption('addActionsToTop', value)}>
+        {t('actions.list.options.addActionToTop')}
+      </CheckboxField>
     </div>
   );
 };
+
+const ActionsLoadoutButton = () => {
+  const [loadoutName, setLoadoutName] = createSignal('laodout name');
+
+  return (
+    <Tooltip>
+      <Tooltip.Trigger>
+        <Button>{t('actions.list.loadouts.title')}</Button>
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        <div>
+          <For each={Array.from({ length: 15 }, (_, i) => i + 1)}>
+            {(i) => (
+              <Button onClick={() => selectLoadout(i)}>
+                Loadout {i}
+              </Button>
+            )}
+          </For>
+          <button
+            onClick={() => saveList()}
+          >
+            {t('actions.list.loadouts.actions.save')}
+          </button>
+          <button
+            onClick={() => loadList()}
+          >
+            {t('actions.list.loadouts.actions.load')}
+          </button>
+          <TextField value={loadoutName()} onChange={setLoadoutName} />
+          <Button onClick={() => nameList(true)}>
+            {t('actions.list.loadouts.actions.rename')}
+          </Button>
+        </div>
+      </Tooltip.Content>
+    </Tooltip>
+  );
+};
+
+const ActionsTitle = () => (
+  <Label
+    label={
+      <>
+        <div class='grid grid-cols-[auto_1fr] gap-2 items-center'>
+          <Icon name='circle' class='w-5 h-5' />
+          <span>{t('actions.list.actions.cap')}</span>
+          <Icon name='plus' class='w-5 h-5' />
+          <span>{t('actions.list.actions.add')}</span>
+          <Icon name='minus' class='w-5 h-5' />
+          <span>{t('actions.list.actions.remove')}</span>
+          <Icon name='split' class='w-5 h-5' />
+          <span>{t('actions.list.actions.split')}</span>
+          <Icon name='chevronUp' class='w-5 h-5' />
+          <span>{t('actions.list.actions.moveUp')}</span>
+          <Icon name='chevronDown' class='w-5 h-5' />
+          <span>{t('actions.list.actions.moveDown')}</span>
+          <div class='flex gap-0.5 items-center'>
+            <Icon name='circleCheck' class='w-5 h-5' />
+            <span>/</span>
+            <Icon name='circleClose' class='w-5 h-5' />
+          </div>
+          <span>{t('actions.list.actions.toggle')}</span>
+          <Icon name='close' class='w-5 h-5' />
+          <span>{t('actions.list.actions.remove')}</span>
+        </div>
+        <span>
+          {t('actions.list.actions.dragAndDrop')}
+        </span>
+      </>
+    }
+    class='font-bold'
+  >
+    {t('actions.list.name')}
+  </Label>
+);
+
+const ActionsNextList = (props: { class?: string }) => {
+  return <div id='nextActionsList' class={props.class}></div>;
+};
+
+const ActionsCurrentList = (props: { class?: string }) => {
+  return <div id='curActionsList' class={props.class}></div>;
+};
+
+const ActionsCurrentUse = (props: { class?: string }) => {
+  const [ticks] = createIntervalSignal(
+    '0 | 0s',
+    () => `${formatNumber(actions.completedTicks)} | ${formatTime(driverVals.timeCounter)}`,
+  );
+
+  return (
+    <Tooltip>
+      <Tooltip.Trigger>
+        <div class={cx('flex w-full flex-col text-center', props.class)}>
+          <span class='font-medium'>{t('actions.list.current.use.manaUsed')}</span>
+          <div>{ticks()}</div>
+        </div>
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        {t('actions.list.current.use.tooltip')}
+      </Tooltip.Content>
+    </Tooltip>
+  );
+};
+
+const ActionsNextAmounts = (props: { class?: string }) => {
+  return (
+    <div class={cx('flex gap-2 items-center', props.class)}>
+      <span class='font-bold'>{t('actions.list.amounts.title')}</span>
+      <Button class='w-8' onClick={() => setActionAmount(1)}>1</Button>
+      <Button class='w-8' onClick={() => setActionAmount(5)}>5</Button>
+      <Button class='w-8' onClick={() => setActionAmount(10)}>10</Button>
+      <NumberField value={actionAmount()} onChange={setActionAmount} />
+    </div>
+  );
+};
+
+export const Actions = () => (
+  <div class='flex flex-col gap-2'>
+    <ActionsTitle />
+    <div class='grid grid-cols-6 divide-x divide-emerald-800'>
+      <div class='col-span-1 bg-emerald-500 py-4'>
+        <ActionsCurrentList />
+        <ActionsCurrentUse class='px-4 justify-center' />
+      </div>
+      <div class='col-span-5 bg-emerald-700 py-4'>
+        <ActionsNextList />
+        <ActionsNextAmounts class='px-4 justify-center' />
+      </div>
+    </div>
+    <div class='grid grid-cols-2 gap-2'>
+      <ActionsOptions />
+      <div class='flex gap-2'>
+        <Button class='w-full' onClick={() => capAllTraining()}>
+          {t('actions.list.actions.maxTraining')}
+        </Button>
+        <Show when={!KeyboardKey.shift()}>
+          <Button class='w-full' onClick={() => clearList()}>
+            {t('actionList.actions.clearAll')}
+          </Button>
+        </Show>
+        <Show when={KeyboardKey.shift()}>
+          <Button class='w-full' onClick={() => clearList()}>
+            {t('actionList.actions.clearDisabled')}
+          </Button>
+        </Show>
+        <ActionsLoadoutButton />
+      </div>
+    </div>
+  </div>
+);

@@ -841,7 +841,6 @@ export function doLoad(toLoad) {
 
   Data.recordBase();
 
-  view.updateLoadoutNames();
   view.updateNextActions();
   view.updateMultiPartActions();
   view.updateStories(true);

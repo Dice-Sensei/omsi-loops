@@ -9,8 +9,47 @@ export const translationsEn = {
     title: 'omsi-loops',
   },
   actions: {
-    amounts: {
-      title: 'Amount',
+    list: {
+      name: 'Action list',
+      actions: {
+        cap: 'cap to current max',
+        add: 'add one loop',
+        remove: 'remove one loop',
+        split: 'split action',
+        moveUp: 'move action up',
+        moveDown: 'move action down',
+        toggle: 'enable/disable action',
+        dragAndDrop:
+          'drag and drop the actions to re-arrange them. The next list becomes the current list every restart. One second= 50 mana (times your speed multiplier). Minimum 1 tick per action. Restarts automatically upon no actions left.',
+        maxTraining: 'max training',
+      },
+      current: {
+        use: {
+          manaUsed: 'mana used',
+          tooltip: `
+            Shows stat gain affecting speed.
+            Updates every completed action.
+            Accurate at the end of the run.
+          `,
+        },
+      },
+      options: {
+        keepCurrentList: 'keep current list',
+        repeatLastList: 'repeat last list',
+        addActionToTop: 'add action to top',
+      },
+      amounts: {
+        title: 'Amount',
+      },
+      loadouts: {
+        title: 'Manage Loadouts',
+        load: 'Load {{name}}',
+        actions: {
+          rename: 'rename',
+          load: 'load',
+          save: 'save',
+        },
+      },
     },
     actions: {
       survey: {
