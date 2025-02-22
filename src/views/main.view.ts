@@ -1,4 +1,3 @@
-import { Buff } from '../original/stats.ts';
 import {
   Action,
   actionsWithGoldCost,
@@ -9,19 +8,13 @@ import {
   getExploreProgress,
   getExploreSkill,
   getPossibleTravel,
-  getTravelNum,
-  getXMLName,
   hasLimit,
-  isActionOfType,
   isTraining,
-  townNames,
   translateClassNames,
 } from '../original/actionList.ts';
-import { isBuffName, vals } from '../original/saving.ts';
+import { vals } from '../original/saving.ts';
 
-import $ from 'jquery';
 import * as d3 from 'd3';
-import { Localization } from '../original/localization.ts';
 import { prestigeValues } from '../original/prestige.ts';
 import { camelize, formatNumber, intToString, intToStringRound, toSuffix } from '../original/helpers.ts';
 import { getNumOnList } from '../original/actions.ts';
@@ -33,26 +26,21 @@ import {
   capAction,
   collapse,
   disableAction,
-  driverVals,
-  handleDragDrop,
-  handleDragOver,
-  handleDragStart,
-  isBonusActive,
   moveDown,
   moveUp,
   removeAction,
   removeLoop,
-  showActionIcons,
   showNotification,
   split,
 } from '../original/driver.ts';
+import { t } from '../locales/translations.utils.ts';
 
 export function formatTime(seconds: number) {
   if (seconds > 300) {
-    let second = Math.floor(seconds % 60);
-    let minute = Math.floor(seconds / 60 % 60);
-    let hour = Math.floor(seconds / 60 / 60 % 24);
-    let day = Math.floor(seconds / 60 / 60 / 24);
+    const second = Math.floor(seconds % 60);
+    const minute = Math.floor(seconds / 60 % 60);
+    const hour = Math.floor(seconds / 60 / 60 % 24);
+    const day = Math.floor(seconds / 60 / 60 / 24);
 
     let timeString = '';
     if (day > 0) timeString += day + 'd ';
@@ -62,19 +50,16 @@ export function formatTime(seconds: number) {
 
     return timeString;
   }
+
   if (Number.isInteger(seconds)) {
-    return (formatNumber(seconds) + Localization.txt('time_controls>seconds')).replace(
-      /\B(?=(\d{3})+(?!\d))/gu,
-      ',',
-    );
+    return (formatNumber(seconds) + 's').replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
   }
+
   if (seconds < 10) {
-    return seconds.toFixed(2) + Localization.txt('time_controls>seconds');
+    return seconds.toFixed(2) + 's';
   }
-  return (seconds.toFixed(1) + Localization.txt('time_controls>seconds')).replace(
-    /\B(?=(\d{3})+(?!\d))/gu,
-    ',',
-  );
+
+  return (seconds.toFixed(1) + 's').replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
 }
 
 let curActionShowing;
@@ -374,30 +359,6 @@ export class View {
 
     curActionsDiv.innerHTML = totalDivText;
 
-    totalDivText = '';
-
-    for (let i = 0; i < actions.current.length; i++) {
-      const action = actions.current[i];
-      totalDivText += `<div id='actionTooltip${i}' style='display:none;padding-left:10px;width:90%'>` +
-        `<div style='text-align:center;width:100%'>${action.label}</div>` +
-        `<b>${Localization.txt('actions>current_action>mana_original')}</b> <div id='action${i}ManaOrig'></div>` +
-        `<b>${Localization.txt('actions>current_action>mana_used')}</b> <div id='action${i}ManaUsed'></div>` +
-        `<b>${Localization.txt('actions>current_action>last_mana')}</b> <div id='action${i}LastMana'></div>` +
-        `<b>${Localization.txt('actions>current_action>mana_remaining')}</b> <div id='action${i}Remaining'></div>` +
-        `<b>${Localization.txt('actions>current_action>gold_remaining')}</b> <div id='action${i}GoldRemaining'></div>` +
-        `<b>${Localization.txt('actions>current_action>time_spent')}</b> <div id='action${i}TimeSpent'></div>` +
-        `<b>${
-          Localization.txt('actions>current_action>total_time_elapsed')
-        }</b> <div id='action${i}TotalTimeElapsed'></div>` +
-        `` +
-        `<div id='action${i}ExpGain'></div>` +
-        `<div id='action${i}HasFailed' style='display:none'>` +
-        `<b>${Localization.txt('actions>current_action>failed_attempts')}</b> <div id='action${i}Failed'></div>` +
-        `<b>${Localization.txt('actions>current_action>error')}</b> <div id='action${i}Error'></div>` +
-        `</div>` +
-        `</div>`;
-    }
-
     this.mouseoverAction(0, false);
   }
 
@@ -479,9 +440,22 @@ export class View {
       while (expGainDiv.firstChild) {
         expGainDiv.removeChild(expGainDiv.firstChild);
       }
+
+      const nameStatMap = {
+        Spd: 'speed',
+        Con: 'constitution',
+        Per: 'perception',
+        Cha: 'charisma',
+        Luck: 'luck',
+        Int: 'intelligence',
+        Soul: 'soul',
+        Str: 'strength',
+        Dex: 'dexterity',
+      } as const;
+
       for (const stat of statList) {
         if (action[`statExp${stat}`]) {
-          statExpGain += `<div class='bold'>${Localization.txt(`stats>${stat}>short_form`)}:</div> ${
+          statExpGain += `<div class='bold'>${t(`statistics.attributes.${nameStatMap[stat]}.abbreviation`)}:</div> ${
             intToString(action[`statExp${stat}`], 2)
           }`;
         }
@@ -844,9 +818,23 @@ export class View {
         continue;
       }
       const mainStat = action.loopStats[(town[`${action.varName}LoopCounter`] + i) % action.loopStats.length];
-      document.getElementById(`mainStat${i}${action.varName}`).textContent = Localization.txt(
-        `stats>${mainStat}>short_form`,
+
+      const nameStatMap = {
+        Spd: 'speed',
+        Con: 'constitution',
+        Per: 'perception',
+        Cha: 'charisma',
+        Luck: 'luck',
+        Int: 'intelligence',
+        Soul: 'soul',
+        Str: 'strength',
+        Dex: 'dexterity',
+      } as const;
+      const stat = nameStatMap[mainStat];
+      document.getElementById(`mainStat${i}${action.varName}`).textContent = t(
+        `statistics.attributes.${stat}.abbreviation`,
       );
+
       addStatColors(expBar, mainStat, true);
       document.getElementById(`segmentName${i}${action.varName}`).textContent = action.getSegmentName(
         town[`${action.varName}LoopCounter`] + i,

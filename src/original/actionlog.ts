@@ -1,8 +1,7 @@
 import { vals } from './saving.ts';
-import { Localization } from './localization.ts';
 import { extractStrings, formatNumber, intToString, restoreStrings } from './helpers.ts';
-import { getActionPrototype, getXMLName, townNames } from './actionList.ts';
-import { Buff } from './stats.ts';
+import { getActionPrototype, townNames } from './actionList.ts';
+import { t } from '../locales/translations.utils.ts';
 
 export class ActionLog {
   entries = [];
@@ -88,9 +87,7 @@ export class ActionLog {
 }
 
 class ActionLogEntry {
-  /** @type {ActionLogEntryTypeName} */
   type;
-  /** @type {number} */
   #entryIndex = null;
   get entryIndex() {
     return this.#entryIndex;
@@ -98,9 +95,7 @@ class ActionLogEntry {
   set entryIndex(index) {
     this.#entryIndex = index;
   }
-  /** @type {number} */
   loop;
-  /** @type {ActionName|ActionId|null} */
   actionName;
 
   get action() {
@@ -111,7 +106,6 @@ class ActionLogEntry {
     return false;
   }
 
-  /** @param {[type: ActionLogEntryTypeName, ...unknown[]]} data @returns {ActionLogEntryInstance | null} */
   static create(data) {
     if (!Array.isArray(data)) return null;
     const type = actionLogEntryTypeMap[data[0]];
@@ -121,17 +115,12 @@ class ActionLogEntry {
     return entry;
   }
 
-  /**
-   * @param {ActionLogEntryTypeName} type
-   * @param {Action|string|null} action
-   * @param {number=} loop
-   */
   constructor(type, action, loop) {
     this.type = type;
     this.loop = typeof loop === 'number' && loop >= 0 ? loop : vals.currentLoop;
     this.actionName = typeof action === 'string' ? action : action?.name ?? null;
   }
-  /** @returns {any[]} */
+
   toJSON() {
     return [this.type, this.actionName, this.loop];
   }
@@ -142,7 +131,6 @@ class ActionLogEntry {
     return rest;
   }
 
-  /** @type {(text: string) => string} */
   format(text) {
     let lastText = null;
     while (lastText !== text) {
@@ -152,7 +140,6 @@ class ActionLogEntry {
     return text;
   }
 
-  /** @type {(key: string) => string} */
   getReplacement(key) {
     if (key === 'loop') return formatNumber(this.loop);
     if (key === 'loopStart') return formatNumber(this.loop);
@@ -163,7 +150,6 @@ class ActionLogEntry {
     throw new Error(`Bad key ${key}`);
   }
 
-  /** @returns {string} */
   abstract getText() {
     throw new Error('Method not implemented.');
   }
@@ -177,32 +163,27 @@ class UniqueLogEntry extends ActionLogEntry {
 }
 
 class RepeatableLogEntry extends ActionLogEntry {
-  /** @type {number} */
   loopEnd;
 
   get repeatable() {
     return true;
   }
 
-  /**
-   * @param {ActionLogEntryTypeName} type
-   * @param {Action|string|null} action
-   * @param {(number | [loopStart: number, loopEnd: number])=} loop
-   */
   constructor(type, action, loop) {
     super(type, action, Array.isArray(loop) ? loop[0] : loop);
     this.loopEnd = Array.isArray(loop) && typeof loop[1] === 'number' && loop[1] >= 0 ? loop[1] : this.loop;
   }
+
   toJSON() {
     return [...super.toJSON(), this.loopEnd];
   }
+
   load(data) {
     const [loopEnd, ...rest] = super.load(data);
     this.loopEnd = typeof loopEnd === 'number' ? loopEnd : this.loop;
     return rest;
   }
 
-  /** @param {string} key  */
   getReplacement(key) {
     if (key === 'loop') {
       return this.loop === this.loopEnd ? formatNumber(this.loop) : '{loopStart}–{loopEnd}';
@@ -217,30 +198,22 @@ class RepeatableLogEntry extends ActionLogEntry {
     return this;
   }
 
-  /** @type {<T extends ActionLogEntry>(other: T) => this is T} */
   canMerge(other) {
     return this.type === other.type && this.actionName === other.actionName && this.canMergeParameters(other);
   }
 
-  /** @returns {boolean} */
   canMergeParameters(_other) {
     return false;
   }
 }
 
 class ActionStoryEntry extends UniqueLogEntry {
-  /** @type {number} */
   storyIndex;
 
   get key() {
     return `${super.key}:${this.storyIndex}`;
   }
 
-  /**
-   * @param {Action|string=} action
-   * @param {number=} storyIndex
-   * @param {number=} loop
-   */
   constructor(action, storyIndex, loop) {
     super('story', action, loop);
     this.storyIndex = storyIndex;
@@ -254,7 +227,7 @@ class ActionStoryEntry extends UniqueLogEntry {
   }
 
   getText() {
-    return '<b>{header} ({condition}):</b> {story}';
+    return '{header} ({condition}): {story}';
   }
 
   getReplacement(key) {
@@ -277,17 +250,12 @@ class ActionStoryEntry extends UniqueLogEntry {
 }
 
 class GlobalStoryEntry extends UniqueLogEntry {
-  /** @type {number} */
   chapter;
 
   get key() {
     return `${super.key}:${this.chapter}`;
   }
 
-  /**
-   * @param {number=} chapter
-   * @param {number=} loop
-   */
   constructor(chapter, loop) {
     super('global', null, loop);
     this.chapter = chapter;
@@ -301,28 +269,22 @@ class GlobalStoryEntry extends UniqueLogEntry {
   }
 
   getText() {
-    return '<b>Loop {loop}:</b> {story}';
+    return 'Loop {loop}: {story}';
   }
 
   getReplacement(key) {
-    if (key === 'story') return Localization.txt(`time_controls>stories>story[num="${this.chapter}"]`);
+    if (key === 'story') return t(`stories.items.${this.chapter}.story`);
     return super.getReplacement(key);
   }
 }
 
 class SoulstoneEntry extends RepeatableLogEntry {
   count = 0;
-  /** @type {{[K in StatName]?: number}} */
   stones = {};
 
-  /**
-   * @param {Action=} action
-   * @param {(number | [loopStart: number, loopEnd: number])=} loop
-   */
   constructor(action, loop) {
     super('soulstone', action, loop);
   }
-  // @ts-ignore
   toJSON() {
     return [...super.toJSON(), this.stones];
   }
@@ -335,7 +297,6 @@ class SoulstoneEntry extends RepeatableLogEntry {
     }
   }
 
-  /** @type {(stat: StatName, count: number) => SoulstoneEntry} */
   addSoulstones(stat, count) {
     this.stones[stat] ??= 0;
     this.stones[stat] += count;
@@ -343,7 +304,6 @@ class SoulstoneEntry extends RepeatableLogEntry {
     return this;
   }
 
-  /** @param {SoulstoneEntry["stones"]} stones  */
   addAllSoulstones(stones) {
     for (const stat of statList) {
       if (stat in stones && typeof stones[stat] === 'number') {
@@ -354,20 +314,20 @@ class SoulstoneEntry extends RepeatableLogEntry {
 
   getText() {
     if (this.count === 1) {
-      return '<b>{header}:</b> You find a soulstone attuned to {stat_long}!';
+      return '{header}: You find a soulstone attuned to {stat_long}!';
     }
 
     if (Object.keys(this.stones).length === 1) {
-      return '<b>{header}:</b> You find {count} soulstones attuned to {stat_long}.';
+      return '{header}: You find {count} soulstones attuned to {stat_long}.';
     }
 
-    return '<b>{header}:</b> You find {count} soulstones: {stats}';
+    return '{header}: You find {count} soulstones: {stats}';
   }
 
   getReplacement(key) {
     if (key === 'count') return intToString(this.count, 1);
-    if (key === 'stat_long') return t(`stats.${Object.keys(this.stones)[0]}.long_form`);
-    if (key === 'stat') return t(`stats.${Object.keys(this.stones)[0]}.short_form`);
+    if (key === 'stat_long') return t(`statistics.attributes.${Object.keys(this.stones)[0]}.abbreviation`);
+    if (key === 'stat') return t(`statistics.attributes.${Object.keys(this.stones)[0]}.abbreviation`);
     if (key === 'stats') {
       const strs = [];
 
@@ -400,22 +360,10 @@ class SoulstoneEntry extends RepeatableLogEntry {
 }
 
 class LeveledLogEntry extends RepeatableLogEntry {
-  /** @type {string} */
   name;
-
-  /** @type {number} */
   fromLevel;
-  /** @type {number} */
   toLevel;
 
-  /**
-   * @param {ActionLogEntryTypeName} type
-   * @param {Action} action
-   * @param {string} name
-   * @param {number} toLevel
-   * @param {number=} fromLevel
-   * @param {(number | [loopStart: number, loopEnd: number])=} loop
-   */
   constructor(type, action, name, toLevel, fromLevel, loop) {
     super(type, action, loop);
     this.name = name;
@@ -440,12 +388,10 @@ class LeveledLogEntry extends RepeatableLogEntry {
     return super.getReplacement(key);
   }
 
-  /** @param {LeveledLogEntry} other */
   canMergeParameters(other) {
     return this.name === other.name;
   }
 
-  /** @param {LeveledLogEntry} other */
   merge(other) {
     this.fromLevel = Math.min(this.fromLevel, other.fromLevel);
     this.toLevel = Math.max(this.toLevel, other.toLevel);
@@ -454,28 +400,42 @@ class LeveledLogEntry extends RepeatableLogEntry {
 }
 
 class SkillEntry extends LeveledLogEntry {
-  /**
-   * @param {Action=} action
-   * @param {SkillName=} skill
-   * @param {number=} toLevel
-   * @param {number=} fromLevel
-   * @param {(number | [loopStart: number, loopEnd: number])=} loop
-   */
   constructor(action, skill, toLevel, fromLevel, loop) {
     super('skill', action, skill, toLevel, fromLevel, loop);
   }
 
   getText() {
     if (this.toLevel === this.fromLevel + 1) {
-      return '<b>{header}:</b> You attain level {toLevel} in {skill}!';
+      return '{header}: You attain level {toLevel} in {skill}!';
     }
 
-    return '<b>{header}:</b> Your skill in {skill} increases from {fromLevel} to {toLevel}.';
+    return '{header}: Your skill in {skill} increases from {fromLevel} to {toLevel}.';
   }
 
   getReplacement(key) {
+    const skillNameMap = {
+      'Combat': 'combat',
+      'Magic': 'magic',
+      'Practical': 'practical',
+      'Alchemy': 'alchemy',
+      'Crafting': 'crafting',
+      'Dark': 'dark',
+      'Chronomancy': 'chronomancy',
+      'Pyromancy': 'pyromancy',
+      'Restoration': 'restoration',
+      'Spatiomancy': 'spatiomancy',
+      'Mercantilism': 'mercantilism',
+      'Divine': 'divine',
+      'Commune': 'commune',
+      'Wunderkind': 'wunderkind',
+      'Gluttony': 'gluttony',
+      'Thievery': 'thievery',
+      'Leadership': 'leadership',
+      'Assassin': 'assassination',
+    };
+
     if (key === 'skill') {
-      return Localization.txt(`skills>${getXMLName(this.name)}>label`);
+      return t(`statistics.statistics.skills.${skillNameMap[this.name]}.name`);
     }
 
     return super.getReplacement(key);
@@ -483,21 +443,9 @@ class SkillEntry extends LeveledLogEntry {
 }
 
 class BuffEntry extends LeveledLogEntry {
-  // the list of soulstones/talent levels spent is stored in-memory as a fake soulstone log entry so we can use its replacements
-  /** @type {SoulstoneEntry} */
   soulstoneEntry;
-  /** @type {"soulstone" | "talent" | "imbuement3"} */
   statSpendType;
 
-  /**
-   * @param {Action=} action
-   * @param {BuffName=} buff
-   * @param {number=} toLevel
-   * @param {number=} fromLevel
-   * @param {(number | [loopStart: number, loopEnd: number])=} loop
-   * @param {SoulstoneEntry["stones"]=} statsSpent
-   * @param {BuffEntry["statSpendType"]=} statSpendType
-   */
   constructor(action, buff, toLevel, fromLevel, loop, statsSpent, statSpendType) {
     super('buff', action, buff, toLevel, fromLevel, loop);
 
@@ -512,7 +460,6 @@ class BuffEntry extends LeveledLogEntry {
   }
   load(data) {
     const [spendType, stones] = super.load(data);
-    // @ts-ignore
     this.statSpendType = typeof spendType === 'string' ? spendType : '';
     if (stones && typeof stones === 'object') {
       this.soulstoneEntry.addAllSoulstones(stones);
@@ -520,41 +467,68 @@ class BuffEntry extends LeveledLogEntry {
   }
 
   getText() {
-    let tag = 'buff';
-    if (this.fromLevel === 0) tag += '_from0';
-    if (this.toLevel !== this.fromLevel + 1) tag += '_multi';
-    return Localization.txt(`actions>log>${tag}`);
+    const fromZero = this.fromLevel === 0;
+    const multi = this.toLevel !== this.fromLevel + 1;
+
+    if (fromZero) {
+      if (multi) return t('actionLog.templates.buffFromZeroMulti');
+      return t('actionLog.templates.buffFromZero');
+    }
+
+    if (multi) return t('actionLog.templates.buffMulti');
+    return t('actionLog.templates.buff');
   }
 
-  /** @param {string} key */
   getReplacement(key) {
+    const map = {
+      'Ritual': 'ritual',
+      'Imbuement': 'mindImbuement',
+      'Imbuement2': 'bodyImbuement',
+      'Feast': 'greatFeast',
+      'Aspirant': 'aspirant',
+      'Heroism': 'heroism',
+      'Imbuement3': 'soulImbuement',
+      'PrestigePhysical': 'prestigePhysical',
+      'PrestigeMental': 'prestigeMental',
+      'PrestigeCombat': 'prestigeCombat',
+      'PrestigeSpatiomancy': 'prestigeSpatiomancy',
+      'PrestigeChronomancy': 'prestigeChronomancy',
+      'PrestigeBartering': 'prestigeBartering',
+      'PrestigeExpOverflow': 'prestigeExpOverflow',
+    } as const;
+
     if (key === 'buff') {
-      return Localization.txt(
-        `buffs>${getXMLName(Buff.fullNames[this.name])}>label`,
-      );
+      return t(`statistics.buffs.${map[this.name]}.name`);
     }
+
     if (key === 'buff_cost') {
-      return this.statSpendType
-        ? Localization.txt(
-          `actions>log>buff_cost_${
-            this.statSpendType === 'soulstone' && Object.keys(this.soulstoneEntry.stones).length === 1
-              ? 'soulstone_single'
-              : this.statSpendType
-          }`,
-        )
-        : '';
+      if (this.statSpendType === 'imbuement3') {
+        return t('actionLog.templates.buffCostSoulImbuement');
+      }
+      if (this.statSpendType === 'talent') {
+        return t('actionLog.templates.buffCostTalent');
+      }
+      if (this.statSpendType === 'soulstone') {
+        if (Object.keys(this.soulstoneEntry.stones).length === 1) {
+          return t('actionLog.templates.buffCostSoulstoneSingle');
+        }
+
+        return t('actionLog.templates.buffCostSoulstone');
+      }
+
+      return '';
     }
+
     if (key === 'count' || key.startsWith('stat')) return this.soulstoneEntry.getReplacement(key);
+
     return super.getReplacement(key);
   }
 
-  /** @param {BuffEntry} other  */
   canMergeParameters(other) {
     return this.statSpendType === other.statSpendType && super.canMergeParameters(other) &&
       this.soulstoneEntry.canMerge(other.soulstoneEntry);
   }
 
-  /** @param {BuffEntry} other  */
   merge(other) {
     this.soulstoneEntry.merge(other.soulstoneEntry);
     return super.merge(other);

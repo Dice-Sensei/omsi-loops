@@ -1666,6 +1666,16 @@ export const translationsEn = {
     messages: {
       latest: 'End of log',
     },
+    templates: {
+      buff: '{header}: You gain the {buff} buff! {buff_cost}',
+      buffMulti: '{header}: Your {buff} buff increases to level {toLevel}. {buff_cost}',
+      buffFromZero: '{header}: You gain the {buff} buff! {buff_cost}',
+      buffFromZeroMulti: '{header}: You gain the {buff} buff and it increases to level {toLevel}! {buff_cost}',
+      buffCostSoulstoneSingle: 'You sacrificed {count} soulstones of {stat_long}.',
+      buffCostSoulstone: 'You sacrificed {count} soulstones: {stats}',
+      buffCostTalent: 'You sacrificed {count} levels of talent: {stats}',
+      buffCostSoulImbuement: 'You sacrificed... everything.',
+    },
     actions: {
       loadPrevious: 'Load previous entries...',
     },
