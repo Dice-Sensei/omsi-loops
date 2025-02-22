@@ -436,19 +436,12 @@ export function loadDefaults() {
   defaultsRecorded = true;
 }
 
-export function loadUISettings() {
-}
-
-export function saveUISettings() {
-}
-
 export function needsDataSnapshots() {
   return vals.options.predictor && vals.options.predictorBackgroundThread;
 }
 
 export function performGameLoad(inChallenge, saveJson = globalThis.localStorage[saveName]) {
   loadDefaults();
-  loadUISettings();
 
   vals.loadouts = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
   vals.loadoutnames = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
@@ -621,37 +614,10 @@ export function doLoad(toLoad) {
     }
   }
 
-  if (toLoad.loadouts) {
-    for (let i = 0; i < vals.loadouts.length; i++) {
-      if (!toLoad.loadouts[i]) {
-        continue;
-      }
-      //Translates old actions that no longer exist
-      for (const action of toLoad.loadouts[i]) {
-        if (action.name === 'Sell Gold') {
-          action.name = 'Buy Mana';
-        }
-        if (action.name === 'Tournament') {
-          action.name = 'Buy Pickaxe';
-        }
-        if (action.name === 'Train Dex') {
-          action.name = 'Train Dexterity';
-        }
-        if (action.name === 'Buy Mana') {
-          action.name = 'Buy Mana Z1';
-        }
-        if (action.name === 'Purchase Mana') {
-          action.name = 'Buy Mana Z3';
-        }
-        if (vals.totalActionList.some((x) => x.name === action.name)) {
-          vals.loadouts[i].push(action);
-        }
-      }
-    }
-  }
   for (let i = 0; i < vals.loadoutnames.length; i++) {
     vals.loadoutnames[i] = 'Loadout ' + (i + 1);
   }
+
   if (toLoad.loadoutnames) {
     for (let i = 0; i < vals.loadoutnames.length; i++) {
       if (toLoad.loadoutnames[i] != undefined && toLoad.loadoutnames != '') {
@@ -662,10 +628,6 @@ export function doLoad(toLoad) {
     }
   }
   vals.curLoadout = toLoad.curLoadout;
-  const elem = typeof document === 'undefined' ? undefined : document.getElementById(`load${vals.curLoadout}`);
-  if (elem) {
-    document.getElementById(`load${vals.curLoadout}`).classList.remove('unused');
-  }
 
   vals.dungeons = [[], [], []];
   const level = { ssChance: 1, completed: 0 };
