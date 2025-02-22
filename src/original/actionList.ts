@@ -23,7 +23,6 @@ import {
 } from './prestige.ts';
 import { vals } from './saving.ts';
 import { Data } from './data.ts';
-import { Localization } from './localization.ts';
 import { camelize, fibonacci, numberToWords, precision3 } from './helpers.ts';
 import { getNumOnList } from './actions.ts';
 import {
@@ -188,23 +187,19 @@ export class Action {
     return camelize(this.name);
   }
 
-  getStoryTexts(rawStoriesDataForAction = Localization.txtsObj(this._rootPath)?.[0]?.children) {
+  getStoryTexts(rawStoriesDataForAction: string[]) {
+    const location = actionNameMap[this.name];
+    rawStoriesDataForAction ??= t(`actions.actions.${location}.stories`);
+
     const storyTexts = [];
 
-    for (const rawStoryData of rawStoriesDataForAction ?? []) {
-      if (rawStoryData.nodeName.startsWith('story_')) {
-        const num = parseInt(rawStoryData.nodeName.replace('story_', ''));
-        const [conditionHTML, text] = rawStoryData.textContent.split('⮀');
-        const condition = conditionHTML.replace(/^<b>|:<\/b>$/g, '');
-        storyTexts.push({ num, condition, conditionHTML, text });
-      } else if (rawStoryData.nodeName === 'story') {
-        const num = parseInt(rawStoryData.getAttribute('num'));
-        const condition = rawStoryData.getAttribute('condition');
-        const conditionHTML = `<b>${condition}:</b> `;
-        const text = rawStoryData.children.length > 0 ? rawStoryData.innerHTML : rawStoryData.textContent;
-        storyTexts.push({ num, condition, conditionHTML, text });
-      }
+    for (let i = 0; i < rawStoriesDataForAction.length; i++) {
+      const num = i + 1;
+      const [condition, text] = rawStoriesDataForAction[i].split(':', 1);
+      const conditionHTML = `<b>${condition}:</b> `;
+      storyTexts.push({ num, condition, conditionHTML, text });
     }
+
     return storyTexts;
   }
 }
@@ -218,25 +213,23 @@ class MultipartAction extends Action {
   }
 
   get segmentNames() {
-    this._segmentNames ??= Array.from(Localization.txtsObj(this._rootPath).find('>segment_names>name')).map((e) =>
-      e.textContent
-    );
+    const location = actionNameMap[this.name];
+    this._segmentNames ??= t(`actions.actions.${location}.segments`);
 
     return this._segmentNames;
   }
 
   get altSegmentNames() {
-    this._altSegmentNames ??= Array.from(Localization.txtsObj(this._rootPath).find('>segment_alt_names>name')).map((
-      e,
-    ) => e.textContent);
+    console.log('HERE');
+    const location = actionNameMap[this.name];
+    this._altSegmentNames ??= t(`actions.actions.${location}.segmentAltNames`);
 
     return this._altSegmentNames;
   }
 
   get segmentModifiers() {
-    this._segmentModifiers ??= Array.from(
-      Localization.txtsObj(this._rootPath).find('>segment_modifiers>segment_modifier'),
-    ).map((e) => e.textContent);
+    const location = actionNameMap[this.name];
+    this._segmentModifiers ??= t(`actions.actions.${location}.segmentModifiers`);
 
     return this._segmentModifiers;
   }
@@ -268,10 +261,13 @@ class DungeonAction extends MultipartAction {
 
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`] + 0.0001) {
     const floor = Math.floor(loopCounter / this.segments + 1);
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+
+    const location = actionNameMap[this.name];
+
+    return `${t(`actions.actions.${location}.states.isPart`)} ${
       floor <= vals.dungeons[this.dungeonNum].length
         ? numberToWords(floor)
-        : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
+        : t(`actions.actions.${location}.states.isComplete`)
     }`;
   }
 }
@@ -285,10 +281,14 @@ class TrialAction extends MultipartAction {
 
   getPartName(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
     const floor = Math.floor((loopCounter + 0.0001) / this.segments + 1);
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+
+    const location = actionNameMap[this.name];
+    const label = t(`actions.actions.${location}.states.isPart`);
+
+    return `${t(`actions.actions.${location}.states.isPart`)} ${
       floor <= vals.trials[this.trialNum].length
         ? numberToWords(floor)
-        : Localization.txt(`actions>${getXMLName(this.name)}>label_complete`)
+        : t(`actions.actions.${location}.states.isComplete`)
     }`;
   }
   currentFloor(loopCounter = towns[this.townNum][`${this.varName}LoopCounter`]) {
@@ -332,9 +332,10 @@ class AssassinAction extends MultipartAction {
     return 'assassin';
   }
 
-  getStoryTexts(
-    rawStoriesDataForAction = Localization.txtsObj(this.name.toLowerCase().replace(/ /gu, '_'))[0].children,
-  ) {
+  getStoryTexts(rawStoriesDataForAction) {
+    const location = actionNameMap[this.name];
+    rawStoriesDataForAction ??= t(`actions.actions.${location}.stories`);
+
     return super.getStoryTexts(rawStoriesDataForAction);
   }
 
@@ -1320,7 +1321,7 @@ Action.HealTheSick = new MultipartAction('Heal The Sick', {
     addResource('reputation', 3);
   },
   getPartName(loopCounter = towns[0].HealLoopCounter) {
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${t(`actions.actions.townZ0.options.healTheSick.states.isPart`)} ${
       numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },
@@ -4741,7 +4742,7 @@ Action.TidyUp = new MultipartAction('Tidy Up', {
     // empty.
   },
   getPartName(loopCounter = towns[4].TidyLoopCounter) {
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${t(`actions.actions.townZ4.options.tidyUp.states.isPart`)} ${
       numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },
@@ -6427,7 +6428,7 @@ Action.RescueSurvivors = new MultipartAction('Rescue Survivors', {
     if (loopCounter >= 20) setStoryFlag('rescued20Survivors');
   },
   getPartName(loopCounter = towns[6].RescueLoopCounter) {
-    return `${Localization.txt(`actions>${getXMLName(this.name)}>label_part`)} ${
+    return `${t(`actions.actions.townZ6.options.rescueSurvivors.states.isPart`)} ${
       numberToWords(Math.floor((loopCounter + 0.0001) / this.segments + 1))
     }`;
   },

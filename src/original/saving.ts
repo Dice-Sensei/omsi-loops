@@ -420,6 +420,7 @@ export function loadDefaults() {
   if (defaultsRecorded) {
     Data.resetToDefaults();
   }
+
   initializeStats();
   initializeSkills();
   initializeBuffs();
@@ -430,6 +431,7 @@ export function loadDefaults() {
   prestigeValues['prestigeTotalCompletions'] = 0;
   prestigeValues['completedCurrentPrestige'] = false;
   prestigeValues['completedAnyPrestige'] = false;
+
   Data.recordDefaults();
   defaultsRecorded = true;
 }

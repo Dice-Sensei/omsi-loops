@@ -506,7 +506,7 @@ export const translationsEn = {
             name: 'Heal The Sick',
             states: {
               isDone: 'Healed',
-              part: 'Patient',
+              isPart: 'Patient',
             },
             description: `
             You won't be able to heal them all, but they'll be thankful for doing what you can.
@@ -554,11 +554,6 @@ export const translationsEn = {
               `20,000 Monsters killed: The most efficient way to dodge, and the most efficient way to kill. You don't need ambushes anymore, you can wade into battle against any number of monsters and kill them all one after another, always inches away from death but never making a single misstep.`,
             ],
             segments: [
-              `speedy`,
-              `defensive`,
-              `aggressive`,
-            ],
-            segmentNames: [
               `Deer`,
               `Giant Turtles`,
               `Goblins`,
@@ -659,7 +654,7 @@ export const translationsEn = {
             `,
             chanceLabel: 'Chance',
             lastStatLabel: 'Last',
-            segmentNames: [
+            segments: [
               'Spike Traps',
               'Long Hallways',
               'Arrow Traps',
@@ -1079,7 +1074,7 @@ export const translationsEn = {
               Unlocked with both 50% Witch Knowledge and 50 Dark Magic.
               Sacrifices (50 * (rituals completed+1)) soulstones.
             `,
-            segmentNames: [
+            segments: [
               'Clear the Area',
               'Prepare the Altar',
               'Summon the Dark Gods',
@@ -1418,7 +1413,7 @@ export const translationsEn = {
               Gather your party to take on the trial of heroes!
               Progress is based on Team Combat.
             `,
-            segmentNames: [
+            segments: [
               'Locate Entrance',
               'Navigate Door Maze',
               'Slay Spectres',
@@ -1624,7 +1619,7 @@ export const translationsEn = {
               Unlocked with 50% Cavern Explored.
               Gives Combat exp per troll kill, rather than upon action completion.
             `,
-            segmentNames: [
+            segments: [
               'Find a Hiding Spot',
               'Scream Very Loudly to Lure Out the Troll',
               'Pounce on the Troll',
@@ -1695,7 +1690,7 @@ export const translationsEn = {
               Unlocked with both 70% Illusory Walls Discovered and 300 Magic.
               Sacrifices (20 * (imbuements+1)) soulstones.
             `,
-            segmentNames: [
+            segments: [
               'Submerge the Soulstones',
               'Arrange the Soulstones',
               'Absorb Knowledge',
@@ -1719,7 +1714,7 @@ export const translationsEn = {
               Level is limited by imbue mind rank.
               Sacrifices (imbuements+1) levels of talent.
             `,
-            segmentNames: [
+            segments: [
               'Submerge yourself',
               'Focus essence',
               'Absorb might',
@@ -1840,7 +1835,7 @@ export const translationsEn = {
             },
             tooltip:
               'Tidy up the place. Gives (Practical Magic) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana. Gives 5 gold and 1 reputation per mess cleaned. Unlocked at 30% of houses canvassed.',
-            segmentNames: [
+            segments: [
               'Move Boxes',
               'Sweep The Floor',
               'Fix Decorations',
@@ -2326,7 +2321,7 @@ export const translationsEn = {
             tooltip: `
               There are people lost wandering the jungle. If you can find them, you can patch them up and bring them back to camp.Gives (magic skill) * (restoration skill / 100) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) * (Jungle Explored %) progress points per mana.Rescued survivors give 4 reputation.Unlocked at 20% Jungle explored.
             `,
-            segmentNames: [
+            segments: [
               'Find',
               'Help',
               'Assure',
@@ -2634,7 +2629,7 @@ export const translationsEn = {
           imbueSoul: {
             name: `Imbue Soul`,
             states: {
-              isCompleted: 'Completed',
+              isComplete: 'Completed',
             },
             tooltip: `
               Resets all talent levels, soulstones, imbue mind and imbue body. Other skills and buffs are unchanged.
@@ -2657,7 +2652,7 @@ export const translationsEn = {
           buildTower: {
             name: `Build Tower`,
             states: {
-              isCompleted: 'Tower progress',
+              isComplete: 'Tower progress',
             },
             tooltip: `
               You've hit rock bottom and now there's nowhere to go but up. If only you had some way to climb back to Valhalla.
@@ -2678,8 +2673,8 @@ export const translationsEn = {
           godsTrial: {
             name: `Trial of the Gods`,
             states: {
-              isCompleted: 'Done',
-              isComplete: '100 Floors Completed',
+              isComplete: 'Done',
+              isCompleted: '100 Floors Completed',
               isPart: 'Gods Trial',
             },
             tooltip: `
@@ -2716,7 +2711,7 @@ export const translationsEn = {
           challengeGods: {
             name: `Challenge Gods`,
             states: {
-              isCompleted: 'Gods Defeated',
+              isComplete: 'Gods Defeated',
               isPart: 'Challenge Gods',
             },
             tooltip: `

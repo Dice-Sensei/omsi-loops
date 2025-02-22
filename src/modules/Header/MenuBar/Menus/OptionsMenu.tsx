@@ -1,10 +1,7 @@
-import { Button } from '../../../../components/buttons/Button/Button.tsx';
-import { Popover } from '../../../../components/containers/Overlay/primitives/Popover.tsx';
 import { Tooltip } from '../../../../components/containers/Overlay/primitives/Tooltip.tsx';
 import { HorizontalBar } from '../../../../components/flow/HorizontalBar/HorizontalBar.tsx';
 import { CheckboxField } from '../../../../components/forms/CheckboxField.tsx';
 import { NumberField } from '../../../../components/forms/NumberField.tsx';
-import { Localization } from '../../../../original/localization.ts';
 import { setOption } from '../../../../original/saving.ts';
 import { et } from '../../../../locales/translations.utils.ts';
 import { MenuOption } from './MenuOption.tsx';
@@ -14,12 +11,6 @@ export const OptionsMenu = () => (
   <MenuOption title={t('title')}>
     <div class='flex flex-col gap-2'>
       <a target='_blank' href='https://discord.gg/dnKA6Xd'>Discord Link</a>
-      <div class='flex gap-2'>
-        <span>Language:</span>
-        <select onChange={() => Localization.change()}>
-          <option value='en-EN'>English</option>
-        </select>
-      </div>
       <HorizontalBar />
       <CheckboxField value={false} onChange={(value) => setOption('actionLog', value)}>
         <span>Show action log</span>
