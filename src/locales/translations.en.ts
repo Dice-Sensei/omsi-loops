@@ -1129,7 +1129,6 @@ export const translationsEn = {
               "100% City Explored: You've seen all that Merchanton has to offer, from all levels of society. The one constant is that no matter where you go, people are busy. This city is a hub for rare items and clandestine deals, and fortunes are made and lost like water to the frantic beat of the city.",
             ],
           },
-
           gamble: {
             name: 'Gamble',
             states: {
@@ -1157,7 +1156,6 @@ export const translationsEn = {
               "Action failed with low money: As you sit down at the table and reach into your pockets, you realize that you don't have any money left! You hastily excuse yourself and leave the casino, and try to ignore the looks of pity you're given as you go.",
             ],
           },
-
           getDrunk: {
             name: 'Get Drunk',
             states: {
@@ -1181,12 +1179,95 @@ export const translationsEn = {
               "100% Rumors Heard: You've been to every bar and dinner party, and heard every bit of gossip there is to hear. While you've only met a tiny fraction of Merchanton's population you've had drinks with every rung of society, and you're starting to feel like the city's running out of secrets for you to uncover.",
             ],
           },
-
           buyManaZ3: {
             name: 'Buy Mana',
             tooltip: '1 gold = {{mana}} mana. Buys all the mana you can.',
             stories: [
               "Mana bought: Unsurprisingly, a hub of commerce such as Merchanton has its fair share of mana vendors. You give the marketplace a once-over, then head back to the cheapest vendor you've found.",
+            ],
+          },
+          sellPotions: {
+            name: 'Sell Potions',
+            tooltip: `
+              Potions are worth 1 gold per alchemy skill, but it takes a while to find a buyer.
+            `,
+            stories: [
+              `Potion sold: You're part of the attention-grabbing vista now, trying to get people to listen to you long enough to convince them your potions are worth the money. It's surprisingly hard work, but you got a man to give you a small sum of gold for one of your potions.`,
+              `20 Potions sold in a loop: All the good herbs of the forest, brewed into potions and sold to the people of Merchanton. It took you a while, but the weight in your coin pouch tells you it was worth the effort.`,
+              `Potion sold for 100 gold: As you hawk your wares, you catch the eye of a passing noblewoman. She's apparently dabbled in alchemy herself, and knows a quality potion when she sees one. After a couple rounds of negotiation she buys the potion for a tidy sum, and you realize your alchemical skills have gotten good enough for you to start marketing to richer clientele.`,
+              `Potion sold for 1000 gold: Potions this potent don't show up every day, even in the bustling hub of trade that is Merchanton, and that means the upper crust takes notice. Not directly, of course: they have people for that. You've started approaching the fancy auction houses with your wares, because it's a lot easier to play these nobles against each other when their agents are all in one place bidding directly against each other. The sale price of your latest masterpiece certainly agrees with you.`,
+            ],
+          },
+          adventureGuild: {
+            name: 'Adventure Guild',
+            states: {
+              isDone: 'Impressed',
+            },
+            tooltip: `
+            The one-stop shop for all your adventuring needs.
+            Take their tests and get a rank!
+            You can only join 1 guild at a time, and only try once.
+            Gives 200 mana per rank.
+            Gives ((magic skill)/2 + (self combat)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.
+            Unlocked at 20% Rumors Heard.
+            `,
+            stories: [
+              `Tests taken: You've gone through the standardized tests of the guild, and you're a little surprised at how low you placed. It seems that what you've considered impressive up until now is just the bare minimum around here.`,
+              `E Rank achieved: You've clawed your way out of the ranks of the common riffraff. You still don't stand out at all, but it feels good to not be on the bottom rung anymore.`,
+              `D Rank achieved: They say you're good for a new recruit, but it's still with a bored tone and an apathetic face. It seems even though you're getting much better scores nobody actually cares yet. Well, at least you're better off than the people stuck in F-rank.`,
+              `C Rank achieved: People seem to actually respect you now, all of a sudden. Apparently it's pretty common for people to fail to make it higher than E or D and quit, but those who make it to C-rank are in for the long haul. You're being treated like a comrade in arms now, and it feels good.`,
+              `B Rank achieved: Now people are starting to take note. B-rank adventurers don't come around every day, and most of them started lower and climbed their way up. That you came out of nowhere and placed B-rank on arrival is stirring up quite a few rumours.`,
+              `A Rank achieved: There are only about a dozen A-rank adventurers in Merchanton, and your arrival astonishes them all. Rumours fly, and some are even saying that you're an A-rank previously thought dead, disguised under a new identity. All the attention makes you uncomfortable, but at this point it's hard to avoid.`,
+              `S Rank achieved: There's only one other S-rank adventurer around, Guildmaster Rannet himself. There aren't any rumours of you being a fake identity this time, because S-rank adventurers are so rare that Rannet personally knows all of them and he's convinced he's never seen you before. Instead, people whisper about everything from the legacy of heroes to divine blood and everything in-between. At this point the only things that could explain your existence are implausible, and you can't really disagree with that assessment.`,
+              `U Rank achieved: You stand above even Rannet now, and you're told the only person who compares is the strongest Guildmaster, Diphon "Living Earthquake" Granwell. Word spreads like wildfire and you become an instant celebrity. Everyone seems to want you to go challenge Diphon to see who's the strongest, but you know that you'd run out of mana long before you even get close to his city.`,
+              `Godlike rank achieved: This isn't really a formal rank, as much as it reflects how you're stronger than they have means to measure, stronger than they've thought possible. They tell you that you're the strongest human alive, perhaps the strongest to ever live, and while you hesitate to embrace such a status you can see that they honestly believe it.`,
+            ],
+          },
+          gatherTeam: {
+            name: 'Gather Team',
+            tooltip: `
+              You don't have to take them on by yourself.
+              Max 5 other team members, plus 1 for each 100 levels of Leadership.
+              Costs <div id='teamCost'></div> gold, and the cost goes up by 100 gold per member.
+              Each member adds (Adventure Guild Multiplier) * (Combat Skill / 2) to your Team Combat.
+              Requires Adventure Guild.
+              Has 3x exp/talent gain.
+              Unlocked at 20% Rumors Heard.
+            `,
+            stories: [
+              `Teammate gathered: Cassandra, self-professed expert spell-slinger, makes no attempt to hide her suspicion of the newcomer who's insisting on an expedition the same day they joined the guild. Still, you're paying the asking price, so she grudgingly accepts. You can tell that she won't be a pleasant companion, though.`,
+              `Full party: Cassandra was a solo adventurer, but you've located a full party willing to join you in the dungeon. There's Marcus the swordsman, Raven the archer, Harvey the spell-slinger, Emily the healer, and Kyla, a rare specialist in magic-augmented dagger fighting. And you, now that you've paid them handsomely to join you.`,
+              `Failed Action: When Cassandra names her price, you mentally count the gold you have remaining and make a counteroffer. Before you can say anything else, Cassandra walks out and tells you to go home and stop wasting people's time.`,
+            ],
+          },
+          largeDungeon: {
+            name: 'Large Dungeon',
+            states: {
+              isDone: 'Looted',
+              isComplete: 'Completed',
+            },
+            tooltip: `
+              With your party, you set out to accomplish great feats of dungeoneering that you couldn't have done while alone.
+              Gives (magic + team combat) * (1 + main stat / 100) * sqrt(1 + times floor completed / 200) * (original mana cost / actual mana cost) progress points per mana.
+              Requires at least one other party member.
+              Unlocked at 20% Rumors Heard.
+              Gives 10 soulstones per completion - hover over Looted for info.
+            `,
+            segments: [
+              `Rally Party`,
+              `Journey to the Entrance`,
+              `Fight Door Guardians`,
+              `Argue over Loot`,
+              `Dodge Traps`,
+              `Dodge Friendly Fire`,
+              `Fight Boss`,
+            ],
+            stories: [
+              `Large Dungeon Attempted: You quickly understand why you couldn't do this alone. The strong guardians at the entrance aside, many of the traps can only be disarmed by multiple people working together. If you tried this on your own you would've been squashed like a bug.`,
+              `2,000 Dungeon Floors Looted: Adventuring in a party is tricky. Everyone wants the kill, everyone wants the loot, and one wrong word from anyone can spell a cascade of arguments. It's frustrating how much time you need to spend defusing tensions and keeping the party focused.`,
+              `10,000 Dungeon Floors Looted: While the dungeon is never quite the same, you have its measure, and that lets you persuade your party to go down the right corridors and avoid traps. You can tell they're suspicious, but you shrug it off as some kind of intuition and change the topic before an argument can start.`,
+              `20,000 Dungeon Floors Looted: They probably don't realize how much you're pulling the strings. How many arguments you've stopped before they start, or why they've never once made a wrong turn. At this point you know them better than they know themselves, and adventuring has never been so peaceful.`,
+              `9 Floors cleared in a loop: An ornate altar in a room full of carvings holds the final soulstones of the dungeon. It emanates a deep red tinted with gray and you feel slightly unsettled, but soulstones are soulstones. You pocket them and swiftly leave.`,
             ],
           },
           craftingGuild: {
@@ -1215,7 +1296,6 @@ export const translationsEn = {
               "Godlike Rank achieved: At last, you've finally broken their pride. You've gone beyond perfection and into the realm of revolution. Your new methods, honed by countless hours of experimentation, are so superior that even the proud old grandmasters bow their heads and humbly ask you to teach them. Victory is sweet.",
             ],
           },
-
           craftArmor: {
             name: 'Craft Armor',
             tooltip: `
@@ -1231,7 +1311,6 @@ export const translationsEn = {
               "Failed Action: No matter how you cut it, there isn't enough hide here to make anything useful. Grumbling in frustration, you throw your unfinished product in the trash and leave. What you have will have to be enough.",
             ],
           },
-
           apprentice: {
             name: 'Apprentice',
             states: {
@@ -1255,7 +1334,6 @@ export const translationsEn = {
               "100% Apprenticeship: Meck is still a better craftsman by far, but he still won't let you touch his tools and you've learned enough to get certified, so it's time to find houses under construction and get some hands-on experience.",
             ],
           },
-
           mason: {
             name: 'Mason',
             states: {
@@ -1300,7 +1378,6 @@ export const translationsEn = {
               "100% Projects Planned: With this victory, you've won every design competition in Merchanton at least once. However, there are countless ways to design a house, so you aren't done designing and maybe never will be.",
             ],
           },
-
           readBooks: {
             name: 'Read Books',
             tooltip: `
@@ -1318,7 +1395,6 @@ export const translationsEn = {
               "100,000 Intelligence Talent: You can't help it. You read a story and just know that it could've been done better. Every mistake sticks out like a challenge, and you'll soon find yourself quill in hand answering the challenge. Better endings, more immersive worldbuilding, clearer themes, there's always something that can be done better. Your rewrites vanish at the end of the loop, never to be read by anyone, but you know that you'll be back here for real once you're free.",
             ],
           },
-
           buyPickaxe: {
             name: 'Buy Pickaxe',
             tooltip: `
@@ -1331,7 +1407,6 @@ export const translationsEn = {
               "Pickaxe bought: The merchant assures you that the pickaxe is made out of only the most sturdy materials and will last a lifetime without needing repair. You're not entirely convinced, but you don't need it to last a lifetime anyways, and it does have a good heft to it.",
             ],
           },
-
           heroesTrial: {
             name: 'Heroes Trial',
             states: {
@@ -1409,7 +1484,6 @@ export const translationsEn = {
               "100% Mountain Explored: You reach the summit, and in front of you is a huge, magnificent temple. It, too, is in ruins, and the statues of the gods are worn and broken. Amidst the bleak scene, your attention is drawn to an inexplicably pristine altar in a position of prominence, and you feel strangely like you're being watched.",
             ],
           },
-
           manaGeyser: {
             name: 'Mana Geyser',
             states: {
@@ -1454,7 +1528,6 @@ export const translationsEn = {
               "100% Runic Symbols Deciphered: It's the last engraving on the mountain, on an intricately detailed but heavily worn headstone, and it explains why all these engravings exist. Out of nowhere, the gods left and a great blight fell upon the mountain. The doomed civilization, unable or unwilling to flee, spent its last days making these carvings. There's a final plea: don't let us be forgotten. Remember our magic, our stories, our way of life, even if nothing else of us survives.",
             ],
           },
-
           chronomancy: {
             name: 'Chronomancy',
             tooltip: `
@@ -1481,7 +1554,6 @@ export const translationsEn = {
               "Potion Made: There's no mistake, this is the same potion that you were transporting what feels like an eternity ago. This is chronomancy you'd never be able to do as a spell, and you take a moment to feel proud at how far you've come. And yet, you don't really know what to do with the thing. Maybe you'll figure something out later.",
             ],
           },
-
           pyromancy: {
             name: 'Pyromancy',
             tooltip: `
@@ -1517,7 +1589,6 @@ export const translationsEn = {
               "100% Cavern Explored: As you go down the last tunnel, you wonder what's causing all this heat. Maybe there's a giant lava pool just beneath your feet, heating the entire mountain. You reach the final dead-end, and the only thing your heat-baked mind can think of is that it doesn't look like you'll be getting an answer.",
             ],
           },
-
           mineSoulstones: {
             name: 'Mine Soulstone',
             states: {
@@ -1541,7 +1612,6 @@ export const translationsEn = {
               '75 Soulstones mined: You whistle a tune while your mastery of Spatiomancy turns a small crack into a cave, letting you dig out a few more soulstones that were out of reach before. Do the wonders of magic ever cease? No, probably not. Nor do you expect to run out of soulstones ever again.',
             ],
           },
-
           huntTrolls: {
             name: 'Hunt Trolls',
             states: {
@@ -1588,7 +1658,6 @@ export const translationsEn = {
               '100% Illusory Walls Discovered: Traversing the entire cavern system the first time was time-consuming but interesting. Traveling it a second time with your hand on the walls was just boring. You just wish you knew to do this the first time around.',
             ],
           },
-
           takeArtifacts: {
             name: 'Take Artifacts',
             states: {
@@ -1611,7 +1680,6 @@ export const translationsEn = {
               '50 Artifacts taken in a loop: During your studies in Valhalla, you picked up on an odd tradition: The people from the mountain would leave one treasure out in the open, but bury a second or even a third nearby. You can kind of follow the logic there; let the intruders grab some small fraction of your wealth, but keep most of it out of sight. In any case, a bit of creative tinkering with Spatiomancy makes even the deepest-buried treasure no further below the surface than you can reach with your bare fingers, and the extra artefacts are a great bonus.',
             ],
           },
-
           imbueMind: {
             name: 'Imbue Mind',
             states: {
@@ -1680,7 +1748,6 @@ export const translationsEn = {
               "Cast into the Shadow Realm: There is only one word for the act of facing the gods while the stench of their dark cousins emanates from you: defiance. They know you aren't here to win their favour, but to spit in their faces as an emissary of their hated nemeses. Enraged, the gods strike you down, and you sink into a world of roiling black turmoil. And yet, the dark gods you're aligned with act too, and in the shadows, you find yourself along a twisted yet familiar path.",
             ],
           },
-
           guru: {
             name: 'Guru',
             tooltip: `
@@ -1992,6 +2059,38 @@ export const translationsEn = {
                 `Held a Feast: For all the hurdles you had to jump to even get this far, the feast itself makes up for the hassle and then some. The tastiest food, the sweetest deserts and the smoothest drinks fill you up, and you feel like you could handle the Frost Giants' armies all on your own!`,
               ],
             },
+          },
+          seekBlessing: {
+            name: 'Seek Blessing',
+            tooltip: `
+              Pray to the Gods to grant you their favor.
+              Increases the number of soulstones earned from all actions.
+              Can only have 1 Seek Blessing action.
+              Requires a Pegasus.
+            `,
+            stories: [
+              `Sought Blessing: You ride your winged mount to the highest place in all of Valhalla and kneel. Asking for the favor of the Gods is a solemn, quiet affair after all.`,
+              `Received Blessing: You finish your quiet prayer, here in the middle of the Gods' realm. For a moment, there is silence, but then you feel a warmth grow in your chest as the Gods below answer in the affirmative.`,
+              `Received Blessing with maximum Giant Slaying rank: Coming to this quiet place has become something of a ritual for you after so many fights against the Frost Giants. Surprisingly enough, this time you're not alone as a smirking God meets you in your usual spot. He introduces himself as Aries and, with a pat on your shoulder, nearly makes you collapse with the intensity of his Blessing. "Keep up the good fight, will you?" he asks, but he doesn't stick around for you to answer.`,
+            ],
+          },
+          greatFeast: {
+            name: 'Great Feast',
+            tooltip: `
+              You realize now that you've forgotten the joy of food, after having gone for so "long" without needing to eat anything. It's about time for a feast of grand proportions. Unfortunately, all the catering services here only accept payments in soulstones.
+              Permanently increases self and team combat.
+              Gives (practical magic skill) * (1 + main stat / 100) * (original mana cost / actual mana cost) progress points per mana.Can only have 1 Great Feast action.Requires 100 reputation.Sacrifices (5,000 * (feasts+1)) soulstones. Currently sacrificing {{sacrifice}} soulstones.
+              Unlocked at 100% of city toured.
+            `,
+            stories: [
+              `Attempted a Feast: Unlike the mortals they rule over, Gods don't need food to survive. Instead, they hold Feasts for the sake of getting drunk and enjoying the best food the realm has to offer. Lucky for you, they are currently planning one you can join!`,
+              `Held a Feast: For all the hurdles you had to jump to even get this far, the feast itself makes up for the hassle and then some. The tastiest food, the sweetest deserts and the smoothest drinks fill you up, and you feel like you could handle the Frost Giants' armies all on your own!`,
+            ],
+            segments: [
+              'Explain your order',
+              'Give them your information',
+              'Verifiy your identity',
+            ],
           },
         },
         journeys: {
