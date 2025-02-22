@@ -5054,21 +5054,21 @@ Action.WizardCollege = new MultipartAction('Wizard College', {
     switch (storyNum) {
       case 1:
         return storyVars.maxWizardGuildSegmentCleared >= 0;
-      case 12:
-        return storyVars.maxWizardGuildSegmentCleared >= 3;
       case 2:
-        return storyVars.maxWizardGuildSegmentCleared >= 6;
+        return storyVars.maxWizardGuildSegmentCleared >= 3;
       case 3:
-        return storyVars.maxWizardGuildSegmentCleared >= 12;
+        return storyVars.maxWizardGuildSegmentCleared >= 6;
       case 4:
+        return storyVars.maxWizardGuildSegmentCleared >= 12;
+      case 5:
         return storyVars.maxWizardGuildSegmentCleared >= 18;
       case 6:
         return storyVars.maxWizardGuildSegmentCleared >= 30;
-      case 8:
+      case 7:
         return storyVars.maxWizardGuildSegmentCleared >= 42;
-      case 10:
+      case 8:
         return storyVars.maxWizardGuildSegmentCleared >= 54;
-      case 13:
+      case 9:
         return storyVars.maxWizardGuildSegmentCleared >= 57;
     }
   },
