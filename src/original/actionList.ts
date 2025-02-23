@@ -34,7 +34,7 @@ import {
   statList,
   stats,
   storyFlags,
-  storyVars,
+  storyFlags,
   towns,
 } from './globals.ts';
 import {
@@ -5055,23 +5055,23 @@ Action.WizardCollege = new MultipartAction('Wizard College', {
   storyReqs(storyNum) {
     switch (storyNum) {
       case 1:
-        return storyVars.maxWizardGuildSegmentCleared >= 0;
+        return storyFlags.maxWizardGuildSegmentCleared >= 0;
       case 2:
-        return storyVars.maxWizardGuildSegmentCleared >= 3;
+        return storyFlags.maxWizardGuildSegmentCleared >= 3;
       case 3:
-        return storyVars.maxWizardGuildSegmentCleared >= 6;
+        return storyFlags.maxWizardGuildSegmentCleared >= 6;
       case 4:
-        return storyVars.maxWizardGuildSegmentCleared >= 12;
+        return storyFlags.maxWizardGuildSegmentCleared >= 12;
       case 5:
-        return storyVars.maxWizardGuildSegmentCleared >= 18;
+        return storyFlags.maxWizardGuildSegmentCleared >= 18;
       case 6:
-        return storyVars.maxWizardGuildSegmentCleared >= 30;
+        return storyFlags.maxWizardGuildSegmentCleared >= 30;
       case 7:
-        return storyVars.maxWizardGuildSegmentCleared >= 42;
+        return storyFlags.maxWizardGuildSegmentCleared >= 42;
       case 8:
-        return storyVars.maxWizardGuildSegmentCleared >= 54;
+        return storyFlags.maxWizardGuildSegmentCleared >= 54;
       case 9:
-        return storyVars.maxWizardGuildSegmentCleared >= 57;
+        return storyFlags.maxWizardGuildSegmentCleared >= 57;
     }
   },
   stats: {
@@ -5899,9 +5899,9 @@ Action.RaiseZombie = new Action('Raise Zombie', {
       case 1:
         return storyFlags.attemptedRaiseZombie;
       case 3:
-        return storyVars.maxZombiesRaised >= 10;
+        return storyFlags.maxZombiesRaised >= 10;
       case 4:
-        return storyVars.maxZombiesRaised >= 25;
+        return storyFlags.maxZombiesRaised >= 25;
     }
   },
   stats: {

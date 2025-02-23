@@ -507,13 +507,6 @@ export function handleSkillExp(list) {
   }
 }
 
-/**
- * @param {BuffName} name
- * @param {number} amount
- * @param {Action} [action]
- * @param {BuffEntry["statSpendType"]} [spendType]
- * @param {SoulstoneEntry["stones"]} [statsSpent]
- */
 export function addBuffAmt(name, amount, action, spendType, statsSpent) {
   const oldBuffLevel = getBuffLevel(name);
   if (oldBuffLevel === buffHardCaps[name]) return;
@@ -548,8 +541,6 @@ export function getTalentMultiplier() {
   }
   return talentMultiplierCache.talentMultiplier;
 }
-
-// how much "addExp" would you have to do to get this stat to the next exp or talent level
 
 export function getExpToLevel(name, talentOnly = false) {
   const expToNext = stats[name].statLevelExp.expToNextLevel;

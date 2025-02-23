@@ -830,8 +830,8 @@ export function setStoryFlag(name) {
 }
 
 export function increaseStoryVarTo(name, value) {
-  if (storyVars[name] < value) {
-    storyVars[name] = value;
+  if (storyFlags[name] < value) {
+    storyFlags[name] = value;
     if (vals.options.actionLog) view.requestUpdate('updateStories', false);
   }
 }

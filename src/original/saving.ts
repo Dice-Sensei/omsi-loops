@@ -16,7 +16,7 @@ import {
   statList,
   stats,
   storyFlags,
-  storyVars,
+  storyFlags,
   towns,
 } from './globals.ts';
 import { actions } from './actions.ts';
@@ -276,9 +276,8 @@ const optionValueHandlers = {
 };
 
 const storyInitializers = {
-  storyFlags: {},
-  storyVars: {
-    maxWizardGuildSegmentCleared(loadingFlags, loadingVars) {
+  storyFlags: {
+    maxWizardGuildSegmentCleared(loadingFlags) {
       if (loadingFlags['wizardGuildRankSSSReached']) return 48;
       if (loadingFlags['wizardGuildRankSSReached']) return 42;
       if (loadingFlags['wizardGuildRankSReached']) return 36;
@@ -530,20 +529,11 @@ export function doLoad(toLoad) {
   }
 
   for (const property in storyFlags) {
-    if (toLoad.storyReqs?.hasOwnProperty(property)) {
-      storyFlags[property] = toLoad.storyReqs[property];
+    if (toLoad.storyFlags?.hasOwnProperty(property)) {
+      storyFlags[property] = toLoad.storyFlags[property];
     } else {
-      storyFlags[property] = storyInitializers.storyFlags[property]?.(toLoad.storyReqs ?? {}, toLoad.storyVars ?? {}) ??
+      storyFlags[property] = storyInitializers.storyFlags[property]?.(toLoad.storyFlags ?? {}) ??
         false;
-    }
-  }
-
-  for (const property in storyVars) {
-    if (toLoad.storyVars?.hasOwnProperty(property)) {
-      storyVars[property] = toLoad.storyVars[property];
-    } else {
-      storyVars[property] = storyInitializers.storyVars[property]?.(toLoad.storyReqs ?? {}, toLoad.storyVars ?? {}) ??
-        -1;
     }
   }
 
@@ -866,8 +856,7 @@ export function doSave() {
   }
   toSave.storyShowing = vals.storyShowing;
   toSave.storyMax = vals.storyMax;
-  toSave.storyReqs = storyFlags; // save uses the legacy name "storyReqs" for compatibility
-  toSave.storyVars = vals.storyVars;
+  toSave.storyFlags = vals.storyFlags;
   toSave.unreadActionStories = vals.unreadActionStories;
   toSave.actionLog = actionLog;
   toSave.buffCaps = buffCaps;
@@ -890,6 +879,7 @@ export function performSaveGame() {
   const saveJson = JSON.stringify(toSave);
   globalThis.localStorage[saveName] = saveJson;
   globalThis.localStorage['updateRate'] = vals.options.updateRate;
+
   return saveJson;
 }
 

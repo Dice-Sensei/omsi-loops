@@ -55,8 +55,8 @@ export const buffCaps = {
   PrestigeBartering: 100,
   PrestigeExpOverflow: 100,
 };
-export const buffs = /** @type {{[K in BuffName]: Buff}} */ ({});
-export const buffList = /** @type {const} */ ([
+export const buffs = {};
+export const buffList = [
   'Ritual',
   'Imbuement',
   'Imbuement2',
@@ -71,8 +71,8 @@ export const buffList = /** @type {const} */ ([
   'PrestigeChronomancy',
   'PrestigeBartering',
   'PrestigeExpOverflow',
-]);
-export const statList = /** @type {const} */ ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'] as const;
+] as const;
+export const statList = ['Dex', 'Str', 'Con', 'Spd', 'Per', 'Cha', 'Int', 'Luck', 'Soul'] as const;
 
 export const hearts = [];
 export const resources = {
@@ -106,8 +106,8 @@ export const resources = {
 };
 
 export const resourcesTemplate = copyObject(resources);
-export const towns = /** @type {TownList<9>} */ (/** @type {Town[]} */ ([]));
-export const skills = /** @type {{[K in SkillName]: Skill}} */ ({});
+export const towns = [];
+export const skills = {};
 
 export type StatName = 'Dex' | 'Str' | 'Con' | 'Spd' | 'Per' | 'Cha' | 'Int' | 'Luck' | 'Soul';
 
@@ -330,9 +330,6 @@ export const storyFlags = {
   fightGods16: false,
   fightGods17: false,
   fightGods18: false,
-};
-
-export const storyVars = {
   maxWizardGuildSegmentCleared: -1,
   maxZombiesRaised: -1,
 };
