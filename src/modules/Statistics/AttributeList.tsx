@@ -3,7 +3,7 @@ import { Tooltip } from '../../components/containers/Overlay/primitives/Tooltip.
 import { For } from '../../components/flow/For/For.tsx';
 import { statList, stats } from '../../original/globals.ts';
 import { getLevel, getPrcToNextLevel, getPrcToNextTalent, getTalent, getTotalBonusXP } from '../../original/stats.ts';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
+import { createIntervalAccessor } from '../../signals/createInterval.ts';
 import { HorizontalBar } from '../../components/flow/HorizontalBar/HorizontalBar.tsx';
 import { et } from '../../locales/translations.utils.ts';
 import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
@@ -26,7 +26,7 @@ const Attribute = (props: { stat: (typeof statList)[number] }) => {
   const name = statToName[props.stat];
   const stat = props.stat;
 
-  const [values] = createIntervalSignal({
+  const values = createIntervalAccessor({
     talent: 0,
     level: 0,
     soulstone: 0,
@@ -115,7 +115,7 @@ const Attribute = (props: { stat: (typeof statList)[number] }) => {
 };
 
 const AttributeTotal = () => {
-  const [values] = createIntervalSignal({
+  const values = createIntervalAccessor({
     talent: 0,
     level: 0,
     soulstone: 0,

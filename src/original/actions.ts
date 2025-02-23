@@ -9,9 +9,8 @@ import { actions } from './actions.ts';
 import { vals } from './saving.ts';
 
 export class Actions {
-  current = [];
-
-  next = [];
+  current: Action[] = [];
+  next: Action[] = [];
 
   #nextLast;
   addAmount = 1;
@@ -735,12 +734,10 @@ export function addExpFromAction(action, manaCount) {
   for (const stat of statList) {
     const expToAdd = ((action.stats[stat] ?? 0) + overFlow) * adjustedExp * getTotalBonusXP(stat);
 
-    // Used for updating the menus when hovering over a completed item in the actionList
-    const statExp = `statExp${stat}`;
-    if (!action[statExp]) {
-      action[statExp] = 0;
+    if (!action.exp[stat]) {
+      action.exp[stat] = 0;
     }
-    action[statExp] += expToAdd;
+    action.exp[stat] += expToAdd;
     addExp(stat, expToAdd);
   }
 }

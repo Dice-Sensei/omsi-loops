@@ -7,17 +7,18 @@ import { actions } from '../../original/actions.ts';
 import { capAllTraining, clearList, loadList, nameList, saveList, selectLoadout } from '../../original/driver.ts';
 import { formatNumber } from '../../original/helpers.ts';
 import { setOption } from '../../original/saving.ts';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
+import { createIntervalAccessor } from '../../signals/createInterval.ts';
 import { actionAmount, setActionAmount } from '../../values.ts';
 import { formatTime } from '../../views/main.view.ts';
 import { KeyboardKey } from '../hotkeys/KeyboardKey.ts';
 import { driverVals } from '../../original/driver.ts';
 import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
 import { CheckboxField } from '../../components/forms/CheckboxField.tsx';
-import { For, Show } from 'solid-js';
+import { Show } from 'solid-js';
 import cx from 'clsx';
 import { TextField } from '../../components/forms/TextField.tsx';
-import { createSignal } from 'solid-js';
+import { createMemo, createSignal } from 'solid-js';
+import { For } from '../../components/flow/For/For.tsx';
 
 const ActionsOptions = () => {
   return (
@@ -114,11 +115,124 @@ const ActionsNextList = (props: { class?: string }) => {
 };
 
 const ActionsCurrentList = (props: { class?: string }) => {
-  return <div id='curActionsList' class={props.class}></div>;
+  const [hoveredIndex, setHoveredIndex] = createSignal<number | null>(null);
+  const list = createIntervalAccessor([], () => actions.current);
+
+  const hoveredAction = createMemo(() => {
+    const index = hoveredIndex();
+
+    if (index === null) return null;
+
+    return list()[index];
+  });
+
+  return (
+    <Tooltip placement='right-start'>
+      <Tooltip.Trigger>
+        <For each={list()} as='div' class='flex flex-col divide-y divide-emerald-900 w-full'>
+          {(action, index) => {
+            const values = createIntervalAccessor({
+              isProgress: false,
+              isFailed: false,
+              isDone: false,
+              percentage: 0,
+              status: 'failed',
+            }, () => {
+              const isFailed = !!action.errorMessage;
+              const isDone = !isFailed && action.loopsLeft === 0;
+              const isProgress = !isFailed && !isDone;
+
+              const status = isFailed ? 'failed' : isDone ? 'done' : 'progress';
+              const percentage = isProgress ? action.ticks / action.adjustedTicks * 100 : 100;
+
+              return { status, isFailed, isDone, isProgress, percentage };
+            });
+
+            return (
+              <Tooltip>
+                <Tooltip.Trigger>
+                  <div
+                    onMouseEnter={() => setHoveredIndex(index())}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    class='relative flex gap-1 items-center text-sm divide-x divide-emerald-700 hover:bg-emerald-800 w-full transition-colors duration-50'
+                  >
+                    <div
+                      class={cx(
+                        'absolute inset-0',
+                        values().status === 'failed' && 'bg-red-500/50',
+                        values().status === 'done' && 'bg-blue-500/50',
+                        values().status === 'progress' && 'bg-emerald-900/50',
+                      )}
+                      style={{ width: `${values().percentage}%` }}
+                    />
+                    <img src={`icons/${action.imageName}.svg`} class='w-4 h-4' />
+                    <div class='flex gap-0.5 items-center px-2'>
+                      <span>{action.loops - action.loopsLeft}</span>
+                      <span>/</span>
+                      <span>{action.loops}</span>
+                    </div>
+                  </div>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                  <div class='font-bold'>{action.name}</div>
+                  <div class='grid grid-cols-[auto,1fr] gap-x-1'>
+                    <div class='font-medium'>Actions left:</div>
+                    <div>{action.loopsLeft}</div>
+                    <div class='font-medium'>Actions total:</div>
+                    <div>{action.loops}</div>
+                    <div class='font-medium'>Actions percentage:</div>
+                    <div>{values().percentage}%</div>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip>
+            );
+          }}
+        </For>
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        <Show when={hoveredAction()}>
+          <div class='flex flex-col gap-1'>
+            <div class='font-bold w-full text-center'>
+              {hoveredAction()?.name}
+            </div>
+            <div class='grid grid-cols-[auto,1fr] gap-x-1'>
+              <div class='font-medium'>Mana original:</div>
+              <div>{hoveredAction()?.manaCost() * hoveredAction()?.loops}</div>
+              <div class='font-medium'>Mana used:</div>
+              <div>{hoveredAction()?.manaUsed}</div>
+              <div class='font-medium'>Mana last:</div>
+              <div>{hoveredAction()?.lastMana}</div>
+              <div class='font-medium'>Mana remaining:</div>
+              <div>{hoveredAction()?.manaRemaining}</div>
+              <div class='font-medium'>Gold remaining:</div>
+              <div>{hoveredAction()?.goldRemaining}</div>
+              <div class='font-medium'>Time spent:</div>
+              <div>{hoveredAction()?.timeSpent}</div>
+              <div class='font-medium'>Time in loop:</div>
+              <div>{hoveredAction()?.effectiveTimeElapsed}</div>
+            </div>
+            <div class='font-medium'>Experience gain:</div>
+            <For
+              each={Object.entries(hoveredAction()?.exp ?? {})}
+              as='div'
+              class='grid grid-cols-[auto,1fr,auto,1fr] gap-x-1 text-sm'
+            >
+              {([stat, exp]) => (
+                <>
+                  <div class='font-medium'>{stat}:</div>
+                  <div>{exp}</div>
+                </>
+              )}
+            </For>
+          </div>
+        </Show>
+      </Tooltip.Content>
+    </Tooltip>
+  );
 };
 
 const ActionsCurrentUse = (props: { class?: string }) => {
-  const [ticks] = createIntervalSignal(
+  const ticks = createIntervalAccessor(
     '0 | 0s',
     () => `${formatNumber(actions.completedTicks)} | ${formatTime(driverVals.timeCounter)}`,
   );

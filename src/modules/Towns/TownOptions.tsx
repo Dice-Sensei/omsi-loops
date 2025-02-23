@@ -1,15 +1,8 @@
 import { createEffect, createMemo, Show } from 'solid-js';
-import { t } from '../../locales/translations.utils.ts';
-import { KeyboardKey } from '../hotkeys/KeyboardKey.ts';
-import {
-  addActionToList,
-  handleDirectActionDragEnd,
-  handleDirectActionDragStart,
-  handleDragOver,
-} from '../../original/driver.ts';
+import { addActionToList } from '../../original/driver.ts';
 import { towns } from '../../original/globals.ts';
 import { For } from '../../components/flow/For/For.tsx';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
+import { createIntervalAccessor } from '../../signals/createInterval.ts';
 import { Tooltip } from '../../components/containers/Overlay/primitives/Tooltip.tsx';
 import { translateClassNames } from '../../original/actionList.ts';
 import cx from 'clsx';
@@ -94,7 +87,7 @@ interface ActionCardProps {
 const ActionCard = (props: ActionCardProps) => {
   const action = translateClassNames(props.action);
 
-  const [values] = createIntervalSignal({
+  const values = createIntervalAccessor({
     experienceMultiplier: 100,
     stats: [],
     manaCost: 0,
@@ -261,10 +254,6 @@ export const ZoneOptionsSelects = () => {
       const container = document.getElementById(`container${action.varName}`) as HTMLButtonElement;
 
       requestAnimationFrame(() => {
-        container.ondragover = (event) => handleDragOver(event);
-        container.ondragstart = (event) =>
-          handleDirectActionDragStart(event, action.name, action.townNum, action.varName, false);
-        container.ondragend = () => handleDirectActionDragEnd(action.varName);
         container.onclick = () => addActionToList(action.name, action.townNum);
       });
     }

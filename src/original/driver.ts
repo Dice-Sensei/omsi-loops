@@ -40,8 +40,6 @@ import { beep, clamp, copyArray, Mana } from './helpers.ts';
 import { actions, actionStory, getNumOnList, markActionsComplete } from './actions.ts';
 import { resources, resourcesTemplate, towns } from './globals.ts';
 import { prestigeBonus, prestigeValues } from './prestige.ts';
-import { dragExitUndecorate, draggedDecorate } from '../views/main.view.ts';
-import { setActionAmount } from '../values.ts';
 
 let curTime = Date.now();
 // actually milliseconds, not ticks
@@ -373,7 +371,6 @@ export function performGameRestart() {
     towns[i].restart();
   }
   actions.restart();
-  view.requestUpdate('updateCurrentActionsDivs');
   view.requestUpdate('updateTrials', null);
   if (needsDataSnapshots()) {
     Data.updateSnapshot('restart', 'base');
@@ -594,65 +591,6 @@ export function showNotification(name) {
 export function hideNotification(name) {
   vals.unreadActionStories = vals.unreadActionStories.filter((toRead) => toRead !== name);
   document.getElementById(`${name}Notification`).style.display = 'none';
-}
-export function hideActionIcons() {
-  document.getElementById('nextActionsList').className = 'disabled';
-}
-export function showActionIcons() {
-  document.getElementById('nextActionsList').className = '';
-}
-
-export function handleDragStart(event) {
-  const index = event.target.getAttribute('data-action-id');
-  draggedDecorate(index);
-  event.dataTransfer.setData('text/html', index);
-  hideActionIcons();
-}
-
-export function handleDirectActionDragStart(event, actionName, townNum, actionVarName, isTravelAction) {
-  // @ts-ignore
-  document.getElementById(`container${actionVarName}`).children[2].style.display = 'none';
-  const actionData = { _actionName: actionName, _townNum: townNum, _isTravelAction: isTravelAction };
-  const serialData = JSON.stringify(actionData);
-  event.dataTransfer.setData('actionData', serialData);
-  hideActionIcons();
-}
-
-export function handleDirectActionDragEnd(actionVarName) {
-  // @ts-ignore
-  document.getElementById(`container${actionVarName}`).children[2].style.display = '';
-  showActionIcons();
-}
-
-export function handleDragOver(event) {
-  event.preventDefault();
-}
-
-export function handleDragDrop(event) {
-  const idOfDroppedOverElement = event.target.getAttribute('data-action-id');
-  const indexOfDroppedOverElement = actions.findIndexOfActionWithId(idOfDroppedOverElement);
-  dragExitUndecorate(idOfDroppedOverElement);
-  const initialId = event.dataTransfer.getData('text/html');
-  if (initialId === '') {
-    const actionData = JSON.parse(event.dataTransfer.getData('actionData'));
-    addActionToList(actionData._actionName, actionData._townNum, actionData._isTravelAction, indexOfDroppedOverElement);
-  } else {
-    moveQueuedAction(actions.findIndexOfActionWithId(initialId), indexOfDroppedOverElement);
-  }
-  showActionIcons();
-}
-
-export function moveQueuedAction(initialIndex, resultingIndex) {
-  if (
-    initialIndex < 0 || initialIndex > actions.next.length || resultingIndex < 0 ||
-    resultingIndex > actions.next.length - 1
-  ) {
-    return;
-  }
-
-  actions.moveAction(initialIndex, resultingIndex, true);
-
-  view.updateNextActions();
 }
 
 export function moveUp(actionId) {

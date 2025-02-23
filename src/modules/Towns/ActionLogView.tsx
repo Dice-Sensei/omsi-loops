@@ -1,10 +1,10 @@
 import { Button } from '../../components/buttons/Button/Button.tsx';
 import { t } from '../../locales/translations.utils.ts';
 import { actionLog } from '../../original/globals.ts';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
+import { createIntervalAccessor } from '../../signals/createInterval.ts';
 
 export const ActionLogView = () => {
-  const [entries] = createIntervalSignal([], () => [...actionLog.entries]);
+  const entries = createIntervalAccessor([], () => [...actionLog.entries]);
 
   return (
     <div class='flex flex-col gap-2'>

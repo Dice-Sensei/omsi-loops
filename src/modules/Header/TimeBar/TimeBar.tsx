@@ -1,12 +1,12 @@
 import { getActualGameSpeed } from '../../../original/driver.ts';
 import { intToString } from '../../../original/helpers.ts';
 import { vals } from '../../../original/saving.ts';
-import { createIntervalSignal } from '../../../signals/createInterval.ts';
+import { createIntervalAccessor } from '../../../signals/createInterval.ts';
 import { formatTime } from '../../../views/main.view.ts';
 
 export const TimeBar = () => {
-  const [progress] = createIntervalSignal(0, () => (100 - (vals.timer / vals.timeNeeded) * 100));
-  const [timer] = createIntervalSignal('0 | 0s', () =>
+  const progress = createIntervalAccessor(0, () => (100 - (vals.timer / vals.timeNeeded) * 100));
+  const timer = createIntervalAccessor('0 | 0s', () =>
     `${
       intToString(
         vals.timeNeeded - vals.timer,

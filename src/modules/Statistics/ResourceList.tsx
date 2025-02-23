@@ -1,7 +1,7 @@
 import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
 import { et } from '../../locales/translations.utils.ts';
 import { resources, towns } from '../../original/globals.ts';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
+import { createIntervalAccessor } from '../../signals/createInterval.ts';
 import { vals } from '../../original/saving.ts';
 
 interface NumericResourceProps {
@@ -10,7 +10,7 @@ interface NumericResourceProps {
 }
 
 const ConsumableResource = (props: NumericResourceProps) => {
-  const [value] = createIntervalSignal(0, () => {
+  const value = createIntervalAccessor(0, () => {
     if (props.id === 'teamMembers') {
       return (resources.teamMembers + 1) * 100;
     }
@@ -39,7 +39,7 @@ interface ItemResourceProps {
 }
 
 const ToolResource = (props: ItemResourceProps) => {
-  const [isAcquired] = createIntervalSignal(false, () => resources[props.id]);
+  const isAcquired = createIntervalAccessor(false, () => resources[props.id]);
 
   return (
     <Label label={props.resource.description} class='font-medium'>

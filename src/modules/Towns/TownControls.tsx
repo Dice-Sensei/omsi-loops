@@ -4,7 +4,7 @@ import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
 import { t } from '../../locales/translations.utils.ts';
 import { townNames } from '../../original/actionList.ts';
 import { vals } from '../../original/saving.ts';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
+import { createIntervalAccessor } from '../../signals/createInterval.ts';
 
 export namespace TownControlsNs {
   type TownIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
@@ -32,7 +32,7 @@ export const ZoneControls = () => {
   const { index, canSelectPrevious, canSelectNext, selectPrevious, selectNext, isHiding, toggleHiding } =
     TownControlsNs;
 
-  const [towns] = createIntervalSignal([], TownControlsNs.towns);
+  const towns = createIntervalAccessor([], TownControlsNs.towns);
 
   return (
     <div class='h-12 relative flex items-center justify-center gap-4 bg-amber-300 border-amber-500 border-b'>

@@ -64,7 +64,6 @@ const setupManaBurn = () => {
       towns[i].restart();
     }
     actions.restart();
-    view.requestUpdate('updateCurrentActionsDivs');
     view.requestUpdate('updateTrials', null);
   };
 };

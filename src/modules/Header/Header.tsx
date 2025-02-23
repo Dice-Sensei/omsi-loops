@@ -9,7 +9,7 @@ import { Popover } from '../../components/containers/Overlay/primitives/Popover.
 import { clamp } from '../../original/helpers.ts';
 import { ButtonIcon } from '../../components/buttons/Button/ButtonIcon.tsx';
 import { Button } from '../../components/buttons/Button/Button.tsx';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
+import { createIntervalAccessor } from '../../signals/createInterval.ts';
 import { Icon } from '../../components/buttons/Button/Icon.tsx';
 import { ResourceList } from '../Statistics/ResourceList.tsx';
 import { isBonusActive, manualRestart, performGamePause } from '../../original/driver.ts';
@@ -18,7 +18,7 @@ import { CheckboxField } from '../../components/forms/CheckboxField.tsx';
 
 const createStoryControls = () => {
   const [index, setIndex] = createSignal(0);
-  const [max] = createIntervalSignal(1, () => vals.storyMax);
+  const max = createIntervalAccessor(1, () => vals.storyMax);
   const next = () => setIndex(Math.min(index() + 1, max()));
   const previous = () => setIndex(Math.max(0, index() - 1));
 
@@ -51,7 +51,7 @@ const StoryOption = () => {
 };
 
 const Controls = (props: { class?: string }) => {
-  const [bonus] = createIntervalSignal({
+  const bonus = createIntervalAccessor({
     seconds: formatTime(vals.totalOfflineMs / 1000),
     isActive: isBonusActive(),
   }, () => ({

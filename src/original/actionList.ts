@@ -164,22 +164,14 @@ export const townNames = [
 export const actionTypes = ['normal', 'progress', 'limited', 'multipart'];
 
 export class Action {
-  varName;
-  _rootPath: string;
+  varName: string!;
+  loops: number!;
+  loopsLeft: number!;
+  exp: Record<string, number>;
 
-  /**
-   * @overload @param {N} name @param {E & ThisType<Action<N>>} extras
-   * @constructor
-   * @param {N} name @param {E} extras
-   */
   constructor(public name: string, extras) {
-    this._rootPath = `actions>${
-      name.startsWith('Assassin') ? 'assassin' : name.startsWith('Survey') ? 'survey' : getXMLName(name)
-    }`;
-
-    // many actions have to override this (in extras) for save compatibility, because the
-    // varName is often used in parts of the game state
     this.varName = withoutSpaces(name);
+    this.exp = {};
     Object.assign(this, extras);
   }
 

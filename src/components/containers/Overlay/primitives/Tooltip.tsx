@@ -8,24 +8,34 @@ import s from './Tooltip.module.css';
 import { autoUpdate } from '@floating-ui/dom';
 
 export interface TooltipProps extends OverlayProps {
+  anchorable?: boolean;
 }
 
-const [useTooltip, TooltipProvider] = createContext(() => {
+const [useTooltip, TooltipProvider] = createContext((props: { anchorable: boolean }) => {
   const [isHover, toggleHover] = createSignal(false);
   const [isFocus, toggleFocus] = createSignal(false);
   const [isAnchored, toggleAnchor] = createSignal(false);
 
   const overlay = selectOverlay();
 
-  return { overlay, isAnchored, toggleAnchor, isHover, toggleHover, isFocus, toggleFocus };
+  return {
+    overlay,
+    isAnchored,
+    toggleAnchor,
+    isHover,
+    toggleHover,
+    isFocus,
+    toggleFocus,
+    anchorable: props.anchorable,
+  };
 });
 
 export const Tooltip = (props: ParentProps<TooltipProps>) => {
-  const $ = mergeProps({ placement: 'bottom' as const }, props);
+  const $ = mergeProps({ placement: 'bottom' as const, anchorable: false }, props);
 
   return (
     <Overlay id={$.id} placement={$.placement}>
-      <TooltipProvider>
+      <TooltipProvider anchorable={$.anchorable}>
         {$.children}
       </TooltipProvider>
     </Overlay>
@@ -98,7 +108,7 @@ const createMouseClick = (fn: (e: MouseEvent) => void) => {
 };
 
 const ProgressCircle = () => {
-  const { overlay, isAnchored, toggleAnchor } = useTooltip();
+  const { overlay, isAnchored, toggleAnchor, anchorable } = useTooltip();
 
   const { attach, detach } = createMouseClick((event: MouseEvent) => {
     event.stopImmediatePropagation();
@@ -113,6 +123,7 @@ const ProgressCircle = () => {
 
   let hoverTimeoutId: number;
   onMount(() => {
+    if (!anchorable) return;
     hoverTimeoutId = setTimeout(enableAnchor, 3000);
   });
 
@@ -128,7 +139,9 @@ const ProgressCircle = () => {
       viewBox='0 0 24 24'
       class={cx(
         'absolute rounded-full top-0.5 right-0.5',
-        isAnchored() ? 'bg-red-500 border-red-600 w-2 h-2' : s.circularProgress + ' border-blue-600 w-3 h-3',
+        anchorable
+          ? (isAnchored() ? 'bg-red-500 border-red-600 w-2 h-2' : s.circularProgress + ' border-blue-600 w-3 h-3')
+          : undefined,
       )}
     >
       <circle class={s.bg} />

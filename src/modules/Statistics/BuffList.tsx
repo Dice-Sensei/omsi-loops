@@ -2,7 +2,7 @@ import { Tooltip } from '../../components/containers/Overlay/primitives/Tooltip.
 import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
 import { et } from '../../locales/translations.utils.ts';
 import { getBuffCap, getBuffLevel } from '../../original/stats.ts';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
+import { createIntervalAccessor } from '../../signals/createInterval.ts';
 const t = et('statistics');
 
 interface BuffLocale {
@@ -11,7 +11,7 @@ interface BuffLocale {
   explaination?: string;
 }
 const IntegerBuff = (props: { id: string; icon: string; locale: BuffLocale }) => {
-  const [values] = createIntervalSignal({
+  const values = createIntervalAccessor({
     level: 0,
     cap: 666,
   }, () => ({

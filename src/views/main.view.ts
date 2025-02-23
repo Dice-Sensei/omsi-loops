@@ -64,16 +64,9 @@ export function formatTime(seconds: number) {
 let curActionShowing;
 let dungeonShowing;
 
-let curActionsDiv;
-let nextActionsDiv;
-
 export class View {
   initalize() {
-    curActionsDiv = document.getElementById('curActionsList');
-    nextActionsDiv = document.getElementById('nextActionsList');
-
     this.updateTime();
-    this.updateCurrentActionsDivs();
     this.updateProgressActions();
     this.updateLockedHidden();
     this.adjustGoldCosts();
@@ -102,7 +95,6 @@ export class View {
     updateStories: [],
     updateGlobalStory: [],
     updateCurrentActionBar: [],
-    updateCurrentActionsDivs: [],
     updateTotalTicks: [],
     updateCurrentActionLoops: [],
     updateActionTooltips: [],
@@ -186,9 +178,9 @@ export class View {
     });
   }
   updateNextActions() {
-    const { scrollTop } = nextActionsDiv; // save the current scroll position
+    const { scrollTop } = document.getElementById('nextActionsList'); // save the current scroll position
 
-    d3.select(nextActionsDiv)
+    d3.select(document.getElementById('nextActionsList'))
       .selectAll('.nextActionContainer')
       .data(
         actions.next.map((a, index) => ({
@@ -331,52 +323,19 @@ export class View {
           .text((action) => action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops))
       );
 
-    nextActionsDiv.scrollTop = Math.max(nextActionsDiv.scrollTop, scrollTop);
-  }
-
-  updateCurrentActionsDivs() {
-    let totalDivText = '';
-
-    // definite leak - need to remove listeners and images
-    for (let i = 0; i < actions.current.length; i++) {
-      const action = actions.current[i];
-      const actionLoops = action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops);
-      const actionLoopsDone = (action.loops - action.loopsLeft) > 99999
-        ? toSuffix(action.loops - action.loopsLeft)
-        : formatNumber(action.loops - action.loopsLeft);
-      const imageName = action.name.startsWith('Assassin') ? 'assassin' : camelize(action.name);
-      totalDivText += `<div id='action${i}Container' class='curActionContainer small'>
-                    <div class='curActionBar' id='action${i}Bar'></div>
-                    <div class='actionSelectedIndicator' id='action${i}Selected'></div>
-                    <img src='icons/${imageName}.svg' class='smallIcon'>
-                    <div id='action${i}LoopsDone' style='margin-left:3px; border-left: 1px solid var(--action-separator-border);padding-left: 3px;'>${actionLoopsDone}</div>
-                    /<div id='action${i}Loops'>${actionLoops}</div>
-                </div>`;
-    }
-
-    curActionsDiv.innerHTML = totalDivText;
-
-    this.mouseoverAction(0, false);
+    document.getElementById('nextActionsList').scrollTop = Math.max(
+      document.getElementById('nextActionsList').scrollTop,
+      scrollTop,
+    );
   }
 
   updateCurrentActionBar(index) {
-    const div = document.getElementById(`action${index}Bar`);
-    if (!div) {
-      return;
-    }
     const action = actions.current[index];
-    if (!action) {
-      return;
-    }
+    if (!action) return;
+
     if (action.errorMessage) {
-      document.getElementById(`action${index}Failed`).textContent = `${action.loopsLeft}`;
-      document.getElementById(`action${index}Error`).textContent = action.errorMessage;
-      document.getElementById(`action${index}HasFailed`).style.display = '';
-      div.style.width = '100%';
-      div.style.backgroundColor = 'var(--cur-action-error-indicator)';
-      div.style.height = '30%';
-      div.style.marginTop = '5px';
       if (action.name === 'Heal The Sick') setStoryFlag('failedHeal');
+
       if (
         action.name === 'Brew Potions' && resources.reputation >= 0 &&
         resources.herbs >= 10
@@ -401,63 +360,6 @@ export class View {
       if (action.name === 'Imbue Body') setStoryFlag('failedImbueBody');
       if (action.name === 'Accept Donations') setStoryFlag('failedReceivedDonations');
       if (action.name === 'Raise Zombie') setStoryFlag('failedRaiseZombie');
-    } else if (action.loopsLeft === 0) {
-      div.style.width = '100%';
-      div.style.backgroundColor = 'var(--cur-action-completed-background)';
-    } else {
-      div.style.width = `${100 * action.ticks / action.adjustedTicks}%`;
-    }
-
-    // only update tooltip if it's open
-    if (curActionShowing === index) {
-      document.getElementById(`action${index}ManaOrig`).textContent = intToString(
-        action.manaCost() * action.loops,
-        vals.options.fractionalMana ? 3 : 1,
-      );
-      document.getElementById(`action${index}ManaUsed`).textContent = intToString(
-        action.manaUsed,
-        vals.options.fractionalMana ? 3 : 1,
-      );
-      document.getElementById(`action${index}LastMana`).textContent = intToString(
-        action.lastMana,
-        3,
-      );
-      document.getElementById(`action${index}Remaining`).textContent = intToString(
-        action.manaRemaining,
-        vals.options.fractionalMana ? 3 : 1,
-      );
-      document.getElementById(`action${index}GoldRemaining`).textContent = formatNumber(
-        action.goldRemaining,
-      );
-      document.getElementById(`action${index}TimeSpent`).textContent = formatTime(action.timeSpent);
-      document.getElementById(`action${index}TotalTimeElapsed`).textContent = formatTime(action.effectiveTimeElapsed);
-
-      let statExpGain = '';
-      const expGainDiv = document.getElementById(`action${index}ExpGain`);
-      while (expGainDiv.firstChild) {
-        expGainDiv.removeChild(expGainDiv.firstChild);
-      }
-
-      const nameStatMap = {
-        Spd: 'speed',
-        Con: 'constitution',
-        Per: 'perception',
-        Cha: 'charisma',
-        Luck: 'luck',
-        Int: 'intelligence',
-        Soul: 'soul',
-        Str: 'strength',
-        Dex: 'dexterity',
-      } as const;
-
-      for (const stat of statList) {
-        if (action[`statExp${stat}`]) {
-          statExpGain += `<div class='bold'>${t(`statistics.attributes.${nameStatMap[stat]}.abbreviation`)}:</div> ${
-            intToString(action[`statExp${stat}`], 2)
-          }`;
-        }
-      }
-      expGainDiv.innerHTML = statExpGain;
     }
   }
 
@@ -845,18 +747,6 @@ export function addStatColors(theDiv, stat, forceColors = false) {
   theDiv.classList.add(`stat-${stat}`, 'stat-background');
   if (forceColors) {
     theDiv.classList.add('use-stat-colors');
-  }
-}
-
-export function dragExitUndecorate(i) {
-  if (document.getElementById(`nextActionContainer${i}`)) {
-    document.getElementById(`nextActionContainer${i}`).classList.remove('draggedOverAction');
-  }
-}
-
-export function draggedDecorate(i) {
-  if (document.getElementById(`nextActionContainer${i}`)) {
-    document.getElementById(`nextActionContainer${i}`).classList.add('draggedAction');
   }
 }
 

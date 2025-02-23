@@ -3,7 +3,7 @@ import { Tooltip } from '../../components/containers/Overlay/primitives/Tooltip.
 import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
 import { et } from '../../locales/translations.utils.ts';
 import { getPrcToNextSkillLevel, getSelfCombat, getSkillLevel, getTeamCombat } from '../../original/stats.ts';
-import { createIntervalSignal } from '../../signals/createInterval.ts';
+import { createIntervalAccessor } from '../../signals/createInterval.ts';
 import { skills } from '../../original/globals.ts';
 
 const t = et('statistics');
@@ -13,7 +13,7 @@ interface IntegerSkillLocale {
 }
 
 const IntegerSkill = (props: { value: Accessor<number>; locale: IntegerSkillLocale }) => {
-  const [values] = createIntervalSignal(0, props.value);
+  const values = createIntervalAccessor(0, props.value);
 
   return (
     <Tooltip>
@@ -40,7 +40,7 @@ const DecimalSkill = (
     locale: DecimalSkillLocale;
   },
 ) => {
-  const [values] = createIntervalSignal({
+  const values = createIntervalAccessor({
     level: 0,
     exp: 0,
     expNeeded: 0,
