@@ -1,4 +1,4 @@
-export const TownInfos = () => {
+export const ZoneStatistics = () => {
   return (
     <div id='townInfos'>
       <div id='townInfo0' class='townInfo'>

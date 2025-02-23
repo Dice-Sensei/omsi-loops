@@ -255,7 +255,7 @@ const ActionCard = (props: ActionCardProps) => {
   );
 };
 
-export const TownOptions = () => {
+export const ZoneOptionsSelects = () => {
   createEffect(() => {
     for (const action of towns.flatMap((t) => t.totalActionList)) {
       const container = document.getElementById(`container${action.varName}`) as HTMLButtonElement;

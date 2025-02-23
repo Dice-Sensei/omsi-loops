@@ -28,7 +28,7 @@ export namespace TownControlsNs {
     setIndex(index() + 1 as TownIndex);
   };
 }
-export const TownControls = () => {
+export const ZoneControls = () => {
   const { index, canSelectPrevious, canSelectNext, selectPrevious, selectNext, isHiding, toggleHiding } =
     TownControlsNs;
 

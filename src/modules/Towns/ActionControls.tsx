@@ -15,7 +15,7 @@ export namespace ActionControlsNs {
   export const toggleOptions = () => setShowMode(isOptions() ? Mode.Stories : Mode.Options);
   export const toggleStories = () => setShowMode(isStories() ? Mode.Options : Mode.Stories);
 }
-export const ActionControls = () => {
+export const ZoneOptionControls = () => {
   const { isOptions, isStories, toggleOptions, toggleStories } = ActionControlsNs;
 
   return (
