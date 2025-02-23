@@ -145,7 +145,7 @@ class ActionLogEntry {
     if (key === 'loopStart') return formatNumber(this.loop);
     if (key === 'loopEnd') return formatNumber(this.loop);
     if (key === 'town') return townNames[this.action?.townNum];
-    if (key === 'action') return '{{ACTION LABEL!!!!}}';
+    if (key === 'action') return '{ACTION NAME}';
     if (key === 'header') return 'Loop {loop}, {action} in {town}';
     throw new Error(`Bad key ${key}`);
   }
@@ -156,7 +156,6 @@ class ActionLogEntry {
 }
 
 class UniqueLogEntry extends ActionLogEntry {
-  /** @type {string} */
   get key() {
     return `${this.type}:${this.actionName}`;
   }

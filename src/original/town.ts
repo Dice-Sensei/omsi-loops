@@ -4,41 +4,6 @@ import { isTravel, lateGameActions } from './actionList.ts';
 import { view } from '../views/main.view.ts';
 import { vals } from './saving.ts';
 
-'use strict';
-/**
- * @template {string} [VN=never]
- * @template {string} [PVN=never]
- * @template {string} [MVN=never]
- * @typedef {{
- *  [K in
- *  `checked${VN}`
- * |`goodTemp${VN}`
- * |`good${VN}`
- * |`lootFrom${VN}`
- * |`total${VN}`
- * |`exp${PVN}`
- * |`total${MVN}`
- * |`${MVN}`
- * |`${MVN}LoopCounter`
- *      ]?: number
- * }} TownVarDefs
- */
-/**
- * @template {number} TN
- * @typedef {TownVarDefs<
- *          ActionVarOfTownAndType<TN,"limited">,
- *          ActionVarOfTownAndType<TN,"progress">,
- *          ActionVarOfTownAndType<TN,"multipart">
- *          >} TownVars
- */
-/**
- * @template {number} TN
- * @typedef {keyof TownVars<TN>} TownVarNames
- */
-
-/**
- * @template {number} TN Town number
- */
 export class Town<TN extends number> {
   index: TN;
   allVarNames: string[] = [];
@@ -73,7 +38,6 @@ export class Town<TN extends number> {
   }
 
   finishProgress(varName, expGain) {
-    // return if capped, for performance
     if (this[`exp${varName}`] === 505000) {
       if (vals.options.pauseOnComplete) {
         performGamePause(true, 'Progress complete! (Game paused)');
@@ -113,7 +77,6 @@ export class Town<TN extends number> {
   }
 
   finishRegular(varName, rewardRatio, rewardFunc) {
-    // error state, negative numbers.
     if (this[`total${varName}`] - this[`checked${varName}`] < 0) {
       this[`checked${varName}`] = this[`total${varName}`];
       this[`good${varName}`] = Math.floor(this[`total${varName}`] / rewardRatio);
@@ -121,9 +84,6 @@ export class Town<TN extends number> {
       console.log('Error state fixed');
     }
 
-    // only checks unchecked items
-    // IF there are unchecked items
-    // AND the user has not disabled checking unchecked items OR there are no checked items left
     const searchToggler = document.getElementById(`searchToggler${varName}`, false, false);
     if (
       this[`total${varName}`] - this[`checked${varName}`] > 0 &&
@@ -197,7 +157,6 @@ export class Town<TN extends number> {
           }
         }
         if (!inLateGameActions && lateGameActionCount > 0 && isTravel(action.name)) {
-          // shift late-game actions to end of action button list
           this.totalActionList.push(...this.totalActionList.splice(0, lateGameActionCount));
           lateGameActionCount = 0;
         }

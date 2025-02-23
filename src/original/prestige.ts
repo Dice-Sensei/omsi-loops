@@ -144,9 +144,9 @@ export function prestigeConfirmation() {
 }
 
 export function getPrestigeCost(prestigeSelected: PrestigeBuffName) {
-  var currentCost = 30;
+  let currentCost = 30;
 
-  for (var i = 0; i < getBuffLevel(prestigeSelected); i++) {
+  for (let i = 0; i < getBuffLevel(prestigeSelected); i++) {
     currentCost += 10 + (5 * i);
   }
 
@@ -206,26 +206,4 @@ export function adjustContentFromPrestige() {
 
 export function adjustGoldCostFromPrestige() {
   return prestigeBonus('PrestigeBartering');
-}
-
-const _prestige = {
-  completedCurrentGame,
-  prestigeUpgrade,
-  resetAllPrestiges,
-  prestigeWithNewValues,
-  prestigeConfirmation,
-  getPrestigeCost,
-  getPrestigeCurrentBonus,
-  adjustContentFromPrestige,
-  adjustGoldCostFromPrestige,
-  prestigeBonus,
-  prestigeCache,
-  prestigeBases,
-  prestigeValues,
-} as const;
-
-globalThis.prestige = _prestige;
-
-declare global {
-  var prestige: typeof _prestige;
 }
