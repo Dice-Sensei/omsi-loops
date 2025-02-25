@@ -191,7 +191,6 @@ export class Actions {
       curAction.goldRemaining = resources.gold;
 
       this.adjustTicksNeeded();
-      view.requestUpdate('updateCurrentActionLoops', this.currentPos);
     }
     view.requestUpdate('updateCurrentActionBar', this.currentPos);
     if (curAction.loopsLeft === 0) {
@@ -333,7 +332,6 @@ export class Actions {
     }
     this.adjustTicksNeeded();
     view.requestUpdate('updateMultiPartActions');
-    view.requestUpdate('updateNextActions');
     view.requestUpdate('updateTime');
     view.requestUpdate('updateActionTooltips');
   }

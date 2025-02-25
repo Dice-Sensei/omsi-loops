@@ -59,7 +59,6 @@ const manageActionList = (inputRef: Reference<HTMLTextAreaElement>) => {
     if (!records) return;
 
     actions.fromRecords(records);
-    view.updateNextActions();
   };
 
   return {

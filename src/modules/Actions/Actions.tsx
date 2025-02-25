@@ -4,7 +4,15 @@ import { Tooltip } from '../../components/containers/Overlay/primitives/Tooltip.
 import { NumberField } from '../../components/forms/NumberField.tsx';
 import { t } from '../../locales/translations.utils.ts';
 import { actions } from '../../original/actions.ts';
-import { capAllTraining, clearList, loadList, nameList, saveList, selectLoadout } from '../../original/driver.ts';
+import {
+  capAllTraining,
+  clearList,
+  disableAction,
+  loadList,
+  nameList,
+  saveList,
+  selectLoadout,
+} from '../../original/driver.ts';
 import { formatNumber } from '../../original/helpers.ts';
 import { setOption } from '../../original/saving.ts';
 import { createIntervalAccessor } from '../../signals/createInterval.ts';
@@ -14,11 +22,13 @@ import { KeyboardKey } from '../hotkeys/KeyboardKey.ts';
 import { driverVals } from '../../original/driver.ts';
 import { Label } from '../../components/containers/Overlay/uses/Label.tsx';
 import { CheckboxField } from '../../components/forms/CheckboxField.tsx';
-import { Show } from 'solid-js';
+import { createEffect, Show } from 'solid-js';
 import cx from 'clsx';
 import { TextField } from '../../components/forms/TextField.tsx';
 import { createMemo, createSignal } from 'solid-js';
 import { For } from '../../components/flow/For/For.tsx';
+import { Action, getActionPrototype } from '../../original/actionList.ts';
+import { ButtonIcon } from '../../components/buttons/Button/ButtonIcon.tsx';
 
 const ActionsOptions = () => {
   return (
@@ -110,11 +120,97 @@ const ActionsTitle = () => (
   </Label>
 );
 
-const ActionsNextList = (props: { class?: string }) => {
-  return <div id='nextActionsList' class={props.class}></div>;
+const iconProps = { class: 'w-4 h-4' };
+const ActionListItem = (props: { action: any }) => {
+  const values = createIntervalAccessor({
+    isProgress: false,
+    isFailed: false,
+    isDone: false,
+    percentage: 0,
+    status: 'failed',
+  }, () => {
+    const isFailed = !!props.action.action.errorMessage;
+    const isDone = !isFailed && props.action.action.loopsLeft === 0;
+    const isProgress = !isFailed && !isDone;
+
+    const status = isFailed ? 'failed' : isDone ? 'done' : 'progress';
+    const percentage = isProgress ? props.action.action.ticks / props.action.action.adjustedTicks * 100 : 100;
+
+    return { status, isFailed, isDone, isProgress, percentage };
+  });
+
+  return (
+    <Tooltip>
+      <Tooltip.Trigger class='text-sm'>
+        <div class='relative w-full flex justify-between'>
+          <div
+            class={cx(
+              'absolute inset-0',
+              values().status === 'failed' && 'bg-red-500/50',
+              values().status === 'done' && 'bg-blue-500/50',
+              values().status === 'progress' && 'bg-emerald-300/50',
+            )}
+            style={{ width: `${values().percentage}%` }}
+          />
+          <div class='flex gap-1 items-center'>
+            <img src={`icons/${props.action.action.imageName}.svg`} class='w-5 h-5' />
+            <div class='flex gap-0.5 items-center'>
+              <Icon name='close' class='w-3 h-3' />
+              <span>{props.action.loops}</span>
+            </div>
+          </div>
+          <div class='flex gap-0.5'>
+            <Show when={true}>
+              <ButtonIcon onClick={() => {}} name='circle' icon={iconProps} />
+            </Show>
+            <Show when={true}>
+              <ButtonIcon onClick={() => {}} name='plus' icon={iconProps} />
+            </Show>
+            <Show when={true}>
+              <ButtonIcon onClick={() => {}} name='minus' icon={iconProps} />
+            </Show>
+            <Show when={true}>
+              <ButtonIcon onClick={() => {}} name='split' icon={iconProps} />
+            </Show>
+            <Show when={true}>
+              <ButtonIcon onClick={() => {}} name='chevronUp' icon={iconProps} />
+            </Show>
+            <Show when={true}>
+              <ButtonIcon onClick={() => {}} name='chevronDown' icon={iconProps} />
+            </Show>
+            <Show when={!props.action.disabled}>
+              <ButtonIcon onClick={() => {}} name='circleClose' icon={iconProps} />
+            </Show>
+            <Show when={props.action.disabled}>
+              <ButtonIcon onClick={() => {}} name='circleCheck' icon={iconProps} />
+            </Show>
+            <ButtonIcon onClick={() => {}} name='close' icon={iconProps} />
+          </div>
+        </div>
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        <div class='font-bold'>
+          {props.action.name}
+        </div>
+      </Tooltip.Content>
+    </Tooltip>
+  );
 };
 
-const ActionsCurrentList = (props: { class?: string }) => {
+const ActionsNextList = (props: { class?: string }) => {
+  const values = createIntervalAccessor(
+    [],
+    () => actions.next.map((a) => ({ ...a, actionId: a.actionId, action: getActionPrototype(a.name) })),
+  );
+
+  return (
+    <For each={values()} as='div' class='flex flex-col divide-y divide-emerald-800 w-full'>
+      {(item) => <ActionListItem action={item} />}
+    </For>
+  );
+};
+
+const ActionsCurrentList = () => {
   const [hoveredIndex, setHoveredIndex] = createSignal<number | null>(null);
   const list = createIntervalAccessor([], () => actions.current);
 

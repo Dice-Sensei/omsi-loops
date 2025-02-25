@@ -1,37 +1,17 @@
 import {
   Action,
   actionsWithGoldCost,
-  actionTypes,
-  getActionPrototype,
   getExploreExpSinceLastProgress,
   getExploreExpToNextProgress,
   getExploreProgress,
   getExploreSkill,
-  getPossibleTravel,
-  hasLimit,
-  isTraining,
   translateClassNames,
 } from '../original/actionList.ts';
 import { vals } from '../original/saving.ts';
-import * as d3 from 'd3';
-import { prestigeValues } from '../original/prestige.ts';
-import { camelize, formatNumber, intToString, intToStringRound, toSuffix } from '../original/helpers.ts';
-import { getNumOnList } from '../original/actions.ts';
+import { formatNumber, intToString, intToStringRound } from '../original/helpers.ts';
 import { actions } from '../original/actions.ts';
-import { actionLog, resources, statList, stats, towns } from '../original/globals.ts';
-import {
-  addLoop,
-  adjustAll,
-  capAction,
-  collapse,
-  disableAction,
-  moveDown,
-  moveUp,
-  removeAction,
-  removeLoop,
-  showNotification,
-  split,
-} from '../original/driver.ts';
+import { actionLog, resources, towns } from '../original/globals.ts';
+import { adjustAll, showNotification } from '../original/driver.ts';
 import { t } from '../locales/translations.utils.ts';
 
 export function formatTime(seconds: number) {
@@ -61,21 +41,18 @@ export function formatTime(seconds: number) {
   return (seconds.toFixed(1) + 's').replace(/\B(?=(\d{3})+(?!\d))/gu, ',');
 }
 
-let curActionShowing;
 let dungeonShowing;
 
 export class View {
   initalize() {
     this.updateTime();
     this.updateProgressActions();
-    this.updateLockedHidden();
     this.adjustGoldCosts();
     this.adjustExpGains();
     this.updateTrials();
 
     setInterval(() => {
       view.updateStories();
-      view.updateLockedHidden();
     }, 2000);
 
     adjustAll();
@@ -90,15 +67,11 @@ export class View {
     updateMultiPartSegments: [],
     updateMultiPart: [],
     updateMultiPartActions: [],
-    updateNextActions: [],
     updateTime: [],
     updateStories: [],
-    updateGlobalStory: [],
     updateCurrentActionBar: [],
     updateTotalTicks: [],
-    updateCurrentActionLoops: [],
     updateActionTooltips: [],
-    updateLockedHidden: [],
     adjustManaCost: [],
     adjustGoldCost: [],
     adjustGoldCosts: [],
@@ -177,157 +150,6 @@ export class View {
       inline: 'nearest',
     });
   }
-  updateNextActions() {
-    const { scrollTop } = document.getElementById('nextActionsList'); // save the current scroll position
-
-    d3.select(document.getElementById('nextActionsList'))
-      .selectAll('.nextActionContainer')
-      .data(
-        actions.next.map((a, index) => ({
-          ...a,
-          actionId: a.actionId,
-          index,
-          action: getActionPrototype(a.name),
-        })),
-        (a) => a.actionId,
-      )
-      .join((enter) => {
-        enter.append(({ actionId: id }) => {
-          const actions = {
-            cap: capAction.bind(null, id),
-            plus: addLoop.bind(null, id),
-            minus: removeLoop.bind(null, id),
-            split: split.bind(null, id),
-            compress: collapse.bind(null, id),
-            up: moveUp.bind(null, id),
-            down: moveDown.bind(null, id),
-            skip: disableAction.bind(null, id),
-            remove: removeAction.bind(null, id),
-          };
-
-          const container = document.createElement('div');
-          container.id = `nextActionContainer${id}`;
-          container.classList.add('nextActionContainer', 'small', 'showthat');
-
-          container.draggable = true;
-          container.dataset.actionId = id;
-
-          const counter = document.createElement('div');
-          counter.classList.add('nextActionLoops');
-          counter.innerHTML = `
-            <img class='smallIcon imageDragFix'> 
-            ×
-            <div class='bold'></div>
-          `;
-
-          container.append(counter);
-
-          const buttons = document.createElement('div');
-          buttons.classList.add('nextActionButtons');
-          const capButton = document.createElement('button');
-          capButton.classList.add('capButton', 'actionIcon', 'far', 'fa-circle');
-          capButton.onclick = actions.cap;
-          buttons.append(capButton);
-
-          const plusButton = document.createElement('button');
-          plusButton.classList.add('plusButton', 'actionIcon', 'fas', 'fa-plus');
-          plusButton.onclick = actions.plus;
-          buttons.append(plusButton);
-
-          const minusButton = document.createElement('button');
-          minusButton.classList.add('minusButton', 'actionIcon', 'fas', 'fa-minus');
-          minusButton.onclick = actions.minus;
-          buttons.append(minusButton);
-
-          const splitButton = document.createElement('button');
-          splitButton.classList.add('splitButton', 'actionIcon', 'fas', 'fa-arrows-alt-h');
-          splitButton.onclick = actions.split;
-          buttons.append(splitButton);
-
-          const compressButton = document.createElement('button');
-          compressButton.classList.add('collapseButton', 'actionIcon', 'fas', 'fa-compress-alt');
-          compressButton.onclick = actions.compress;
-          buttons.append(compressButton);
-
-          const upButton = document.createElement('button');
-          upButton.classList.add('upButton', 'actionIcon', 'fas', 'fa-sort-up');
-          upButton.onclick = actions.up;
-          buttons.append(upButton);
-
-          const downButton = document.createElement('button');
-          downButton.classList.add('downButton', 'actionIcon', 'fas', 'fa-sort-down');
-          downButton.onclick = actions.down;
-          buttons.append(downButton);
-
-          const skipButton = document.createElement('button');
-          skipButton.classList.add('skipButton', 'actionIcon', 'far', 'fa-times-circle');
-          skipButton.onclick = actions.skip;
-          buttons.append(skipButton);
-
-          const removeButton = document.createElement('button');
-          removeButton.classList.add('removeButton', 'actionIcon', 'fas', 'fa-times');
-          removeButton.onclick = actions.remove;
-          buttons.append(removeButton);
-
-          container.append(buttons);
-
-          return container;
-        });
-      })
-      .property('data-index', (_a, i) => i)
-      .call((container) => {
-        for (const { index } of towns) {
-          container.classed(`zone-${index + 1}`, (a) => a.action.townNum === index);
-        }
-        for (const type of actionTypes) {
-          container.classed(`action-type-${type}`, (a) => a.action.type === type);
-        }
-      })
-      .classed('action-has-limit', (a) => hasLimit(a.name))
-      .classed('action-is-training', (a) => isTraining(a.name))
-      .classed('action-is-singular', (a) => a.action.allowed?.() === 1)
-      .classed('action-is-travel', (a) => getPossibleTravel(a.name).length > 0)
-      .classed('action-disabled', (a) => !actions.isValidAndEnabled(a))
-      .classed('user-disabled', (a) => !!a.disabled)
-      .classed('user-collapsed', (a) => !!a.collapsed)
-      .classed('zone-collapsed', (a) => actions.zoneSpanAtIndex(a.index).isCollapsed)
-      .classed('action-is-collapsing-zone', (a) => {
-        const zoneSpan = actions.zoneSpanAtIndex(a.index);
-        return zoneSpan.end === a.index && zoneSpan.isCollapsed;
-      })
-      .style('background', ({ action }) => {
-        const { townNum } = action;
-        const travelNums = getPossibleTravel(action.name);
-        let color = this.zoneTints[townNum];
-        if (travelNums.length === 1) {
-          color = `linear-gradient(${color} 49%, ${this.zoneTints[townNum + travelNums[0]]} 51%)`;
-        } else if (travelNums.length > 1) {
-          color = `conic-gradient(${color} 100grad, ${
-            travelNums.map((travelNum, i) =>
-              `${this.zoneTints[townNum + travelNum]} ${i * 200 / travelNums.length + 100}grad ${
-                (i + 1) * 200 / travelNums.length + 100
-              }grad`
-            ).join(', ')
-          }, ${color} 300grad)`;
-        }
-        return color;
-      })
-      .call((container) =>
-        container
-          .select('div.nextActionLoops > img')
-          .property('src', (a) => `icons/${a.action.imageName}.svg`)
-      )
-      .call((container) =>
-        container
-          .select('div.nextActionLoops > div.bold')
-          .text((action) => action.loops > 99999 ? toSuffix(action.loops) : formatNumber(action.loops))
-      );
-
-    document.getElementById('nextActionsList').scrollTop = Math.max(
-      document.getElementById('nextActionsList').scrollTop,
-      scrollTop,
-    );
-  }
 
   updateCurrentActionBar(index) {
     const action = actions.current[index];
@@ -363,17 +185,6 @@ export class View {
     }
   }
 
-  recordScrollPosition() {
-    const { scrollTop, scrollHeight, clientHeight } = this;
-    this.lastScroll = { scrollTop, scrollHeight, clientHeight };
-  }
-
-  mouseoverAction(index, isShowing) {
-  }
-
-  updateCurrentActionLoops(index) {
-  }
-
   updateProgressAction(
     { name: varName, town },
     level = town.getLevel(varName),
@@ -405,72 +216,6 @@ export class View {
         this.updateProgressAction({ name: varName, town: town });
       }
     }
-  }
-
-  updateLockedHidden() {
-    for (const action of vals.totalActionList) {
-      const actionDiv = document.getElementById(`container${action.varName}`);
-      const infoDiv = document.getElementById(`infoContainer${action.varName}`);
-      const storyDiv = document.getElementById(`storyContainer${action.varName}`);
-
-      if (action.allowed && getNumOnList(action.name) >= action.allowed()) {
-        // actionDiv.classList.add('capped');
-      } else if (action.unlocked()) {
-        if (infoDiv) {
-          infoDiv.classList.remove('hidden');
-
-          if (action.varName.startsWith('Survey')) {
-            document.getElementById(`infoContainer${action.varName}Global`).classList.remove('hidden');
-          }
-        }
-        // actionDiv.classList.remove('locked');
-        // actionDiv.classList.remove('capped');
-      } else {
-        // actionDiv.classList.add('locked');
-        if (infoDiv) {
-          infoDiv.classList.add('hidden');
-
-          if (action.varName.startsWith('Survey')) {
-            document.getElementById(`infoContainer${action.varName}Global`).classList.add('hidden');
-          }
-        }
-      }
-      if (action.unlocked() && infoDiv) {
-        infoDiv.classList.remove('hidden');
-      }
-      if (action.visible()) {
-        // actionDiv.classList.remove('hidden');
-        if (storyDiv !== null) storyDiv.classList.remove('hidden');
-      } else {
-        // actionDiv.classList.add('hidden');
-        if (storyDiv !== null) storyDiv.classList.add('hidden');
-      }
-      if (storyDiv !== null) {
-        if (action.unlocked()) {
-          storyDiv.classList.remove('hidden');
-        } else {
-          storyDiv.classList.add('hidden');
-        }
-      }
-    }
-    if (
-      vals.totalActionList.filter((action) => action.finish.toString().includes('handleSkillExp'))
-        .filter((action) => action.unlocked()).length > 0
-    ) {
-    } else {
-    }
-    if (
-      vals.totalActionList.filter((action) => action.finish.toString().includes('updateBuff')).filter(
-          (action) => action.unlocked(),
-        ).length > 0 ||
-      prestigeValues['completedAnyPrestige']
-    ) {
-    } else {
-    }
-  }
-
-  updateGlobalStory(num) {
-    actionLog.addGlobalStory(num);
   }
 
   updateStories(init: boolean = false) {
@@ -597,8 +342,8 @@ export class View {
   updateMultiPartSegments(action) {
     let segment = 0;
     let curProgress = towns[action.townNum][action.varName];
-    // update previous segments
     let loopCost = action.loopCost(segment);
+
     while (curProgress >= loopCost && segment < action.segments) {
       document.getElementById(`expBar${segment}${action.varName}`).style.width = '0px';
       const roundedLoopCost = intToStringRound(loopCost);
@@ -612,7 +357,6 @@ export class View {
       loopCost = action.loopCost(segment);
     }
 
-    // update current segments
     if (document.getElementById(`progress${segment}${action.varName}`)) {
       document.getElementById(`expBar${segment}${action.varName}`).style.width = `${
         100 - 100 * curProgress / loopCost
@@ -623,7 +367,6 @@ export class View {
       document.getElementById(`progressNeeded${segment}${action.varName}`).textContent = intToStringRound(loopCost);
     }
 
-    // update later segments
     for (let i = segment + 1; i < action.segments; i++) {
       document.getElementById(`expBar${i}${action.varName}`).style.width = '100%';
       if (document.getElementById(`progress${i}${action.varName}`).textContent !== '0') {
@@ -708,7 +451,6 @@ export class View {
         `statistics.attributes.${stat}.abbreviation`,
       );
 
-      addStatColors(expBar, mainStat, true);
       document.getElementById(`segmentName${i}${action.varName}`).textContent = action.getSegmentName(
         town[`${action.varName}LoopCounter`] + i,
       );
@@ -720,7 +462,7 @@ export function unlockGlobalStory(num) {
   if (num > vals.storyMax) {
     document.getElementById('newStory').style.display = 'inline-block';
     vals.storyMax = num;
-    view.requestUpdate('updateGlobalStory', num);
+    actionLog.addGlobalStory(num);
   }
 }
 
@@ -735,18 +477,6 @@ export function increaseStoryVarTo(name, value) {
   if (storyFlags[name] < value) {
     storyFlags[name] = value;
     if (vals.options.actionLog) view.requestUpdate('updateStories', false);
-  }
-}
-
-export function addStatColors(theDiv, stat, forceColors = false) {
-  for (const className of Array.from(theDiv.classList)) {
-    if (className.startsWith('stat-') && className.slice(5) in stats) {
-      theDiv.classList.remove(className);
-    }
-  }
-  theDiv.classList.add(`stat-${stat}`, 'stat-background');
-  if (forceColors) {
-    theDiv.classList.add('use-stat-colors');
   }
 }
 

@@ -243,9 +243,6 @@ const optionValueHandlers = {
     }
   },
   repeatLastAction() {
-    if (vals.options.predictor) {
-      view.requestUpdate('updateNextActions');
-    }
   },
   predictorActionWidth(value) {
     document.documentElement.style.setProperty('--predictor-actions-width', `${value}px`);
@@ -267,9 +264,6 @@ const optionValueHandlers = {
     }
   },
   predictorTrackedStat(value, init) {
-    if (!init) {
-      view.requestUpdate('updateNextActions');
-    }
   },
   predictorBackgroundThread(value, init) {
   },
@@ -795,7 +789,6 @@ export function doLoad(toLoad) {
 
   Data.recordBase();
 
-  view.updateNextActions();
   view.updateMultiPartActions();
   view.updateStories(true);
   view.update();

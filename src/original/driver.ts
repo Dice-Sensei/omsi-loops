@@ -275,9 +275,6 @@ export function stopGame() {
   if (needsDataSnapshots()) {
     Data.updateSnapshot('stop', 'base');
   }
-  if (vals.options.predictor) {
-    view.requestUpdate('updateNextActions');
-  }
 }
 
 export function performGamePause(ping?: boolean, message?: string) {
@@ -413,8 +410,6 @@ export function addActionToList(name, townNum, isTravelAction?: boolean, insertA
       }
     }
   }
-  view.updateNextActions();
-  view.updateLockedHidden();
 }
 
 // mana and resources
@@ -531,16 +526,12 @@ export function capAmount(index, townNum) {
     newLoops = 5 + Math.floor(getSkillLevel('Leadership') / 100) - alreadyExisting;
   } else newLoops = towns[townNum][varName] - alreadyExisting;
   actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
-  view.updateNextActions();
-  view.updateLockedHidden();
 }
 export function capTraining(index) {
   const action = actions.next[index];
   const alreadyExisting = getNumOnList(action.name) + (action.disabled ? action.loops : 0);
   const newLoops = vals.trainingLimits - alreadyExisting;
   actions.updateAction(index, { loops: clamp(action.loops + newLoops, 0, null) });
-  view.updateNextActions();
-  view.updateLockedHidden();
 }
 export function capAllTraining() {
   for (const [index, action] of actions.next.entries()) {
@@ -564,26 +555,20 @@ export function addLoop(actionId) {
   actions.updateAction(action.index, {
     loops: clamp(action.loops + addAmount, 0, 1e12),
   });
-  view.updateNextActions();
-  view.updateLockedHidden();
 }
 export function removeLoop(actionId) {
   const action = actions.findActionWithId(actionId);
   actions.updateAction(action.index, {
     loops: clamp(action.loops - actions.addAmount, 0, 1e12),
   });
-  view.updateNextActions();
-  view.updateLockedHidden();
 }
 export function split(actionId) {
   const action = actions.findActionWithId(actionId);
   actions.splitAction(action.index);
-  view.updateNextActions();
 }
 export function collapse(actionId) {
   const action = actions.findActionWithId(actionId);
   actions.updateAction(action.index, { collapsed: !action.collapsed });
-  view.updateNextActions();
 }
 export function showNotification(name) {
   document.getElementById(`${name}Notification`).style.display = 'block';
@@ -599,7 +584,6 @@ export function moveUp(actionId) {
     return;
   }
   actions.moveAction(index, index - 1);
-  view.updateNextActions();
 }
 export function moveDown(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
@@ -607,7 +591,6 @@ export function moveDown(actionId) {
     return;
   }
   actions.moveAction(index, index + 1);
-  view.updateNextActions();
 }
 export function disableAction(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
@@ -620,14 +603,10 @@ export function disableAction(actionId) {
   } else {
     actions.updateAction(index, { disabled: true });
   }
-  view.updateNextActions();
-  view.requestUpdate('updateLockedHidden', null);
 }
 export function removeAction(actionId) {
   const index = actions.findIndexOfActionWithId(actionId);
   actions.removeAction(index);
-  view.updateNextActions();
-  view.requestUpdate('updateLockedHidden', null);
 }
 
 export function borrowTime() {

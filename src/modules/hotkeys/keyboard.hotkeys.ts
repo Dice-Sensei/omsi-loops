@@ -201,8 +201,6 @@ export const createKeyboardHotkeys = () => {
       onDown: {
         fn: () => {
           actions.undoLast();
-          view.updateNextActions();
-          view.updateLockedHidden();
         },
         description: t('shortcuts.undoLastAction'),
       },

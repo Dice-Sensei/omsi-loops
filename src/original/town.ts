@@ -52,7 +52,6 @@ export class Town<TN extends number> {
     }
     const level = this.getLevel(varName);
     if (level !== prevLevel) {
-      view.requestUpdate('updateLockedHidden', null);
       adjustAll();
       for (const action of vals.totalActionList) {
         if (towns[action.townNum].varNames.indexOf(action.varName) !== -1) {
