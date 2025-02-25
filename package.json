@@ -1,15 +1,11 @@
 {
   "dependencies": {
-    "d3": "^7.9.0",
-    "jquery": "^3.7.1",
     "@nimir/a-path": "2.0.2",
     "solid-js": "1.9.4",
     "@floating-ui/dom": "1.6.9",
     "fast-equals": "5.2.2"
   },
   "devDependencies": {
-    "@types/d3": "^7.4.3",
-    "@types/jquery": "^3.5.32",
     "vite": "^6.0.7",
     "typescript": "5.7.3",
     "postcss": "8.5.1",
